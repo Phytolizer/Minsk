@@ -3,7 +3,7 @@ namespace Minsk;
 public class Lexer
 {
     private readonly string _text;
-    private int _position = 0;
+    private int _position;
 
     private char Current => _position >= _text.Length ? '\0' : _text[_position];
 

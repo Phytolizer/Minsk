@@ -5,7 +5,7 @@ namespace Minsk;
 public class Parser
 {
     private readonly ImmutableArray<SyntaxToken> _tokens;
-    private int _position = 0;
+    private int _position;
 
     public Parser(string text)
     {
