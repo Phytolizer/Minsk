@@ -9,14 +9,10 @@ while (true)
         break;
     }
 
-    var lexer = new Lexer(line);
-    for (var token = lexer.NextToken(); token.Kind != SyntaxKind.EndOfFileToken; token = lexer.NextToken())
-    {
-        Console.Write($"{token.Kind}: '{token.Text}'");
-        if (token.Value != null)
-        {
-            Console.Write($" {token.Value}");
-        }
-        Console.WriteLine();
-    }
+    var parser = new Parser(line);
+    var expression = parser.ParseExpression();
+
+    Console.ForegroundColor = ConsoleColor.DarkGray;
+    SyntaxNode.PrettyPrint(expression);
+    Console.ResetColor();
 }
