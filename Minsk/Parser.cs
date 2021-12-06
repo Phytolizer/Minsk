@@ -6,6 +6,8 @@ public class Parser
 {
     private readonly ImmutableArray<SyntaxToken> _tokens;
     private int _position;
+    private readonly List<string> _diagnostics;
+    public IImmutableList<string> Diagnostics => _diagnostics.ToImmutableList();
 
     public Parser(string text)
     {
@@ -26,6 +28,7 @@ public class Parser
         }
 
         _tokens = tokens.ToImmutableArray();
+        _diagnostics = lexer.Diagnostics.ToList();
     }
 
     private SyntaxToken Peek(int offset)
@@ -46,10 +49,21 @@ public class Parser
 
     private SyntaxToken MatchToken(SyntaxKind kind)
     {
-        return Current.Kind == kind ? NextToken() : new SyntaxToken(Current.Position, "", kind);
+        if (Current.Kind == kind)
+        {
+            return NextToken();
+        }
+
+        _diagnostics.Add($"Expected next token to be {kind}, got {Current.Kind} instead.");
+        return new SyntaxToken(Current.Position, "", kind);
     }
 
-    public ExpressionSyntax ParseExpression()
+    public SyntaxTree Parse()
+    {
+        return new SyntaxTree(ParseExpression(), _diagnostics.ToImmutableList());
+    }
+
+    private ExpressionSyntax ParseExpression()
     {
         return ParseBinaryExpression();
     }

@@ -1,11 +1,16 @@
+using System.Collections.Immutable;
+
 namespace Minsk;
 
 public class Lexer
 {
     private readonly string _text;
     private int _position;
+    private readonly List<string> _diagnostics = new();
 
     private char Current => _position >= _text.Length ? '\0' : _text[_position];
+
+    public IImmutableList<string> Diagnostics => _diagnostics.ToImmutableList();
 
     public Lexer(string text)
     {
@@ -75,6 +80,7 @@ public class Lexer
                     break;
                 default:
                     ++_position;
+                    _diagnostics.Add($"Bad character input: '{Current}'.");
                     break;
             }
         }
