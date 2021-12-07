@@ -10,7 +10,7 @@ while (true)
     }
 
     var parser = new Parser(line);
-    var (expression, diagnostics) = parser.Parse();
+    var (expression, _, diagnostics) = parser.Parse();
 
     Console.ForegroundColor = ConsoleColor.DarkRed;
     foreach (var diagnostic in diagnostics)
