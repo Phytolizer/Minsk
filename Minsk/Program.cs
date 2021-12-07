@@ -1,5 +1,7 @@
 ﻿using Minsk;
 
+var showTree = false;
+
 while (true)
 {
     Console.Write("> ");
@@ -9,13 +11,22 @@ while (true)
         break;
     }
 
-    var parser = new Parser(line);
-    var (expression, _, diagnostics) = parser.Parse();
+    switch (line)
+    {
+        case "#showTree":
+            showTree = !showTree;
+            Console.WriteLine(showTree ? "Showing parse tree" : "Not showing parse tree");
+            continue;
+    }
 
+    var (expression, _, diagnostics) = SyntaxTree.Parse(line);
 
-    Console.ForegroundColor = ConsoleColor.DarkGray;
-    SyntaxNode.PrettyPrint(expression);
-    Console.ResetColor();
+    if (showTree)
+    {
+        Console.ForegroundColor = ConsoleColor.DarkGray;
+        SyntaxNode.PrettyPrint(expression);
+        Console.ResetColor();
+    }
 
     if (diagnostics.Any())
     {
