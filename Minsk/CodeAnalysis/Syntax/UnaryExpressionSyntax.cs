@@ -2,10 +2,10 @@ namespace Minsk.CodeAnalysis.Syntax;
 
 public class UnaryExpressionSyntax : ExpressionSyntax
 {
-    public UnaryExpressionSyntax(SyntaxToken operatorToken, ExpressionSyntax right)
+    public UnaryExpressionSyntax(SyntaxToken operatorToken, ExpressionSyntax operand)
     {
         OperatorToken = operatorToken;
-        Right = right;
+        Operand = operand;
     }
 
     public override SyntaxKind Kind => SyntaxKind.UnaryExpression;
@@ -15,10 +15,10 @@ public class UnaryExpressionSyntax : ExpressionSyntax
         get
         {
             yield return OperatorToken;
-            yield return Right;
+            yield return Operand;
         }
     }
 
     public SyntaxToken OperatorToken { get; }
-    public ExpressionSyntax Right { get; }
+    public ExpressionSyntax Operand { get; }
 }

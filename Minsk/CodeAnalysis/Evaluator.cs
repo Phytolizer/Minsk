@@ -30,7 +30,7 @@ public class Evaluator
 
     private static int EvaluateUnaryExpression(UnaryExpressionSyntax root)
     {
-        var operand = EvaluateExpression(root.Right);
+        var operand = EvaluateExpression(root.Operand);
 
         return root.OperatorToken.Kind switch
         {
