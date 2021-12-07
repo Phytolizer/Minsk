@@ -60,7 +60,9 @@ public class Parser
 
     public SyntaxTree Parse()
     {
-        return new SyntaxTree(ParseExpression(), _diagnostics.ToImmutableList());
+        var expression = ParseExpression();
+        var endOfFileToken = MatchToken(SyntaxKind.EndOfFileToken);
+        return new SyntaxTree(expression, endOfFileToken, _diagnostics.ToImmutableList());
     }
 
     private ExpressionSyntax ParseExpression()

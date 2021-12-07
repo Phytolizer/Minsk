@@ -2,4 +2,4 @@ using System.Collections.Immutable;
 
 namespace Minsk;
 
-public record SyntaxTree(ExpressionSyntax Expression, ImmutableList<string> Diagnostics);
+public record SyntaxTree(ExpressionSyntax Expression, SyntaxToken EndOfFileToken, ImmutableList<string> Diagnostics);
