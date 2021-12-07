@@ -20,8 +20,14 @@ public class Evaluator
         {
             SyntaxKind.BinaryExpression => EvaluateBinaryExpression((BinaryExpressionSyntax)root),
             SyntaxKind.LiteralExpression => EvaluateLiteralExpression((LiteralExpressionSyntax)root),
+            SyntaxKind.ParenthesizedExpression => EvaluateParenthesizedExpression((ParenthesizedExpressionSyntax)root),
             _ => throw new InvalidOperationException()
         };
+    }
+
+    private static int EvaluateParenthesizedExpression(ParenthesizedExpressionSyntax root)
+    {
+        return EvaluateExpression(root.Expression);
     }
 
     private static int EvaluateLiteralExpression(LiteralExpressionSyntax root)
