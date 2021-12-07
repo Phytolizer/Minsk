@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace Minsk;
+namespace Minsk.CodeAnalysis.Syntax;
 
 public record SyntaxTree(ExpressionSyntax Expression, SyntaxToken EndOfFileToken, ImmutableList<string> Diagnostics)
 {

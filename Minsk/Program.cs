@@ -1,4 +1,4 @@
-﻿using Minsk;
+﻿using Minsk.CodeAnalysis.Syntax;
 
 var showTree = false;
 
