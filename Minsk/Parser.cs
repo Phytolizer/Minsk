@@ -72,8 +72,22 @@ public class Parser
 
     private ExpressionSyntax ParseBinaryExpression()
     {
-        var left = ParsePrimaryExpression();
+        var left = ParseFactor();
         while (Current.Kind is SyntaxKind.PlusToken or SyntaxKind.MinusToken)
+        {
+            var operatorToken = NextToken();
+            var right = ParseFactor();
+            left = new BinaryExpressionSyntax(left, operatorToken, right);
+        }
+
+        return left;
+    }
+
+    private ExpressionSyntax ParseFactor()
+    {
+        var left = ParsePrimaryExpression();
+
+        while (Current.Kind is SyntaxKind.StarToken or SyntaxKind.SlashToken)
         {
             var operatorToken = NextToken();
             var right = ParsePrimaryExpression();
