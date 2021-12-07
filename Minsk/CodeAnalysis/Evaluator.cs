@@ -1,4 +1,6 @@
-namespace Minsk.CodeAnalysis.Syntax;
+using Minsk.CodeAnalysis.Syntax;
+
+namespace Minsk.CodeAnalysis;
 
 public class Evaluator
 {
