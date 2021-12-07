@@ -79,8 +79,8 @@ public class Lexer
                     kind = SyntaxKind.EndOfFileToken;
                     break;
                 default:
-                    ++_position;
                     _diagnostics.Add($"Bad character input: '{Current}'.");
+                    ++_position;
                     break;
             }
         }
