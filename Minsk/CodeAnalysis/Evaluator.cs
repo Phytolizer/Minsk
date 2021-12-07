@@ -21,8 +21,21 @@ public class Evaluator
         return root.Kind switch
         {
             SyntaxKind.BinaryExpression => EvaluateBinaryExpression((BinaryExpressionSyntax)root),
+            SyntaxKind.UnaryExpression => EvaluateUnaryExpression((UnaryExpressionSyntax)root),
             SyntaxKind.LiteralExpression => EvaluateLiteralExpression((LiteralExpressionSyntax)root),
             SyntaxKind.ParenthesizedExpression => EvaluateParenthesizedExpression((ParenthesizedExpressionSyntax)root),
+            _ => throw new InvalidOperationException()
+        };
+    }
+
+    private static int EvaluateUnaryExpression(UnaryExpressionSyntax root)
+    {
+        var operand = EvaluateExpression(root.Right);
+
+        return root.OperatorToken.Kind switch
+        {
+            SyntaxKind.MinusToken => -operand,
+            SyntaxKind.PlusToken => +operand,
             _ => throw new InvalidOperationException()
         };
     }
