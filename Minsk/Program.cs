@@ -17,6 +17,9 @@ while (true)
             showTree = !showTree;
             Console.WriteLine(showTree ? "Showing parse tree" : "Not showing parse tree");
             continue;
+        case "#cls":
+            Console.Clear();
+            continue;
     }
 
     var (expression, _, diagnostics) = SyntaxTree.Parse(line);
