@@ -16,7 +16,7 @@ public static class SyntaxFacts
     {
         return kind switch
         {
-            SyntaxKind.PlusToken or SyntaxKind.MinusToken => 1,
+            SyntaxKind.PlusToken or SyntaxKind.MinusToken => 3,
             _ => 0
         };
     }
