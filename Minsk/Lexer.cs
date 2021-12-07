@@ -33,7 +33,7 @@ public class Lexer
             kind = SyntaxKind.NumberToken;
             if (!int.TryParse(_text[start.._position], out var intVal))
             {
-                throw new NotImplementedException();
+                _diagnostics.Add($"The value {_text[start.._position]} isn't a valid int!");
             }
 
             value = intVal;
