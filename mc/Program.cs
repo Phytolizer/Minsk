@@ -1,4 +1,6 @@
-﻿namespace mc;
+﻿using Minsk;
+
+namespace mc;
 
 internal static class Program
 {
@@ -13,7 +15,7 @@ internal static class Program
                 break;
             }
 
-            foreach (var token in new Minsk.Lexer(line))
+            foreach (var token in new Lexer(line))
             {
                 Console.WriteLine(token);
             }
