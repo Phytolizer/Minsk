@@ -16,8 +16,8 @@ internal static class Program
             }
 
             var parser = new Parser(line);
-            var expression = parser.Parse();
-            var diagnostics = parser.Diagnostics.ToArray();
+            var syntaxTree = parser.Parse();
+            var diagnostics = syntaxTree.Diagnostics;
             if (diagnostics.Any())
             {
                 foreach (var diagnostic in diagnostics)
@@ -27,7 +27,7 @@ internal static class Program
             }
             else
             {
-                expression.PrettyPrint();
+                syntaxTree.Root.PrettyPrint();
             }
         }
     }

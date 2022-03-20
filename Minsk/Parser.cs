@@ -8,8 +8,6 @@ public class Parser
     private readonly List<string> _diagnostics;
     private int _position;
 
-    public IEnumerable<string> Diagnostics => _diagnostics;
-
     public Parser(string text)
     {
         var lexer = new Lexer(text);
@@ -57,7 +55,12 @@ public class Parser
         return new SyntaxToken(kind, "", Current.Position, null);
     }
 
-    public ExpressionSyntax Parse()
+    public SyntaxTree Parse()
+    {
+        return new SyntaxTree(ParseExpression(), MatchToken(SyntaxKind.EndOfFileToken), _diagnostics.ToArray());
+    }
+
+    public ExpressionSyntax ParseExpression()
     {
         var left = ParsePrimaryExpression();
 
