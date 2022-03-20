@@ -1,3 +1,5 @@
+using Minsk.CodeAnalysis.Binding;
+
 namespace Minsk.CodeAnalysis.Syntax;
 
 public sealed class SyntaxTree
@@ -11,5 +13,11 @@ public sealed class SyntaxTree
         Root = root;
         EndOfFileToken = endOfFileToken;
         Diagnostics = diagnostics;
+    }
+
+    public int Evaluate()
+    {
+        var boundExpression = new Binder().BindExpression(Root);
+        return new Evaluator(boundExpression).Evaluate();
     }
 }

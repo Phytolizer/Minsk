@@ -39,6 +39,7 @@ internal static class Program
                 {
                     Console.WriteLine(diagnostic);
                 }
+
                 Console.ResetColor();
             }
             else
@@ -50,7 +51,7 @@ internal static class Program
                     Console.ResetColor();
                 }
 
-                Console.WriteLine(new Evaluator(syntaxTree.Root).Evaluate());
+                Console.WriteLine(syntaxTree.Evaluate());
             }
         }
     }
