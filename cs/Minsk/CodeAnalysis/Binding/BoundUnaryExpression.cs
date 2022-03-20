@@ -1,8 +1,6 @@
-using Minsk.CodeAnalysis.Syntax;
-
 namespace Minsk.CodeAnalysis.Binding;
 
-internal class BoundUnaryExpression : BoundExpression
+internal sealed class BoundUnaryExpression : BoundExpression
 {
     public BoundUnaryOperator Op { get; }
     public BoundExpression Operand { get; }
