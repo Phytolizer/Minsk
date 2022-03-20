@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace Minsk.CodeAnalysis;
+namespace Minsk.CodeAnalysis.Syntax;
 
 public class Parser
 {

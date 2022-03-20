@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Minsk.CodeAnalysis;
+namespace Minsk.CodeAnalysis.Syntax;
 
 public class SyntaxToken : SyntaxNode
 {
