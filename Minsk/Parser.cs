@@ -5,7 +5,7 @@ namespace Minsk;
 public class Parser
 {
     private readonly ImmutableArray<SyntaxToken> _tokens;
-    private List<string> _diagnostics;
+    private readonly List<string> _diagnostics;
     private int _position;
 
     public IEnumerable<string> Diagnostics => _diagnostics;
