@@ -5,13 +5,16 @@ namespace Minsk.CodeAnalysis.Binding;
 internal sealed class BoundBinaryOperator
 {
     public Type LeftType { get; }
+    public SyntaxKind SyntaxKind { get; }
     public BoundBinaryOperatorKind OperatorKind { get; }
     public Type RightType { get; }
     public Type ResultType { get; }
 
-    private BoundBinaryOperator(Type leftType, BoundBinaryOperatorKind operatorKind, Type rightType, Type resultType)
+    private BoundBinaryOperator(Type leftType, SyntaxKind syntaxKind, BoundBinaryOperatorKind operatorKind,
+        Type rightType, Type resultType)
     {
         LeftType = leftType;
+        SyntaxKind = syntaxKind;
         OperatorKind = operatorKind;
         RightType = rightType;
         ResultType = resultType;
@@ -19,10 +22,10 @@ internal sealed class BoundBinaryOperator
 
     private static readonly BoundBinaryOperator[] KnownOperators =
     {
-        new(typeof(int), BoundBinaryOperatorKind.Addition, typeof(int), typeof(int)),
-        new(typeof(int), BoundBinaryOperatorKind.Subtraction, typeof(int), typeof(int)),
-        new(typeof(int), BoundBinaryOperatorKind.Multiplication, typeof(int), typeof(int)),
-        new(typeof(int), BoundBinaryOperatorKind.Division, typeof(int), typeof(int)),
+        new(typeof(int), SyntaxKind.PlusToken, BoundBinaryOperatorKind.Addition, typeof(int), typeof(int)),
+        new(typeof(int), SyntaxKind.MinusToken, BoundBinaryOperatorKind.Subtraction, typeof(int), typeof(int)),
+        new(typeof(int), SyntaxKind.StarToken, BoundBinaryOperatorKind.Multiplication, typeof(int), typeof(int)),
+        new(typeof(int), SyntaxKind.SlashToken, BoundBinaryOperatorKind.Division, typeof(int), typeof(int)),
     };
 
     public static BoundBinaryOperator? BindBinaryOperator(
@@ -32,6 +35,7 @@ internal sealed class BoundBinaryOperator
     )
     {
         return KnownOperators.FirstOrDefault(knownOperator =>
-            knownOperator.LeftType == left.Type && knownOperator.RightType == right.Type);
+            knownOperator.LeftType == left.Type && knownOperator.SyntaxKind == operatorKind &&
+            knownOperator.RightType == right.Type);
     }
 }

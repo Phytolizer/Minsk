@@ -5,11 +5,14 @@ namespace Minsk.CodeAnalysis.Binding;
 internal class BoundUnaryOperator
 {
     public BoundUnaryOperatorKind OperatorKind { get; }
+    public SyntaxKind SyntaxKind { get; }
     public Type OperandType { get; }
     public Type ResultType { get; }
 
-    private BoundUnaryOperator(BoundUnaryOperatorKind operatorKind, Type operandType, Type resultType)
+    private BoundUnaryOperator(SyntaxKind syntaxKind, BoundUnaryOperatorKind operatorKind, Type operandType,
+        Type resultType)
     {
+        SyntaxKind = syntaxKind;
         OperatorKind = operatorKind;
         OperandType = operandType;
         ResultType = resultType;
@@ -17,12 +20,12 @@ internal class BoundUnaryOperator
 
     private static readonly BoundUnaryOperator[] KnownOperators =
     {
-        new(BoundUnaryOperatorKind.Identity, typeof(int), typeof(int)),
-        new(BoundUnaryOperatorKind.Negation, typeof(int), typeof(int)),
+        new(SyntaxKind.PlusToken, BoundUnaryOperatorKind.Identity, typeof(int), typeof(int)),
+        new(SyntaxKind.MinusToken, BoundUnaryOperatorKind.Negation, typeof(int), typeof(int)),
     };
 
     public static BoundUnaryOperator? Bind(SyntaxKind operatorKind, BoundExpression operand)
     {
-        return KnownOperators.FirstOrDefault(op => op.OperandType == operand.Type);
+        return KnownOperators.FirstOrDefault(op => op.SyntaxKind == operatorKind && op.OperandType == operand.Type);
     }
 }
