@@ -15,10 +15,9 @@ internal static class Program
                 break;
             }
 
-            foreach (var token in new Lexer(line))
-            {
-                Console.WriteLine(token);
-            }
+            var parser = new Parser(line);
+            var expression = parser.Parse();
+            expression.PrettyPrint();
         }
     }
 }

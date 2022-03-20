@@ -2,9 +2,10 @@
 
 namespace Minsk;
 
-public record SyntaxToken
+public class SyntaxToken : SyntaxNode
 {
-    public SyntaxKind Kind { get; }
+    public override SyntaxKind Kind { get; }
+    public override IEnumerable<SyntaxNode> Children => Enumerable.Empty<SyntaxNode>();
     public string Text { get; }
     public int Position { get; }
     public object? Value { get; }
@@ -25,6 +26,7 @@ public record SyntaxToken
         {
             result.Append($" {Value}");
         }
+
         return result.ToString();
     }
 }

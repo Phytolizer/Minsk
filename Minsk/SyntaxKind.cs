@@ -14,4 +14,8 @@ public enum SyntaxKind
     SlashToken,
     OpenParenthesisToken,
     CloseParenthesisToken,
+
+    // Syntax nodes
+    LiteralExpression,
+    BinaryExpression
 }
