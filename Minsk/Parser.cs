@@ -55,7 +55,7 @@ public class Parser
     {
         var left = ParsePrimaryExpression();
 
-        while (Current is { Kind: SyntaxKind.PlusToken or SyntaxKind.MinusToken })
+        while (Current.Kind is SyntaxKind.PlusToken or SyntaxKind.MinusToken)
         {
             var operatorToken = NextToken();
             var right = ParsePrimaryExpression();
