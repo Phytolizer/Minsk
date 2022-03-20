@@ -60,7 +60,7 @@ public class Parser
         return new SyntaxTree(ParseExpression(), MatchToken(SyntaxKind.EndOfFileToken), _diagnostics.ToArray());
     }
 
-    public ExpressionSyntax ParseExpression()
+    private ExpressionSyntax ParseExpression()
     {
         var left = ParsePrimaryExpression();
 
