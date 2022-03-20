@@ -21,8 +21,14 @@ public class Evaluator
         {
             SyntaxKind.LiteralExpression => EvaluateLiteralExpression((LiteralExpressionSyntax)root),
             SyntaxKind.BinaryExpression => EvaluateBinaryExpression((BinaryExpressionSyntax)root),
+            SyntaxKind.ParenthesizedExpression => EvaluateParenthesizedExpression((ParenthesizedExpressionSyntax)root),
             _ => throw new InvalidOperationException($"Unexpected syntax node {root.Kind}")
         };
+    }
+
+    private int EvaluateParenthesizedExpression(ParenthesizedExpressionSyntax root)
+    {
+        return EvaluateExpression(root.Expression);
     }
 
     private int EvaluateBinaryExpression(BinaryExpressionSyntax root)

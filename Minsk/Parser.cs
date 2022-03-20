@@ -95,6 +95,14 @@ public class Parser
 
     private ExpressionSyntax ParsePrimaryExpression()
     {
+        if (Current.Kind == SyntaxKind.OpenParenthesisToken)
+        {
+            var openParenthesisToken = MatchToken(SyntaxKind.OpenParenthesisToken);
+            var expression = ParseExpression();
+            var closeParenthesisToken = MatchToken(SyntaxKind.CloseParenthesisToken);
+            return new ParenthesizedExpressionSyntax(openParenthesisToken, expression, closeParenthesisToken);
+        }
+
         var numberToken = MatchToken(SyntaxKind.NumberToken);
         return new LiteralExpressionSyntax(numberToken);
     }
