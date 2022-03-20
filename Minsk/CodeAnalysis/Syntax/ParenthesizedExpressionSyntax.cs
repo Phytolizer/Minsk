@@ -1,6 +1,6 @@
 namespace Minsk.CodeAnalysis.Syntax;
 
-public class ParenthesizedExpressionSyntax : ExpressionSyntax
+public sealed class ParenthesizedExpressionSyntax : ExpressionSyntax
 {
     public SyntaxToken OpenParenthesisToken { get; }
     public ExpressionSyntax Expression { get; }

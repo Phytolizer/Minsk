@@ -2,7 +2,7 @@ using System.Collections.Immutable;
 
 namespace Minsk.CodeAnalysis.Syntax;
 
-public class Parser
+public sealed class Parser
 {
     private readonly ImmutableArray<SyntaxToken> _tokens;
     private readonly List<string> _diagnostics;

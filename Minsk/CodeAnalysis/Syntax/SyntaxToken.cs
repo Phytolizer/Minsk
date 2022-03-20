@@ -2,7 +2,7 @@
 
 namespace Minsk.CodeAnalysis.Syntax;
 
-public class SyntaxToken : SyntaxNode
+public sealed class SyntaxToken : SyntaxNode
 {
     public override SyntaxKind Kind { get; }
     public override IEnumerable<SyntaxNode> Children => Enumerable.Empty<SyntaxNode>();

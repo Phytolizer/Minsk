@@ -2,7 +2,7 @@ using System.Collections;
 
 namespace Minsk.CodeAnalysis.Syntax;
 
-public class Lexer : IEnumerable<SyntaxToken>
+internal sealed class Lexer : IEnumerable<SyntaxToken>
 {
     private readonly string _text;
     private readonly List<string> _diagnostics = new();

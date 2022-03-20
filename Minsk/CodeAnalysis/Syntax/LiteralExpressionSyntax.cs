@@ -1,6 +1,6 @@
 namespace Minsk.CodeAnalysis.Syntax;
 
-public class LiteralExpressionSyntax : ExpressionSyntax
+public sealed class LiteralExpressionSyntax : ExpressionSyntax
 {
     public SyntaxToken LiteralToken { get; }
 
