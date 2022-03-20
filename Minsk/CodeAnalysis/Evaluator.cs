@@ -2,7 +2,7 @@ using Minsk.CodeAnalysis.Syntax;
 
 namespace Minsk.CodeAnalysis;
 
-public class Evaluator
+public sealed class Evaluator
 {
     private readonly ExpressionSyntax _root;
 
@@ -16,52 +16,42 @@ public class Evaluator
         return EvaluateExpression(_root);
     }
 
-    private static int EvaluateExpression(ExpressionSyntax root)
+    private int EvaluateExpression(ExpressionSyntax root)
     {
+        // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
         return root.Kind switch
         {
-            SyntaxKind.BinaryExpression => EvaluateBinaryExpression((BinaryExpressionSyntax)root),
-            SyntaxKind.UnaryExpression => EvaluateUnaryExpression((UnaryExpressionSyntax)root),
             SyntaxKind.LiteralExpression => EvaluateLiteralExpression((LiteralExpressionSyntax)root),
+            SyntaxKind.BinaryExpression => EvaluateBinaryExpression((BinaryExpressionSyntax)root),
             SyntaxKind.ParenthesizedExpression => EvaluateParenthesizedExpression((ParenthesizedExpressionSyntax)root),
-            _ => throw new InvalidOperationException()
+            _ => throw new InvalidOperationException($"Unexpected syntax node {root.Kind}")
         };
     }
 
-    private static int EvaluateUnaryExpression(UnaryExpressionSyntax root)
-    {
-        var operand = EvaluateExpression(root.Operand);
-
-        return root.OperatorToken.Kind switch
-        {
-            SyntaxKind.MinusToken => -operand,
-            SyntaxKind.PlusToken => +operand,
-            _ => throw new InvalidOperationException()
-        };
-    }
-
-    private static int EvaluateParenthesizedExpression(ParenthesizedExpressionSyntax root)
+    private int EvaluateParenthesizedExpression(ParenthesizedExpressionSyntax root)
     {
         return EvaluateExpression(root.Expression);
     }
 
-    private static int EvaluateLiteralExpression(LiteralExpressionSyntax root)
-    {
-        return (int)(root.LiteralToken.Value ?? throw new InvalidOperationException());
-    }
-
-    private static int EvaluateBinaryExpression(BinaryExpressionSyntax root)
+    private int EvaluateBinaryExpression(BinaryExpressionSyntax root)
     {
         var left = EvaluateExpression(root.Left);
         var right = EvaluateExpression(root.Right);
 
+        // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
         return root.OperatorToken.Kind switch
         {
             SyntaxKind.PlusToken => left + right,
             SyntaxKind.MinusToken => left - right,
             SyntaxKind.StarToken => left * right,
             SyntaxKind.SlashToken => left / right,
-            _ => 0
+            _ => throw new InvalidOperationException($"Unexpected binary operator {root.OperatorToken.Kind}")
         };
+    }
+
+    private static int EvaluateLiteralExpression(LiteralExpressionSyntax root)
+    {
+        return root.LiteralToken.Value as int? ??
+               throw new InvalidOperationException();
     }
 }

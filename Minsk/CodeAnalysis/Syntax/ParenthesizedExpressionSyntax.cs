@@ -1,28 +1,21 @@
 namespace Minsk.CodeAnalysis.Syntax;
 
-public class ParenthesizedExpressionSyntax : ExpressionSyntax
+public sealed class ParenthesizedExpressionSyntax : ExpressionSyntax
 {
-    public ParenthesizedExpressionSyntax(SyntaxToken openParenthesisToken, ExpressionSyntax expression,
-        SyntaxToken closeParenthesisToken)
-    {
-        Expression = expression;
-        CloseParenthesisToken = closeParenthesisToken;
-        OpenParenthesisToken = openParenthesisToken;
-    }
-
-    public override SyntaxKind Kind => SyntaxKind.ParenthesizedExpression;
-
-    public override IEnumerable<SyntaxNode> Children
-    {
-        get
-        {
-            yield return OpenParenthesisToken;
-            yield return Expression;
-            yield return CloseParenthesisToken;
-        }
-    }
-
     public SyntaxToken OpenParenthesisToken { get; }
     public ExpressionSyntax Expression { get; }
     public SyntaxToken CloseParenthesisToken { get; }
+
+    public override SyntaxKind Kind => SyntaxKind.ParenthesizedExpression;
+
+    public override IEnumerable<SyntaxNode> Children => new SyntaxNode[]
+        { OpenParenthesisToken, Expression, CloseParenthesisToken };
+
+    public ParenthesizedExpressionSyntax(SyntaxToken openParenthesisToken, ExpressionSyntax expression,
+        SyntaxToken closeParenthesisToken)
+    {
+        OpenParenthesisToken = openParenthesisToken;
+        Expression = expression;
+        CloseParenthesisToken = closeParenthesisToken;
+    }
 }

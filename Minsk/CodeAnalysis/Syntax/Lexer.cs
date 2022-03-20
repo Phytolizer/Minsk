@@ -1,90 +1,111 @@
-using System.Collections.Immutable;
+using System.Collections;
 
 namespace Minsk.CodeAnalysis.Syntax;
 
-public class Lexer
+internal sealed class Lexer : IEnumerable<SyntaxToken>
 {
     private readonly string _text;
-    private int _position;
     private readonly List<string> _diagnostics = new();
-
-    private char Current => _position >= _text.Length ? '\0' : _text[_position];
-
-    public IImmutableList<string> Diagnostics => _diagnostics.ToImmutableList();
+    private int _position;
+    public IEnumerable<string> Diagnostics => _diagnostics;
 
     public Lexer(string text)
     {
         _text = text;
     }
 
-    public SyntaxToken NextToken()
+    private char CurrentChar
     {
-        var kind = SyntaxKind.BadToken;
-        var start = _position;
-        object? value = null;
-
-        if (char.IsDigit(Current))
+        get
         {
-            while (char.IsDigit(Current))
+            if (_position >= _text.Length)
             {
-                ++_position;
+                return '\0';
             }
 
-            kind = SyntaxKind.NumberToken;
-            if (!int.TryParse(_text[start.._position], out var intVal))
-            {
-                _diagnostics.Add($"The value {_text[start.._position]} isn't a valid int!");
-            }
-
-            value = intVal;
+            return _text[_position];
         }
-        else if (char.IsWhiteSpace(Current))
+    }
+
+    private string CurrentText(int start) => _text[start.._position];
+
+    public IEnumerator<SyntaxToken> GetEnumerator()
+    {
+        while (true)
         {
-            while (char.IsWhiteSpace(Current))
+            var start = _position;
+            var kind = SyntaxKind.BadToken;
+            string? currentText = null;
+            object? value = null;
+
+            if (char.IsWhiteSpace(CurrentChar))
             {
-                ++_position;
+                while (char.IsWhiteSpace(CurrentChar))
+                {
+                    _position++;
+                }
+
+                kind = SyntaxKind.WhitespaceToken;
+            }
+            else if (char.IsDigit(CurrentChar))
+            {
+                while (char.IsDigit(CurrentChar))
+                {
+                    _position++;
+                }
+
+                currentText = CurrentText(start);
+                if (!int.TryParse(currentText, out var intVal))
+                {
+                    _diagnostics.Add($"Number {currentText} doesn't fit in {typeof(int)}");
+                }
+
+                kind = SyntaxKind.NumberToken;
+                value = intVal;
+            }
+            else
+            {
+                switch (CurrentChar)
+                {
+                    case '+':
+                        kind = SyntaxKind.PlusToken;
+                        _position++;
+                        break;
+                    case '-':
+                        kind = SyntaxKind.MinusToken;
+                        _position++;
+                        break;
+                    case '*':
+                        kind = SyntaxKind.StarToken;
+                        _position++;
+                        break;
+                    case '/':
+                        kind = SyntaxKind.SlashToken;
+                        _position++;
+                        break;
+                    case '(':
+                        kind = SyntaxKind.OpenParenthesisToken;
+                        _position++;
+                        break;
+                    case ')':
+                        kind = SyntaxKind.CloseParenthesisToken;
+                        _position++;
+                        break;
+                    case '\0':
+                        yield break;
+                    default:
+                        _position++;
+                        _diagnostics.Add($"Illegal character in input: {_text[start]}");
+                        break;
+                }
             }
 
-            kind = SyntaxKind.WhitespaceToken;
+            yield return new SyntaxToken(kind, currentText ?? CurrentText(start), start, value);
         }
-        else
-        {
-            switch (Current)
-            {
-                case '+':
-                    ++_position;
-                    kind = SyntaxKind.PlusToken;
-                    break;
-                case '-':
-                    ++_position;
-                    kind = SyntaxKind.MinusToken;
-                    break;
-                case '*':
-                    ++_position;
-                    kind = SyntaxKind.StarToken;
-                    break;
-                case '/':
-                    ++_position;
-                    kind = SyntaxKind.SlashToken;
-                    break;
-                case '(':
-                    ++_position;
-                    kind = SyntaxKind.OpenParenthesisToken;
-                    break;
-                case ')':
-                    ++_position;
-                    kind = SyntaxKind.CloseParenthesisToken;
-                    break;
-                case '\0':
-                    kind = SyntaxKind.EndOfFileToken;
-                    break;
-                default:
-                    _diagnostics.Add($"Bad character input: '{Current}'.");
-                    ++_position;
-                    break;
-            }
-        }
+    }
 
-        return new SyntaxToken(start, _text[start.._position], kind, value);
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return this.GetEnumerator();
     }
 }

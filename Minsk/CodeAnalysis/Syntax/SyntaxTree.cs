@@ -1,12 +1,15 @@
-using System.Collections.Immutable;
-
 namespace Minsk.CodeAnalysis.Syntax;
 
-public record SyntaxTree(ExpressionSyntax Expression, SyntaxToken EndOfFileToken, ImmutableList<string> Diagnostics)
+public sealed class SyntaxTree
 {
-    public static SyntaxTree Parse(string text)
+    public ExpressionSyntax Root { get; }
+    public SyntaxToken EndOfFileToken { get; }
+    public string[] Diagnostics { get; }
+
+    public SyntaxTree(ExpressionSyntax root, SyntaxToken endOfFileToken, string[] diagnostics)
     {
-        var parser = new Parser(text);
-        return parser.Parse();
+        Root = root;
+        EndOfFileToken = endOfFileToken;
+        Diagnostics = diagnostics;
     }
 }

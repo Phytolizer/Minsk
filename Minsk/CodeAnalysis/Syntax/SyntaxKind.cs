@@ -2,18 +2,21 @@ namespace Minsk.CodeAnalysis.Syntax;
 
 public enum SyntaxKind
 {
-    NumberToken,
+    BadToken,
+    EndOfFileToken,
+
     WhitespaceToken,
+    NumberToken,
+
     PlusToken,
     MinusToken,
     StarToken,
     SlashToken,
     OpenParenthesisToken,
     CloseParenthesisToken,
-    BadToken,
-    EndOfFileToken,
+
+    // Syntax nodes
     LiteralExpression,
     BinaryExpression,
-    ParenthesizedExpression,
-    UnaryExpression
+    ParenthesizedExpression
 }

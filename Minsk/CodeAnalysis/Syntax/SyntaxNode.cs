@@ -5,22 +5,33 @@ public abstract class SyntaxNode
     public abstract SyntaxKind Kind { get; }
     public abstract IEnumerable<SyntaxNode> Children { get; }
 
-    public static void PrettyPrint(SyntaxNode node, string indent = "")
+    public void PrettyPrint()
     {
-        Console.Write($"{indent}{node.Kind}");
+        PrettyPrintInternal(this, "", true);
+    }
 
-        if (node is SyntaxToken { Value: { } } t)
+    private static void PrettyPrintInternal(SyntaxNode node, string indent, bool isLast)
+    {
+        Console.Write(indent);
+        var marker = isLast ? "└───" : "├───";
+        Console.Write(marker);
+        if (node is SyntaxToken t)
         {
-            Console.Write($" {t.Value}");
+            Console.Write(t);
+        }
+        else
+        {
+            Console.Write(node.Kind);
         }
 
         Console.WriteLine();
 
-        indent += "    ";
-
-        foreach (var child in node.Children)
+        indent += isLast ? "    " : "│   ";
+        var children = node.Children.ToArray();
+        var lastChild = children.LastOrDefault();
+        foreach (var child in children)
         {
-            PrettyPrint(child, indent);
+            PrettyPrintInternal(child, indent, child == lastChild);
         }
     }
 }

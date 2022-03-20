@@ -1,23 +1,14 @@
 namespace Minsk.CodeAnalysis.Syntax;
 
-public static class SyntaxFacts
+internal static class SyntaxFacts
 {
-    public static int GetBinaryOperatorPrecedence(this SyntaxKind kind)
+    public static int GetBinaryOperatorPrecedence(SyntaxKind kind)
     {
         return kind switch
         {
-            SyntaxKind.PlusToken or SyntaxKind.MinusToken => 1,
             SyntaxKind.StarToken or SyntaxKind.SlashToken => 2,
-            _ => 0
-        };
-    }
-
-    public static int GetUnaryOperatorPrecedence(this SyntaxKind kind)
-    {
-        return kind switch
-        {
-            SyntaxKind.PlusToken or SyntaxKind.MinusToken => 3,
-            _ => 0
+            SyntaxKind.PlusToken or SyntaxKind.MinusToken => 1,
+            _ => 0,
         };
     }
 }
