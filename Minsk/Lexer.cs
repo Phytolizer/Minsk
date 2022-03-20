@@ -4,7 +4,7 @@ namespace Minsk;
 
 public class Lexer : IEnumerable<SyntaxToken?>
 {
-    private string _text;
+    private readonly string _text;
 
     public Lexer(string text)
     {
