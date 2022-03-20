@@ -27,7 +27,7 @@ internal static class Program
             }
             else
             {
-                syntaxTree.Root.PrettyPrint();
+                Console.WriteLine(new Evaluator(syntaxTree.Root).Evaluate());
             }
         }
     }
