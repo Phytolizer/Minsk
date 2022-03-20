@@ -66,7 +66,18 @@ public sealed class Parser
 
     private ExpressionSyntax ParseBinaryExpression(int parentPrecedence)
     {
-        var left = ParsePrimaryExpression();
+        ExpressionSyntax left;
+        var unaryOperatorPrecedence = SyntaxFacts.GetUnaryOperatorPrecedence(Current.Kind);
+        if (unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence)
+        {
+            var operatorToken = NextToken();
+            var right = ParseBinaryExpression(unaryOperatorPrecedence);
+            left = new UnaryExpressionSyntax(operatorToken, right);
+        }
+        else
+        {
+            left = ParsePrimaryExpression();
+        }
 
         while (true)
         {

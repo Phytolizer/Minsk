@@ -11,4 +11,13 @@ internal static class SyntaxFacts
             _ => 0,
         };
     }
+
+    public static int GetUnaryOperatorPrecedence(SyntaxKind kind)
+    {
+        return kind switch
+        {
+            SyntaxKind.PlusToken or SyntaxKind.MinusToken => 3,
+            _ => 0,
+        };
+    }
 }

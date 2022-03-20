@@ -23,8 +23,20 @@ public sealed class Evaluator
         {
             SyntaxKind.LiteralExpression => EvaluateLiteralExpression((LiteralExpressionSyntax)root),
             SyntaxKind.BinaryExpression => EvaluateBinaryExpression((BinaryExpressionSyntax)root),
+            SyntaxKind.UnaryExpression => EvaluateUnaryExpression((UnaryExpressionSyntax)root),
             SyntaxKind.ParenthesizedExpression => EvaluateParenthesizedExpression((ParenthesizedExpressionSyntax)root),
             _ => throw new InvalidOperationException($"Unexpected syntax node {root.Kind}")
+        };
+    }
+
+    private int EvaluateUnaryExpression(UnaryExpressionSyntax root)
+    {
+        var operand = EvaluateExpression(root.Operand);
+        return root.OperatorToken.Kind switch
+        {
+            SyntaxKind.PlusToken => operand,
+            SyntaxKind.MinusToken => -operand,
+            _ => throw new InvalidOperationException($"Unexpected unary operator {root.OperatorToken.Kind}"),
         };
     }
 
@@ -51,7 +63,6 @@ public sealed class Evaluator
 
     private static int EvaluateLiteralExpression(LiteralExpressionSyntax root)
     {
-        return root.LiteralToken.Value as int? ??
-               throw new InvalidOperationException();
+        return root.LiteralToken.Value as int? ?? throw new InvalidOperationException();
     }
 }
