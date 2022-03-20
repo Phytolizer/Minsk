@@ -5,14 +5,19 @@ namespace Minsk;
 public class Parser
 {
     private readonly ImmutableArray<SyntaxToken> _tokens;
+    private List<string> _diagnostics;
     private int _position;
+
+    public IEnumerable<string> Diagnostics => _diagnostics;
 
     public Parser(string text)
     {
-        _tokens = new Lexer(text)
+        var lexer = new Lexer(text);
+        _tokens = lexer
             .Select(tok => tok!)
             .Where(tok => tok.Kind != SyntaxKind.BadToken && tok.Kind != SyntaxKind.WhitespaceToken)
             .ToImmutableArray();
+        _diagnostics = lexer.Diagnostics.ToList();
     }
 
     private SyntaxToken Peek(int offset)
@@ -42,6 +47,7 @@ public class Parser
             return NextToken();
         }
 
+        _diagnostics.Add($"Expected next token to be {kind}, got {Current.Kind} instead.");
         return new SyntaxToken(kind, "", Current.Position, null);
     }
 

@@ -5,6 +5,8 @@ namespace Minsk;
 public class Lexer : IEnumerable<SyntaxToken?>
 {
     private readonly string _text;
+    private List<string> _diagnostics = new();
+    public IEnumerable<string> Diagnostics => _diagnostics;
 
     public Lexer(string text)
     {
@@ -13,7 +15,7 @@ public class Lexer : IEnumerable<SyntaxToken?>
 
     public IEnumerator<SyntaxToken?> GetEnumerator()
     {
-        return new Enumerator(_text);
+        return new Enumerator(_text, _diagnostics);
     }
 
     IEnumerator IEnumerable.GetEnumerator()
@@ -25,6 +27,7 @@ public class Lexer : IEnumerable<SyntaxToken?>
     {
         private readonly string _text;
         private int _position;
+        private List<string> _diagnostics;
 
         public SyntaxToken? Current { get; private set; }
 
@@ -45,9 +48,10 @@ public class Lexer : IEnumerable<SyntaxToken?>
             throw new InvalidOperationException();
         }
 
-        public Enumerator(string text)
+        public Enumerator(string text, List<string> diagnostics)
         {
             _text = text;
+            _diagnostics = diagnostics;
         }
 
         private char CurrentChar
@@ -58,6 +62,7 @@ public class Lexer : IEnumerable<SyntaxToken?>
                 {
                     return '\0';
                 }
+
                 return _text[_position];
             }
         }
@@ -77,6 +82,7 @@ public class Lexer : IEnumerable<SyntaxToken?>
                 {
                     _position++;
                 }
+
                 kind = SyntaxKind.WhitespaceToken;
             }
             else if (char.IsDigit(CurrentChar))
@@ -85,10 +91,13 @@ public class Lexer : IEnumerable<SyntaxToken?>
                 {
                     _position++;
                 }
+
                 currentText = CurrentText(start);
                 if (!int.TryParse(currentText, out var intVal))
                 {
+                    _diagnostics.Add($"Number {currentText} doesn't fit in {typeof(int)}");
                 }
+
                 kind = SyntaxKind.NumberToken;
                 value = intVal;
             }
@@ -125,6 +134,7 @@ public class Lexer : IEnumerable<SyntaxToken?>
                         break;
                     default:
                         _position++;
+                        _diagnostics.Add($"Illegal character in input: {_text[start]}");
                         break;
                 }
             }

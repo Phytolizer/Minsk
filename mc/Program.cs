@@ -17,7 +17,18 @@ internal static class Program
 
             var parser = new Parser(line);
             var expression = parser.Parse();
-            expression.PrettyPrint();
+            var diagnostics = parser.Diagnostics.ToArray();
+            if (diagnostics.Any())
+            {
+                foreach (var diagnostic in diagnostics)
+                {
+                    Console.WriteLine(diagnostic);
+                }
+            }
+            else
+            {
+                expression.PrettyPrint();
+            }
         }
     }
 }
