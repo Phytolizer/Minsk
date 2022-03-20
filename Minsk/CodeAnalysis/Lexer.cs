@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace Minsk;
+namespace Minsk.CodeAnalysis;
 
 public class Lexer : IEnumerable<SyntaxToken?>
 {
