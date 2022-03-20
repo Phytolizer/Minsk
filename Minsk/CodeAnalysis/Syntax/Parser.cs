@@ -12,7 +12,6 @@ public class Parser
     {
         var lexer = new Lexer(text);
         _tokens = lexer
-            .Select(tok => tok!)
             .Where(tok => tok.Kind != SyntaxKind.BadToken && tok.Kind != SyntaxKind.WhitespaceToken)
             .ToImmutableArray();
         _diagnostics = lexer.Diagnostics.ToList();
