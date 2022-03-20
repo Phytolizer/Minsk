@@ -1,5 +1,4 @@
-﻿using Minsk;
-using Minsk.CodeAnalysis;
+﻿using Minsk.CodeAnalysis;
 
 namespace mc;
 
