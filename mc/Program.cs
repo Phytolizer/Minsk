@@ -6,6 +6,8 @@ internal static class Program
 {
     private static void Main()
     {
+        var showTree = false;
+
         while (true)
         {
             Console.Write("> ");
@@ -13,6 +15,17 @@ internal static class Program
             if (line == null)
             {
                 break;
+            }
+
+            switch (line)
+            {
+                case "#showTree":
+                    showTree = !showTree;
+                    Console.WriteLine(showTree ? "Showing parse trees." : "Not showing parse trees.");
+                    continue;
+                case "#cls":
+                    Console.Clear();
+                    continue;
             }
 
             var parser = new Parser(line);
@@ -27,6 +40,11 @@ internal static class Program
             }
             else
             {
+                if (showTree)
+                {
+                    syntaxTree.Root.PrettyPrint();
+                }
+
                 Console.WriteLine(new Evaluator(syntaxTree.Root).Evaluate());
             }
         }
