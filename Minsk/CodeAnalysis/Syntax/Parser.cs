@@ -82,7 +82,7 @@ public sealed class Parser
         while (true)
         {
             var precedence = SyntaxFacts.GetBinaryOperatorPrecedence(Current.Kind);
-            if (precedence == 0 || precedence < parentPrecedence)
+            if (precedence == 0 || precedence <= parentPrecedence)
             {
                 break;
             }
