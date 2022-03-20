@@ -45,7 +45,9 @@ internal static class Program
             {
                 if (showTree)
                 {
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
                     syntaxTree.Root.PrettyPrint();
+                    Console.ResetColor();
                 }
 
                 Console.WriteLine(new Evaluator(syntaxTree.Root).Evaluate());
