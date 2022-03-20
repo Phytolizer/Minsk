@@ -34,10 +34,12 @@ internal static class Program
             var diagnostics = syntaxTree.Diagnostics;
             if (diagnostics.Any())
             {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
                 foreach (var diagnostic in diagnostics)
                 {
                     Console.WriteLine(diagnostic);
                 }
+                Console.ResetColor();
             }
             else
             {
