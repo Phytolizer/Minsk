@@ -23,12 +23,18 @@ public class Parser
     private SyntaxToken Peek(int offset)
     {
         var index = _position + offset;
-        if (index >= _tokens.Length)
+        if (index < _tokens.Length)
         {
-            return new SyntaxToken(SyntaxKind.EndOfFileToken, "", _tokens.Last().Position, null);
+            return _tokens[index];
         }
 
-        return _tokens[index];
+        var lastPosition = 0;
+        if (_tokens.Length > 0)
+        {
+            lastPosition = _tokens.Last().Position;
+        }
+
+        return new SyntaxToken(SyntaxKind.EndOfFileToken, "", lastPosition, null);
     }
 
     private SyntaxToken Current => Peek(0);
