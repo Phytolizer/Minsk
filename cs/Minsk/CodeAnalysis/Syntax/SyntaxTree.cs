@@ -8,11 +8,17 @@ public sealed class SyntaxTree
     public SyntaxToken EndOfFileToken { get; }
     public string[] Diagnostics { get; }
 
-    public SyntaxTree(ExpressionSyntax root, SyntaxToken endOfFileToken, string[] diagnostics)
+    internal SyntaxTree(ExpressionSyntax root, SyntaxToken endOfFileToken, string[] diagnostics)
     {
         Root = root;
         EndOfFileToken = endOfFileToken;
         Diagnostics = diagnostics;
+    }
+
+    public static SyntaxTree Parse(string text)
+    {
+        var parser = new Parser(text);
+        return parser.Parse();
     }
 
     public int Evaluate()

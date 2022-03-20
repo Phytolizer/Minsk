@@ -2,13 +2,13 @@ using System.Collections.Immutable;
 
 namespace Minsk.CodeAnalysis.Syntax;
 
-public sealed class Parser
+internal sealed class Parser
 {
     private readonly ImmutableArray<SyntaxToken> _tokens;
     private readonly List<string> _diagnostics;
     private int _position;
 
-    public Parser(string text)
+    internal Parser(string text)
     {
         var lexer = new Lexer(text);
         _tokens = lexer
@@ -54,7 +54,7 @@ public sealed class Parser
         return new SyntaxToken(kind, "", Current.Position, null);
     }
 
-    public SyntaxTree Parse()
+    internal SyntaxTree Parse()
     {
         return new SyntaxTree(ParseExpression(), MatchToken(SyntaxKind.EndOfFileToken), _diagnostics.ToArray());
     }

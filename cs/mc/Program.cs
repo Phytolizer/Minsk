@@ -28,8 +28,7 @@ internal static class Program
                     continue;
             }
 
-            var parser = new Parser(line);
-            var syntaxTree = parser.Parse();
+            var syntaxTree = SyntaxTree.Parse(line);
             var diagnostics = syntaxTree.Diagnostics;
             if (diagnostics.Any())
             {
