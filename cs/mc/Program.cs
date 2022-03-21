@@ -49,6 +49,7 @@ internal static class Program
                     Console.Write(line[errorSpan.Start..errorSpan.End]);
                     Console.ResetColor();
                     Console.WriteLine(line[suffixSpan.Start..suffixSpan.End]);
+                    Console.WriteLine();
                 }
 
                 Console.ResetColor();
