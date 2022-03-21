@@ -38,7 +38,7 @@ internal sealed class Binder
             return new BoundLiteralExpression(0);
         }
 
-        var type = typeof(int);
+        var type = value.GetType();
         return new BoundVariableExpression(name, type);
     }
 
