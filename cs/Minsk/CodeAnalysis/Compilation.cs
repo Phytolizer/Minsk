@@ -16,13 +16,13 @@ public class Compilation
     {
         var binder = new Binder();
         var boundExpression = binder.BindExpression(_syntaxTree.Root);
-        var diagnostics = binder.Diagnostics.ToArray();
+        var diagnostics = _syntaxTree.Diagnostics.Concat(binder.Diagnostics).ToArray();
         if (diagnostics.Any())
         {
-            return new EvaluationResult(diagnostics);
+            return new EvaluationResult(diagnostics, null);
         }
 
         var evaluator = new Evaluator(boundExpression);
-        return new EvaluationResult(evaluator.Evaluate());
+        return new EvaluationResult(Array.Empty<string>(), evaluator.Evaluate());
     }
 }
