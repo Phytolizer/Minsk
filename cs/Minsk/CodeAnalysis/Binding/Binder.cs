@@ -37,7 +37,8 @@ internal sealed class Binder
 
         _diagnostics.Add(
             $"Binary operator '{syntax.OperatorToken.Text}' is not defined " +
-            $"for types {boundLeft.Type} and {boundRight.Type}.");
+            $"for types {boundLeft.Type} and {boundRight.Type}."
+        );
         return boundLeft;
     }
 
