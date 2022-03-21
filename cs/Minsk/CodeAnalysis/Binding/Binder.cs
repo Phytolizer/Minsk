@@ -4,10 +4,10 @@ namespace Minsk.CodeAnalysis.Binding;
 
 internal sealed class Binder
 {
-    private readonly Dictionary<string, object> _variables;
+    private readonly Dictionary<VariableSymbol, object> _variables;
     private readonly DiagnosticBag _diagnostics = new();
 
-    public Binder(Dictionary<string, object> variables)
+    public Binder(Dictionary<VariableSymbol, object> variables)
     {
         _variables = variables;
     }
@@ -32,14 +32,15 @@ internal sealed class Binder
     private BoundExpression BindNameExpression(NameExpressionSyntax syntax)
     {
         var name = syntax.IdentifierToken.Text;
-        if (!_variables.TryGetValue(name, out var value))
+        var variable = _variables.Keys.FirstOrDefault(v => v.Name == name);
+        if (variable != null)
         {
-            _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
-            return new BoundLiteralExpression(0);
+            return new BoundVariableExpression(variable);
         }
 
-        var type = value.GetType();
-        return new BoundVariableExpression(name, type);
+        _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
+        return new BoundLiteralExpression(0);
+
     }
 
     private BoundExpression BindAssignmentExpression(AssignmentExpressionSyntax syntax)
@@ -47,23 +48,16 @@ internal sealed class Binder
         var name = syntax.IdentifierToken.Text;
         var boundExpression = BindExpression(syntax.Expression);
 
-        object defaultValue;
-        if (boundExpression.Type == typeof(int))
+        var existingVariable = _variables.Keys.FirstOrDefault(v => v.Name == name);
+        if (existingVariable != null)
         {
-            defaultValue = 0;
+            _variables.Remove(existingVariable);
         }
-        else if (boundExpression.Type == typeof(bool))
-        {
-            defaultValue = false;
-        }
-        else
-        {
-            throw new InvalidOperationException($"Unsupported variable type '{boundExpression.Type}'");
-        }
+        var variable = new VariableSymbol(name, boundExpression.Type);
 
-        _variables[name] = defaultValue;
+        _variables[variable] = null;
 
-        return new BoundAssignmentExpression(name, boundExpression);
+        return new BoundAssignmentExpression(variable, boundExpression);
     }
 
     private BoundExpression BindParenthesizedExpression(ParenthesizedExpressionSyntax syntax)
