@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mc", "mc\mc.csproj", "{3A74
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minsk", "Minsk\Minsk.csproj", "{A72CC47C-9DE5-4FF6-A012-73C70B8EEB55}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minsk.Tests", "Minsk.Tests\Minsk.Tests.csproj", "{AEA1F84C-C2E4-47FA-BC09-387E8673D7F2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{A72CC47C-9DE5-4FF6-A012-73C70B8EEB55}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A72CC47C-9DE5-4FF6-A012-73C70B8EEB55}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A72CC47C-9DE5-4FF6-A012-73C70B8EEB55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEA1F84C-C2E4-47FA-BC09-387E8673D7F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEA1F84C-C2E4-47FA-BC09-387E8673D7F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEA1F84C-C2E4-47FA-BC09-387E8673D7F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEA1F84C-C2E4-47FA-BC09-387E8673D7F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
