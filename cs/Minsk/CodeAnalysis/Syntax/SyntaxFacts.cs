@@ -1,6 +1,6 @@
 namespace Minsk.CodeAnalysis.Syntax;
 
-internal static class SyntaxFacts
+public static class SyntaxFacts
 {
     public static int GetBinaryOperatorPrecedence(SyntaxKind kind)
     {
@@ -31,6 +31,26 @@ internal static class SyntaxFacts
             "true" => SyntaxKind.TrueKeyword,
             "false" => SyntaxKind.FalseKeyword,
             _ => SyntaxKind.IdentifierToken
+        };
+    }
+
+    public static string? GetText(SyntaxKind kind)
+    {
+        return kind switch
+        {
+            SyntaxKind.BangToken => "!",
+            SyntaxKind.EqualsToken => "=",
+            SyntaxKind.MinusToken => "-",
+            SyntaxKind.PlusToken => "+",
+            SyntaxKind.SlashToken => "/",
+            SyntaxKind.StarToken => "*",
+            SyntaxKind.AmpersandAmpersandToken => "&&",
+            SyntaxKind.BangEqualsToken => "!=",
+            SyntaxKind.PipePipeToken => "||",
+            SyntaxKind.OpenParenthesisToken => "(",
+            SyntaxKind.CloseParenthesisToken => ")",
+            SyntaxKind.EqualsEqualsToken => "==",
+            _ => null,
         };
     }
 }
