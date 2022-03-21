@@ -108,6 +108,11 @@ internal sealed class Lexer : IEnumerable<SyntaxToken>
                             kind = SyntaxKind.EqualsEqualsToken;
                             _position += 2;
                         }
+                        else
+                        {
+                            kind = SyntaxKind.EqualsToken;
+                            _position++;
+                        }
 
                         break;
                     case '&':

@@ -5,10 +5,12 @@ namespace Minsk.CodeAnalysis;
 internal sealed class Evaluator
 {
     private readonly BoundExpression _root;
+    private readonly Dictionary<string, object> _variables;
 
-    public Evaluator(BoundExpression root)
+    public Evaluator(BoundExpression root, Dictionary<string, object> variables)
     {
         _root = root;
+        _variables = variables;
     }
 
     public object Evaluate()
@@ -24,8 +26,22 @@ internal sealed class Evaluator
             BoundNodeKind.LiteralExpression => EvaluateLiteralExpression((BoundLiteralExpression)root),
             BoundNodeKind.BinaryExpression => EvaluateBinaryExpression((BoundBinaryExpression)root),
             BoundNodeKind.UnaryExpression => EvaluateUnaryExpression((BoundUnaryExpression)root),
+            BoundNodeKind.VariableExpression => EvaluateVariableExpression((BoundVariableExpression)root),
+            BoundNodeKind.AssignmentExpression => EvaluateAssignmentExpression((BoundAssignmentExpression)root),
             _ => throw new InvalidOperationException($"Unexpected syntax node {root.Kind}")
         };
+    }
+
+    private object EvaluateAssignmentExpression(BoundAssignmentExpression root)
+    {
+        var value = EvaluateExpression(root.Expression);
+        _variables[root.Name] = value;
+        return value;
+    }
+
+    private object EvaluateVariableExpression(BoundVariableExpression root)
+    {
+        return _variables[root.Name];
     }
 
     private object EvaluateUnaryExpression(BoundUnaryExpression root)

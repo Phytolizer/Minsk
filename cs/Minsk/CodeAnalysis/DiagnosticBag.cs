@@ -58,4 +58,10 @@ internal sealed class DiagnosticBag : IEnumerable<Diagnostic>
         var message = $"Unary operator '{op.Text}' is not defined for type {operandType}";
         Report(span, message);
     }
+
+    public void ReportUndefinedName(TextSpan span, string name)
+    {
+        var message = $"Undefined name '{name}'";
+        Report(span, message);
+    }
 }

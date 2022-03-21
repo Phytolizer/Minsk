@@ -4,7 +4,14 @@ namespace Minsk.CodeAnalysis.Binding;
 
 internal sealed class Binder
 {
+    private readonly Dictionary<string, object> _variables;
     private readonly DiagnosticBag _diagnostics = new();
+
+    public Binder(Dictionary<string, object> variables)
+    {
+        _variables = variables;
+    }
+
     public IEnumerable<Diagnostic> Diagnostics => _diagnostics;
 
     public BoundExpression BindExpression(ExpressionSyntax syntax)
@@ -16,8 +23,30 @@ internal sealed class Binder
             SyntaxKind.LiteralExpression => BindLiteralExpression((LiteralExpressionSyntax)syntax),
             SyntaxKind.UnaryExpression => BindUnaryExpression((UnaryExpressionSyntax)syntax),
             SyntaxKind.ParenthesizedExpression => BindParenthesizedExpression((ParenthesizedExpressionSyntax)syntax),
+            SyntaxKind.NameExpression => BindNameExpression((NameExpressionSyntax)syntax),
+            SyntaxKind.AssignmentExpression => BindAssignmentExpression((AssignmentExpressionSyntax)syntax),
             _ => throw new InvalidOperationException($"Unexpected syntax {syntax.Kind}")
         };
+    }
+
+    private BoundExpression BindNameExpression(NameExpressionSyntax syntax)
+    {
+        var name = syntax.IdentifierToken.Text;
+        if (!_variables.TryGetValue(name, out var value))
+        {
+            _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
+            return new BoundLiteralExpression(0);
+        }
+
+        var type = typeof(int);
+        return new BoundVariableExpression(name, type);
+    }
+
+    private BoundExpression BindAssignmentExpression(AssignmentExpressionSyntax syntax)
+    {
+        var name = syntax.IdentifierToken.Text;
+        var boundExpression = BindExpression(syntax.Expression);
+        return new BoundAssignmentExpression(name, boundExpression);
     }
 
     private BoundExpression BindParenthesizedExpression(ParenthesizedExpressionSyntax syntax)

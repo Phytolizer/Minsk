@@ -61,7 +61,20 @@ internal sealed class Parser
 
     private ExpressionSyntax ParseExpression()
     {
-        return ParseBinaryExpression(0);
+        return ParseAssignmentExpression();
+    }
+
+    private ExpressionSyntax ParseAssignmentExpression()
+    {
+        if (Current.Kind != SyntaxKind.IdentifierToken || Peek(1).Kind != SyntaxKind.EqualsToken)
+        {
+            return ParseBinaryExpression(0);
+        }
+
+        var identifierToken = NextToken();
+        var equalsToken = NextToken();
+        var right = ParseAssignmentExpression();
+        return new AssignmentExpressionSyntax(identifierToken, equalsToken, right);
     }
 
     private ExpressionSyntax ParseBinaryExpression(int parentPrecedence)
@@ -112,6 +125,11 @@ internal sealed class Parser
             {
                 var keywordToken = NextToken();
                 return new LiteralExpressionSyntax(Current, keywordToken.Kind == SyntaxKind.TrueKeyword);
+            }
+            case SyntaxKind.IdentifierToken:
+            {
+                var identifierToken = NextToken();
+                return new NameExpressionSyntax(identifierToken);
             }
             default:
             {
