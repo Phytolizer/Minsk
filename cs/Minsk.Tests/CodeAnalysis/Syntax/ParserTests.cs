@@ -48,9 +48,55 @@ public class ParserTests
         }
     }
 
+    [Theory]
+    [MemberData(nameof(GetUnaryOperatorPairsData))]
+    private void UnaryExpressionHonorsPrecedences(SyntaxKind unaryKind, SyntaxKind binaryKind)
+    {
+        var unaryPrecedence = SyntaxFacts.GetUnaryOperatorPrecedence(unaryKind);
+        var binaryPrecedence = SyntaxFacts.GetBinaryOperatorPrecedence(binaryKind);
+        var unaryText = SyntaxFacts.GetText(unaryKind)!;
+        var binaryText = SyntaxFacts.GetText(binaryKind)!;
+        var text = $"{unaryText} a {binaryText} b";
+        var expression = SyntaxTree.Parse(text).Root;
+
+        if (unaryPrecedence >= binaryPrecedence)
+        {
+            using var e = new AssertingEnumerator(expression);
+
+            e.AssertNode(SyntaxKind.BinaryExpression);
+            e.AssertNode(SyntaxKind.UnaryExpression);
+            e.AssertToken(unaryKind, unaryText);
+            e.AssertNode(SyntaxKind.NameExpression);
+            e.AssertToken(SyntaxKind.IdentifierToken, "a");
+            e.AssertToken(binaryKind, binaryText);
+            e.AssertNode(SyntaxKind.NameExpression);
+            e.AssertToken(SyntaxKind.IdentifierToken, "b");
+        }
+        else
+        {
+            using var e = new AssertingEnumerator(expression);
+            e.AssertNode(SyntaxKind.UnaryExpression);
+            e.AssertToken(unaryKind, unaryText);
+            e.AssertNode(SyntaxKind.BinaryExpression);
+            e.AssertNode(SyntaxKind.NameExpression);
+            e.AssertToken(SyntaxKind.IdentifierToken, "a");
+            e.AssertToken(binaryKind, binaryText);
+            e.AssertNode(SyntaxKind.NameExpression);
+            e.AssertToken(SyntaxKind.IdentifierToken, "b");
+        }
+    }
+
     private static IEnumerable<object[]> GetBinaryOperatorPairsData()
     {
         return SyntaxFacts.GetBinaryOperatorKinds()
-            .SelectMany(_ => SyntaxFacts.GetBinaryOperatorKinds(), (op1, op2) => new object[] { op1, op2 });
+            .SelectMany(_ => SyntaxFacts.GetBinaryOperatorKinds(),
+                (op1, op2) => new object[] { op1, op2 });
+    }
+
+    private static IEnumerable<object[]> GetUnaryOperatorPairsData()
+    {
+        return SyntaxFacts.GetUnaryOperatorKinds()
+            .SelectMany(_ => SyntaxFacts.GetBinaryOperatorKinds(),
+                (unary, binary) => new object[] { unary, binary });
     }
 }
