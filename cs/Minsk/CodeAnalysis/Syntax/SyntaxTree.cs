@@ -21,9 +21,16 @@ public sealed class SyntaxTree
         return parser.Parse();
     }
 
-    public int Evaluate()
+    public EvaluationResult Evaluate()
     {
-        var boundExpression = new Binder().BindExpression(Root);
-        return new Evaluator(boundExpression).Evaluate();
+        var binder = new Binder();
+        var boundExpression = binder.BindExpression(Root);
+        var diagnostics = binder.Diagnostics.ToArray();
+        if (diagnostics.Any())
+        {
+            return new EvaluationResult(diagnostics);
+        }
+
+        return new EvaluationResult(new Evaluator(boundExpression).Evaluate());
     }
 }

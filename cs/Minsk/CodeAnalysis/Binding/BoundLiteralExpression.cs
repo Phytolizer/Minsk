@@ -1,6 +1,6 @@
 namespace Minsk.CodeAnalysis.Binding;
 
-internal class BoundLiteralExpression : BoundExpression
+internal sealed class BoundLiteralExpression : BoundExpression
 {
     public object Value { get; }
     public override Type Type => Value.GetType();
