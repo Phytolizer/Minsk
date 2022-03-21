@@ -1,5 +1,6 @@
 use crate::analysis::diagnostic::Diagnostic;
 
+use super::lexer::Lexer;
 use super::node::expression::ExpressionSyntax;
 use super::parser::Parser;
 use super::token::SyntaxToken;
@@ -25,5 +26,9 @@ impl SyntaxTree {
 
     pub fn parse(text: &str) -> Self {
         Parser::new(text).parse()
+    }
+
+    pub fn parse_tokens(text: &str) -> Vec<SyntaxToken> {
+        Lexer::new(text).into_only_tokens()
     }
 }

@@ -28,6 +28,10 @@ impl Lexer {
             .collect::<Vec<_>>();
         (tokens, self.diagnostics)
     }
+
+    pub(crate) fn into_only_tokens(mut self) -> Vec<SyntaxToken> {
+        LexerIterator::new(&mut self).collect::<Vec<_>>()
+    }
 }
 
 struct LexerIterator<'a> {
@@ -171,5 +175,62 @@ impl<'a> Iterator for LexerIterator<'a> {
             self.position - start,
             value,
         ))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::analysis::syntax::kind::SyntaxKind;
+    use crate::analysis::syntax::tree::SyntaxTree;
+
+    struct SimpleToken {
+        kind: SyntaxKind,
+        text: &'static str,
+    }
+
+    impl SimpleToken {
+        fn new(kind: SyntaxKind, text: &'static str) -> Self {
+            Self { kind, text }
+        }
+    }
+
+    fn get_tokens() -> Vec<SimpleToken> {
+        vec![
+            SimpleToken::new(SyntaxKind::WhitespaceToken, " "),
+            SimpleToken::new(SyntaxKind::WhitespaceToken, "  "),
+            SimpleToken::new(SyntaxKind::WhitespaceToken, "\n"),
+            SimpleToken::new(SyntaxKind::WhitespaceToken, "\r"),
+            SimpleToken::new(SyntaxKind::WhitespaceToken, "\r\n"),
+            SimpleToken::new(SyntaxKind::IdentifierToken, "a"),
+            SimpleToken::new(SyntaxKind::IdentifierToken, "abc"),
+            SimpleToken::new(SyntaxKind::NumberToken, "1"),
+            SimpleToken::new(SyntaxKind::NumberToken, "123"),
+            SimpleToken::new(SyntaxKind::PlusToken, "+"),
+            SimpleToken::new(SyntaxKind::MinusToken, "-"),
+            SimpleToken::new(SyntaxKind::StarToken, "*"),
+            SimpleToken::new(SyntaxKind::SlashToken, "/"),
+            SimpleToken::new(SyntaxKind::BangToken, "!"),
+            SimpleToken::new(SyntaxKind::AmpersandAmpersandToken, "&&"),
+            SimpleToken::new(SyntaxKind::PipePipeToken, "||"),
+            SimpleToken::new(SyntaxKind::BangEqualsToken, "!="),
+            SimpleToken::new(SyntaxKind::EqualsEqualsToken, "=="),
+            SimpleToken::new(SyntaxKind::EqualsToken, "="),
+            SimpleToken::new(SyntaxKind::OpenParenthesisToken, "("),
+            SimpleToken::new(SyntaxKind::CloseParenthesisToken, ")"),
+            SimpleToken::new(SyntaxKind::TrueKeyword, "true"),
+            SimpleToken::new(SyntaxKind::FalseKeyword, "false"),
+        ]
+    }
+
+    #[test]
+    fn lexes_token() {
+        for tt in get_tokens() {
+            let SimpleToken { kind, text } = tt;
+            let tokens = SyntaxTree::parse_tokens(text);
+            assert_eq!(1, tokens.len());
+            let token = &tokens[0];
+            assert_eq!(kind, token.kind);
+            assert_eq!(text, token.text);
+        }
     }
 }
