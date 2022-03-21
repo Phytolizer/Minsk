@@ -44,6 +44,7 @@ internal static class Program
                     var prefixSpan = new TextSpan(0, errorSpan.Start);
                     var suffixSpan = TextSpan.FromBounds(errorSpan.End, line.Length);
                     Console.ResetColor();
+                    Console.Write("    ");
                     Console.Write(line[prefixSpan.Start..prefixSpan.End]);
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.Write(line[errorSpan.Start..errorSpan.End]);
