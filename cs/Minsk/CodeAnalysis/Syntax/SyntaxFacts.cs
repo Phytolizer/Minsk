@@ -11,7 +11,7 @@ internal static class SyntaxFacts
             SyntaxKind.EqualsEqualsToken or SyntaxKind.BangEqualsToken => 3,
             SyntaxKind.AmpersandAmpersandToken => 2,
             SyntaxKind.PipePipeToken => 1,
-            _ => 0,
+            _ => 0
         };
     }
 
@@ -20,7 +20,7 @@ internal static class SyntaxFacts
         return kind switch
         {
             SyntaxKind.PlusToken or SyntaxKind.MinusToken or SyntaxKind.BangToken => 6,
-            _ => 0,
+            _ => 0
         };
     }
 

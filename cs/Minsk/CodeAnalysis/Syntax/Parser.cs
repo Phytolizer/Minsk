@@ -4,8 +4,8 @@ namespace Minsk.CodeAnalysis.Syntax;
 
 internal sealed class Parser
 {
+    private readonly DiagnosticBag _diagnostics = new();
     private readonly ImmutableArray<SyntaxToken> _tokens;
-    private readonly List<string> _diagnostics;
     private int _position;
 
     internal Parser(string text)
@@ -14,8 +14,10 @@ internal sealed class Parser
         _tokens = lexer
             .Where(tok => tok.Kind != SyntaxKind.BadToken && tok.Kind != SyntaxKind.WhitespaceToken)
             .ToImmutableArray();
-        _diagnostics = lexer.Diagnostics.ToList();
+        _diagnostics.AddRange(lexer.Diagnostics);
     }
+
+    private SyntaxToken Current => Peek(0);
 
     private SyntaxToken Peek(int offset)
     {
@@ -34,8 +36,6 @@ internal sealed class Parser
         return new SyntaxToken(SyntaxKind.EndOfFileToken, "", lastPosition, null);
     }
 
-    private SyntaxToken Current => Peek(0);
-
     private SyntaxToken NextToken()
     {
         var current = Current;
@@ -50,7 +50,7 @@ internal sealed class Parser
             return NextToken();
         }
 
-        _diagnostics.Add($"Expected next token to be {kind}, got {Current.Kind} instead.");
+        _diagnostics.ReportUnexpectedToken(Current.Span, kind, Current.Kind);
         return new SyntaxToken(kind, "", Current.Position, null);
     }
 

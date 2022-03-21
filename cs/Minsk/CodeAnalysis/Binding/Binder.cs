@@ -4,8 +4,8 @@ namespace Minsk.CodeAnalysis.Binding;
 
 internal sealed class Binder
 {
-    private readonly List<string> _diagnostics = new();
-    public IEnumerable<string> Diagnostics => _diagnostics;
+    private readonly DiagnosticBag _diagnostics = new();
+    public IEnumerable<Diagnostic> Diagnostics => _diagnostics;
 
     public BoundExpression BindExpression(ExpressionSyntax syntax)
     {
@@ -16,7 +16,7 @@ internal sealed class Binder
             SyntaxKind.LiteralExpression => BindLiteralExpression((LiteralExpressionSyntax)syntax),
             SyntaxKind.UnaryExpression => BindUnaryExpression((UnaryExpressionSyntax)syntax),
             SyntaxKind.ParenthesizedExpression => BindParenthesizedExpression((ParenthesizedExpressionSyntax)syntax),
-            _ => throw new InvalidOperationException($"Unexpected syntax {syntax.Kind}"),
+            _ => throw new InvalidOperationException($"Unexpected syntax {syntax.Kind}")
         };
     }
 
@@ -35,9 +35,11 @@ internal sealed class Binder
             return new BoundBinaryExpression(boundLeft, boundOperator, boundRight);
         }
 
-        _diagnostics.Add(
-            $"Binary operator '{syntax.OperatorToken.Text}' is not defined " +
-            $"for types {boundLeft.Type} and {boundRight.Type}."
+        _diagnostics.ReportUndefinedBinaryOperator(
+            syntax.OperatorToken.Span,
+            syntax.OperatorToken,
+            boundLeft.Type,
+            boundRight.Type
         );
         return boundLeft;
     }
@@ -57,7 +59,7 @@ internal sealed class Binder
             return new BoundUnaryExpression(boundOperator, boundOperand);
         }
 
-        _diagnostics.Add($"Unary operator '{syntax.OperatorToken.Text}' is not defined for type {boundOperand.Type}.");
+        _diagnostics.ReportUndefinedUnaryOperator(syntax.OperatorToken.Span, syntax.OperatorToken, boundOperand.Type);
         return boundOperand;
     }
 }

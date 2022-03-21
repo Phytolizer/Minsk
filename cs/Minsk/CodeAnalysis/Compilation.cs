@@ -23,6 +23,6 @@ public class Compilation
         }
 
         var evaluator = new Evaluator(boundExpression);
-        return new EvaluationResult(Array.Empty<string>(), evaluator.Evaluate());
+        return new EvaluationResult(Array.Empty<Diagnostic>(), evaluator.Evaluate());
     }
 }

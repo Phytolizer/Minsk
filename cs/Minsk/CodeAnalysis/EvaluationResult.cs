@@ -2,10 +2,10 @@ namespace Minsk.CodeAnalysis;
 
 public sealed class EvaluationResult
 {
+    public Diagnostic[] Diagnostics;
     public object? Value;
-    public string[] Diagnostics;
 
-    internal EvaluationResult(string[] diagnostics, object? value)
+    internal EvaluationResult(Diagnostic[] diagnostics, object? value)
     {
         Diagnostics = diagnostics;
         Value = value;

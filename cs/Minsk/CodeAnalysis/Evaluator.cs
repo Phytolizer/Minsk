@@ -36,7 +36,7 @@ internal sealed class Evaluator
             BoundUnaryOperatorKind.Identity => operand,
             BoundUnaryOperatorKind.Negation => -(int)operand,
             BoundUnaryOperatorKind.LogicalNegation => !(bool)operand,
-            _ => throw new InvalidOperationException(),
+            _ => throw new InvalidOperationException()
         };
     }
 
@@ -55,7 +55,7 @@ internal sealed class Evaluator
             BoundBinaryOperatorKind.LogicalOr => (bool)left || (bool)right,
             BoundBinaryOperatorKind.Equality => left.Equals(right),
             BoundBinaryOperatorKind.Inequality => !left.Equals(right),
-            _ => throw new InvalidOperationException(),
+            _ => throw new InvalidOperationException()
         };
     }
 

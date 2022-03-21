@@ -2,6 +2,17 @@ namespace Minsk.CodeAnalysis.Syntax;
 
 public sealed class ParenthesizedExpressionSyntax : ExpressionSyntax
 {
+    public ParenthesizedExpressionSyntax(
+        SyntaxToken openParenthesisToken,
+        ExpressionSyntax expression,
+        SyntaxToken closeParenthesisToken
+    )
+    {
+        OpenParenthesisToken = openParenthesisToken;
+        Expression = expression;
+        CloseParenthesisToken = closeParenthesisToken;
+    }
+
     public SyntaxToken OpenParenthesisToken { get; }
     public ExpressionSyntax Expression { get; }
     public SyntaxToken CloseParenthesisToken { get; }
@@ -10,12 +21,4 @@ public sealed class ParenthesizedExpressionSyntax : ExpressionSyntax
 
     public override IEnumerable<SyntaxNode> Children => new SyntaxNode[]
         { OpenParenthesisToken, Expression, CloseParenthesisToken };
-
-    public ParenthesizedExpressionSyntax(SyntaxToken openParenthesisToken, ExpressionSyntax expression,
-        SyntaxToken closeParenthesisToken)
-    {
-        OpenParenthesisToken = openParenthesisToken;
-        Expression = expression;
-        CloseParenthesisToken = closeParenthesisToken;
-    }
 }

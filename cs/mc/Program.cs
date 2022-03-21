@@ -36,10 +36,7 @@ internal static class Program
             if (diagnostics.Any())
             {
                 Console.ForegroundColor = ConsoleColor.DarkRed;
-                foreach (var diagnostic in diagnostics)
-                {
-                    Console.WriteLine(diagnostic);
-                }
+                foreach (var diagnostic in diagnostics) Console.WriteLine(diagnostic);
 
                 Console.ResetColor();
             }

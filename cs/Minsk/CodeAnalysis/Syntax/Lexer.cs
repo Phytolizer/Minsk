@@ -4,30 +4,18 @@ namespace Minsk.CodeAnalysis.Syntax;
 
 internal sealed class Lexer : IEnumerable<SyntaxToken>
 {
+    private readonly DiagnosticBag _diagnostics = new();
     private readonly string _text;
-    private readonly List<string> _diagnostics = new();
     private int _position;
-    public IEnumerable<string> Diagnostics => _diagnostics;
 
     public Lexer(string text)
     {
         _text = text;
     }
 
-    private char Peek(int offset)
-    {
-        var index = _position + offset;
-        if (index >= _text.Length)
-        {
-            return '\0';
-        }
-
-        return _text[index];
-    }
+    public IEnumerable<Diagnostic> Diagnostics => _diagnostics;
 
     private char CurrentChar => Peek(0);
-
-    private string CurrentText(int start) => _text[start.._position];
 
     public IEnumerator<SyntaxToken> GetEnumerator()
     {
@@ -40,24 +28,18 @@ internal sealed class Lexer : IEnumerable<SyntaxToken>
 
             if (char.IsWhiteSpace(CurrentChar))
             {
-                while (char.IsWhiteSpace(CurrentChar))
-                {
-                    _position++;
-                }
+                while (char.IsWhiteSpace(CurrentChar)) _position++;
 
                 kind = SyntaxKind.WhitespaceToken;
             }
             else if (char.IsDigit(CurrentChar))
             {
-                while (char.IsDigit(CurrentChar))
-                {
-                    _position++;
-                }
+                while (char.IsDigit(CurrentChar)) _position++;
 
                 currentText = CurrentText(start);
                 if (!int.TryParse(currentText, out var intVal))
                 {
-                    _diagnostics.Add($"Number {currentText} doesn't fit in {typeof(int)}");
+                    _diagnostics.ReportInvalidInt(new TextSpan(start, _position - start), currentText, typeof(int));
                 }
 
                 kind = SyntaxKind.NumberToken;
@@ -65,10 +47,7 @@ internal sealed class Lexer : IEnumerable<SyntaxToken>
             }
             else if (char.IsLetter(CurrentChar))
             {
-                while (char.IsLetterOrDigit(CurrentChar))
-                {
-                    _position++;
-                }
+                while (char.IsLetterOrDigit(CurrentChar)) _position++;
 
                 currentText = CurrentText(start);
                 kind = SyntaxFacts.GetKeywordKind(currentText);
@@ -120,10 +99,6 @@ internal sealed class Lexer : IEnumerable<SyntaxToken>
                             kind = SyntaxKind.EqualsEqualsToken;
                             _position += 2;
                         }
-                        else
-                        {
-                            _position++;
-                        }
 
                         break;
                     case '&':
@@ -131,10 +106,6 @@ internal sealed class Lexer : IEnumerable<SyntaxToken>
                         {
                             kind = SyntaxKind.AmpersandAmpersandToken;
                             _position += 2;
-                        }
-                        else
-                        {
-                            _position++;
                         }
 
                         break;
@@ -144,23 +115,17 @@ internal sealed class Lexer : IEnumerable<SyntaxToken>
                             kind = SyntaxKind.PipePipeToken;
                             _position += 2;
                         }
-                        else
-                        {
-                            _position++;
-                        }
 
                         break;
                     case '\0':
                         yield break;
-                    default:
-                        _position++;
-                        break;
                 }
             }
 
             if (kind == SyntaxKind.BadToken)
             {
-                _diagnostics.Add($"Illegal character in input: {_text[start]}");
+                _diagnostics.ReportBadCharacter(_position, CurrentChar);
+                _position++;
             }
 
             yield return new SyntaxToken(kind, currentText ?? CurrentText(start), start, value);
@@ -169,6 +134,22 @@ internal sealed class Lexer : IEnumerable<SyntaxToken>
 
     IEnumerator IEnumerable.GetEnumerator()
     {
-        return this.GetEnumerator();
+        return GetEnumerator();
+    }
+
+    private char Peek(int offset)
+    {
+        var index = _position + offset;
+        if (index >= _text.Length)
+        {
+            return '\0';
+        }
+
+        return _text[index];
+    }
+
+    private string CurrentText(int start)
+    {
+        return _text[start.._position];
     }
 }

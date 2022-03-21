@@ -4,27 +4,6 @@ namespace Minsk.CodeAnalysis.Binding;
 
 internal sealed class BoundBinaryOperator
 {
-    public Type LeftType { get; }
-    public SyntaxKind SyntaxKind { get; }
-    public BoundBinaryOperatorKind OperatorKind { get; }
-    public Type RightType { get; }
-    public Type ResultType { get; }
-
-    private BoundBinaryOperator(
-        SyntaxKind syntaxKind,
-        BoundBinaryOperatorKind operatorKind,
-        Type leftType,
-        Type rightType,
-        Type resultType
-    )
-    {
-        SyntaxKind = syntaxKind;
-        OperatorKind = operatorKind;
-        LeftType = leftType;
-        RightType = rightType;
-        ResultType = resultType;
-    }
-
     private static readonly BoundBinaryOperator[] KnownOperators =
     {
         new(SyntaxKind.PlusToken, BoundBinaryOperatorKind.Addition, typeof(int), typeof(int), typeof(int)),
@@ -72,8 +51,29 @@ internal sealed class BoundBinaryOperator
             typeof(bool),
             typeof(bool),
             typeof(bool)
-        ),
+        )
     };
+
+    private BoundBinaryOperator(
+        SyntaxKind syntaxKind,
+        BoundBinaryOperatorKind operatorKind,
+        Type leftType,
+        Type rightType,
+        Type resultType
+    )
+    {
+        SyntaxKind = syntaxKind;
+        OperatorKind = operatorKind;
+        LeftType = leftType;
+        RightType = rightType;
+        ResultType = resultType;
+    }
+
+    public Type LeftType { get; }
+    public SyntaxKind SyntaxKind { get; }
+    public BoundBinaryOperatorKind OperatorKind { get; }
+    public Type RightType { get; }
+    public Type ResultType { get; }
 
     public static BoundBinaryOperator? BindBinaryOperator(
         BoundExpression left,

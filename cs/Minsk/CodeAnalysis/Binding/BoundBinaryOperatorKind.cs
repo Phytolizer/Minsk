@@ -9,5 +9,5 @@ internal enum BoundBinaryOperatorKind
     LogicalAnd,
     LogicalOr,
     Equality,
-    Inequality,
+    Inequality
 }

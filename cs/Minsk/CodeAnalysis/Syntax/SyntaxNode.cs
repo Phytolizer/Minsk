@@ -29,9 +29,6 @@ public abstract class SyntaxNode
         indent += isLast ? "    " : "│   ";
         var children = node.Children.ToArray();
         var lastChild = children.LastOrDefault();
-        foreach (var child in children)
-        {
-            PrettyPrintInternal(child, indent, child == lastChild);
-        }
+        foreach (var child in children) PrettyPrintInternal(child, indent, child == lastChild);
     }
 }

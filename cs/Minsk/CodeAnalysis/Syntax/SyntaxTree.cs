@@ -2,16 +2,16 @@ namespace Minsk.CodeAnalysis.Syntax;
 
 public sealed class SyntaxTree
 {
-    public ExpressionSyntax Root { get; }
-    public SyntaxToken EndOfFileToken { get; }
-    public string[] Diagnostics { get; }
-
-    internal SyntaxTree(ExpressionSyntax root, SyntaxToken endOfFileToken, string[] diagnostics)
+    internal SyntaxTree(ExpressionSyntax root, SyntaxToken endOfFileToken, Diagnostic[] diagnostics)
     {
         Root = root;
         EndOfFileToken = endOfFileToken;
         Diagnostics = diagnostics;
     }
+
+    public ExpressionSyntax Root { get; }
+    public SyntaxToken EndOfFileToken { get; }
+    public Diagnostic[] Diagnostics { get; }
 
     public static SyntaxTree Parse(string text)
     {

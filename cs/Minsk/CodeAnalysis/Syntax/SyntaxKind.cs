@@ -20,7 +20,7 @@ public enum SyntaxKind
     EqualsEqualsToken,
     OpenParenthesisToken,
     CloseParenthesisToken,
-    
+
     TrueKeyword,
     FalseKeyword,
 
@@ -28,5 +28,5 @@ public enum SyntaxKind
     LiteralExpression,
     BinaryExpression,
     ParenthesizedExpression,
-    UnaryExpression,
+    UnaryExpression
 }
