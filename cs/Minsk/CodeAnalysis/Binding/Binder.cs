@@ -46,6 +46,23 @@ internal sealed class Binder
     {
         var name = syntax.IdentifierToken.Text;
         var boundExpression = BindExpression(syntax.Expression);
+
+        object defaultValue;
+        if (boundExpression.Type == typeof(int))
+        {
+            defaultValue = 0;
+        }
+        else if (boundExpression.Type == typeof(bool))
+        {
+            defaultValue = false;
+        }
+        else
+        {
+            throw new InvalidOperationException($"Unsupported variable type '{boundExpression.Type}'");
+        }
+
+        _variables[name] = defaultValue;
+
         return new BoundAssignmentExpression(name, boundExpression);
     }
 
