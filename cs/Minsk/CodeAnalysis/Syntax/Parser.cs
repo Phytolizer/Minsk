@@ -45,7 +45,7 @@ internal sealed class Parser
 
     private SyntaxToken MatchToken(SyntaxKind kind)
     {
-        if (Current is { } token && token.Kind == kind)
+        if (Current.Kind == kind)
         {
             return NextToken();
         }
