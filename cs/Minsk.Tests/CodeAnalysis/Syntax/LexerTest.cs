@@ -5,7 +5,7 @@ namespace Minsk.Tests.CodeAnalysis.Syntax;
 
 public sealed class LexerTest
 {
-    private class SimpleToken
+    private sealed class SimpleToken
     {
         public SyntaxKind Kind { get; }
         public string Text { get; }
