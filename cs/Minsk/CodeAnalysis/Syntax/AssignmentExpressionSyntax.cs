@@ -7,7 +7,7 @@ public sealed class AssignmentExpressionSyntax : ExpressionSyntax
     public ExpressionSyntax Expression { get; }
     public override SyntaxKind Kind => SyntaxKind.AssignmentExpression;
 
-    protected override IEnumerable<SyntaxNode> Children =>
+    public override IEnumerable<SyntaxNode> Children =>
         new SyntaxNode[] { IdentifierToken, EqualsToken, Expression };
 
     public AssignmentExpressionSyntax(SyntaxToken identifierToken, SyntaxToken equalsToken, ExpressionSyntax expression)

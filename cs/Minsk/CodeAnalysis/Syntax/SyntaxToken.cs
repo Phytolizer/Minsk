@@ -13,7 +13,7 @@ public sealed class SyntaxToken : SyntaxNode
     }
 
     public override SyntaxKind Kind { get; }
-    protected override IEnumerable<SyntaxNode> Children => Enumerable.Empty<SyntaxNode>();
+    public override IEnumerable<SyntaxNode> Children => Enumerable.Empty<SyntaxNode>();
     public string Text { get; }
     public int Position { get; }
     public object? Value { get; }

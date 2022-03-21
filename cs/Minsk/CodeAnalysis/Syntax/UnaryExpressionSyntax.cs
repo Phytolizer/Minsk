@@ -12,5 +12,5 @@ public sealed class UnaryExpressionSyntax : ExpressionSyntax
     public ExpressionSyntax Operand { get; }
 
     public override SyntaxKind Kind => SyntaxKind.UnaryExpression;
-    protected override IEnumerable<SyntaxNode> Children => new SyntaxNode[] { OperatorToken, Operand };
+    public override IEnumerable<SyntaxNode> Children => new SyntaxNode[] { OperatorToken, Operand };
 }

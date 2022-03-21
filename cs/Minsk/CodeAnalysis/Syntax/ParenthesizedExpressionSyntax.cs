@@ -19,6 +19,6 @@ public sealed class ParenthesizedExpressionSyntax : ExpressionSyntax
 
     public override SyntaxKind Kind => SyntaxKind.ParenthesizedExpression;
 
-    protected override IEnumerable<SyntaxNode> Children => new SyntaxNode[]
+    public override IEnumerable<SyntaxNode> Children => new SyntaxNode[]
         { OpenParenthesisToken, Expression, CloseParenthesisToken };
 }

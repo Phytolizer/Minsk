@@ -16,5 +16,5 @@ public sealed class LiteralExpressionSyntax : ExpressionSyntax
     public object? Value { get; }
 
     public override SyntaxKind Kind => SyntaxKind.LiteralExpression;
-    protected override IEnumerable<SyntaxNode> Children => new[] { LiteralToken };
+    public override IEnumerable<SyntaxNode> Children => new[] { LiteralToken };
 }
