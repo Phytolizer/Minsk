@@ -10,13 +10,14 @@ use super::binding::node::expression::variable::BoundVariableExpression;
 use super::binding::node::expression::BoundExpression;
 use super::binding::node::operator::binary::kind::BoundBinaryOperatorKind;
 use super::binding::node::operator::unary::kind::BoundUnaryOperatorKind;
+use super::variable_symbol::VariableSymbol;
 
 pub(crate) struct Evaluator<'v> {
-    variables: &'v mut HashMap<String, Object>,
+    variables: &'v mut HashMap<VariableSymbol, Object>,
 }
 
 impl<'v> Evaluator<'v> {
-    pub(crate) fn new(variables: &'v mut HashMap<String, Object>) -> Self {
+    pub(crate) fn new(variables: &'v mut HashMap<VariableSymbol, Object>) -> Self {
         Self { variables }
     }
 
@@ -36,7 +37,7 @@ impl<'v> Evaluator<'v> {
 
     fn evaluate_assignment_expression(&mut self, root: BoundAssignmentExpression) -> Object {
         let value = self.evaluate_expression(*root.expression);
-        self.variables.insert(root.name, value.clone());
+        self.variables.insert(root.variable, value.clone());
         value
     }
 
@@ -84,6 +85,6 @@ impl<'v> Evaluator<'v> {
     }
 
     fn evaluate_variable_expression(&mut self, root: BoundVariableExpression) -> Object {
-        self.variables.get(root.name.as_str()).unwrap().clone()
+        self.variables.get(&root.variable).unwrap().clone()
     }
 }

@@ -6,7 +6,7 @@ pub enum Object {
     Bool(bool),
 }
 
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 pub enum ObjectKind {
     Number,
     Bool,

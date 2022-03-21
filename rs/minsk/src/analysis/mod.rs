@@ -5,3 +5,4 @@ pub(crate) mod diagnostic_bag;
 pub(crate) mod evaluator;
 pub mod syntax;
 pub mod text_span;
+pub mod variable_symbol;

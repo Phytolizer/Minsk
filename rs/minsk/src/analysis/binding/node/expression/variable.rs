@@ -1,13 +1,13 @@
+use crate::analysis::variable_symbol::VariableSymbol;
 use crate::object::ObjectKind;
 
 #[derive(Debug)]
 pub(crate) struct BoundVariableExpression {
-    pub(crate) name: String,
-    pub(crate) ty: ObjectKind,
+    pub(crate) variable: VariableSymbol,
 }
 
 impl BoundVariableExpression {
     pub(crate) fn ty(&self) -> ObjectKind {
-        self.ty
+        self.variable.ty
     }
 }

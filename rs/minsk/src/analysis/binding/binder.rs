@@ -11,8 +11,8 @@ use crate::analysis::syntax::node::expression::unary::UnaryExpressionSyntax;
 use crate::analysis::syntax::node::expression::ExpressionSyntax;
 use crate::analysis::syntax::node::SyntaxNode;
 use crate::analysis::syntax::tree::SyntaxTree;
+use crate::analysis::variable_symbol::VariableSymbol;
 use crate::object::Object;
-use crate::object::ObjectKind;
 
 use super::node::expression::assignment::BoundAssignmentExpression;
 use super::node::expression::binary::BoundBinaryExpression;
@@ -25,11 +25,11 @@ use super::node::operator::unary::BoundUnaryOperator;
 
 pub(crate) struct Binder<'v> {
     diagnostics: DiagnosticBag,
-    variables: &'v mut HashMap<String, Object>,
+    variables: &'v mut HashMap<VariableSymbol, Object>,
 }
 
 impl<'v> Binder<'v> {
-    pub(crate) fn new(variables: &'v mut HashMap<String, Object>) -> Self {
+    pub(crate) fn new(variables: &'v mut HashMap<VariableSymbol, Object>) -> Self {
         Self {
             diagnostics: DiagnosticBag::new(),
             variables,
@@ -68,14 +68,20 @@ impl<'v> Binder<'v> {
         let name = syntax.identifier_token.text;
         let bound_expression = self.bind_expression(*syntax.expression);
 
-        let default_value = match bound_expression.ty() {
-            ObjectKind::Number => Object::Number(0),
-            ObjectKind::Bool => Object::Bool(false),
+        let existing_variable = self.variables.keys().find(|k| k.name == name);
+        if let Some(existing_variable) = existing_variable.cloned() {
+            self.variables.remove(&existing_variable);
+        }
+        let variable = VariableSymbol {
+            name,
+            ty: bound_expression.ty(),
         };
-        self.variables.insert(name.clone(), default_value);
+        // will be overwritten pretty quickly, so this is a dummy
+        let default_value = Object::Number(0);
+        self.variables.insert(variable.clone(), default_value);
 
         BoundExpression::Assignment(BoundAssignmentExpression {
-            name,
+            variable,
             expression: Box::new(bound_expression),
         })
     }
@@ -114,11 +120,8 @@ impl<'v> Binder<'v> {
     fn bind_name_expression(&mut self, syntax: NameExpressionSyntax) -> BoundExpression {
         let identifier_span = syntax.identifier_token.span();
         let name = syntax.identifier_token.text;
-        match self.variables.get(name.as_str()) {
-            Some(value) => {
-                let ty = value.kind();
-                BoundExpression::Variable(BoundVariableExpression { name, ty })
-            }
+        match self.variables.keys().find(|k| k.name == name).cloned() {
+            Some(variable) => BoundExpression::Variable(BoundVariableExpression { variable }),
             None => {
                 self.diagnostics
                     .report_undefined_name(identifier_span, name.as_str());

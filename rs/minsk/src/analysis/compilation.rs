@@ -6,6 +6,7 @@ use super::binding::binder::Binder;
 use super::diagnostic::Diagnostic;
 use super::evaluator::Evaluator;
 use super::syntax::tree::SyntaxTree;
+use super::variable_symbol::VariableSymbol;
 
 pub struct Compilation {
     syntax_tree: SyntaxTree,
@@ -18,7 +19,7 @@ impl Compilation {
 
     pub fn evaluate(
         self,
-        variables: &mut HashMap<String, Object>,
+        variables: &mut HashMap<VariableSymbol, Object>,
     ) -> Result<Object, Vec<Diagnostic>> {
         let (bound_expression, diagnostics) =
             Binder::new(variables).into_expression_and_diagnostics(self.syntax_tree);
