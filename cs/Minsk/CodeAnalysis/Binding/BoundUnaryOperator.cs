@@ -22,6 +22,7 @@ internal class BoundUnaryOperator
     {
         new(SyntaxKind.PlusToken, BoundUnaryOperatorKind.Identity, typeof(int), typeof(int)),
         new(SyntaxKind.MinusToken, BoundUnaryOperatorKind.Negation, typeof(int), typeof(int)),
+        new(SyntaxKind.BangToken, BoundUnaryOperatorKind.LogicalNegation, typeof(bool), typeof(bool)),
     };
 
     public static BoundUnaryOperator? Bind(SyntaxKind operatorKind, BoundExpression operand)

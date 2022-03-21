@@ -31,11 +31,11 @@ internal sealed class Evaluator
     private object EvaluateUnaryExpression(BoundUnaryExpression root)
     {
         var operand = EvaluateExpression(root.Operand);
-        // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
         return root.Op.OperatorKind switch
         {
             BoundUnaryOperatorKind.Identity => operand,
             BoundUnaryOperatorKind.Negation => -(int)operand,
+            BoundUnaryOperatorKind.LogicalNegation => !(bool)operand,
             _ => throw new InvalidOperationException(),
         };
     }
@@ -45,13 +45,14 @@ internal sealed class Evaluator
         var left = EvaluateExpression(root.Left);
         var right = EvaluateExpression(root.Right);
 
-        // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
         return root.Op.OperatorKind switch
         {
             BoundBinaryOperatorKind.Addition => (int)left + (int)right,
             BoundBinaryOperatorKind.Subtraction => (int)left - (int)right,
             BoundBinaryOperatorKind.Multiplication => (int)left * (int)right,
             BoundBinaryOperatorKind.Division => (int)left / (int)right,
+            BoundBinaryOperatorKind.LogicalAnd => (bool)left && (bool)right,
+            BoundBinaryOperatorKind.LogicalOr => (bool)left || (bool)right,
             _ => throw new InvalidOperationException(),
         };
     }

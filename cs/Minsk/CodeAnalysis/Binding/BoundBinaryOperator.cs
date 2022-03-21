@@ -26,6 +26,20 @@ internal sealed class BoundBinaryOperator
         new(typeof(int), SyntaxKind.MinusToken, BoundBinaryOperatorKind.Subtraction, typeof(int), typeof(int)),
         new(typeof(int), SyntaxKind.StarToken, BoundBinaryOperatorKind.Multiplication, typeof(int), typeof(int)),
         new(typeof(int), SyntaxKind.SlashToken, BoundBinaryOperatorKind.Division, typeof(int), typeof(int)),
+        new(
+            typeof(bool),
+            SyntaxKind.AmpersandAmpersandToken,
+            BoundBinaryOperatorKind.LogicalAnd,
+            typeof(bool),
+            typeof(bool)
+        ),
+        new(
+            typeof(bool),
+            SyntaxKind.PipePipeToken,
+            BoundBinaryOperatorKind.LogicalOr,
+            typeof(bool),
+            typeof(bool)
+        ),
     };
 
     public static BoundBinaryOperator? BindBinaryOperator(
