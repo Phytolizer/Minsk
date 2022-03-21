@@ -14,18 +14,18 @@ internal sealed class Lexer : IEnumerable<SyntaxToken>
         _text = text;
     }
 
-    private char CurrentChar
+    private char Peek(int offset)
     {
-        get
+        var index = _position + offset;
+        if (index >= _text.Length)
         {
-            if (_position >= _text.Length)
-            {
-                return '\0';
-            }
-
-            return _text[_position];
+            return '\0';
         }
+
+        return _text[index];
     }
+
+    private char CurrentChar => Peek(0);
 
     private string CurrentText(int start) => _text[start.._position];
 
@@ -101,13 +101,45 @@ internal sealed class Lexer : IEnumerable<SyntaxToken>
                         kind = SyntaxKind.CloseParenthesisToken;
                         _position++;
                         break;
+                    case '!':
+                        kind = SyntaxKind.BangToken;
+                        _position++;
+                        break;
+                    case '&':
+                        if (Peek(1) == '&')
+                        {
+                            kind = SyntaxKind.AmpersandAmpersandToken;
+                            _position += 2;
+                        }
+                        else
+                        {
+                            _position++;
+                        }
+
+                        break;
+                    case '|':
+                        if (Peek(1) == '|')
+                        {
+                            kind = SyntaxKind.PipePipeToken;
+                            _position += 2;
+                        }
+                        else
+                        {
+                            _position++;
+                        }
+
+                        break;
                     case '\0':
                         yield break;
                     default:
                         _position++;
-                        _diagnostics.Add($"Illegal character in input: {_text[start]}");
                         break;
                 }
+            }
+
+            if (kind == SyntaxKind.BadToken)
+            {
+                _diagnostics.Add($"Illegal character in input: {_text[start]}");
             }
 
             yield return new SyntaxToken(kind, currentText ?? CurrentText(start), start, value);
