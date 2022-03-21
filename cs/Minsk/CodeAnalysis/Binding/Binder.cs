@@ -2,7 +2,7 @@ using Minsk.CodeAnalysis.Syntax;
 
 namespace Minsk.CodeAnalysis.Binding;
 
-internal class Binder
+internal sealed class Binder
 {
     private readonly List<string> _diagnostics = new();
     public IEnumerable<string> Diagnostics => _diagnostics;
@@ -35,7 +35,7 @@ internal class Binder
         return boundLeft;
     }
 
-    private BoundExpression BindLiteralExpression(LiteralExpressionSyntax syntax)
+    private static BoundExpression BindLiteralExpression(LiteralExpressionSyntax syntax)
     {
         var value = syntax.Value;
         return new BoundLiteralExpression(value ?? 0);
