@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Minsk.Tests.CodeAnalysis.Syntax;
 
-public sealed class LexerTest
+public sealed class LexerTests
 {
     private sealed class SimpleToken
     {
