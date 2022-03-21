@@ -195,11 +195,6 @@ mod tests {
     }
 
     const TOKENS: &[SimpleToken] = &[
-        SimpleToken::new(SyntaxKind::WhitespaceToken, " "),
-        SimpleToken::new(SyntaxKind::WhitespaceToken, "  "),
-        SimpleToken::new(SyntaxKind::WhitespaceToken, "\n"),
-        SimpleToken::new(SyntaxKind::WhitespaceToken, "\r"),
-        SimpleToken::new(SyntaxKind::WhitespaceToken, "\r\n"),
         SimpleToken::new(SyntaxKind::IdentifierToken, "a"),
         SimpleToken::new(SyntaxKind::IdentifierToken, "abc"),
         SimpleToken::new(SyntaxKind::NumberToken, "1"),
@@ -220,6 +215,14 @@ mod tests {
         SimpleToken::new(SyntaxKind::FalseKeyword, "false"),
     ];
 
+    const SEPARATORS: &[SimpleToken] = &[
+        SimpleToken::new(SyntaxKind::WhitespaceToken, " "),
+        SimpleToken::new(SyntaxKind::WhitespaceToken, "  "),
+        SimpleToken::new(SyntaxKind::WhitespaceToken, "\n"),
+        SimpleToken::new(SyntaxKind::WhitespaceToken, "\r"),
+        SimpleToken::new(SyntaxKind::WhitespaceToken, "\r\n"),
+    ];
+
     #[test]
     fn lexes_token() {
         for tt in TOKENS {
@@ -229,6 +232,46 @@ mod tests {
             let token = &tokens[0];
             assert_eq!(*kind, token.kind);
             assert_eq!(*text, token.text);
+        }
+    }
+
+    #[test]
+    fn lexes_token_pairs() {
+        for t1 in TOKENS {
+            for t2 in TOKENS {
+                if !requires_separator(t1, t2) {
+                    let text = format!("{}{}", t1.text, t2.text);
+                    let tokens = SyntaxTree::parse_tokens(&text);
+                    assert_eq!(2, tokens.len());
+                    assert_eq!(t1.kind, tokens[0].kind);
+                    assert_eq!(t1.text, tokens[0].text);
+                    assert_eq!(t2.kind, tokens[1].kind);
+                    assert_eq!(t2.text, tokens[1].text);
+                }
+            }
+        }
+    }
+
+    fn requires_separator(t1: &SimpleToken, t2: &SimpleToken) -> bool {
+        let t1_is_keyword = format!("{:?}", t1.kind).ends_with("Keyword");
+        let t2_is_keyword = format!("{:?}", t2.kind).ends_with("Keyword");
+
+        if (t1.kind == SyntaxKind::IdentifierToken || t1_is_keyword)
+            && (t2.kind == SyntaxKind::IdentifierToken || t2_is_keyword)
+        {
+            true
+        } else if (t1.kind == SyntaxKind::NumberToken
+            || t1.kind == SyntaxKind::IdentifierToken
+            || t1_is_keyword)
+            && t2.kind == SyntaxKind::NumberToken
+        {
+            true
+        } else if (t1.kind == SyntaxKind::BangToken || t1.kind == SyntaxKind::EqualsToken)
+            && (t2.kind == SyntaxKind::EqualsToken || t2.kind == SyntaxKind::EqualsEqualsToken)
+        {
+            true
+        } else {
+            false
         }
     }
 }
