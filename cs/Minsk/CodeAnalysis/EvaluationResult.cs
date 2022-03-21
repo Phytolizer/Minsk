@@ -1,4 +1,4 @@
-namespace Minsk.CodeAnalysis.Syntax;
+namespace Minsk.CodeAnalysis;
 
 public sealed class EvaluationResult
 {

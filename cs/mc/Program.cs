@@ -1,4 +1,5 @@
-﻿using Minsk.CodeAnalysis.Syntax;
+﻿using Minsk.CodeAnalysis;
+using Minsk.CodeAnalysis.Syntax;
 
 namespace mc;
 
@@ -29,8 +30,9 @@ internal static class Program
             }
 
             var syntaxTree = SyntaxTree.Parse(line);
-            var evaluationResult = syntaxTree.Evaluate();
-            var diagnostics = syntaxTree.Diagnostics.Concat(evaluationResult.Diagnostics).ToArray();
+            var compilation = new Compilation(syntaxTree);
+            var result = compilation.Evaluate();
+            var diagnostics = result.Diagnostics.ToArray();
             if (diagnostics.Any())
             {
                 Console.ForegroundColor = ConsoleColor.DarkRed;
@@ -50,7 +52,7 @@ internal static class Program
                     Console.ResetColor();
                 }
 
-                Console.WriteLine(evaluationResult.Value);
+                Console.WriteLine(result.Value);
             }
         }
     }

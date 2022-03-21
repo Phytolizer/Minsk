@@ -1,5 +1,3 @@
-using Minsk.CodeAnalysis.Binding;
-
 namespace Minsk.CodeAnalysis.Syntax;
 
 public sealed class SyntaxTree
@@ -19,18 +17,5 @@ public sealed class SyntaxTree
     {
         var parser = new Parser(text);
         return parser.Parse();
-    }
-
-    public EvaluationResult Evaluate()
-    {
-        var binder = new Binder();
-        var boundExpression = binder.BindExpression(Root);
-        var diagnostics = binder.Diagnostics.ToArray();
-        if (diagnostics.Any())
-        {
-            return new EvaluationResult(diagnostics);
-        }
-
-        return new EvaluationResult(new Evaluator(boundExpression).Evaluate());
     }
 }
