@@ -35,10 +35,20 @@ internal static class Program
             var diagnostics = result.Diagnostics.ToArray();
             if (diagnostics.Any())
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
                 foreach (var diagnostic in diagnostics)
                 {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine(diagnostic);
+                    Console.WriteLine();
+                    var errorSpan = diagnostic.Span;
+                    var prefixSpan = new TextSpan(0, errorSpan.Start);
+                    var suffixSpan = TextSpan.FromBounds(errorSpan.End, line.Length);
+                    Console.ResetColor();
+                    Console.Write(line[prefixSpan.Start..prefixSpan.End]);
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write(line[errorSpan.Start..errorSpan.End]);
+                    Console.ResetColor();
+                    Console.WriteLine(line[suffixSpan.Start..suffixSpan.End]);
                 }
 
                 Console.ResetColor();
