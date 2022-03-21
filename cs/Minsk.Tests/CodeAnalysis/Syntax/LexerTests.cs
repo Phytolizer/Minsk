@@ -64,6 +64,14 @@ public sealed class LexerTests
             .Select(elem => (elem.t1, elem.t2));
     }
 
+    private static IEnumerable<(SimpleToken t1, SimpleToken separator, SimpleToken t2)> GetTokenPairsWithSeparator()
+    {
+        return GetTokens()
+            .SelectMany(_ => GetTokens(), (t1, t2) => new { t1, t2 })
+            .Where(elem => RequiresSeparator(elem.t1.Kind, elem.t2.Kind))
+            .SelectMany(_ => GetSeparators(), (elem, separator) => (elem.t1, separator, elem.t2));
+    }
+
     private static bool RequiresSeparator(SyntaxKind t1Kind, SyntaxKind t2Kind)
     {
         var t1IsKeyword = t1Kind.ToString().EndsWith("Keyword");
@@ -92,7 +100,7 @@ public sealed class LexerTests
 
     private static IEnumerable<object[]> GetLexesTokenData()
     {
-        return GetTokens().Select(t => new object[] { t.Kind, t.Text });
+        return GetTokens().Select(t => new object[] { t });
     }
 
     private static IEnumerable<object[]> GetLexesTokenPairsData()
@@ -100,14 +108,19 @@ public sealed class LexerTests
         return GetTokenPairs().Select(t => new object[] { t.t1, t.t2 });
     }
 
+    private static IEnumerable<object[]> GetLexesTokenPairsWithSeparatorData()
+    {
+        return GetTokenPairsWithSeparator().Select(t => new object[] { t.t1, t.separator, t.t2 });
+    }
+
     [Theory]
     [MemberData(nameof(GetLexesTokenData))]
-    private void LexesToken(SyntaxKind kind, string text)
+    private void LexesToken(SimpleToken t)
     {
-        var tokens = SyntaxTree.ParseTokens(text);
+        var tokens = SyntaxTree.ParseTokens(t.Text);
         var token = Assert.Single(tokens);
-        Assert.Equal(kind, token.Kind);
-        Assert.Equal(text, token.Text);
+        Assert.Equal(t.Kind, token.Kind);
+        Assert.Equal(t.Text, token.Text);
     }
 
     [Theory]
@@ -121,5 +134,20 @@ public sealed class LexerTests
         Assert.Equal(t1.Text, tokens[0].Text);
         Assert.Equal(t2.Kind, tokens[1].Kind);
         Assert.Equal(t2.Text, tokens[1].Text);
+    }
+
+    [Theory]
+    [MemberData(nameof(GetLexesTokenPairsWithSeparatorData))]
+    private void LexesTokenPairsWithSeparator(SimpleToken t1, SimpleToken separator, SimpleToken t2)
+    {
+        var text = t1.Text + separator.Text + t2.Text;
+        var tokens = SyntaxTree.ParseTokens(text).ToArray();
+        Assert.Equal(3, tokens.Length);
+        Assert.Equal(t1.Kind, tokens[0].Kind);
+        Assert.Equal(t1.Text, tokens[0].Text);
+        Assert.Equal(separator.Kind, tokens[1].Kind);
+        Assert.Equal(separator.Text, tokens[1].Text);
+        Assert.Equal(t2.Kind, tokens[2].Kind);
+        Assert.Equal(t2.Text, tokens[2].Text);
     }
 }
