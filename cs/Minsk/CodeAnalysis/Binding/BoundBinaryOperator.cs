@@ -10,33 +10,66 @@ internal sealed class BoundBinaryOperator
     public Type RightType { get; }
     public Type ResultType { get; }
 
-    private BoundBinaryOperator(Type leftType, SyntaxKind syntaxKind, BoundBinaryOperatorKind operatorKind,
-        Type rightType, Type resultType)
+    private BoundBinaryOperator(
+        SyntaxKind syntaxKind,
+        BoundBinaryOperatorKind operatorKind,
+        Type leftType,
+        Type rightType,
+        Type resultType
+    )
     {
-        LeftType = leftType;
         SyntaxKind = syntaxKind;
         OperatorKind = operatorKind;
+        LeftType = leftType;
         RightType = rightType;
         ResultType = resultType;
     }
 
     private static readonly BoundBinaryOperator[] KnownOperators =
     {
-        new(typeof(int), SyntaxKind.PlusToken, BoundBinaryOperatorKind.Addition, typeof(int), typeof(int)),
-        new(typeof(int), SyntaxKind.MinusToken, BoundBinaryOperatorKind.Subtraction, typeof(int), typeof(int)),
-        new(typeof(int), SyntaxKind.StarToken, BoundBinaryOperatorKind.Multiplication, typeof(int), typeof(int)),
-        new(typeof(int), SyntaxKind.SlashToken, BoundBinaryOperatorKind.Division, typeof(int), typeof(int)),
+        new(SyntaxKind.PlusToken, BoundBinaryOperatorKind.Addition, typeof(int), typeof(int), typeof(int)),
+        new(SyntaxKind.MinusToken, BoundBinaryOperatorKind.Subtraction, typeof(int), typeof(int), typeof(int)),
+        new(SyntaxKind.StarToken, BoundBinaryOperatorKind.Multiplication, typeof(int), typeof(int), typeof(int)),
+        new(SyntaxKind.SlashToken, BoundBinaryOperatorKind.Division, typeof(int), typeof(int), typeof(int)),
         new(
-            typeof(bool),
             SyntaxKind.AmpersandAmpersandToken,
             BoundBinaryOperatorKind.LogicalAnd,
+            typeof(bool),
             typeof(bool),
             typeof(bool)
         ),
         new(
-            typeof(bool),
             SyntaxKind.PipePipeToken,
             BoundBinaryOperatorKind.LogicalOr,
+            typeof(bool),
+            typeof(bool),
+            typeof(bool)
+        ),
+        new(
+            SyntaxKind.EqualsEqualsToken,
+            BoundBinaryOperatorKind.Equality,
+            typeof(int),
+            typeof(int),
+            typeof(bool)
+        ),
+        new(
+            SyntaxKind.BangEqualsToken,
+            BoundBinaryOperatorKind.Inequality,
+            typeof(int),
+            typeof(int),
+            typeof(bool)
+        ),
+        new(
+            SyntaxKind.EqualsEqualsToken,
+            BoundBinaryOperatorKind.Equality,
+            typeof(bool),
+            typeof(bool),
+            typeof(bool)
+        ),
+        new(
+            SyntaxKind.BangEqualsToken,
+            BoundBinaryOperatorKind.Inequality,
+            typeof(bool),
             typeof(bool),
             typeof(bool)
         ),

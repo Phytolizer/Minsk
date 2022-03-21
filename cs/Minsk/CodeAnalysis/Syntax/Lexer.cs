@@ -102,8 +102,29 @@ internal sealed class Lexer : IEnumerable<SyntaxToken>
                         _position++;
                         break;
                     case '!':
-                        kind = SyntaxKind.BangToken;
-                        _position++;
+                        if (Peek(1) == '=')
+                        {
+                            kind = SyntaxKind.BangEqualsToken;
+                            _position += 2;
+                        }
+                        else
+                        {
+                            kind = SyntaxKind.BangToken;
+                            _position++;
+                        }
+
+                        break;
+                    case '=':
+                        if (Peek(1) == '=')
+                        {
+                            kind = SyntaxKind.EqualsEqualsToken;
+                            _position += 2;
+                        }
+                        else
+                        {
+                            _position++;
+                        }
+
                         break;
                     case '&':
                         if (Peek(1) == '&')
