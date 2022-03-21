@@ -53,4 +53,18 @@ public static class SyntaxFacts
             _ => null,
         };
     }
+
+    public static IEnumerable<SyntaxKind> GetUnaryOperatorKinds()
+    {
+        return Enum.GetValues(typeof(SyntaxKind))
+            .Cast<SyntaxKind>()
+            .Where(kind => GetUnaryOperatorPrecedence(kind) > 0);
+    }
+
+    public static IEnumerable<SyntaxKind> GetBinaryOperatorKinds()
+    {
+        return Enum.GetValues(typeof(SyntaxKind))
+            .Cast<SyntaxKind>()
+            .Where(kind => GetBinaryOperatorPrecedence(kind) > 0);
+    }
 }
