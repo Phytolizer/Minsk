@@ -69,10 +69,10 @@ internal sealed class BoundBinaryOperator
         ResultType = resultType;
     }
 
-    public Type LeftType { get; }
-    public SyntaxKind SyntaxKind { get; }
+    private Type LeftType { get; }
+    private SyntaxKind SyntaxKind { get; }
     public BoundBinaryOperatorKind OperatorKind { get; }
-    public Type RightType { get; }
+    private Type RightType { get; }
     public Type ResultType { get; }
 
     public static BoundBinaryOperator? BindBinaryOperator(

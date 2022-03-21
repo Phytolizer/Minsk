@@ -2,7 +2,7 @@ using Minsk.CodeAnalysis.Syntax;
 
 namespace Minsk.CodeAnalysis.Binding;
 
-internal class BoundUnaryOperator
+internal sealed class BoundUnaryOperator
 {
     private static readonly BoundUnaryOperator[] KnownOperators =
     {
@@ -25,8 +25,8 @@ internal class BoundUnaryOperator
     }
 
     public BoundUnaryOperatorKind OperatorKind { get; }
-    public SyntaxKind SyntaxKind { get; }
-    public Type OperandType { get; }
+    private SyntaxKind SyntaxKind { get; }
+    private Type OperandType { get; }
     public Type ResultType { get; }
 
     public static BoundUnaryOperator? Bind(SyntaxKind operatorKind, BoundExpression operand)

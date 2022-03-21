@@ -1,6 +1,6 @@
 namespace Minsk.CodeAnalysis.Binding;
 
-internal class BoundBinaryExpression : BoundExpression
+internal sealed class BoundBinaryExpression : BoundExpression
 {
     public BoundBinaryExpression(BoundExpression left, BoundBinaryOperator op, BoundExpression right)
     {

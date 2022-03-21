@@ -3,7 +3,7 @@ using Minsk.CodeAnalysis.Syntax;
 
 namespace Minsk.CodeAnalysis;
 
-public class Compilation
+public sealed class Compilation
 {
     private readonly SyntaxTree _syntaxTree;
 

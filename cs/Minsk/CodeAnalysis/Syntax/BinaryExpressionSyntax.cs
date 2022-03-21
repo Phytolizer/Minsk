@@ -14,5 +14,5 @@ public sealed class BinaryExpressionSyntax : ExpressionSyntax
     public ExpressionSyntax Right { get; }
 
     public override SyntaxKind Kind => SyntaxKind.BinaryExpression;
-    public override IEnumerable<SyntaxNode> Children => new SyntaxNode[] { Left, OperatorToken, Right };
+    protected override IEnumerable<SyntaxNode> Children => new SyntaxNode[] { Left, OperatorToken, Right };
 }

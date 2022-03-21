@@ -3,7 +3,7 @@ namespace Minsk.CodeAnalysis.Syntax;
 public abstract class SyntaxNode
 {
     public abstract SyntaxKind Kind { get; }
-    public abstract IEnumerable<SyntaxNode> Children { get; }
+    protected abstract IEnumerable<SyntaxNode> Children { get; }
 
     public void PrettyPrint()
     {
@@ -29,6 +29,9 @@ public abstract class SyntaxNode
         indent += isLast ? "    " : "│   ";
         var children = node.Children.ToArray();
         var lastChild = children.LastOrDefault();
-        foreach (var child in children) PrettyPrintInternal(child, indent, child == lastChild);
+        foreach (var child in children)
+        {
+            PrettyPrintInternal(child, indent, child == lastChild);
+        }
     }
 }

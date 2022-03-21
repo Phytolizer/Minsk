@@ -2,8 +2,8 @@ namespace Minsk.CodeAnalysis;
 
 public sealed class EvaluationResult
 {
-    public Diagnostic[] Diagnostics;
-    public object? Value;
+    public readonly Diagnostic[] Diagnostics;
+    public readonly object? Value;
 
     internal EvaluationResult(Diagnostic[] diagnostics, object? value)
     {

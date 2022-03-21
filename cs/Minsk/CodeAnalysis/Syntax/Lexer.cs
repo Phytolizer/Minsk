@@ -28,13 +28,19 @@ internal sealed class Lexer : IEnumerable<SyntaxToken>
 
             if (char.IsWhiteSpace(CurrentChar))
             {
-                while (char.IsWhiteSpace(CurrentChar)) _position++;
+                while (char.IsWhiteSpace(CurrentChar))
+                {
+                    _position++;
+                }
 
                 kind = SyntaxKind.WhitespaceToken;
             }
             else if (char.IsDigit(CurrentChar))
             {
-                while (char.IsDigit(CurrentChar)) _position++;
+                while (char.IsDigit(CurrentChar))
+                {
+                    _position++;
+                }
 
                 currentText = CurrentText(start);
                 if (!int.TryParse(currentText, out var intVal))
@@ -47,7 +53,10 @@ internal sealed class Lexer : IEnumerable<SyntaxToken>
             }
             else if (char.IsLetter(CurrentChar))
             {
-                while (char.IsLetterOrDigit(CurrentChar)) _position++;
+                while (char.IsLetterOrDigit(CurrentChar))
+                {
+                    _position++;
+                }
 
                 currentText = CurrentText(start);
                 kind = SyntaxFacts.GetKeywordKind(currentText);
