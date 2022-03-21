@@ -284,12 +284,12 @@ mod tests {
                         let text = format!("{}{}{}", t1.text, sep.text, t2.text);
                         let tokens = SyntaxTree::parse_tokens(&text);
                         assert_eq!(3, tokens.len());
-                    assert_eq!(t1.kind, tokens[0].kind);
-                    assert_eq!(t1.text, tokens[0].text);
-                    assert_eq!(sep.kind, tokens[1].kind);
-                    assert_eq!(sep.text, tokens[1].text);
-                    assert_eq!(t2.kind, tokens[2].kind);
-                    assert_eq!(t2.text, tokens[2].text);
+                        assert_eq!(t1.kind, tokens[0].kind);
+                        assert_eq!(t1.text, tokens[0].text);
+                        assert_eq!(sep.kind, tokens[1].kind);
+                        assert_eq!(sep.text, tokens[1].text);
+                        assert_eq!(t2.kind, tokens[2].kind);
+                        assert_eq!(t2.text, tokens[2].text);
                     }
                 }
             }
