@@ -97,15 +97,27 @@ internal sealed class Parser
 
     private ExpressionSyntax ParsePrimaryExpression()
     {
-        if (Current.Kind == SyntaxKind.OpenParenthesisToken)
+        // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+        switch (Current.Kind)
         {
-            var openParenthesisToken = MatchToken(SyntaxKind.OpenParenthesisToken);
-            var expression = ParseExpression();
-            var closeParenthesisToken = MatchToken(SyntaxKind.CloseParenthesisToken);
-            return new ParenthesizedExpressionSyntax(openParenthesisToken, expression, closeParenthesisToken);
+            case SyntaxKind.OpenParenthesisToken:
+            {
+                var openParenthesisToken = MatchToken(SyntaxKind.OpenParenthesisToken);
+                var expression = ParseExpression();
+                var closeParenthesisToken = MatchToken(SyntaxKind.CloseParenthesisToken);
+                return new ParenthesizedExpressionSyntax(openParenthesisToken, expression, closeParenthesisToken);
+            }
+            case SyntaxKind.TrueKeyword:
+            case SyntaxKind.FalseKeyword:
+            {
+                var keywordToken = NextToken();
+                return new LiteralExpressionSyntax(Current, keywordToken.Kind == SyntaxKind.TrueKeyword);
+            }
+            default:
+            {
+                var numberToken = MatchToken(SyntaxKind.NumberToken);
+                return new LiteralExpressionSyntax(numberToken);
+            }
         }
-
-        var numberToken = MatchToken(SyntaxKind.NumberToken);
-        return new LiteralExpressionSyntax(numberToken);
     }
 }

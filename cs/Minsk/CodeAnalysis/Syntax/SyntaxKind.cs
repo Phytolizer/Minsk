@@ -6,6 +6,7 @@ public enum SyntaxKind
     EndOfFileToken,
 
     WhitespaceToken,
+    IdentifierToken,
     NumberToken,
 
     PlusToken,
@@ -14,10 +15,13 @@ public enum SyntaxKind
     SlashToken,
     OpenParenthesisToken,
     CloseParenthesisToken,
+    
+    TrueKeyword,
+    FalseKeyword,
 
     // Syntax nodes
     LiteralExpression,
     BinaryExpression,
     ParenthesizedExpression,
-    UnaryExpression
+    UnaryExpression,
 }

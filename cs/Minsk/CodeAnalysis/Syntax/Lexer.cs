@@ -63,6 +63,16 @@ internal sealed class Lexer : IEnumerable<SyntaxToken>
                 kind = SyntaxKind.NumberToken;
                 value = intVal;
             }
+            else if (char.IsLetter(CurrentChar))
+            {
+                while (char.IsLetterOrDigit(CurrentChar))
+                {
+                    _position++;
+                }
+
+                currentText = CurrentText(start);
+                kind = SyntaxFacts.GetKeywordKind(currentText);
+            }
             else
             {
                 switch (CurrentChar)

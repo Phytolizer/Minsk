@@ -11,12 +11,12 @@ internal sealed class Evaluator
         _root = root;
     }
 
-    public int Evaluate()
+    public object Evaluate()
     {
         return EvaluateExpression(_root);
     }
 
-    private int EvaluateExpression(BoundExpression root)
+    private object EvaluateExpression(BoundExpression root)
     {
         // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
         return root.Kind switch
@@ -28,19 +28,19 @@ internal sealed class Evaluator
         };
     }
 
-    private int EvaluateUnaryExpression(BoundUnaryExpression root)
+    private object EvaluateUnaryExpression(BoundUnaryExpression root)
     {
         var operand = EvaluateExpression(root.Operand);
         // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
         return root.Op.OperatorKind switch
         {
             BoundUnaryOperatorKind.Identity => operand,
-            BoundUnaryOperatorKind.Negation => -operand,
+            BoundUnaryOperatorKind.Negation => -(int)operand,
             _ => throw new InvalidOperationException(),
         };
     }
 
-    private int EvaluateBinaryExpression(BoundBinaryExpression root)
+    private object EvaluateBinaryExpression(BoundBinaryExpression root)
     {
         var left = EvaluateExpression(root.Left);
         var right = EvaluateExpression(root.Right);
@@ -48,16 +48,16 @@ internal sealed class Evaluator
         // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
         return root.Op.OperatorKind switch
         {
-            BoundBinaryOperatorKind.Addition => left + right,
-            BoundBinaryOperatorKind.Subtraction => left - right,
-            BoundBinaryOperatorKind.Multiplication => left * right,
-            BoundBinaryOperatorKind.Division => left / right,
+            BoundBinaryOperatorKind.Addition => (int)left + (int)right,
+            BoundBinaryOperatorKind.Subtraction => (int)left - (int)right,
+            BoundBinaryOperatorKind.Multiplication => (int)left * (int)right,
+            BoundBinaryOperatorKind.Division => (int)left / (int)right,
             _ => throw new InvalidOperationException(),
         };
     }
 
-    private static int EvaluateLiteralExpression(BoundLiteralExpression root)
+    private static object EvaluateLiteralExpression(BoundLiteralExpression root)
     {
-        return root.Value as int? ?? throw new InvalidOperationException();
+        return root.Value ?? throw new InvalidOperationException();
     }
 }
