@@ -1,3 +1,3 @@
 namespace Minsk.CodeAnalysis;
 
-public record VariableSymbol(string Name, Type Type);
+public readonly record struct VariableSymbol(string Name, Type Type);
