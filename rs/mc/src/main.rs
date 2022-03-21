@@ -1,8 +1,8 @@
-use std::io::Write;
 use std::io::stdin;
 use std::io::stdout;
 use std::io::BufRead;
 use std::io::BufReader;
+use std::io::Write;
 
 use crossterm::style::Color;
 use crossterm::style::ResetColor;
@@ -14,6 +14,7 @@ use crossterm::ExecutableCommand;
 use minsk::analysis::compilation::Compilation;
 use minsk::analysis::syntax::node::SyntaxNode;
 use minsk::analysis::syntax::tree::SyntaxTree;
+use minsk::analysis::text_span::TextSpan;
 
 fn main() -> std::io::Result<()> {
     let mut reader = BufReader::new(stdin());
@@ -59,9 +60,20 @@ fn main() -> std::io::Result<()> {
                 println!("{}", result);
             }
             Err(diagnostics) => {
-                stdout().execute(SetForegroundColor(Color::DarkRed))?;
                 for diagnostic in diagnostics {
+                    stdout().execute(SetForegroundColor(Color::DarkRed))?;
                     println!("{}", diagnostic);
+                    println!();
+                    let error_span = diagnostic.span();
+                    let prefix_span = TextSpan::new(0, error_span.start());
+                    let suffix_span = TextSpan::from_bounds(error_span.end(), line.trim().len());
+                    stdout().execute(ResetColor)?;
+                    print!("    {}", &line[prefix_span.start()..prefix_span.end()]);
+                    stdout().execute(SetForegroundColor(Color::DarkRed))?;
+                    print!("{}", &line[error_span.start()..error_span.end()]);
+                    stdout().execute(ResetColor)?;
+                    println!("{}", &line[suffix_span.start()..suffix_span.end()]);
+                    println!();
                 }
                 stdout().execute(ResetColor)?;
             }

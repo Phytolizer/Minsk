@@ -5,8 +5,15 @@ pub struct TextSpan {
 }
 
 impl TextSpan {
-    pub(crate) fn new(start: usize, length: usize) -> Self {
+    pub fn new(start: usize, length: usize) -> Self {
         Self { start, length }
+    }
+
+    pub fn from_bounds(start: usize, end: usize) -> Self {
+        Self {
+            start,
+            length: end - start,
+        }
     }
 
     pub fn start(&self) -> usize {
