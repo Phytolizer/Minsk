@@ -137,6 +137,9 @@ impl<'a> Iterator for LexerIterator<'a> {
                 if self.peek(1) == '=' {
                     kind = SyntaxKind::EqualsEqualsToken;
                     self.position += 2;
+                } else {
+                    kind = SyntaxKind::EqualsToken;
+                    self.position += 1;
                 }
             }
             '&' => {

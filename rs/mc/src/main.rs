@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::io::stdin;
 use std::io::stdout;
 use std::io::BufRead;
@@ -15,11 +16,13 @@ use minsk::analysis::compilation::Compilation;
 use minsk::analysis::syntax::node::SyntaxNode;
 use minsk::analysis::syntax::tree::SyntaxTree;
 use minsk::analysis::text_span::TextSpan;
+use minsk::object::Object;
 
 fn main() -> std::io::Result<()> {
     let mut reader = BufReader::new(stdin());
     let mut line = String::new();
     let mut show_tree = false;
+    let mut variables = HashMap::<String, Object>::new();
     loop {
         print!("> ");
         stdout().flush()?;
@@ -55,7 +58,7 @@ fn main() -> std::io::Result<()> {
             stdout().execute(ResetColor)?;
         }
         let compilation = Compilation::new(syntax_tree);
-        match compilation.evaluate() {
+        match compilation.evaluate(&mut variables) {
             Ok(result) => {
                 println!("{}", result);
             }

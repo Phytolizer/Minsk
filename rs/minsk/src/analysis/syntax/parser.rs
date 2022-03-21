@@ -4,8 +4,10 @@ use crate::object::Object;
 use super::facts;
 use super::kind::SyntaxKind;
 use super::lexer::Lexer;
+use super::node::expression::assignment::AssignmentExpressionSyntax;
 use super::node::expression::binary::BinaryExpressionSyntax;
 use super::node::expression::literal::LiteralExpressionSyntax;
+use super::node::expression::name::NameExpressionSyntax;
 use super::node::expression::parenthesized::ParenthesizedExpressionSyntax;
 use super::node::expression::unary::UnaryExpressionSyntax;
 use super::node::expression::ExpressionSyntax;
@@ -95,7 +97,24 @@ impl Parser {
     }
 
     fn parse_expression(&mut self) -> ExpressionSyntax {
-        self.parse_binary_expression(0)
+        self.parse_assignment_expression()
+    }
+
+    fn parse_assignment_expression(&mut self) -> ExpressionSyntax {
+        if self.current_kind() != SyntaxKind::IdentifierToken
+            || self.peek_kind(1) != SyntaxKind::EqualsToken
+        {
+            self.parse_binary_expression(0)
+        } else {
+            let identifier_token = self.next_token();
+            let equals_token = self.next_token();
+            let expression = Box::new(self.parse_assignment_expression());
+            ExpressionSyntax::Assignment(AssignmentExpressionSyntax {
+                identifier_token,
+                equals_token,
+                expression,
+            })
+        }
     }
 
     fn parse_binary_expression(&mut self, parent_precedence: usize) -> ExpressionSyntax {
@@ -150,6 +169,10 @@ impl Parser {
                     )),
                     literal_token: keyword_token,
                 })
+            }
+            SyntaxKind::IdentifierToken => {
+                let identifier_token = self.next_token();
+                ExpressionSyntax::Name(NameExpressionSyntax { identifier_token })
             }
             _ => {
                 let number_token = self.match_token(SyntaxKind::NumberToken);

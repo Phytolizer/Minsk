@@ -75,6 +75,10 @@ impl DiagnosticBag {
             ),
         );
     }
+
+    pub(crate) fn report_undefined_name(&mut self, span: TextSpan, name: &str) {
+        self.report(span, format!("Undefined name '{}'", name));
+    }
 }
 
 pub(crate) struct DiagnosticBagIterator {

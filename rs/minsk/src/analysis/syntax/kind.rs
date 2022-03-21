@@ -16,14 +16,17 @@ pub enum SyntaxKind {
     PipePipeToken,
     BangEqualsToken,
     EqualsEqualsToken,
+    EqualsToken,
     OpenParenthesisToken,
     CloseParenthesisToken,
 
     TrueKeyword,
     FalseKeyword,
 
+    AssignmentExpression,
     BinaryExpression,
     LiteralExpression,
+    NameExpression,
     UnaryExpression,
     ParenthesizedExpression,
 }

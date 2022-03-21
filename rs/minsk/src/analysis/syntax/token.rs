@@ -8,11 +8,11 @@ use super::node::SyntaxNode;
 
 #[derive(Debug, Clone)]
 pub struct SyntaxToken {
-    kind: SyntaxKind,
-    text: String,
-    position: usize,
-    length: usize,
-    value: Option<Object>,
+    pub(crate) kind: SyntaxKind,
+    pub(crate) text: String,
+    pub(crate) position: usize,
+    pub(crate) length: usize,
+    pub(crate) value: Option<Object>,
 }
 
 impl SyntaxToken {
@@ -50,6 +50,10 @@ impl SyntaxToken {
 
     pub(crate) fn text(&self) -> &str {
         self.text.as_str()
+    }
+
+    pub(crate) fn take_text(self) -> String {
+        self.text
     }
 }
 
