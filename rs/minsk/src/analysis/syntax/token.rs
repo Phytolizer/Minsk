@@ -51,10 +51,6 @@ impl SyntaxToken {
     pub(crate) fn text(&self) -> &str {
         self.text.as_str()
     }
-
-    pub(crate) fn take_text(self) -> String {
-        self.text
-    }
 }
 
 impl Display for SyntaxToken {

@@ -65,8 +65,15 @@ impl<'v> Binder<'v> {
         &mut self,
         syntax: AssignmentExpressionSyntax,
     ) -> BoundExpression {
-        let name = syntax.identifier_token.take_text();
+        let name = syntax.identifier_token.text;
         let bound_expression = self.bind_expression(*syntax.expression);
+
+        let default_value = match bound_expression.ty() {
+            ObjectKind::Number => Object::Number(0),
+            ObjectKind::Bool => Object::Bool(false),
+        };
+        self.variables.insert(name.clone(), default_value);
+
         BoundExpression::Assignment(BoundAssignmentExpression {
             name,
             expression: Box::new(bound_expression),
