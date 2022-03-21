@@ -116,7 +116,7 @@ impl<'v> Binder<'v> {
         let name = syntax.identifier_token.text;
         match self.variables.get(name.as_str()) {
             Some(value) => {
-                let ty = ObjectKind::Number;
+                let ty = value.kind();
                 BoundExpression::Variable(BoundVariableExpression { name, ty })
             }
             None => {
