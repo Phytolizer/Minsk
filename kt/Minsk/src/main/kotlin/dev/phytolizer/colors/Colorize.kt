@@ -15,7 +15,7 @@ object Colorize {
     }
 
     fun clearScreen() {
-        print("${ESC}2J")
+        print("${ESC}2J${ESC}0;0H")
     }
 
     fun colorCode256(index: Int): String = "${ESC}38;5;${index}m"
