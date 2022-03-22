@@ -8,37 +8,37 @@ internal class BoundBinaryOperator private constructor(
     val kind: BoundBinaryOperatorKind,
     private val leftType: Type,
     private val rightType: Type,
-    val resultType: Type
+    val resultType: Type,
 ) {
     companion object {
         private val operators = listOf(
             BoundBinaryOperator(
                 SyntaxKind.PlusToken,
                 BoundBinaryOperatorKind.Addition,
-                Int::class.java,
-                Int::class.java,
-                Int::class.java
+                Integer::class.java,
+                Integer::class.java,
+                Integer::class.java,
             ),
             BoundBinaryOperator(
                 SyntaxKind.MinusToken,
                 BoundBinaryOperatorKind.Subtraction,
-                Int::class.java,
-                Int::class.java,
-                Int::class.java
+                Integer::class.java,
+                Integer::class.java,
+                Integer::class.java,
             ),
             BoundBinaryOperator(
                 SyntaxKind.StarToken,
                 BoundBinaryOperatorKind.Multiplication,
-                Int::class.java,
-                Int::class.java,
-                Int::class.java
+                Integer::class.java,
+                Integer::class.java,
+                Integer::class.java,
             ),
             BoundBinaryOperator(
                 SyntaxKind.SlashToken,
                 BoundBinaryOperatorKind.Division,
-                Int::class.java,
-                Int::class.java,
-                Int::class.java
+                Integer::class.java,
+                Integer::class.java,
+                Integer::class.java,
             )
         )
 

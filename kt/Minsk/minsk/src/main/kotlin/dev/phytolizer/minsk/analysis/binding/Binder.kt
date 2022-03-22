@@ -21,6 +21,7 @@ internal class Binder {
 
         val op = BoundBinaryOperator.bind(syntax.operatorToken.kind, left.type, right.type)
         return if (op == null) {
+            _diagnostics.add("Binary operator ${syntax.operatorToken.text} is not defined for ${left.type} and ${right.type}")
             left
         } else {
             BoundBinaryExpression(left, op, right)
@@ -40,6 +41,7 @@ internal class Binder {
 
         val op = BoundUnaryOperator.bind(syntax.operatorToken.kind, operand.type)
         return if (op == null) {
+            _diagnostics.add("Unary operator ${syntax.operatorToken.text} is not defined for ${operand.type}")
             operand
         } else {
             BoundUnaryExpression(op, operand)
