@@ -20,4 +20,25 @@ object SyntaxFacts {
         "false" -> SyntaxKind.FalseKeyword
         else -> SyntaxKind.IdentifierToken
     }
+
+    fun binaryOperators(): List<SyntaxKind> = SyntaxKind.values().filter { binaryOperatorPrecedence(it) > 0 }
+    fun unaryOperators(): List<SyntaxKind> = SyntaxKind.values().filter { unaryOperatorPrecedence(it) > 0 }
+
+    fun getText(kind: SyntaxKind): String? = when (kind) {
+        SyntaxKind.PlusToken -> "+"
+        SyntaxKind.MinusToken -> "-"
+        SyntaxKind.StarToken -> "*"
+        SyntaxKind.SlashToken -> "/"
+        SyntaxKind.OpenParenthesisToken -> "("
+        SyntaxKind.CloseParenthesisToken -> ")"
+        SyntaxKind.BangToken -> "!"
+        SyntaxKind.AmpersandAmpersandToken -> "&&"
+        SyntaxKind.PipePipeToken -> "||"
+        SyntaxKind.BangEqualsToken -> "!="
+        SyntaxKind.EqualsEqualsToken -> "=="
+        SyntaxKind.EqualsToken -> "="
+        SyntaxKind.TrueKeyword -> "true"
+        SyntaxKind.FalseKeyword -> "false"
+        else -> null
+    }
 }

@@ -1,5 +1,6 @@
 package dev.phytolizer.minsk.analysis.syntax
 
+import dev.phytolizer.minsk.TestUtils
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.shouldBe
@@ -77,18 +78,14 @@ class LexerTests : FunSpec({
             SimpleToken(SyntaxKind.WhitespaceToken, "\r\n"),
         )
 
-        private fun tokenPairs(): List<List<SimpleToken>> =
-            listOf(tokens(), tokens()).fold<List<SimpleToken>, List<List<SimpleToken>>>(listOf(listOf())) { acc, lst ->
-                acc.flatMap { fst -> lst.map { fst + it } }
-            }.filter { !requiresSeparator(it[0], it[1]) }
+        private fun tokenPairs() =
+            TestUtils.cartesianProduct(tokens(), tokens()).filter { !requiresSeparator(it[0], it[1]) }
 
-        private fun tokenPairsWithSeparator(): List<List<SimpleToken>> = listOf(
+        private fun tokenPairsWithSeparator() = TestUtils.cartesianProduct(
             tokens(),
             separators(),
             tokens(),
-        ).fold<List<SimpleToken>, List<List<SimpleToken>>>(listOf(listOf())) { acc, lst ->
-            acc.flatMap { fst -> lst.map { fst + it } }
-        }.filter { requiresSeparator(it[0], it[2]) }
+        ).filter { requiresSeparator(it[0], it[2]) }
 
         private fun requiresSeparator(t1: SimpleToken, t2: SimpleToken): Boolean {
             val t1IsKeyword = t1.kind.toString().endsWith("Keyword")
