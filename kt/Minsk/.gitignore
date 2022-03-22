@@ -1,7 +1,7 @@
 ### Gradle template
 .gradle
 **/build/
-!Minsk/src/**/build/
+!minsk/src/**/build/
 
 # Ignore Gradle GUI config
 gradle-app.setting
