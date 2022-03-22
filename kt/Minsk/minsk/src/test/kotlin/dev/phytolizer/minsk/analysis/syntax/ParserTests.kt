@@ -46,9 +46,54 @@ class ParserTests : FunSpec({
             }
         }
     }
+
+    context("unary operator honors precedence") {
+        withData(
+            nameFn = { "${it[0]} x ${it[1]}" },
+            unaryOperatorPairs(),
+        ) {
+            val unaryKind = it[0]
+            val binaryKind = it[1]
+            val unaryText = SyntaxFacts.getText(unaryKind)!!
+            val binaryText = SyntaxFacts.getText(binaryKind)!!
+            val unaryPrecedence = SyntaxFacts.unaryOperatorPrecedence(unaryKind)
+            val binaryPrecedence = SyntaxFacts.binaryOperatorPrecedence(binaryKind)
+            val text = "$unaryText a $binaryText b"
+            val expression = SyntaxTree.parse(text).root
+
+            if (unaryPrecedence >= binaryPrecedence) {
+                val e = AssertingEnumerator(expression)
+
+                e.assertNode(SyntaxKind.BinaryExpression)
+                e.assertNode(SyntaxKind.UnaryExpression)
+                e.assertToken(unaryKind, unaryText)
+                e.assertNode(SyntaxKind.NameExpression)
+                e.assertToken(SyntaxKind.IdentifierToken, "a")
+                e.assertToken(binaryKind, binaryText)
+                e.assertNode(SyntaxKind.NameExpression)
+                e.assertToken(SyntaxKind.IdentifierToken, "b")
+                e.assertAtEnd()
+            } else {
+                val e = AssertingEnumerator(expression)
+
+                e.assertNode(SyntaxKind.UnaryExpression)
+                e.assertToken(unaryKind, unaryText)
+                e.assertNode(SyntaxKind.BinaryExpression)
+                e.assertNode(SyntaxKind.NameExpression)
+                e.assertToken(SyntaxKind.IdentifierToken, "a")
+                e.assertToken(binaryKind, binaryText)
+                e.assertNode(SyntaxKind.NameExpression)
+                e.assertToken(SyntaxKind.IdentifierToken, "b")
+                e.assertAtEnd()
+            }
+        }
+    }
 }) {
     companion object {
         fun binaryOperatorPairs() =
             TestUtils.cartesianProduct(SyntaxFacts.binaryOperators(), SyntaxFacts.binaryOperators())
+
+        fun unaryOperatorPairs() =
+            TestUtils.cartesianProduct(SyntaxFacts.unaryOperators(), SyntaxFacts.binaryOperators())
     }
 }
