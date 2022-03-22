@@ -1,7 +1,5 @@
 package dev.phytolizer.minsk.analysis.syntax
 
-import java.lang.NumberFormatException
-
 class Lexer(private val _text: String) : Iterable<SyntaxToken> {
     private val _diagnostics = mutableListOf<String>()
     val diagnostics: List<String>
