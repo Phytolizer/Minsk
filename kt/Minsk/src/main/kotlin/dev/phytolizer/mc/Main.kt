@@ -1,14 +1,15 @@
 package dev.phytolizer.mc
 
-import dev.phytolizer.minsk.Lexer
+import dev.phytolizer.minsk.Parser
 
 fun main() {
     while (true) {
         print("> ")
         val line = readLine() ?: break
 
-        for (token in Lexer(line)) {
-            println(token)
-        }
+        val parser = Parser(line)
+        val expression = parser.parse()
+
+        expression.prettyPrint()
     }
 }

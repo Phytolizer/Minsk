@@ -1,6 +1,6 @@
 package dev.phytolizer.minsk
 
-class SyntaxToken(val kind: SyntaxKind, val position: Int, val text: String, val value: Any?) {
+class SyntaxToken(override val kind: SyntaxKind, val position: Int, val text: String, val value: Any?) : SyntaxNode() {
     override fun toString(): String {
         val result = StringBuilder()
         result.append("$kind '$text'")
@@ -9,4 +9,7 @@ class SyntaxToken(val kind: SyntaxKind, val position: Int, val text: String, val
         }
         return result.toString()
     }
+
+    override val children: List<SyntaxNode>
+        get() = listOf()
 }
