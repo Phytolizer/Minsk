@@ -55,7 +55,7 @@ internal sealed class Binder
 
         var variable = new VariableSymbol(name, boundExpression.Type);
 
-        _variables[variable] = null;
+        _variables[variable] = 0;
 
         return new BoundAssignmentExpression(variable, boundExpression);
     }
