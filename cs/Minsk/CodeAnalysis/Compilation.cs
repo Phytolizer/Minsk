@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Minsk.CodeAnalysis.Binding;
 using Minsk.CodeAnalysis.Syntax;
 
@@ -16,13 +17,13 @@ public sealed class Compilation
     {
         var binder = new Binder(variables);
         var boundExpression = binder.BindExpression(_syntaxTree.Root);
-        var diagnostics = _syntaxTree.Diagnostics.Concat(binder.Diagnostics).ToArray();
+        var diagnostics = _syntaxTree.Diagnostics.Concat(binder.Diagnostics).ToImmutableArray();
         if (diagnostics.Any())
         {
             return new EvaluationResult(diagnostics, null);
         }
 
         var evaluator = new Evaluator(boundExpression, variables);
-        return new EvaluationResult(Array.Empty<Diagnostic>(), evaluator.Evaluate());
+        return new EvaluationResult(ImmutableArray<Diagnostic>.Empty, evaluator.Evaluate());
     }
 }
