@@ -23,7 +23,3 @@ tasks.test {
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
 }
-
-application {
-    mainClass.set("dev.phytolizer.mc.MainKt")
-}
