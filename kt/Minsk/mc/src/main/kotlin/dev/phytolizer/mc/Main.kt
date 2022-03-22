@@ -14,11 +14,13 @@ fun main() {
     val textBuilder = StringBuilder()
 
     while (true) {
+        print(Colorize.colorCode(AnsiColor.Green, ColorStyle.Regular))
         if (textBuilder.isEmpty()) {
             print("» ")
         } else {
             print("· ")
         }
+        print(Colorize.RESET)
         val input = readLine() ?: break
         if (textBuilder.isEmpty()) {
             when (input) {
