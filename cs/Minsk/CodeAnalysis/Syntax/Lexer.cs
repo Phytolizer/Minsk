@@ -6,10 +6,10 @@ namespace Minsk.CodeAnalysis.Syntax;
 internal sealed class Lexer : IEnumerable<SyntaxToken>
 {
     private readonly DiagnosticBag _diagnostics = new();
-    private readonly string _text;
+    private readonly SourceText _text;
     private int _position;
 
-    public Lexer(string text)
+    public Lexer(SourceText text)
     {
         _text = text;
     }
@@ -165,6 +165,6 @@ internal sealed class Lexer : IEnumerable<SyntaxToken>
 
     private string CurrentText(int start)
     {
-        return _text[start.._position];
+        return _text.ToString(start, _position - start);
     }
 }
