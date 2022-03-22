@@ -38,6 +38,8 @@ internal class Evaluator {
             BoundBinaryOperatorKind.Subtraction -> left as Int - right as Int
             BoundBinaryOperatorKind.Multiplication -> left as Int * right as Int
             BoundBinaryOperatorKind.Division -> left as Int / right as Int
+            BoundBinaryOperatorKind.LogicalAnd -> left as Boolean && right as Boolean
+            BoundBinaryOperatorKind.LogicalOr -> left as Boolean || right as Boolean
         }
     }
 }

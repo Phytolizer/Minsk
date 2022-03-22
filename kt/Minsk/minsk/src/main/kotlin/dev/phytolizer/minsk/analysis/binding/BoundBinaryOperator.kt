@@ -39,6 +39,20 @@ internal class BoundBinaryOperator private constructor(
                 Int::class,
                 Int::class,
                 Int::class,
+            ),
+            BoundBinaryOperator(
+                SyntaxKind.AmpersandAmpersandToken,
+                BoundBinaryOperatorKind.LogicalAnd,
+                Boolean::class,
+                Boolean::class,
+                Boolean::class,
+            ),
+            BoundBinaryOperator(
+                SyntaxKind.PipePipeToken,
+                BoundBinaryOperatorKind.LogicalOr,
+                Boolean::class,
+                Boolean::class,
+                Boolean::class,
             )
         )
 
