@@ -56,7 +56,14 @@ class Parser(text: String) {
     }
 
     private fun parseBinaryExpression(parentPrecedence: Int): ExpressionSyntax {
-        var left = parsePrimaryExpression()
+        val unaryOperatorPrecedence = SyntaxFacts.unaryOperatorPrecedence(current.kind)
+        var left = if (unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence) {
+            val operatorToken = nextToken()
+            val operand = parseBinaryExpression(unaryOperatorPrecedence)
+            UnaryExpressionSyntax(operatorToken, operand)
+        } else {
+            parsePrimaryExpression()
+        }
 
         while (true) {
             val precedence = SyntaxFacts.binaryOperatorPrecedence(current.kind)
