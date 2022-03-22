@@ -2,9 +2,10 @@ package dev.phytolizer.minsk.analysis.binding
 
 import dev.phytolizer.minsk.analysis.Diagnostic
 import dev.phytolizer.minsk.analysis.DiagnosticBag
+import dev.phytolizer.minsk.analysis.VariableSymbol
 import dev.phytolizer.minsk.analysis.syntax.*
 
-internal class Binder(private val _variables: MutableMap<String, Any>) {
+internal class Binder(private val _variables: MutableMap<VariableSymbol, Any>) {
     private val _diagnostics = DiagnosticBag()
     val diagnostics: List<Diagnostic>
         get() = _diagnostics.diagnostics
@@ -23,17 +24,18 @@ internal class Binder(private val _variables: MutableMap<String, Any>) {
         val expression = bindExpression(syntax.expression)
 
         val name = syntax.identifierToken.text
-        val existingVariable = _variables[name]
+        val existingVariable = _variables.keys.firstOrNull { it.name == name }
         if (existingVariable != null) {
             _variables.remove(existingVariable)
         }
 
-        _variables[name] = when (expression.type) {
+        val variable = VariableSymbol(name, expression.type)
+        _variables[variable] = when (variable.type) {
             Int::class -> 0
             Boolean::class -> false
             else -> throw IllegalStateException()
         }
-        return BoundAssignmentExpression(name, expression)
+        return BoundAssignmentExpression(variable, expression)
     }
 
     private fun bindBinaryExpression(syntax: BinaryExpressionSyntax): BoundExpression {
@@ -60,13 +62,12 @@ internal class Binder(private val _variables: MutableMap<String, Any>) {
 
     private fun bindNameExpression(syntax: NameExpressionSyntax): BoundExpression {
         val name = syntax.identifierToken.text
-        val value = _variables[name]
-        return if (value == null) {
+        val variable = _variables.keys.firstOrNull { it.name == name }
+        return if (variable == null) {
             _diagnostics.reportUndefinedName(syntax.identifierToken.span, name)
             BoundLiteralExpression(0)
         } else {
-            val type = value::class
-            BoundVariableExpression(name, type)
+            BoundVariableExpression(variable)
         }
     }
 

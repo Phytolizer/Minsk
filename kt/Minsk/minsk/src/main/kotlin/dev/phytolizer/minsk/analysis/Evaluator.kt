@@ -2,7 +2,7 @@ package dev.phytolizer.minsk.analysis
 
 import dev.phytolizer.minsk.analysis.binding.*
 
-internal class Evaluator(private val _variables: MutableMap<String, Any>) {
+internal class Evaluator(private val _variables: MutableMap<VariableSymbol, Any>) {
     fun evaluate(root: BoundExpression): Any {
         return evaluateExpression(root)
     }
@@ -19,7 +19,7 @@ internal class Evaluator(private val _variables: MutableMap<String, Any>) {
 
     private fun evaluateAssignmentExpression(root: BoundAssignmentExpression): Any {
         val value = evaluateExpression(root.expression)
-        _variables[root.name] = value
+        _variables[root.variable] = value
         return value
     }
 
@@ -54,6 +54,6 @@ internal class Evaluator(private val _variables: MutableMap<String, Any>) {
     }
 
     private fun evaluateVariableExpression(root: BoundVariableExpression): Any {
-        return _variables[root.name]!!
+        return _variables[root.variable]!!
     }
 }
