@@ -40,4 +40,8 @@ internal class DiagnosticBag {
     fun addAll(diagnostics: Collection<Diagnostic>) {
         _diagnostics.addAll(diagnostics)
     }
+
+    fun reportUndefinedName(span: TextSpan, name: String) {
+        report(span, "Undefined name '$name'")
+    }
 }

@@ -108,6 +108,9 @@ internal class Lexer(private val _text: String) : Iterable<SyntaxToken> {
                 '=' -> if (peek(1) == '=') {
                     kind = SyntaxKind.EqualsEqualsToken
                     position += 2
+                } else {
+                    kind = SyntaxKind.EqualsToken
+                    position += 1
                 }
                 else -> {}
             }

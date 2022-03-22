@@ -19,12 +19,15 @@ enum class SyntaxKind {
     PipePipeToken,
     EqualsEqualsToken,
     BangEqualsToken,
+    EqualsToken,
 
     TrueKeyword,
     FalseKeyword,
 
+    AssignmentExpression,
     BinaryExpression,
     LiteralExpression,
-    UnaryExpression,
+    NameExpression,
     ParenthesizedExpression,
+    UnaryExpression,
 }

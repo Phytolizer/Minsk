@@ -52,7 +52,18 @@ internal class Parser(text: String) {
     }
 
     private fun parseExpression(): ExpressionSyntax {
-        return parseBinaryExpression(0)
+        return parseAssignmentExpression()
+    }
+
+    private fun parseAssignmentExpression(): ExpressionSyntax {
+        return if (peek(0).kind == SyntaxKind.IdentifierToken && peek(1).kind == SyntaxKind.EqualsToken) {
+            val identifierToken = nextToken()
+            val equalsToken = nextToken()
+            val expression = parseAssignmentExpression()
+            AssignmentExpressionSyntax(identifierToken, equalsToken, expression)
+        } else {
+            parseBinaryExpression(0)
+        }
     }
 
     private fun parseBinaryExpression(parentPrecedence: Int): ExpressionSyntax {
@@ -82,7 +93,13 @@ internal class Parser(text: String) {
     private fun parsePrimaryExpression(): ExpressionSyntax = when (current.kind) {
         SyntaxKind.OpenParenthesisToken -> parseParenthesizedExpression()
         SyntaxKind.TrueKeyword, SyntaxKind.FalseKeyword -> parseBooleanLiteral()
-        else -> parseNumberLiteral()
+        SyntaxKind.NumberToken -> parseNumberLiteral()
+        else -> parseNameExpression()
+    }
+
+    private fun parseNameExpression(): ExpressionSyntax {
+        val identifierToken = matchToken(SyntaxKind.IdentifierToken)
+        return NameExpressionSyntax(identifierToken)
     }
 
     private fun parseNumberLiteral(): LiteralExpressionSyntax {

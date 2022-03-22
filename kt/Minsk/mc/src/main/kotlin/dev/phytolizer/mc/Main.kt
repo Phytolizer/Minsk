@@ -8,6 +8,7 @@ import dev.phytolizer.minsk.analysis.syntax.SyntaxTree
 
 fun main() {
     var showTree = false
+    val variables = mutableMapOf<String, Any>()
 
     while (true) {
         print("> ")
@@ -29,7 +30,7 @@ fun main() {
         }
 
         val syntaxTree = SyntaxTree.parse(line)
-        val result = Compilation().evaluate(syntaxTree)
+        val result = Compilation().evaluate(syntaxTree, variables)
         val diagnostics = result.diagnostics
 
         if (diagnostics.isEmpty()) {
