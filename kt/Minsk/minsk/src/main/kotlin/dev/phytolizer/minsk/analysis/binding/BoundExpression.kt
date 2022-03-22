@@ -1,8 +1,8 @@
 package dev.phytolizer.minsk.analysis.binding
 
-import java.lang.reflect.Type
+import kotlin.reflect.KClass
 
 internal abstract class BoundExpression : BoundNode() {
-    abstract val type: Type
+    abstract val type: KClass<out Any>
 }
 

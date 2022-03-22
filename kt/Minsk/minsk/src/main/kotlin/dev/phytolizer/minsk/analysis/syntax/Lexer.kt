@@ -11,14 +11,17 @@ class Lexer(private val _text: String) : Iterable<SyntaxToken> {
 
     private class LexerIterator(private val lexer: Lexer) : Iterator<SyntaxToken> {
         private var position = 0
-        private val current: Char
-            get() {
-                return if (position >= lexer._text.length) {
-                    '\u0000'
-                } else {
-                    lexer._text[position]
-                }
+        private fun peek(offset: Int): Char {
+            val index = position + offset
+            return if (index >= lexer._text.length) {
+                '\u0000'
+            } else {
+                lexer._text[index]
             }
+        }
+
+        private val current: Char
+            get() = peek(0)
 
         override fun hasNext(): Boolean {
             return position < lexer._text.length
@@ -48,6 +51,13 @@ class Lexer(private val _text: String) : Iterable<SyntaxToken> {
                 } catch (_: NumberFormatException) {
                     lexer._diagnostics.add("The number $currentText doesn't fit in an Int")
                 }
+            } else if (current.isLetter()) {
+                while (current.isLetterOrDigit()) {
+                    position += 1
+                }
+
+                currentText = lexer._text.substring(start until position)
+                kind = SyntaxFacts.keywordKind(currentText)
             } else when (current) {
                 '\u0000' -> {
                     kind = SyntaxKind.EndOfFileToken
@@ -75,6 +85,18 @@ class Lexer(private val _text: String) : Iterable<SyntaxToken> {
                 ')' -> {
                     kind = SyntaxKind.CloseParenthesisToken
                     position += 1
+                }
+                '!' -> {
+                    kind = SyntaxKind.BangToken
+                    position += 1
+                }
+                '&' -> if (peek(1) == '&') {
+                    kind = SyntaxKind.AmpersandAmpersandToken
+                    position += 2
+                }
+                '|' -> if (peek(1) == '|') {
+                    kind = SyntaxKind.PipePipeToken
+                    position += 2
                 }
                 else -> {}
             }

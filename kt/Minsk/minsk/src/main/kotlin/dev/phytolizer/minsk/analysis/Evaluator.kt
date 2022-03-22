@@ -21,6 +21,7 @@ internal class Evaluator {
         return when (root.op.kind) {
             BoundUnaryOperatorKind.Identity -> operand
             BoundUnaryOperatorKind.Negation -> -(operand as Int)
+            BoundUnaryOperatorKind.LogicalNegation -> !(operand as Boolean)
         }
     }
 

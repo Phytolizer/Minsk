@@ -85,6 +85,14 @@ class Parser(text: String) {
             val expression = parseExpression()
             val closeParenthesisToken = matchToken(SyntaxKind.CloseParenthesisToken)
             ParenthesizedExpressionSyntax(openParenthesisToken, expression, closeParenthesisToken)
+        } else if (current.kind == SyntaxKind.TrueKeyword || current.kind == SyntaxKind.FalseKeyword) {
+            val isTrue = current.kind == SyntaxKind.TrueKeyword
+            val keywordToken = if (isTrue) {
+                matchToken(SyntaxKind.TrueKeyword)
+            } else {
+                matchToken(SyntaxKind.FalseKeyword)
+            }
+            LiteralExpressionSyntax(keywordToken, isTrue)
         } else {
             val numberToken = matchToken(SyntaxKind.NumberToken)
             LiteralExpressionSyntax(numberToken)

@@ -1,13 +1,13 @@
 package dev.phytolizer.minsk.analysis.binding
 
-import java.lang.reflect.Type
+import kotlin.reflect.KClass
 
 internal class BoundBinaryExpression(
     val left: BoundExpression,
     val op: BoundBinaryOperator,
     val right: BoundExpression,
 ) : BoundExpression() {
-    override val type: Type
+    override val type: KClass<out Any>
         get() = op.resultType
     override val kind: BoundNodeKind
         get() = BoundNodeKind.BinaryExpression

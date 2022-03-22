@@ -5,6 +5,7 @@ enum class SyntaxKind {
     EndOfFileToken,
 
     WhitespaceToken,
+    IdentifierToken,
     NumberToken,
 
     PlusToken,
@@ -13,6 +14,12 @@ enum class SyntaxKind {
     SlashToken,
     OpenParenthesisToken,
     CloseParenthesisToken,
+    BangToken,
+    AmpersandAmpersandToken,
+    PipePipeToken,
+
+    TrueKeyword,
+    FalseKeyword,
 
     BinaryExpression,
     LiteralExpression,
