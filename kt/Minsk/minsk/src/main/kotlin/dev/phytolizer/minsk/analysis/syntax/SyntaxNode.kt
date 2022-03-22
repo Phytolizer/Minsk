@@ -1,8 +1,17 @@
 package dev.phytolizer.minsk.analysis.syntax
 
+import dev.phytolizer.minsk.analysis.TextSpan
+
 abstract class SyntaxNode {
     abstract val kind: SyntaxKind
     abstract val children: List<SyntaxNode>
+
+    open val span: TextSpan
+        get() {
+            val first = children.first().span
+            val last = children.last().span
+            return TextSpan.fromBounds(first.start, last.end)
+        }
 
     fun prettyPrint() {
         prettyPrint(this, "", true)

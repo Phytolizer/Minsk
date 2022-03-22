@@ -12,7 +12,7 @@ class SyntaxToken(override val kind: SyntaxKind, val position: Int, val text: St
         return result.toString()
     }
 
-    val span: TextSpan
+    override val span: TextSpan
         get() = TextSpan(position, text.length)
     override val children: List<SyntaxNode>
         get() = listOf()

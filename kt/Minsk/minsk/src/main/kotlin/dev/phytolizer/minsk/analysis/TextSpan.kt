@@ -5,4 +5,10 @@ class TextSpan(val start: Int, val length: Int) {
         get() = start + length
     val range: IntRange
         get() = start until end
+
+    companion object {
+        fun fromBounds(start: Int, end: Int): TextSpan {
+            return TextSpan(start, end - start)
+        }
+    }
 }
