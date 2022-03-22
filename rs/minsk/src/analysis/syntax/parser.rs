@@ -167,7 +167,7 @@ impl Parser {
     }
 
     fn parse_name_expression(&mut self) -> ExpressionSyntax {
-        let identifier_token = self.next_token();
+        let identifier_token = self.match_token(SyntaxKind::IdentifierToken);
         ExpressionSyntax::Name(NameExpressionSyntax { identifier_token })
     }
 
