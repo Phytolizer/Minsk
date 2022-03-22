@@ -3,7 +3,7 @@ package dev.phytolizer.minsk.analysis.syntax
 class ParenthesizedExpressionSyntax(
     val openParenthesisToken: SyntaxToken,
     val expression: ExpressionSyntax,
-    val closeParenthesisToken: SyntaxToken
+    val closeParenthesisToken: SyntaxToken,
 ) : ExpressionSyntax() {
     override val kind: SyntaxKind
         get() = SyntaxKind.ParenthesizedExpression

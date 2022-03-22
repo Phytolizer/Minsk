@@ -7,7 +7,7 @@ internal class BoundUnaryOperator private constructor(
     private val syntaxKind: SyntaxKind,
     val kind: BoundUnaryOperatorKind,
     private val operandType: Type,
-    val resultType: Type
+    val resultType: Type,
 ) {
     companion object {
         private val operators = listOf(

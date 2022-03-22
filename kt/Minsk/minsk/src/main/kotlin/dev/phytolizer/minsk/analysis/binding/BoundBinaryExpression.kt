@@ -5,7 +5,7 @@ import java.lang.reflect.Type
 internal class BoundBinaryExpression(
     val left: BoundExpression,
     val op: BoundBinaryOperator,
-    val right: BoundExpression
+    val right: BoundExpression,
 ) : BoundExpression() {
     override val type: Type
         get() = op.resultType
