@@ -28,9 +28,7 @@ class SourceText private constructor(private val _text: String) {
                 }
             }
 
-            if (position > lineStart) {
-                addLine(result, sourceText, position, lineStart, 0)
-            }
+            addLine(result, sourceText, position, lineStart, 0)
 
             return result
         }
