@@ -28,7 +28,7 @@ internal class Binder {
     }
 
     private fun bindLiteralExpression(syntax: LiteralExpressionSyntax): BoundExpression {
-        return BoundLiteralExpression(syntax.literalToken.value!!)
+        return BoundLiteralExpression(syntax.literalToken.value ?: 0)
     }
 
     private fun bindParenthesizedExpression(syntax: ParenthesizedExpressionSyntax): BoundExpression {

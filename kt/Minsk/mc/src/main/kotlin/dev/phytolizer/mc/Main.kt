@@ -3,7 +3,6 @@ package dev.phytolizer.mc
 import dev.phytolizer.colors.AnsiColor
 import dev.phytolizer.colors.ColorStyle
 import dev.phytolizer.colors.Colorize
-import dev.phytolizer.minsk.analysis.Evaluator
 import dev.phytolizer.minsk.analysis.syntax.SyntaxTree
 
 fun main() {
@@ -29,7 +28,8 @@ fun main() {
         }
 
         val syntaxTree = SyntaxTree.parse(line)
-        val diagnostics = syntaxTree.diagnostics
+        val result = syntaxTree.evaluate()
+        val diagnostics = listOf(syntaxTree.diagnostics, result.diagnostics).flatten()
 
         if (diagnostics.isEmpty()) {
             if (showTree) {
@@ -38,8 +38,7 @@ fun main() {
                 print(Colorize.RESET)
             }
 
-            val result = Evaluator().evaluate(syntaxTree.root)
-            println(result)
+            println(result.value)
         } else {
             print(Colorize.colorCode(AnsiColor.Red, ColorStyle.Regular))
             for (diagnostic in diagnostics) {
