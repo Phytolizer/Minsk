@@ -1,4 +1,4 @@
-pub(crate) mod facts;
+pub mod facts;
 pub mod kind;
 pub(crate) mod lexer;
 pub mod node;
