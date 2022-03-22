@@ -1,5 +1,8 @@
 package dev.phytolizer.minsk.analysis.syntax
 
+import dev.phytolizer.colors.AnsiColor
+import dev.phytolizer.colors.ColorStyle
+import dev.phytolizer.colors.Colorize
 import dev.phytolizer.minsk.analysis.text.TextSpan
 import java.io.PrintStream
 
@@ -23,18 +26,35 @@ abstract class SyntaxNode {
     }
 
     private fun prettyPrint(node: SyntaxNode, writer: PrintStream, indent: String, isLast: Boolean) {
-        writer.print(indent)
+        val isToConsole = writer == System.out
         val marker = if (isLast) {
             "└── "
         } else {
             "├── "
         }
-        writer.print(marker)
-        if (node is SyntaxToken) {
-            writer.print(node)
-        } else {
-            writer.print(node.kind)
+        if (isToConsole) {
+            writer.print(Colorize.colorCode256(243))
         }
+        writer.print(indent)
+        if (isToConsole) {
+            writer.print(marker)
+        }
+
+        if (isToConsole) {
+            writer.print(Colorize.colorCode(if (node is SyntaxToken) {
+                AnsiColor.Blue
+            } else {
+                AnsiColor.Cyan
+            }, ColorStyle.Regular))
+        }
+        writer.print(node.kind)
+        if (isToConsole) {
+            writer.print(Colorize.RESET)
+        }
+        if (node is SyntaxToken && node.value != null) {
+            writer.print(" ${node.value}")
+        }
+
         writer.println()
         val newIndent = indent + if (isLast) {
             "    "
