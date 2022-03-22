@@ -76,4 +76,8 @@ impl SyntaxNode for SyntaxToken {
     fn is_token(&self) -> bool {
         true
     }
+
+    fn token_text(&self) -> &str {
+        &self.text
+    }
 }

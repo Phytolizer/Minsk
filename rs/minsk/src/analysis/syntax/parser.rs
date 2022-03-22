@@ -184,3 +184,55 @@ impl Parser {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::analysis::syntax::asserting_enumerator::AssertingEnumerator;
+    use crate::analysis::syntax::facts;
+    use crate::analysis::syntax::kind::SyntaxKind;
+    use crate::analysis::syntax::tree::SyntaxTree;
+
+    #[test]
+    fn binary_expression_honors_precedence() {
+        for op1 in facts::get_binary_operator_kinds() {
+            for op2 in facts::get_binary_operator_kinds() {
+                let op1_precedence = facts::binary_operator_precedence(op1);
+                let op2_precedence = facts::binary_operator_precedence(op2);
+                let op1_text = facts::get_text(op1).unwrap();
+                let op2_text = facts::get_text(op2).unwrap();
+                let text = format!("a {} b {} c", op1_text, op2_text);
+                let expression = SyntaxTree::parse(&text);
+
+                if op1_precedence >= op2_precedence {
+                    let mut e = AssertingEnumerator::new(&expression.root);
+
+                    e.assert_node(SyntaxKind::BinaryExpression);
+                    e.assert_node(SyntaxKind::BinaryExpression);
+                    e.assert_node(SyntaxKind::NameExpression);
+                    e.assert_token(SyntaxKind::IdentifierToken, "a");
+                    e.assert_token(op1, op1_text);
+                    e.assert_node(SyntaxKind::NameExpression);
+                    e.assert_token(SyntaxKind::IdentifierToken, "b");
+                    e.assert_token(op2, op2_text);
+                    e.assert_node(SyntaxKind::NameExpression);
+                    e.assert_token(SyntaxKind::IdentifierToken, "c");
+                    e.assert_at_end();
+                } else {
+                    let mut e = AssertingEnumerator::new(&expression.root);
+
+                    e.assert_node(SyntaxKind::BinaryExpression);
+                    e.assert_node(SyntaxKind::NameExpression);
+                    e.assert_token(SyntaxKind::IdentifierToken, "a");
+                    e.assert_token(op1, op1_text);
+                    e.assert_node(SyntaxKind::BinaryExpression);
+                    e.assert_node(SyntaxKind::NameExpression);
+                    e.assert_token(SyntaxKind::IdentifierToken, "b");
+                    e.assert_token(op2, op2_text);
+                    e.assert_node(SyntaxKind::NameExpression);
+                    e.assert_token(SyntaxKind::IdentifierToken, "c");
+                    e.assert_at_end();
+                }
+            }
+        }
+    }
+}

@@ -10,6 +10,9 @@ pub trait SyntaxNode: Display {
     fn is_token(&self) -> bool {
         false
     }
+    fn token_text(&self) -> &str {
+        panic!("token_text() on non-token");
+    }
     fn pretty_print(&self, writer: &mut dyn std::io::Write) -> std::io::Result<()>
     where
         Self: Sized,
