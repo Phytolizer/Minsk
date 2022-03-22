@@ -1,6 +1,6 @@
 use strum::EnumIter;
 
-#[derive(Debug, PartialEq, Eq, Clone, Copy, EnumIter)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash, EnumIter)]
 pub enum SyntaxKind {
     BadToken,
     EndOfFileToken,

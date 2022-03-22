@@ -180,6 +180,8 @@ impl<'a> Iterator for LexerIterator<'a> {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashSet;
+
     use strum::IntoEnumIterator;
 
     use crate::analysis::syntax::facts;
@@ -218,13 +220,37 @@ mod tests {
             )
     }
 
-    const SEPARATORS: &[SimpleToken] = &[
-        SimpleToken::new(SyntaxKind::WhitespaceToken, " "),
-        SimpleToken::new(SyntaxKind::WhitespaceToken, "  "),
-        SimpleToken::new(SyntaxKind::WhitespaceToken, "\n"),
-        SimpleToken::new(SyntaxKind::WhitespaceToken, "\r"),
-        SimpleToken::new(SyntaxKind::WhitespaceToken, "\r\n"),
-    ];
+    fn get_separators() -> impl Iterator<Item = SimpleToken> {
+        [
+            SimpleToken::new(SyntaxKind::WhitespaceToken, " "),
+            SimpleToken::new(SyntaxKind::WhitespaceToken, "  "),
+            SimpleToken::new(SyntaxKind::WhitespaceToken, "\n"),
+            SimpleToken::new(SyntaxKind::WhitespaceToken, "\r"),
+            SimpleToken::new(SyntaxKind::WhitespaceToken, "\r\n"),
+        ]
+        .into_iter()
+    }
+
+    #[test]
+    fn tests_all_tokens() {
+        let all_token_kinds = SyntaxKind::iter()
+            .filter(|k| {
+                let name = format!("{:?}", k);
+                name.ends_with("Token") || name.ends_with("Keyword")
+            })
+            .collect::<HashSet<_>>();
+
+        let tested_token_kinds = get_tokens()
+            .chain(get_separators())
+            .map(|t| t.kind)
+            .collect::<HashSet<_>>();
+
+        let mut token_kinds = all_token_kinds;
+        token_kinds.remove(&SyntaxKind::BadToken);
+        token_kinds.remove(&SyntaxKind::EndOfFileToken);
+
+        assert!(token_kinds.difference(&tested_token_kinds).count() == 0);
+    }
 
     #[test]
     fn lexes_token() {
@@ -283,7 +309,7 @@ mod tests {
         for t1 in get_tokens() {
             for t2 in get_tokens() {
                 if requires_separator(&t1, &t2) {
-                    for sep in SEPARATORS {
+                    for sep in get_separators() {
                         let text = format!("{}{}{}", t1.text, sep.text, t2.text);
                         let tokens = SyntaxTree::parse_tokens(&text);
                         assert_eq!(3, tokens.len());

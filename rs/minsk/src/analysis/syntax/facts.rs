@@ -42,6 +42,8 @@ pub fn get_text(kind: SyntaxKind) -> Option<&'static str> {
         SyntaxKind::OpenParenthesisToken => Some("("),
         SyntaxKind::CloseParenthesisToken => Some(")"),
         SyntaxKind::EqualsEqualsToken => Some("=="),
+        SyntaxKind::TrueKeyword => Some("true"),
+        SyntaxKind::FalseKeyword => Some("false"),
         _ => None,
     }
 }
