@@ -2,7 +2,11 @@ package dev.phytolizer.minsk
 
 import java.lang.NumberFormatException
 
-class Lexer(private val text: String) : Iterable<SyntaxToken> {
+class Lexer(private val _text: String) : Iterable<SyntaxToken> {
+    private val _diagnostics = mutableListOf<String>()
+    val diagnostics: List<String>
+        get() = _diagnostics
+
     override fun iterator(): Iterator<SyntaxToken> {
         return LexerIterator(this)
     }
@@ -11,15 +15,15 @@ class Lexer(private val text: String) : Iterable<SyntaxToken> {
         private var position = 0
         private val current: Char
             get() {
-                return if (position >= lexer.text.length) {
+                return if (position >= lexer._text.length) {
                     '\u0000'
                 } else {
-                    lexer.text[position]
+                    lexer._text[position]
                 }
             }
 
         override fun hasNext(): Boolean {
-            return position < lexer.text.length
+            return position < lexer._text.length
         }
 
         override fun next(): SyntaxToken {
@@ -40,10 +44,11 @@ class Lexer(private val text: String) : Iterable<SyntaxToken> {
                 }
 
                 kind = SyntaxKind.NumberToken
-                currentText = lexer.text.substring(start until position)
+                currentText = lexer._text.substring(start until position)
                 try {
                     value = currentText.toInt()
                 } catch (_: NumberFormatException) {
+                    lexer._diagnostics.add("The number $currentText doesn't fit in an Int")
                 }
             } else when (current) {
                 '\u0000' -> {
@@ -77,10 +82,11 @@ class Lexer(private val text: String) : Iterable<SyntaxToken> {
             }
 
             if (kind == SyntaxKind.BadToken) {
+                lexer._diagnostics.add("Unexpected character '$current'")
                 position += 1
             }
 
-            return SyntaxToken(kind, start, currentText ?: lexer.text.substring(start until position), value)
+            return SyntaxToken(kind, start, currentText ?: lexer._text.substring(start until position), value)
         }
     }
 }

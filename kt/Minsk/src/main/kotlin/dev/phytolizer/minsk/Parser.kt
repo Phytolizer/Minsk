@@ -1,27 +1,32 @@
 package dev.phytolizer.minsk
 
 class Parser(text: String) {
-    private val tokens: List<SyntaxToken>
-    private var position = 0
+    private val _tokens: List<SyntaxToken>
+    private var _position = 0
+    private val _diagnostics = mutableListOf<String>()
+    val diagnostics: List<String>
+        get() = _diagnostics
 
     init {
         val tempTokens = mutableListOf<SyntaxToken>()
-        for (token in Lexer(text)) {
+        val lexer = Lexer(text)
+        for (token in lexer) {
             if (token.kind != SyntaxKind.BadToken && token.kind != SyntaxKind.WhitespaceToken) {
                 tempTokens.add(token)
             }
         }
         tempTokens.add(SyntaxToken(SyntaxKind.EndOfFileToken, tempTokens.lastOrNull()?.position ?: 0, "", null))
-        tokens = tempTokens
+        _diagnostics.addAll(lexer.diagnostics)
+        _tokens = tempTokens
     }
 
     private fun peek(offset: Int): SyntaxToken {
-        val index = position + offset
-        if (index >= tokens.size) {
-            return tokens.last()
+        val index = _position + offset
+        if (index >= _tokens.size) {
+            return _tokens.last()
         }
 
-        return tokens[index]
+        return _tokens[index]
     }
 
     private val current
@@ -29,7 +34,7 @@ class Parser(text: String) {
 
     private fun nextToken(): SyntaxToken {
         val curr = current
-        position += 1
+        _position += 1
         return curr
     }
 
@@ -38,6 +43,7 @@ class Parser(text: String) {
             return nextToken()
         }
 
+        _diagnostics.add("Expected next token to be $kind, got ${current.kind} instead")
         return SyntaxToken(kind, current.position, "", null)
     }
 
