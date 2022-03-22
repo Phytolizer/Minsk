@@ -48,27 +48,19 @@ class LexerTests : FunSpec({
     }
 }) {
     companion object {
-        private fun tokens(): List<SimpleToken> = listOf(
-            SimpleToken(SyntaxKind.IdentifierToken, "a"),
-            SimpleToken(SyntaxKind.IdentifierToken, "abc"),
-            SimpleToken(SyntaxKind.NumberToken, "1"),
-            SimpleToken(SyntaxKind.NumberToken, "123"),
-            SimpleToken(SyntaxKind.PlusToken, "+"),
-            SimpleToken(SyntaxKind.MinusToken, "-"),
-            SimpleToken(SyntaxKind.StarToken, "*"),
-            SimpleToken(SyntaxKind.SlashToken, "/"),
-            SimpleToken(SyntaxKind.OpenParenthesisToken, "("),
-            SimpleToken(SyntaxKind.CloseParenthesisToken, ")"),
-            SimpleToken(SyntaxKind.BangToken, "!"),
-            SimpleToken(SyntaxKind.AmpersandAmpersandToken, "&&"),
-            SimpleToken(SyntaxKind.PipePipeToken, "||"),
-            SimpleToken(SyntaxKind.EqualsEqualsToken, "=="),
-            SimpleToken(SyntaxKind.BangEqualsToken, "!="),
-            SimpleToken(SyntaxKind.EqualsToken, "="),
-
-            SimpleToken(SyntaxKind.TrueKeyword, "true"),
-            SimpleToken(SyntaxKind.FalseKeyword, "false"),
-        )
+        private fun tokens(): List<SimpleToken> {
+            val fixedTokens = SyntaxKind.values().filter { SyntaxFacts.getText(it) != null }
+                .map { SimpleToken(it, SyntaxFacts.getText(it)!!) }
+            return listOf(
+                fixedTokens,
+                listOf(
+                    SimpleToken(SyntaxKind.IdentifierToken, "a"),
+                    SimpleToken(SyntaxKind.IdentifierToken, "abc"),
+                    SimpleToken(SyntaxKind.NumberToken, "1"),
+                    SimpleToken(SyntaxKind.NumberToken, "123"),
+                ),
+            ).flatten()
+        }
 
         private fun separators(): List<SimpleToken> = listOf(
             SimpleToken(SyntaxKind.WhitespaceToken, " "),
