@@ -1,11 +1,13 @@
 package dev.phytolizer.minsk.analysis.binding
 
+import dev.phytolizer.minsk.analysis.Diagnostic
+import dev.phytolizer.minsk.analysis.DiagnosticBag
 import dev.phytolizer.minsk.analysis.syntax.*
 
 internal class Binder {
-    private val _diagnostics = mutableListOf<String>()
-    val diagnostics: List<String>
-        get() = _diagnostics
+    private val _diagnostics = DiagnosticBag()
+    val diagnostics: List<Diagnostic>
+        get() = _diagnostics.diagnostics
 
     fun bindExpression(syntax: ExpressionSyntax): BoundExpression = when (syntax.kind) {
         SyntaxKind.BinaryExpression -> bindBinaryExpression(syntax as BinaryExpressionSyntax)
@@ -21,7 +23,12 @@ internal class Binder {
 
         val op = BoundBinaryOperator.bind(syntax.operatorToken.kind, left.type, right.type)
         return if (op == null) {
-            _diagnostics.add("Binary operator ${syntax.operatorToken.text} is not defined for ${left.type} and ${right.type}")
+            _diagnostics.reportUndefinedBinaryOperator(
+                syntax.operatorToken.span,
+                syntax.operatorToken.text,
+                left.type,
+                right.type,
+            )
             left
         } else {
             BoundBinaryExpression(left, op, right)
@@ -41,7 +48,11 @@ internal class Binder {
 
         val op = BoundUnaryOperator.bind(syntax.operatorToken.kind, operand.type)
         return if (op == null) {
-            _diagnostics.add("Unary operator ${syntax.operatorToken.text} is not defined for ${operand.type}")
+            _diagnostics.reportUndefinedUnaryOperator(
+                syntax.operatorToken.span,
+                syntax.operatorToken.text,
+                operand.type,
+            )
             operand
         } else {
             BoundUnaryExpression(op, operand)

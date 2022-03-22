@@ -1,6 +1,8 @@
 package dev.phytolizer.minsk.analysis.syntax
 
-class SyntaxTree(val root: ExpressionSyntax, val endOfFileToken: SyntaxToken, val diagnostics: List<String>) {
+import dev.phytolizer.minsk.analysis.Diagnostic
+
+class SyntaxTree(val root: ExpressionSyntax, val endOfFileToken: SyntaxToken, val diagnostics: List<Diagnostic>) {
     companion object {
         fun parse(text: String): SyntaxTree {
             return Parser(text).parse()

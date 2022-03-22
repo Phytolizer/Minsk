@@ -1,5 +1,7 @@
 package dev.phytolizer.minsk.analysis.syntax
 
+import dev.phytolizer.minsk.analysis.TextSpan
+
 class SyntaxToken(override val kind: SyntaxKind, val position: Int, val text: String, val value: Any?) : SyntaxNode() {
     override fun toString(): String {
         val result = StringBuilder()
@@ -10,6 +12,8 @@ class SyntaxToken(override val kind: SyntaxKind, val position: Int, val text: St
         return result.toString()
     }
 
+    val span: TextSpan
+        get() = TextSpan(position, text.length)
     override val children: List<SyntaxNode>
         get() = listOf()
 }

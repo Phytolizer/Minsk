@@ -1,9 +1,13 @@
 package dev.phytolizer.minsk.analysis.syntax
 
-class Lexer(private val _text: String) : Iterable<SyntaxToken> {
-    private val _diagnostics = mutableListOf<String>()
-    val diagnostics: List<String>
-        get() = _diagnostics
+import dev.phytolizer.minsk.analysis.Diagnostic
+import dev.phytolizer.minsk.analysis.DiagnosticBag
+import dev.phytolizer.minsk.analysis.TextSpan
+
+internal class Lexer(private val _text: String) : Iterable<SyntaxToken> {
+    private val _diagnostics = DiagnosticBag()
+    val diagnostics: List<Diagnostic>
+        get() = _diagnostics.diagnostics
 
     override fun iterator(): Iterator<SyntaxToken> {
         return LexerIterator(this)
@@ -49,7 +53,7 @@ class Lexer(private val _text: String) : Iterable<SyntaxToken> {
                 try {
                     value = currentText.toInt()
                 } catch (_: NumberFormatException) {
-                    lexer._diagnostics.add("The number $currentText doesn't fit in an Int")
+                    lexer._diagnostics.reportInvalidInt(TextSpan(start, position - start), currentText, Int::class)
                 }
             } else if (current.isLetter()) {
                 while (current.isLetterOrDigit()) {
@@ -109,7 +113,7 @@ class Lexer(private val _text: String) : Iterable<SyntaxToken> {
             }
 
             if (kind == SyntaxKind.BadToken) {
-                lexer._diagnostics.add("Unexpected character '$current'")
+                lexer._diagnostics.reportBadCharacter(start, current)
                 position += 1
             }
 

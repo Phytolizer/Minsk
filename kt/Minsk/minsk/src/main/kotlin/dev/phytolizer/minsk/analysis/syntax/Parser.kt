@@ -1,9 +1,11 @@
 package dev.phytolizer.minsk.analysis.syntax
 
-class Parser(text: String) {
+import dev.phytolizer.minsk.analysis.DiagnosticBag
+
+internal class Parser(text: String) {
     private val _tokens: List<SyntaxToken>
     private var _position = 0
-    private val _diagnostics = mutableListOf<String>()
+    private val _diagnostics = DiagnosticBag()
 
     init {
         val tempTokens = mutableListOf<SyntaxToken>()
@@ -41,12 +43,12 @@ class Parser(text: String) {
             return nextToken()
         }
 
-        _diagnostics.add("Expected next token to be $kind, got ${current.kind} instead")
+        _diagnostics.reportUnexpectedToken(current.span, kind, current.kind)
         return SyntaxToken(kind, current.position, "", null)
     }
 
     fun parse(): SyntaxTree {
-        return SyntaxTree(parseExpression(), matchToken(SyntaxKind.EndOfFileToken), _diagnostics)
+        return SyntaxTree(parseExpression(), matchToken(SyntaxKind.EndOfFileToken), _diagnostics.diagnostics)
     }
 
     private fun parseExpression(): ExpressionSyntax {
