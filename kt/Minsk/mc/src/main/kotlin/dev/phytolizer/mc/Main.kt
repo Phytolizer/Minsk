@@ -6,31 +6,48 @@ import dev.phytolizer.colors.Colorize
 import dev.phytolizer.minsk.analysis.Compilation
 import dev.phytolizer.minsk.analysis.VariableSymbol
 import dev.phytolizer.minsk.analysis.syntax.SyntaxTree
+import dev.phytolizer.minsk.analysis.text.TextSpan
 
 fun main() {
     var showTree = false
     val variables = mutableMapOf<VariableSymbol, Any>()
+    val textBuilder = StringBuilder()
 
     while (true) {
-        print("> ")
-        val line = readLine() ?: break
-        when (line) {
-            "#showTree" -> {
-                showTree = !showTree
-                if (showTree) {
-                    println("Showing parse trees.")
-                } else {
-                    println("Not showing parse trees.")
+        if (textBuilder.isEmpty()) {
+            print("> ")
+        } else {
+            print("| ")
+        }
+        val input = readLine() ?: break
+        if (textBuilder.isEmpty()) {
+            when (input) {
+                "#showTree" -> {
+                    showTree = !showTree
+                    if (showTree) {
+                        println("Showing parse trees.")
+                    } else {
+                        println("Not showing parse trees.")
+                    }
+                    continue
                 }
-                continue
-            }
-            "#cls" -> {
-                Colorize.clearScreen()
-                continue
+                "#cls" -> {
+                    Colorize.clearScreen()
+                    continue
+                }
             }
         }
 
-        val syntaxTree = SyntaxTree.parse(line)
+        textBuilder.appendLine(input)
+        val text = textBuilder.toString()
+
+        val syntaxTree = SyntaxTree.parse(text)
+
+        val isBlank = input.all { it.isWhitespace() }
+        if (!isBlank && syntaxTree.diagnostics.isNotEmpty()) {
+            continue
+        }
+
         val result = Compilation().evaluate(syntaxTree, variables)
         val diagnostics = result.diagnostics
 
@@ -43,16 +60,18 @@ fun main() {
 
             println(result.value)
         } else {
-            val text = syntaxTree.text
-
             for (diagnostic in diagnostics) {
-                val lineIndex = text.lineIndex(diagnostic.span.start)
+                val lineIndex = syntaxTree.text.lineIndex(diagnostic.span.start)
+                val line = syntaxTree.text.lines[lineIndex]
                 val lineNumber = lineIndex + 1
-                val character = diagnostic.span.start - text.lines[lineIndex].start + 1
+                val character = diagnostic.span.start - line.start + 1
 
-                val prefix = line.substring(0 until diagnostic.span.start)
-                val error = line.substring(diagnostic.span.range)
-                val suffix = line.substring(diagnostic.span.end until line.length)
+                val prefixSpan = TextSpan.fromBounds(line.start, diagnostic.span.start)
+                val suffixSpan = TextSpan.fromBounds(diagnostic.span.end, line.end)
+
+                val prefix = syntaxTree.text.toString(prefixSpan)
+                val error = syntaxTree.text.toString(diagnostic.span)
+                val suffix = syntaxTree.text.toString(suffixSpan)
 
                 print(Colorize.colorCode(AnsiColor.Red, ColorStyle.Regular))
                 print("($lineNumber, $character): ")
@@ -69,5 +88,7 @@ fun main() {
             }
             print(Colorize.RESET)
         }
+
+        textBuilder.clear()
     }
 }
