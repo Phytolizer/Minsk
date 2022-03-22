@@ -7,29 +7,21 @@ public sealed class LexerTests
 {
     private static IEnumerable<SimpleToken> GetTokens()
     {
-        return new SimpleToken[]
+        var fixedTokens = Enum.GetValues(typeof(SyntaxKind))
+            .Cast<SyntaxKind>()
+            .Select(k => (kind: k, text: SyntaxFacts.GetText(k)))
+            .Where(t => t.text != null)
+            .Select(t => new SimpleToken(t.kind, t.text!));
+
+        var dynamicTokens = new SimpleToken[]
         {
             new(SyntaxKind.IdentifierToken, "a"),
             new(SyntaxKind.IdentifierToken, "abc"),
             new(SyntaxKind.NumberToken, "1"),
             new(SyntaxKind.NumberToken, "123"),
-
-            new(SyntaxKind.PlusToken, "+"),
-            new(SyntaxKind.MinusToken, "-"),
-            new(SyntaxKind.StarToken, "*"),
-            new(SyntaxKind.SlashToken, "/"),
-            new(SyntaxKind.BangToken, "!"),
-            new(SyntaxKind.AmpersandAmpersandToken, "&&"),
-            new(SyntaxKind.PipePipeToken, "||"),
-            new(SyntaxKind.BangEqualsToken, "!="),
-            new(SyntaxKind.EqualsEqualsToken, "=="),
-            new(SyntaxKind.EqualsToken, "="),
-            new(SyntaxKind.OpenParenthesisToken, "("),
-            new(SyntaxKind.CloseParenthesisToken, ")"),
-
-            new(SyntaxKind.TrueKeyword, "true"),
-            new(SyntaxKind.FalseKeyword, "false")
         };
+
+        return fixedTokens.Concat(dynamicTokens);
     }
 
     private static IEnumerable<SimpleToken> GetSeparators()
