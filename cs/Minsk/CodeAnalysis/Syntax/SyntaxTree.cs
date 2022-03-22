@@ -1,8 +1,10 @@
+using System.Collections.Immutable;
+
 namespace Minsk.CodeAnalysis.Syntax;
 
 public sealed class SyntaxTree
 {
-    internal SyntaxTree(ExpressionSyntax root, SyntaxToken endOfFileToken, Diagnostic[] diagnostics)
+    internal SyntaxTree(ExpressionSyntax root, SyntaxToken endOfFileToken, ImmutableArray<Diagnostic> diagnostics)
     {
         Root = root;
         EndOfFileToken = endOfFileToken;
@@ -11,7 +13,7 @@ public sealed class SyntaxTree
 
     public ExpressionSyntax Root { get; }
     public SyntaxToken EndOfFileToken { get; }
-    public Diagnostic[] Diagnostics { get; }
+    public ImmutableArray<Diagnostic> Diagnostics { get; }
 
     public static SyntaxTree Parse(string text)
     {

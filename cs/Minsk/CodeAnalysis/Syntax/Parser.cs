@@ -56,7 +56,7 @@ internal sealed class Parser
 
     internal SyntaxTree Parse()
     {
-        return new SyntaxTree(ParseExpression(), MatchToken(SyntaxKind.EndOfFileToken), _diagnostics.ToArray());
+        return new SyntaxTree(ParseExpression(), MatchToken(SyntaxKind.EndOfFileToken), _diagnostics.ToImmutableArray());
     }
 
     private ExpressionSyntax ParseExpression()
