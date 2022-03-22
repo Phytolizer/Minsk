@@ -3,9 +3,24 @@ package dev.phytolizer.minsk.analysis.syntax
 import dev.phytolizer.minsk.TestUtils
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.withData
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 
 class LexerTests : FunSpec({
+    test("tests all tokens") {
+        val testedTokens = SyntaxKind.values().filter {
+            val str = it.toString()
+            str.endsWith("Keyword") || str.endsWith("Token")
+        }.toSet()
+
+        val untestedTokens = listOf(tokens(), separators()).flatten().map { it.kind }.toMutableSet()
+        untestedTokens.remove(SyntaxKind.BadToken)
+        untestedTokens.remove(SyntaxKind.EndOfFileToken)
+        untestedTokens.removeAll(testedTokens)
+
+        untestedTokens.shouldBeEmpty()
+    }
+
     context("lexes token") {
         withData(tokens()) { (kind, text) ->
             val tokens = SyntaxTree.parseTokens(text)

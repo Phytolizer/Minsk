@@ -8,7 +8,7 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 
 class EvaluatorTests : FunSpec({
-    context("evaluates correct value") {
+    test("evaluates correct value") {
         forAll<String, Any>(
             row("1", 1),
             row("+1", 1),
