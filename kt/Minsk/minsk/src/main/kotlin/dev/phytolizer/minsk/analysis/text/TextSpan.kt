@@ -1,4 +1,4 @@
-package dev.phytolizer.minsk.analysis
+package dev.phytolizer.minsk.analysis.text
 
 class TextSpan(val start: Int, val length: Int) {
     val end

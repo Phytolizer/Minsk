@@ -1,6 +1,6 @@
 package dev.phytolizer.minsk.analysis.syntax
 
-import dev.phytolizer.minsk.analysis.TextSpan
+import dev.phytolizer.minsk.analysis.text.TextSpan
 import java.io.PrintStream
 
 abstract class SyntaxNode {

@@ -1,6 +1,7 @@
 package dev.phytolizer.minsk.analysis
 
 import dev.phytolizer.minsk.analysis.syntax.SyntaxKind
+import dev.phytolizer.minsk.analysis.text.TextSpan
 import kotlin.reflect.KClass
 
 internal class DiagnosticBag {

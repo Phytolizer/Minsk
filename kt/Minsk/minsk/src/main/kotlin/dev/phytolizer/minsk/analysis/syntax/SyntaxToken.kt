@@ -1,6 +1,6 @@
 package dev.phytolizer.minsk.analysis.syntax
 
-import dev.phytolizer.minsk.analysis.TextSpan
+import dev.phytolizer.minsk.analysis.text.TextSpan
 
 class SyntaxToken(override val kind: SyntaxKind, val position: Int, val text: String, val value: Any?) : SyntaxNode() {
     override fun toString(): String {

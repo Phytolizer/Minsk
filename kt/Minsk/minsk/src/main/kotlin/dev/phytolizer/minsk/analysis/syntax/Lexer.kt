@@ -2,7 +2,7 @@ package dev.phytolizer.minsk.analysis.syntax
 
 import dev.phytolizer.minsk.analysis.Diagnostic
 import dev.phytolizer.minsk.analysis.DiagnosticBag
-import dev.phytolizer.minsk.analysis.TextSpan
+import dev.phytolizer.minsk.analysis.text.TextSpan
 
 internal class Lexer(private val _text: String) : Iterable<SyntaxToken> {
     private val _diagnostics = DiagnosticBag()
