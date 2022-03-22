@@ -80,22 +80,26 @@ class Parser(text: String) {
     }
 
     private fun parsePrimaryExpression(): ExpressionSyntax {
-        return if (current.kind == SyntaxKind.OpenParenthesisToken) {
-            val openParenthesisToken = matchToken(SyntaxKind.OpenParenthesisToken)
-            val expression = parseExpression()
-            val closeParenthesisToken = matchToken(SyntaxKind.CloseParenthesisToken)
-            ParenthesizedExpressionSyntax(openParenthesisToken, expression, closeParenthesisToken)
-        } else if (current.kind == SyntaxKind.TrueKeyword || current.kind == SyntaxKind.FalseKeyword) {
-            val isTrue = current.kind == SyntaxKind.TrueKeyword
-            val keywordToken = if (isTrue) {
-                matchToken(SyntaxKind.TrueKeyword)
-            } else {
-                matchToken(SyntaxKind.FalseKeyword)
+        return when (current.kind) {
+            SyntaxKind.OpenParenthesisToken -> {
+                val openParenthesisToken = matchToken(SyntaxKind.OpenParenthesisToken)
+                val expression = parseExpression()
+                val closeParenthesisToken = matchToken(SyntaxKind.CloseParenthesisToken)
+                ParenthesizedExpressionSyntax(openParenthesisToken, expression, closeParenthesisToken)
             }
-            LiteralExpressionSyntax(keywordToken, isTrue)
-        } else {
-            val numberToken = matchToken(SyntaxKind.NumberToken)
-            LiteralExpressionSyntax(numberToken)
+            SyntaxKind.TrueKeyword, SyntaxKind.FalseKeyword -> {
+                val isTrue = current.kind == SyntaxKind.TrueKeyword
+                val keywordToken = if (isTrue) {
+                    matchToken(SyntaxKind.TrueKeyword)
+                } else {
+                    matchToken(SyntaxKind.FalseKeyword)
+                }
+                LiteralExpressionSyntax(keywordToken, isTrue)
+            }
+            else -> {
+                val numberToken = matchToken(SyntaxKind.NumberToken)
+                LiteralExpressionSyntax(numberToken)
+            }
         }
     }
 }
