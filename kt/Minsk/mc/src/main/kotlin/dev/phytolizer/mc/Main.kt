@@ -43,12 +43,19 @@ fun main() {
 
             println(result.value)
         } else {
+            val text = syntaxTree.text
+
             for (diagnostic in diagnostics) {
+                val lineIndex = text.lineIndex(diagnostic.span.start)
+                val lineNumber = lineIndex + 1
+                val character = diagnostic.span.start - text.lines[lineIndex].start + 1
+
                 val prefix = line.substring(0 until diagnostic.span.start)
                 val error = line.substring(diagnostic.span.range)
                 val suffix = line.substring(diagnostic.span.end until line.length)
 
                 print(Colorize.colorCode(AnsiColor.Red, ColorStyle.Regular))
+                print("($lineNumber, $character): ")
                 println(diagnostic)
                 print(Colorize.RESET)
                 println()

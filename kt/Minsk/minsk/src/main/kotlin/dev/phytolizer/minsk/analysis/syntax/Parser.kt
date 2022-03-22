@@ -1,15 +1,16 @@
 package dev.phytolizer.minsk.analysis.syntax
 
 import dev.phytolizer.minsk.analysis.DiagnosticBag
+import dev.phytolizer.minsk.analysis.text.SourceText
 
-internal class Parser(text: String) {
+internal class Parser(private val _text: SourceText) {
     private val _tokens: List<SyntaxToken>
     private var _position = 0
     private val _diagnostics = DiagnosticBag()
 
     init {
         val tempTokens = mutableListOf<SyntaxToken>()
-        val lexer = Lexer(text)
+        val lexer = Lexer(_text)
         for (token in lexer) {
             if (token.kind != SyntaxKind.BadToken && token.kind != SyntaxKind.WhitespaceToken) {
                 tempTokens.add(token)
@@ -48,7 +49,7 @@ internal class Parser(text: String) {
     }
 
     fun parse(): SyntaxTree {
-        return SyntaxTree(parseExpression(), matchToken(SyntaxKind.EndOfFileToken), _diagnostics.diagnostics)
+        return SyntaxTree(_text, parseExpression(), matchToken(SyntaxKind.EndOfFileToken), _diagnostics.toList())
     }
 
     private fun parseExpression(): ExpressionSyntax {

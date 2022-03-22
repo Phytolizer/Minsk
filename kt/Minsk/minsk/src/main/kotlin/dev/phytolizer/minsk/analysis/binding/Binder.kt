@@ -8,7 +8,7 @@ import dev.phytolizer.minsk.analysis.syntax.*
 internal class Binder(private val _variables: MutableMap<VariableSymbol, Any>) {
     private val _diagnostics = DiagnosticBag()
     val diagnostics: List<Diagnostic>
-        get() = _diagnostics.diagnostics
+        get() = _diagnostics.toList()
 
     fun bindExpression(syntax: ExpressionSyntax): BoundExpression = when (syntax.kind) {
         SyntaxKind.AssignmentExpression -> bindAssignmentExpression(syntax as AssignmentExpressionSyntax)

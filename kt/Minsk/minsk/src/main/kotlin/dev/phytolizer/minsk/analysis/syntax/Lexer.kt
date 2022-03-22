@@ -2,12 +2,13 @@ package dev.phytolizer.minsk.analysis.syntax
 
 import dev.phytolizer.minsk.analysis.Diagnostic
 import dev.phytolizer.minsk.analysis.DiagnosticBag
+import dev.phytolizer.minsk.analysis.text.SourceText
 import dev.phytolizer.minsk.analysis.text.TextSpan
 
-internal class Lexer(private val _text: String) : Iterable<SyntaxToken> {
+internal class Lexer(private val _text: SourceText) : Iterable<SyntaxToken> {
     private val _diagnostics = DiagnosticBag()
     val diagnostics: List<Diagnostic>
-        get() = _diagnostics.diagnostics
+        get() = _diagnostics.toList()
 
     override fun iterator(): Iterator<SyntaxToken> {
         return LexerIterator(this)
@@ -49,7 +50,7 @@ internal class Lexer(private val _text: String) : Iterable<SyntaxToken> {
                 }
 
                 kind = SyntaxKind.NumberToken
-                currentText = lexer._text.substring(start until position)
+                currentText = lexer._text.toString(start until position)
                 try {
                     value = currentText.toInt()
                 } catch (_: NumberFormatException) {
@@ -60,7 +61,7 @@ internal class Lexer(private val _text: String) : Iterable<SyntaxToken> {
                     position += 1
                 }
 
-                currentText = lexer._text.substring(start until position)
+                currentText = lexer._text.toString(start until position)
                 kind = SyntaxFacts.keywordKind(currentText)
             } else when (current) {
                 '\u0000' -> {
@@ -120,7 +121,7 @@ internal class Lexer(private val _text: String) : Iterable<SyntaxToken> {
                 position += 1
             }
 
-            return SyntaxToken(kind, start, currentText ?: lexer._text.substring(start until position), value)
+            return SyntaxToken(kind, start, currentText ?: lexer._text.toString(start until position), value)
         }
     }
 }

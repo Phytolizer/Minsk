@@ -6,8 +6,7 @@ import kotlin.reflect.KClass
 
 internal class DiagnosticBag {
     private val _diagnostics = mutableListOf<Diagnostic>()
-    val diagnostics: List<Diagnostic>
-        get() = _diagnostics
+    fun toList(): List<Diagnostic> = _diagnostics
 
     private fun report(span: TextSpan, message: String) {
         _diagnostics.add(Diagnostic(span, message))
