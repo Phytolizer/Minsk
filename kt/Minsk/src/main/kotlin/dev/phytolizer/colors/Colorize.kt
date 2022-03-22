@@ -13,4 +13,10 @@ object Colorize {
         ColorStyle.Background -> "${ESC}4${color.code}m"
         ColorStyle.BrightBackground -> "${ESC}0;10${color.code}m"
     }
+
+    fun clearScreen() {
+        print("${ESC}2J")
+    }
+
+    fun colorCode256(index: Int): String = "${ESC}38;5;${index}m"
 }
