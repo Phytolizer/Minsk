@@ -53,7 +53,35 @@ internal class BoundBinaryOperator private constructor(
                 Boolean::class,
                 Boolean::class,
                 Boolean::class,
-            )
+            ),
+            BoundBinaryOperator(
+                SyntaxKind.EqualsEqualsToken,
+                BoundBinaryOperatorKind.Equality,
+                Int::class,
+                Int::class,
+                Boolean::class,
+            ),
+            BoundBinaryOperator(
+                SyntaxKind.BangEqualsToken,
+                BoundBinaryOperatorKind.Inequality,
+                Int::class,
+                Int::class,
+                Boolean::class,
+            ),
+            BoundBinaryOperator(
+                SyntaxKind.EqualsEqualsToken,
+                BoundBinaryOperatorKind.Equality,
+                Boolean::class,
+                Boolean::class,
+                Boolean::class,
+            ),
+            BoundBinaryOperator(
+                SyntaxKind.BangEqualsToken,
+                BoundBinaryOperatorKind.Inequality,
+                Boolean::class,
+                Boolean::class,
+                Boolean::class,
+            ),
         )
 
         fun bind(syntaxKind: SyntaxKind, leftType: KClass<out Any>, rightType: KClass<out Any>): BoundBinaryOperator? {

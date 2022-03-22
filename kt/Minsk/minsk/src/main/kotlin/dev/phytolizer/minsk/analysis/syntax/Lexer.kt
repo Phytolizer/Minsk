@@ -86,7 +86,10 @@ class Lexer(private val _text: String) : Iterable<SyntaxToken> {
                     kind = SyntaxKind.CloseParenthesisToken
                     position += 1
                 }
-                '!' -> {
+                '!' -> if (peek(1) == '=') {
+                    kind = SyntaxKind.BangEqualsToken
+                    position += 2
+                } else {
                     kind = SyntaxKind.BangToken
                     position += 1
                 }
@@ -96,6 +99,10 @@ class Lexer(private val _text: String) : Iterable<SyntaxToken> {
                 }
                 '|' -> if (peek(1) == '|') {
                     kind = SyntaxKind.PipePipeToken
+                    position += 2
+                }
+                '=' -> if (peek(1) == '=') {
+                    kind = SyntaxKind.EqualsEqualsToken
                     position += 2
                 }
                 else -> {}
