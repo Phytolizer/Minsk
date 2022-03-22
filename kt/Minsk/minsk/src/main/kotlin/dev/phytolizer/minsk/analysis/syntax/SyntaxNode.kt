@@ -1,6 +1,7 @@
 package dev.phytolizer.minsk.analysis.syntax
 
 import dev.phytolizer.minsk.analysis.TextSpan
+import java.io.PrintStream
 
 abstract class SyntaxNode {
     abstract val kind: SyntaxKind
@@ -14,23 +15,27 @@ abstract class SyntaxNode {
         }
 
     fun prettyPrint() {
-        prettyPrint(this, "", true)
+        prettyPrint(this, System.out, "", true)
     }
 
-    private fun prettyPrint(node: SyntaxNode, indent: String, isLast: Boolean) {
-        print(indent)
+    fun writeTo(writer: PrintStream) {
+        prettyPrint(this, writer, "", true)
+    }
+
+    private fun prettyPrint(node: SyntaxNode, writer: PrintStream, indent: String, isLast: Boolean) {
+        writer.print(indent)
         val marker = if (isLast) {
             "└── "
         } else {
             "├── "
         }
-        print(marker)
+        writer.print(marker)
         if (node is SyntaxToken) {
-            print(node)
+            writer.print(node)
         } else {
-            print(node.kind)
+            writer.print(node.kind)
         }
-        println()
+        writer.println()
         val newIndent = indent + if (isLast) {
             "    "
         } else {
@@ -38,7 +43,7 @@ abstract class SyntaxNode {
         }
         val lastChild = node.children.lastOrNull()
         for (child in node.children) {
-            prettyPrint(child, newIndent, child == lastChild)
+            prettyPrint(child, writer, newIndent, child == lastChild)
         }
     }
 }
