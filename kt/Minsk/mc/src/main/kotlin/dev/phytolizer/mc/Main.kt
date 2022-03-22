@@ -15,9 +15,9 @@ fun main() {
 
     while (true) {
         if (textBuilder.isEmpty()) {
-            print("> ")
+            print("» ")
         } else {
-            print("| ")
+            print("· ")
         }
         val input = readLine() ?: break
         if (textBuilder.isEmpty()) {
