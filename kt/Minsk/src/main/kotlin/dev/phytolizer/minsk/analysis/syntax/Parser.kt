@@ -52,27 +52,20 @@ class Parser(text: String) {
     }
 
     private fun parseExpression(): ExpressionSyntax {
-        return parseTerm()
+        return parseBinaryExpression(0)
     }
 
-    private fun parseTerm(): ExpressionSyntax {
-        var left = parseFactor()
-
-        while (current.kind == SyntaxKind.PlusToken || current.kind == SyntaxKind.MinusToken) {
-            val operatorToken = nextToken()
-            val right = parseFactor()
-            left = BinaryExpressionSyntax(left, operatorToken, right)
-        }
-
-        return left
-    }
-
-    private fun parseFactor(): ExpressionSyntax {
+    private fun parseBinaryExpression(parentPrecedence: Int): ExpressionSyntax {
         var left = parsePrimaryExpression()
 
-        while (current.kind == SyntaxKind.StarToken || current.kind == SyntaxKind.SlashToken) {
+        while (true) {
+            val precedence = SyntaxFacts.binaryOperatorPrecedence(current.kind)
+            if (precedence == 0 || precedence <= parentPrecedence) {
+                break
+            }
+
             val operatorToken = nextToken()
-            val right = parsePrimaryExpression()
+            val right = parseBinaryExpression(precedence)
             left = BinaryExpressionSyntax(left, operatorToken, right)
         }
 
