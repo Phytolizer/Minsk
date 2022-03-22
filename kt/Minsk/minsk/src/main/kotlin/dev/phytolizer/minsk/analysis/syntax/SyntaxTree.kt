@@ -7,5 +7,9 @@ class SyntaxTree(val root: ExpressionSyntax, val endOfFileToken: SyntaxToken, va
         fun parse(text: String): SyntaxTree {
             return Parser(text).parse()
         }
+
+        fun parseTokens(text: String): List<SyntaxToken> {
+            return Lexer(text).toList()
+        }
     }
 }
