@@ -235,4 +235,44 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    fn unary_expression_honors_precedence() {
+        for unary in facts::get_unary_operator_kinds() {
+            for binary in facts::get_binary_operator_kinds() {
+                let unary_precedence = facts::unary_operator_precedence(unary);
+                let binary_precedence = facts::binary_operator_precedence(binary);
+                let unary_text = facts::get_text(unary).unwrap();
+                let binary_text = facts::get_text(binary).unwrap();
+                let text = format!("{} a {} b", unary_text, binary_text);
+                let expression = SyntaxTree::parse(&text);
+
+                if unary_precedence >= binary_precedence {
+                    let mut e = AssertingEnumerator::new(&expression.root);
+
+                    e.assert_node(SyntaxKind::BinaryExpression);
+                    e.assert_node(SyntaxKind::UnaryExpression);
+                    e.assert_token(unary, unary_text);
+                    e.assert_node(SyntaxKind::NameExpression);
+                    e.assert_token(SyntaxKind::IdentifierToken, "a");
+                    e.assert_token(binary, binary_text);
+                    e.assert_node(SyntaxKind::NameExpression);
+                    e.assert_token(SyntaxKind::IdentifierToken, "b");
+                    e.assert_at_end();
+                } else {
+                    let mut e = AssertingEnumerator::new(&expression.root);
+
+                    e.assert_node(SyntaxKind::UnaryExpression);
+                    e.assert_token(unary, unary_text);
+                    e.assert_node(SyntaxKind::BinaryExpression);
+                    e.assert_node(SyntaxKind::NameExpression);
+                    e.assert_token(SyntaxKind::IdentifierToken, "a");
+                    e.assert_token(binary, binary_text);
+                    e.assert_node(SyntaxKind::NameExpression);
+                    e.assert_token(SyntaxKind::IdentifierToken, "b");
+                    e.assert_at_end();
+                }
+            }
+        }
+    }
 }
