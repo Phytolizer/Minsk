@@ -41,9 +41,22 @@ fun main() {
 
             println(result.value)
         } else {
-            print(Colorize.colorCode(AnsiColor.Red, ColorStyle.Regular))
             for (diagnostic in diagnostics) {
+                val prefix = line.substring(0 until diagnostic.span.start)
+                val error = line.substring(diagnostic.span.range)
+                val suffix = line.substring(diagnostic.span.end until line.length)
+
+                print(Colorize.colorCode(AnsiColor.Red, ColorStyle.Regular))
                 println(diagnostic)
+                print(Colorize.RESET)
+                println()
+                print("    ")
+                print(prefix)
+                print(Colorize.colorCode(AnsiColor.Red, ColorStyle.Regular))
+                print(error)
+                print(Colorize.RESET)
+                println(suffix)
+                println()
             }
             print(Colorize.RESET)
         }
