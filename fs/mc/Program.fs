@@ -1,3 +1,13 @@
+open System
 open Minsk
 
-Say.hello "kyle"
+let rec repl () =
+    Console.Write "> "
+    let line = Console.ReadLine () in
+        match line with
+        | null -> ()
+        | line ->
+            Console.WriteLine line
+            repl ()
+
+in repl ()
