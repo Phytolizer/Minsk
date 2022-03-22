@@ -1,3 +1,5 @@
+use strum::IntoEnumIterator;
+
 use super::kind::SyntaxKind;
 
 pub(crate) fn keyword_kind(text: &str) -> SyntaxKind {
@@ -42,6 +44,14 @@ pub fn get_text(kind: SyntaxKind) -> Option<&'static str> {
         SyntaxKind::EqualsEqualsToken => Some("=="),
         _ => None,
     }
+}
+
+pub fn get_unary_operator_kinds() -> impl Iterator<Item = SyntaxKind> {
+    SyntaxKind::iter().filter(|k| unary_operator_precedence(*k) > 0)
+}
+
+pub fn get_binary_operator_kinds() -> impl Iterator<Item = SyntaxKind> {
+    SyntaxKind::iter().filter(|k| binary_operator_precedence(*k) > 0)
 }
 
 #[cfg(test)]
