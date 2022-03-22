@@ -1,4 +1,4 @@
-namespace Minsk.CodeAnalysis;
+namespace Minsk.CodeAnalysis.Text;
 
 public readonly record struct TextSpan(int Start, int Length)
 {
