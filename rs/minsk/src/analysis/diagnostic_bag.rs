@@ -2,7 +2,7 @@ use crate::object::ObjectKind;
 
 use super::diagnostic::Diagnostic;
 use super::syntax::kind::SyntaxKind;
-use super::text_span::TextSpan;
+use super::text::span::TextSpan;
 
 pub(crate) struct DiagnosticBag {
     diagnostics: Vec<Diagnostic>,

@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::analysis::text_span::TextSpan;
+use crate::analysis::text::span::TextSpan;
 
 use super::kind::SyntaxKind;
 

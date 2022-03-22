@@ -1,5 +1,5 @@
 use crate::analysis::diagnostic_bag::DiagnosticBag;
-use crate::analysis::text_span::TextSpan;
+use crate::analysis::text::span::TextSpan;
 use crate::object::Object;
 
 use super::facts;
