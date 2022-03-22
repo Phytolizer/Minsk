@@ -8,7 +8,7 @@ internal sealed class Parser
     private readonly DiagnosticBag _diagnostics = new();
     private readonly ImmutableArray<SyntaxToken> _tokens;
     private int _position;
-    private SourceText _text;
+    private readonly SourceText _text;
 
     internal Parser(SourceText text)
     {
@@ -59,7 +59,8 @@ internal sealed class Parser
 
     internal SyntaxTree Parse()
     {
-        return new SyntaxTree(_text, ParseExpression(), MatchToken(SyntaxKind.EndOfFileToken), _diagnostics.ToImmutableArray());
+        return new SyntaxTree(_text, ParseExpression(), MatchToken(SyntaxKind.EndOfFileToken),
+            _diagnostics.ToImmutableArray());
     }
 
     private ExpressionSyntax ParseExpression()

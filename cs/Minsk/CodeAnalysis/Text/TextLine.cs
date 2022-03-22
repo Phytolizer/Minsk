@@ -5,5 +5,9 @@ public sealed record TextLine(SourceText Text, int Start, int Length, int Length
     public int End => Start + Length;
     public TextSpan Span => new(Start, Length);
     public TextSpan SpanIncludingLineBreak => new(Start, LengthIncludingLineBreak);
-    public override string ToString() => Text.ToString(Span);
+
+    public override string ToString()
+    {
+        return Text.ToString(Span);
+    }
 }

@@ -111,7 +111,18 @@ public sealed class SourceText
         return new SourceText(text);
     }
 
-    public override string ToString() => _text;
-    public string ToString(int start, int length) => _text.Substring(start, length);
-    public string ToString(TextSpan span) => ToString(span.Start, span.Length);
+    public override string ToString()
+    {
+        return _text;
+    }
+
+    public string ToString(int start, int length)
+    {
+        return _text.Substring(start, length);
+    }
+
+    public string ToString(TextSpan span)
+    {
+        return ToString(span.Start, span.Length);
+    }
 }

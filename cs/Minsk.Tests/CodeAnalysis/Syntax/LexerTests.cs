@@ -18,7 +18,7 @@ public sealed class LexerTests
             new(SyntaxKind.IdentifierToken, "a"),
             new(SyntaxKind.IdentifierToken, "abc"),
             new(SyntaxKind.NumberToken, "1"),
-            new(SyntaxKind.NumberToken, "123"),
+            new(SyntaxKind.NumberToken, "123")
         };
 
         return fixedTokens.Concat(dynamicTokens);
