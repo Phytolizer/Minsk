@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use super::text_span::TextSpan;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Diagnostic {
     span: TextSpan,
     message: String,

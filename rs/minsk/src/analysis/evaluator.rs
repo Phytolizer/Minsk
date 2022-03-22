@@ -88,3 +88,60 @@ impl<'v> Evaluator<'v> {
         self.variables.get(&root.variable).unwrap().clone()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::collections::HashMap;
+
+    use crate::analysis::compilation::Compilation;
+    use crate::analysis::syntax::tree::SyntaxTree;
+    use crate::analysis::variable_symbol::VariableSymbol;
+    use crate::object::Object;
+
+    struct Test {
+        text: &'static str,
+        expected: Object,
+    }
+
+    impl Test {
+        const fn new(text: &'static str, expected: Object) -> Self {
+            Self { text, expected }
+        }
+    }
+
+    const TESTS: &[Test] = &[
+        Test::new("1", Object::Number(1)),
+        Test::new("+1", Object::Number(1)),
+        Test::new("-1", Object::Number(-1)),
+        Test::new("14 + 12", Object::Number(26)),
+        Test::new("12 - 3", Object::Number(9)),
+        Test::new("4 * 2", Object::Number(8)),
+        Test::new("9 / 3", Object::Number(3)),
+        Test::new("(10)", Object::Number(10)),
+        Test::new("12 == 3", Object::Bool(false)),
+        Test::new("3 == 3", Object::Bool(true)),
+        Test::new("12 != 3", Object::Bool(true)),
+        Test::new("3 != 3", Object::Bool(false)),
+        Test::new("false == false", Object::Bool(true)),
+        Test::new("true == false", Object::Bool(false)),
+        Test::new("false != false", Object::Bool(false)),
+        Test::new("true != false", Object::Bool(true)),
+        Test::new("true", Object::Bool(true)),
+        Test::new("false", Object::Bool(false)),
+        Test::new("!true", Object::Bool(false)),
+        Test::new("!false", Object::Bool(true)),
+        Test::new("(a = 10) * a", Object::Number(100)),
+    ];
+
+    #[test]
+    fn evaluates_correct_value() {
+        for test in TESTS {
+            let Test { text, expected } = test;
+            let syntax_tree = SyntaxTree::parse(text);
+            let compilation = Compilation::new(syntax_tree);
+            let mut variables = HashMap::<VariableSymbol, Object>::new();
+            let result = compilation.evaluate(&mut variables).unwrap();
+            assert_eq!(*expected, result);
+        }
+    }
+}
