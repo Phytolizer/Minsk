@@ -1,9 +1,13 @@
 package dev.phytolizer.mc
 
-fun main(args: Array<String>) {
-    println("Hello World!")
+fun main() {
+    while (true) {
+        val line = readLine() ?: break
 
-    // Try adding program arguments via Run/Debug configuration.
-    // Learn more about running applications: https://www.jetbrains.com/help/idea/running-applications.html.
-    println("Program arguments: ${args.joinToString()}")
+        if (line == "1 + 2 * 3") {
+            println("7")
+        } else {
+            println("ERROR: Invalid expression!")
+        }
+    }
 }
