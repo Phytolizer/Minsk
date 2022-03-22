@@ -1,4 +1,5 @@
-﻿using Minsk.CodeAnalysis;
+﻿using System.Text;
+using Minsk.CodeAnalysis;
 using Minsk.CodeAnalysis.Syntax;
 using Minsk.CodeAnalysis.Text;
 
@@ -10,54 +11,76 @@ internal static class Program
     {
         var showTree = false;
         var variables = new Dictionary<VariableSymbol, object>();
+        var textBuilder = new StringBuilder();
 
         while (true)
         {
-            Console.Write("> ");
-            var line = Console.ReadLine();
-            if (line == null)
+            if (textBuilder.Length == 0)
+            {
+                Console.Write("> ");
+            }
+            else
+            {
+                Console.Write("| ");
+            }
+
+            var input = Console.ReadLine();
+            if (input == null)
             {
                 break;
             }
 
-            switch (line)
+            var isBlank = input.All(char.IsWhiteSpace);
+
+            if (textBuilder.Length == 0)
             {
-                case "#showTree":
-                    showTree = !showTree;
-                    Console.WriteLine(showTree ? "Showing parse trees." : "Not showing parse trees.");
-                    continue;
-                case "#cls":
-                    Console.Clear();
-                    continue;
+                switch (input)
+                {
+                    case "#showTree":
+                        showTree = !showTree;
+                        Console.WriteLine(showTree ? "Showing parse trees." : "Not showing parse trees.");
+                        continue;
+                    case "#cls":
+                        Console.Clear();
+                        continue;
+                }
             }
 
-            var syntaxTree = SyntaxTree.Parse(line);
+            textBuilder.AppendLine(input);
+            var text = textBuilder.ToString();
+
+            var syntaxTree = SyntaxTree.Parse(text);
+
+            if (!isBlank && syntaxTree.Diagnostics.Any())
+            {
+                continue;
+            }
+
             var compilation = new Compilation(syntaxTree);
             var result = compilation.Evaluate(variables);
             var diagnostics = result.Diagnostics.ToArray();
             if (diagnostics.Any())
             {
-                var text = syntaxTree.Text;
-
                 foreach (var diagnostic in diagnostics)
                 {
-                    var lineIndex = text.GetLineIndex(diagnostic.Span.Start);
+                    var lineIndex = syntaxTree.Text.GetLineIndex(diagnostic.Span.Start);
                     var lineNumber = lineIndex + 1;
-                    var character = diagnostic.Span.Start - text.Lines[lineIndex].Start + 1;
+                    var line = syntaxTree.Text.Lines[lineIndex];
+                    var character = diagnostic.Span.Start - line.Start + 1;
                     Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.Write($"({lineNumber}, {character}): ");
                     Console.WriteLine(diagnostic);
                     Console.WriteLine();
                     var errorSpan = diagnostic.Span;
-                    var prefixSpan = new TextSpan(0, errorSpan.Start);
-                    var suffixSpan = TextSpan.FromBounds(errorSpan.End, line.Length);
+                    var prefixSpan = new TextSpan(line.Start, errorSpan.Start);
+                    var suffixSpan = TextSpan.FromBounds(errorSpan.End, line.End);
                     Console.ResetColor();
                     Console.Write("    ");
-                    Console.Write(line[prefixSpan.Start..prefixSpan.End]);
+                    Console.Write(syntaxTree.Text.ToString(prefixSpan));
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Write(line[errorSpan.Start..errorSpan.End]);
+                    Console.Write(syntaxTree.Text.ToString(errorSpan));
                     Console.ResetColor();
-                    Console.WriteLine(line[suffixSpan.Start..suffixSpan.End]);
+                    Console.WriteLine(syntaxTree.Text.ToString(suffixSpan));
                     Console.WriteLine();
                 }
 
@@ -74,6 +97,8 @@ internal static class Program
 
                 Console.WriteLine(result.Value);
             }
+
+            textBuilder.Clear();
         }
     }
 }
