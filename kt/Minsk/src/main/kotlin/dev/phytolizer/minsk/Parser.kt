@@ -47,8 +47,8 @@ class Parser(text: String) {
         return SyntaxToken(kind, current.position, "", null)
     }
 
-    fun parse(): ExpressionSyntax {
-        return parseExpression()
+    fun parse(): SyntaxTree {
+        return SyntaxTree(parseExpression(), matchToken(SyntaxKind.EndOfFileToken), diagnostics)
     }
 
     private fun parseExpression(): ExpressionSyntax {

@@ -29,17 +29,17 @@ fun main() {
         }
 
         val parser = Parser(line)
-        val expression = parser.parse()
-        val diagnostics = parser.diagnostics
+        val syntaxTree = parser.parse()
+        val diagnostics = syntaxTree.diagnostics
 
         if (diagnostics.isEmpty()) {
             if (showTree) {
                 print(Colorize.colorCode256(243))
-                expression.prettyPrint()
+                syntaxTree.root.prettyPrint()
                 print(Colorize.RESET)
             }
 
-            val result = Evaluator().evaluate(expression)
+            val result = Evaluator().evaluate(syntaxTree.root)
             println(result)
         } else {
             print(Colorize.colorCode(AnsiColor.Red, ColorStyle.Regular))

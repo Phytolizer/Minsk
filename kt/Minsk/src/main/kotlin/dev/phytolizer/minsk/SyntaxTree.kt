@@ -1,0 +1,3 @@
+package dev.phytolizer.minsk
+
+class SyntaxTree(val root: ExpressionSyntax, val endOfFileToken: SyntaxToken, val diagnostics: List<String>)
