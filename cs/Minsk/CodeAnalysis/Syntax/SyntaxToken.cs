@@ -17,7 +17,7 @@ public sealed class SyntaxToken : SyntaxNode
     public string Text { get; }
     public int Position { get; }
     public object? Value { get; }
-    public TextSpan Span => new(Position, Text.Length);
+    public override TextSpan Span => new(Position, Text.Length);
 
     public override string ToString()
     {

@@ -5,6 +5,16 @@ public abstract class SyntaxNode
     public abstract SyntaxKind Kind { get; }
     public abstract IEnumerable<SyntaxNode> Children { get; }
 
+    public virtual TextSpan Span
+    {
+        get
+        {
+            var first = Children.First().Span;
+            var last = Children.Last().Span;
+            return TextSpan.FromBounds(first.Start, last.End);
+        }
+    }
+
     public void PrettyPrint()
     {
         PrettyPrintInternal(this, "", true);
