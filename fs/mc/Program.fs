@@ -3,14 +3,15 @@ open Minsk
 
 let rec repl () =
     Console.Write "> "
-    let line = Console.ReadLine () in
-        match line with
-        | null -> ()
-        | "1 + 2 * 3"  ->
-            Console.WriteLine "7"
-            repl ()
-        | _ ->
-            Console.WriteLine "ERROR: Invalid expression!"
-            repl ()
+    let line = Console.ReadLine()
 
-in repl ()
+    match line with
+    | null -> ()
+    | line ->
+        match line with
+        | "1 + 2 * 3" -> Console.WriteLine "7"
+        | _ -> Console.WriteLine "ERROR: Invalid expression!"
+
+        repl ()
+
+repl ()
