@@ -93,6 +93,23 @@ public sealed class LexerTests
         return GetTokenPairsWithSeparator().Select(t => new object[] { t.t1, t.separator, t.t2 });
     }
 
+    [Fact]
+    private void TestsAllTokens()
+    {
+        var tokenKinds = Enum.GetValues(typeof(SyntaxKind))
+            .Cast<SyntaxKind>()
+            .Where(k => k.ToString().EndsWith("Keyword") || k.ToString().EndsWith("Token"));
+
+        var testedTokenKinds = GetTokens().Concat(GetSeparators()).Select(t => t.Kind);
+
+        var untestedTokenKinds = new SortedSet<SyntaxKind>(tokenKinds);
+        untestedTokenKinds.Remove(SyntaxKind.BadToken);
+        untestedTokenKinds.Remove(SyntaxKind.EndOfFileToken);
+        untestedTokenKinds.ExceptWith(testedTokenKinds);
+
+        Assert.Empty(untestedTokenKinds);
+    }
+
     [Theory]
     [MemberData(nameof(GetLexesTokenData))]
     private void LexesToken(SimpleToken t)

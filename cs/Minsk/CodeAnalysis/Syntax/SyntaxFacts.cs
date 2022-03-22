@@ -50,6 +50,8 @@ public static class SyntaxFacts
             SyntaxKind.OpenParenthesisToken => "(",
             SyntaxKind.CloseParenthesisToken => ")",
             SyntaxKind.EqualsEqualsToken => "==",
+            SyntaxKind.TrueKeyword => "true",
+            SyntaxKind.FalseKeyword => "false",
             _ => null
         };
     }
