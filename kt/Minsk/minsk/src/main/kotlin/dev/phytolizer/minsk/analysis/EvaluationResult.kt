@@ -1,3 +1,3 @@
-package dev.phytolizer.minsk.analysis.syntax
+package dev.phytolizer.minsk.analysis
 
 class EvaluationResult(val value: Any?, val diagnostics: List<String>)

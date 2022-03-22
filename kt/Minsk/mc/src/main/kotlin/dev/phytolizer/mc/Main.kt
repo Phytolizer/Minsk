@@ -3,6 +3,7 @@ package dev.phytolizer.mc
 import dev.phytolizer.colors.AnsiColor
 import dev.phytolizer.colors.ColorStyle
 import dev.phytolizer.colors.Colorize
+import dev.phytolizer.minsk.analysis.Compilation
 import dev.phytolizer.minsk.analysis.syntax.SyntaxTree
 
 fun main() {
@@ -28,8 +29,8 @@ fun main() {
         }
 
         val syntaxTree = SyntaxTree.parse(line)
-        val result = syntaxTree.evaluate()
-        val diagnostics = listOf(syntaxTree.diagnostics, result.diagnostics).flatten()
+        val result = Compilation().evaluate(syntaxTree)
+        val diagnostics = result.diagnostics
 
         if (diagnostics.isEmpty()) {
             if (showTree) {
