@@ -1,4 +1,4 @@
-package dev.phytolizer.minsk
+package dev.phytolizer.minsk.analysis.syntax
 
 class BinaryExpressionSyntax(val left: ExpressionSyntax, val operatorToken: SyntaxToken, val right: ExpressionSyntax) :
     ExpressionSyntax() {

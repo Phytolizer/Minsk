@@ -3,8 +3,8 @@ package dev.phytolizer.mc
 import dev.phytolizer.colors.AnsiColor
 import dev.phytolizer.colors.ColorStyle
 import dev.phytolizer.colors.Colorize
-import dev.phytolizer.minsk.Evaluator
-import dev.phytolizer.minsk.SyntaxTree
+import dev.phytolizer.minsk.analysis.Evaluator
+import dev.phytolizer.minsk.analysis.syntax.SyntaxTree
 
 fun main() {
     var showTree = false

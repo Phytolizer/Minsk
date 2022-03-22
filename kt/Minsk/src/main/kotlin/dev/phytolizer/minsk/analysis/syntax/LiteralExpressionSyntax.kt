@@ -1,4 +1,4 @@
-package dev.phytolizer.minsk
+package dev.phytolizer.minsk.analysis.syntax
 
 class LiteralExpressionSyntax(val literalToken: SyntaxToken) : ExpressionSyntax() {
     override val kind: SyntaxKind

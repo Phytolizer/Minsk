@@ -1,4 +1,4 @@
-package dev.phytolizer.minsk
+package dev.phytolizer.minsk.analysis.syntax
 
 class Parser(text: String) {
     private val _tokens: List<SyntaxToken>

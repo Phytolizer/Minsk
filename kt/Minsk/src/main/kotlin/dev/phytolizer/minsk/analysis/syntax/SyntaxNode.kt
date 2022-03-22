@@ -1,4 +1,4 @@
-package dev.phytolizer.minsk
+package dev.phytolizer.minsk.analysis.syntax
 
 abstract class SyntaxNode {
     abstract val kind: SyntaxKind

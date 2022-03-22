@@ -1,4 +1,4 @@
-package dev.phytolizer.minsk
+package dev.phytolizer.minsk.analysis.syntax
 
 class UnaryExpressionSyntax(val operatorToken: SyntaxToken, val operand: ExpressionSyntax) : ExpressionSyntax() {
     override val kind: SyntaxKind

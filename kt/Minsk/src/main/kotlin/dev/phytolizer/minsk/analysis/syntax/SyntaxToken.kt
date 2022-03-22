@@ -1,4 +1,4 @@
-package dev.phytolizer.minsk
+package dev.phytolizer.minsk.analysis.syntax
 
 class SyntaxToken(override val kind: SyntaxKind, val position: Int, val text: String, val value: Any?) : SyntaxNode() {
     override fun toString(): String {

@@ -1,4 +1,6 @@
-package dev.phytolizer.minsk
+package dev.phytolizer.minsk.analysis
+
+import dev.phytolizer.minsk.analysis.syntax.*
 
 class Evaluator {
     fun evaluate(root: ExpressionSyntax): Any {
