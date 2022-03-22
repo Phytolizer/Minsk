@@ -72,7 +72,7 @@ internal static class Program
                     Console.WriteLine(diagnostic);
                     Console.WriteLine();
                     var errorSpan = diagnostic.Span;
-                    var prefixSpan = new TextSpan(line.Start, errorSpan.Start);
+                    var prefixSpan = TextSpan.FromBounds(line.Start, errorSpan.Start);
                     var suffixSpan = TextSpan.FromBounds(errorSpan.End, line.End);
                     Console.ResetColor();
                     Console.Write("    ");

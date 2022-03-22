@@ -98,7 +98,7 @@ public sealed class SourceText
             return 2;
         }
 
-        if (c == '\r' || l == '\n')
+        if (c is '\r' or '\n')
         {
             return 1;
         }
@@ -123,6 +123,7 @@ public sealed class SourceText
 
     public string ToString(TextSpan span)
     {
-        return ToString(span.Start, span.Length);
+        var (start, length) = span;
+        return ToString(start, length);
     }
 }
