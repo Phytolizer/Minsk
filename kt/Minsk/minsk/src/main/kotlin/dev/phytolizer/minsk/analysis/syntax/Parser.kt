@@ -4,8 +4,6 @@ class Parser(text: String) {
     private val _tokens: List<SyntaxToken>
     private var _position = 0
     private val _diagnostics = mutableListOf<String>()
-    val diagnostics: List<String>
-        get() = _diagnostics
 
     init {
         val tempTokens = mutableListOf<SyntaxToken>()
@@ -48,7 +46,7 @@ class Parser(text: String) {
     }
 
     fun parse(): SyntaxTree {
-        return SyntaxTree(parseExpression(), matchToken(SyntaxKind.EndOfFileToken), diagnostics)
+        return SyntaxTree(parseExpression(), matchToken(SyntaxKind.EndOfFileToken), _diagnostics)
     }
 
     private fun parseExpression(): ExpressionSyntax {
@@ -79,27 +77,31 @@ class Parser(text: String) {
         return left
     }
 
-    private fun parsePrimaryExpression(): ExpressionSyntax {
-        return when (current.kind) {
-            SyntaxKind.OpenParenthesisToken -> {
-                val openParenthesisToken = matchToken(SyntaxKind.OpenParenthesisToken)
-                val expression = parseExpression()
-                val closeParenthesisToken = matchToken(SyntaxKind.CloseParenthesisToken)
-                ParenthesizedExpressionSyntax(openParenthesisToken, expression, closeParenthesisToken)
-            }
-            SyntaxKind.TrueKeyword, SyntaxKind.FalseKeyword -> {
-                val isTrue = current.kind == SyntaxKind.TrueKeyword
-                val keywordToken = if (isTrue) {
-                    matchToken(SyntaxKind.TrueKeyword)
-                } else {
-                    matchToken(SyntaxKind.FalseKeyword)
-                }
-                LiteralExpressionSyntax(keywordToken, isTrue)
-            }
-            else -> {
-                val numberToken = matchToken(SyntaxKind.NumberToken)
-                LiteralExpressionSyntax(numberToken)
-            }
+    private fun parsePrimaryExpression(): ExpressionSyntax = when (current.kind) {
+        SyntaxKind.OpenParenthesisToken -> parseParenthesizedExpression()
+        SyntaxKind.TrueKeyword, SyntaxKind.FalseKeyword -> parseBooleanLiteral()
+        else -> parseNumberLiteral()
+    }
+
+    private fun parseNumberLiteral(): LiteralExpressionSyntax {
+        val numberToken = matchToken(SyntaxKind.NumberToken)
+        return LiteralExpressionSyntax(numberToken)
+    }
+
+    private fun parseBooleanLiteral(): LiteralExpressionSyntax {
+        val isTrue = current.kind == SyntaxKind.TrueKeyword
+        val keywordToken = if (isTrue) {
+            matchToken(SyntaxKind.TrueKeyword)
+        } else {
+            matchToken(SyntaxKind.FalseKeyword)
         }
+        return LiteralExpressionSyntax(keywordToken, isTrue)
+    }
+
+    private fun parseParenthesizedExpression(): ParenthesizedExpressionSyntax {
+        val openParenthesisToken = matchToken(SyntaxKind.OpenParenthesisToken)
+        val expression = parseExpression()
+        val closeParenthesisToken = matchToken(SyntaxKind.CloseParenthesisToken)
+        return ParenthesizedExpressionSyntax(openParenthesisToken, expression, closeParenthesisToken)
     }
 }
