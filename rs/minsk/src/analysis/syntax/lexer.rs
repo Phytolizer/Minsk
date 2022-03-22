@@ -180,9 +180,13 @@ impl<'a> Iterator for LexerIterator<'a> {
 
 #[cfg(test)]
 mod tests {
+    use strum::IntoEnumIterator;
+
+    use crate::analysis::syntax::facts;
     use crate::analysis::syntax::kind::SyntaxKind;
     use crate::analysis::syntax::tree::SyntaxTree;
 
+    #[derive(Clone, Copy)]
     struct SimpleToken {
         kind: SyntaxKind,
         text: &'static str,
@@ -194,26 +198,25 @@ mod tests {
         }
     }
 
-    const TOKENS: &[SimpleToken] = &[
-        SimpleToken::new(SyntaxKind::IdentifierToken, "a"),
-        SimpleToken::new(SyntaxKind::IdentifierToken, "abc"),
-        SimpleToken::new(SyntaxKind::NumberToken, "1"),
-        SimpleToken::new(SyntaxKind::NumberToken, "123"),
-        SimpleToken::new(SyntaxKind::PlusToken, "+"),
-        SimpleToken::new(SyntaxKind::MinusToken, "-"),
-        SimpleToken::new(SyntaxKind::StarToken, "*"),
-        SimpleToken::new(SyntaxKind::SlashToken, "/"),
-        SimpleToken::new(SyntaxKind::BangToken, "!"),
-        SimpleToken::new(SyntaxKind::AmpersandAmpersandToken, "&&"),
-        SimpleToken::new(SyntaxKind::PipePipeToken, "||"),
-        SimpleToken::new(SyntaxKind::BangEqualsToken, "!="),
-        SimpleToken::new(SyntaxKind::EqualsEqualsToken, "=="),
-        SimpleToken::new(SyntaxKind::EqualsToken, "="),
-        SimpleToken::new(SyntaxKind::OpenParenthesisToken, "("),
-        SimpleToken::new(SyntaxKind::CloseParenthesisToken, ")"),
-        SimpleToken::new(SyntaxKind::TrueKeyword, "true"),
-        SimpleToken::new(SyntaxKind::FalseKeyword, "false"),
-    ];
+    fn get_tokens() -> impl Iterator<Item = SimpleToken> {
+        SyntaxKind::iter()
+            .filter_map(|kind| {
+                if let Some(text) = facts::get_text(kind) {
+                    Some(SimpleToken::new(kind, text))
+                } else {
+                    None
+                }
+            })
+            .chain(
+                [
+                    SimpleToken::new(SyntaxKind::IdentifierToken, "a"),
+                    SimpleToken::new(SyntaxKind::IdentifierToken, "abc"),
+                    SimpleToken::new(SyntaxKind::NumberToken, "1"),
+                    SimpleToken::new(SyntaxKind::NumberToken, "123"),
+                ]
+                .into_iter(),
+            )
+    }
 
     const SEPARATORS: &[SimpleToken] = &[
         SimpleToken::new(SyntaxKind::WhitespaceToken, " "),
@@ -225,21 +228,21 @@ mod tests {
 
     #[test]
     fn lexes_token() {
-        for tt in TOKENS {
+        for tt in get_tokens() {
             let SimpleToken { kind, text } = tt;
             let tokens = SyntaxTree::parse_tokens(text);
             assert_eq!(1, tokens.len());
             let token = &tokens[0];
-            assert_eq!(*kind, token.kind);
-            assert_eq!(*text, token.text);
+            assert_eq!(kind, token.kind);
+            assert_eq!(text, token.text);
         }
     }
 
     #[test]
     fn lexes_token_pairs() {
-        for t1 in TOKENS {
-            for t2 in TOKENS {
-                if !requires_separator(t1, t2) {
+        for t1 in get_tokens() {
+            for t2 in get_tokens() {
+                if !requires_separator(&t1, &t2) {
                     let text = format!("{}{}", t1.text, t2.text);
                     let tokens = SyntaxTree::parse_tokens(&text);
                     assert_eq!(2, tokens.len());
@@ -277,9 +280,9 @@ mod tests {
 
     #[test]
     fn lexes_token_pairs_with_separator() {
-        for t1 in TOKENS {
-            for t2 in TOKENS {
-                if requires_separator(t1, t2) {
+        for t1 in get_tokens() {
+            for t2 in get_tokens() {
+                if requires_separator(&t1, &t2) {
                     for sep in SEPARATORS {
                         let text = format!("{}{}{}", t1.text, sep.text, t2.text);
                         let tokens = SyntaxTree::parse_tokens(&text);
