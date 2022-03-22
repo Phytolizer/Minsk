@@ -1,13 +1,14 @@
 package dev.phytolizer.mc
 
+import dev.phytolizer.minsk.Lexer
+
 fun main() {
     while (true) {
+        print("> ")
         val line = readLine() ?: break
 
-        if (line == "1 + 2 * 3") {
-            println("7")
-        } else {
-            println("ERROR: Invalid expression!")
+        for (token in Lexer(line)) {
+            println(token)
         }
     }
 }
