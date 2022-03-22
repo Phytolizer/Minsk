@@ -4,8 +4,8 @@ namespace Minsk.CodeAnalysis.Binding;
 
 internal sealed class Binder
 {
-    private readonly Dictionary<VariableSymbol, object> _variables;
     private readonly DiagnosticBag _diagnostics = new();
+    private readonly Dictionary<VariableSymbol, object> _variables;
 
     public Binder(Dictionary<VariableSymbol, object> variables)
     {
@@ -40,7 +40,6 @@ internal sealed class Binder
 
         _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
         return new BoundLiteralExpression(0);
-
     }
 
     private BoundExpression BindAssignmentExpression(AssignmentExpressionSyntax syntax)
@@ -53,6 +52,7 @@ internal sealed class Binder
         {
             _variables.Remove(existingVariable);
         }
+
         var variable = new VariableSymbol(name, boundExpression.Type);
 
         _variables[variable] = null;

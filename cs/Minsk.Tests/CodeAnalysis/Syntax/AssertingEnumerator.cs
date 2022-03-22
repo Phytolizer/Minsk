@@ -6,17 +6,11 @@ namespace Minsk.Tests.CodeAnalysis.Syntax;
 internal sealed class AssertingEnumerator : IDisposable
 {
     private readonly IEnumerator<SyntaxNode> _enumerator;
-    private bool _hasErrors = false;
+    private bool _hasErrors;
 
     public AssertingEnumerator(SyntaxNode node)
     {
         _enumerator = Flatten(node).GetEnumerator();
-    }
-
-    private bool MarkFailed()
-    {
-        _hasErrors = true;
-        return false;
     }
 
     public void Dispose()
@@ -27,6 +21,12 @@ internal sealed class AssertingEnumerator : IDisposable
         }
 
         _enumerator.Dispose();
+    }
+
+    private bool MarkFailed()
+    {
+        _hasErrors = true;
+        return false;
     }
 
     private static IEnumerable<SyntaxNode> Flatten(SyntaxNode node)

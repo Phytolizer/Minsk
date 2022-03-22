@@ -50,7 +50,7 @@ public static class SyntaxFacts
             SyntaxKind.OpenParenthesisToken => "(",
             SyntaxKind.CloseParenthesisToken => ")",
             SyntaxKind.EqualsEqualsToken => "==",
-            _ => null,
+            _ => null
         };
     }
 

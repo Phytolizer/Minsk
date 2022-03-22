@@ -5,18 +5,6 @@ namespace Minsk.Tests.CodeAnalysis.Syntax;
 
 public sealed class LexerTests
 {
-    private sealed class SimpleToken
-    {
-        public SyntaxKind Kind { get; }
-        public string Text { get; }
-
-        public SimpleToken(SyntaxKind kind, string text)
-        {
-            Kind = kind;
-            Text = text;
-        }
-    }
-
     private static IEnumerable<SimpleToken> GetTokens()
     {
         return new SimpleToken[]
@@ -40,7 +28,7 @@ public sealed class LexerTests
             new(SyntaxKind.CloseParenthesisToken, ")"),
 
             new(SyntaxKind.TrueKeyword, "true"),
-            new(SyntaxKind.FalseKeyword, "false"),
+            new(SyntaxKind.FalseKeyword, "false")
         };
     }
 
@@ -52,7 +40,7 @@ public sealed class LexerTests
             new(SyntaxKind.WhitespaceToken, "  "),
             new(SyntaxKind.WhitespaceToken, "\n"),
             new(SyntaxKind.WhitespaceToken, "\r"),
-            new(SyntaxKind.WhitespaceToken, "\r\n"),
+            new(SyntaxKind.WhitespaceToken, "\r\n")
         };
     }
 
@@ -149,5 +137,17 @@ public sealed class LexerTests
         Assert.Equal(separator.Text, tokens[1].Text);
         Assert.Equal(t2.Kind, tokens[2].Kind);
         Assert.Equal(t2.Text, tokens[2].Text);
+    }
+
+    private sealed class SimpleToken
+    {
+        public SimpleToken(SyntaxKind kind, string text)
+        {
+            Kind = kind;
+            Text = text;
+        }
+
+        public SyntaxKind Kind { get; }
+        public string Text { get; }
     }
 }
