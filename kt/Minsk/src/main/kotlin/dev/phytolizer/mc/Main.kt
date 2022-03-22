@@ -4,7 +4,7 @@ import dev.phytolizer.colors.AnsiColor
 import dev.phytolizer.colors.ColorStyle
 import dev.phytolizer.colors.Colorize
 import dev.phytolizer.minsk.Evaluator
-import dev.phytolizer.minsk.Parser
+import dev.phytolizer.minsk.SyntaxTree
 
 fun main() {
     var showTree = false
@@ -28,8 +28,7 @@ fun main() {
             }
         }
 
-        val parser = Parser(line)
-        val syntaxTree = parser.parse()
+        val syntaxTree = SyntaxTree.parse(line)
         val diagnostics = syntaxTree.diagnostics
 
         if (diagnostics.isEmpty()) {
