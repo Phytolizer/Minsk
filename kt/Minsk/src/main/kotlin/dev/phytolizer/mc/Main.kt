@@ -3,6 +3,7 @@ package dev.phytolizer.mc
 import dev.phytolizer.colors.AnsiColor
 import dev.phytolizer.colors.ColorStyle
 import dev.phytolizer.colors.Colorize
+import dev.phytolizer.minsk.Evaluator
 import dev.phytolizer.minsk.Parser
 
 fun main() {
@@ -37,6 +38,9 @@ fun main() {
                 expression.prettyPrint()
                 print(Colorize.RESET)
             }
+
+            val result = Evaluator().evaluate(expression)
+            println(result)
         } else {
             print(Colorize.colorCode(AnsiColor.Red, ColorStyle.Regular))
             for (diagnostic in diagnostics) {
