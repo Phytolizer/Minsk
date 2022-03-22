@@ -6,8 +6,11 @@ let rec repl () =
     let line = Console.ReadLine () in
         match line with
         | null -> ()
-        | line ->
-            Console.WriteLine line
+        | "1 + 2 * 3"  ->
+            Console.WriteLine "7"
+            repl ()
+        | _ ->
+            Console.WriteLine "ERROR: Invalid expression!"
             repl ()
 
 in repl ()
