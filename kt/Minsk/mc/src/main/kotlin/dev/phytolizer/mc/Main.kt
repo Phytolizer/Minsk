@@ -60,7 +60,9 @@ fun main() {
                 print(Colorize.RESET)
             }
 
+            print(Colorize.colorCode(AnsiColor.Purple, ColorStyle.Regular))
             println(result.value)
+            print(Colorize.RESET)
         } else {
             for (diagnostic in diagnostics) {
                 val lineIndex = syntaxTree.text.lineIndex(diagnostic.span.start)
