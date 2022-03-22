@@ -32,10 +32,6 @@ impl SyntaxToken {
         }
     }
 
-    pub(crate) fn span(&self) -> TextSpan {
-        TextSpan::new(self.position, self.text.len())
-    }
-
     pub(crate) fn position(&self) -> usize {
         self.position
     }
@@ -79,5 +75,9 @@ impl SyntaxNode for SyntaxToken {
 
     fn token_text(&self) -> &str {
         &self.text
+    }
+
+    fn span(&self) -> TextSpan {
+        TextSpan::new(self.position, self.text.len())
     }
 }

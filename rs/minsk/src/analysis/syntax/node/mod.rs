@@ -1,5 +1,7 @@
 use std::fmt::Display;
 
+use crate::analysis::text_span::TextSpan;
+
 use super::kind::SyntaxKind;
 
 pub mod expression;
@@ -18,6 +20,13 @@ pub trait SyntaxNode: Display {
         Self: Sized,
     {
         pretty_print_node(self, writer, String::new(), true)
+    }
+    fn span(&self) -> TextSpan {
+        let children = self.children();
+        let first_span = children.first().unwrap().span();
+        let last_span = children.last().unwrap().span();
+
+        TextSpan::from_bounds(first_span.start(), last_span.end())
     }
 }
 
