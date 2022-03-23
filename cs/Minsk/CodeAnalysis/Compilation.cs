@@ -6,23 +6,51 @@ namespace Minsk.CodeAnalysis;
 
 public sealed class Compilation
 {
-    private readonly SyntaxTree _syntaxTree;
+    public Compilation? Previous { get; }
+    public SyntaxTree SyntaxTree { get; }
+    private BoundGlobalScope? _globalScope;
 
     public Compilation(SyntaxTree syntaxTree)
     {
-        _syntaxTree = syntaxTree;
+        SyntaxTree = syntaxTree;
+    }
+
+    private Compilation(Compilation previous, SyntaxTree syntaxTree)
+    {
+        Previous = previous;
+        SyntaxTree = syntaxTree;
+    }
+
+    internal BoundGlobalScope GlobalScope
+    {
+        get
+        {
+            if (_globalScope != null)
+            {
+                return _globalScope;
+            }
+
+            var globalScope = Binder.BindGlobalScope(Previous?.GlobalScope, SyntaxTree.Root);
+            Interlocked.CompareExchange(ref _globalScope, globalScope, null);
+
+            return _globalScope;
+        }
+    }
+
+    public Compilation ContinueWith(SyntaxTree syntaxTree)
+    {
+        return new Compilation(this, syntaxTree);
     }
 
     public EvaluationResult Evaluate(Dictionary<VariableSymbol, object> variables)
     {
-        var globalScope = Binder.BindGlobalScope(_syntaxTree.Root);
-        var diagnostics = _syntaxTree.Diagnostics.Concat(globalScope.Diagnostics).ToImmutableArray();
+        var diagnostics = SyntaxTree.Diagnostics.Concat(GlobalScope.Diagnostics).ToImmutableArray();
         if (diagnostics.Any())
         {
             return new EvaluationResult(diagnostics, null);
         }
 
-        var evaluator = new Evaluator(globalScope.Expression, variables);
+        var evaluator = new Evaluator(GlobalScope.Expression, variables);
         return new EvaluationResult(ImmutableArray<Diagnostic>.Empty, evaluator.Evaluate());
     }
 }

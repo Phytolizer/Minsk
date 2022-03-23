@@ -13,13 +13,40 @@ internal sealed class Binder
         _scope = new BoundScope(parent);
     }
 
-    public static BoundGlobalScope BindGlobalScope(CompilationUnitSyntax syntax)
+    public static BoundGlobalScope BindGlobalScope(BoundGlobalScope? previous, CompilationUnitSyntax syntax)
     {
-        var binder = new Binder(null);
+        var parent = CreateParentScopes(previous);
+        var binder = new Binder(parent);
         var expression = binder.BindExpression(syntax.Expression);
         var variables = binder._scope.GetDeclaredVariables();
         var diagnostics = binder.Diagnostics.ToImmutableArray();
         return new BoundGlobalScope(null, diagnostics, variables, expression);
+    }
+
+    private static BoundScope? CreateParentScopes(BoundGlobalScope? previous)
+    {
+        var stack = new Stack<BoundGlobalScope>();
+        while (previous != null)
+        {
+            stack.Push(previous);
+            previous = previous.Previous;
+        }
+
+        BoundScope? current = null;
+
+        while (stack.Count > 0)
+        {
+            var globalScope = stack.Pop();
+            var scope = new BoundScope(current);
+            foreach (var variable in globalScope.Variables)
+            {
+                scope.TryDeclare(variable);
+            }
+
+            current = scope;
+        }
+
+        return current;
     }
 
     public IEnumerable<Diagnostic> Diagnostics => _diagnostics;
