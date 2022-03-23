@@ -52,6 +52,10 @@ class Evaluator:
                 return left and right
             case BoundBinaryOperatorKind.LogicalOr:
                 return left or right
+            case BoundBinaryOperatorKind.Equality:
+                return left == right
+            case BoundBinaryOperatorKind.Inequality:
+                return left != right
             case _:
                 raise Exception(f"Unhandled operator kind {syntax.operator.kind}")
 

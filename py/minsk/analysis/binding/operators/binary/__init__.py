@@ -69,6 +69,34 @@ _OPERATORS = (
         bool,
         bool,
     ),
+    BoundBinaryOperator(
+        SyntaxKind.BangEqualsToken,
+        BoundBinaryOperatorKind.Inequality,
+        int,
+        int,
+        bool,
+    ),
+    BoundBinaryOperator(
+        SyntaxKind.EqualsEqualsToken,
+        BoundBinaryOperatorKind.Equality,
+        int,
+        int,
+        bool,
+    ),
+    BoundBinaryOperator(
+        SyntaxKind.BangEqualsToken,
+        BoundBinaryOperatorKind.Inequality,
+        bool,
+        bool,
+        bool,
+    ),
+    BoundBinaryOperator(
+        SyntaxKind.EqualsEqualsToken,
+        BoundBinaryOperatorKind.Equality,
+        bool,
+        bool,
+        bool,
+    ),
 )
 
 
