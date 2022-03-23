@@ -38,6 +38,10 @@ fun main() {
                     Colorize.clearScreen()
                     continue
                 }
+                "#reset" -> {
+                    previous = null
+                    continue
+                }
             }
         }
 
