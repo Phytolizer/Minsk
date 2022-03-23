@@ -70,6 +70,22 @@ def get_token_pairs_with_separator() -> Iterable[
                     yield t1, sep, t2
 
 
+def test_tests_all_tokens():
+    tested_token_kinds = set(
+        t.kind for lst in (get_tokens(), get_separators()) for t in lst
+    )
+
+    untested_token_kinds = set(
+        k for k in SyntaxKind if str(k).endswith("Token") or str(k).endswith("Keyword")
+    ) - {
+        SyntaxKind.BadToken,
+        SyntaxKind.EndOfFileToken,
+    }
+    untested_token_kinds -= tested_token_kinds
+
+    assert len(untested_token_kinds) == 0
+
+
 @pytest.mark.parametrize("t", get_tokens())
 def test_lexes_token(t: SimpleToken):
     tokens = SyntaxTree.parse_tokens(t.text)

@@ -67,6 +67,10 @@ def get_text(kind: SyntaxKind) -> Optional[str]:
             return "=="
         case SyntaxKind.EqualsToken:
             return "="
+        case SyntaxKind.OpenParenthesisToken:
+            return "("
+        case SyntaxKind.CloseParenthesisToken:
+            return ")"
         case SyntaxKind.TrueKeyword:
             return "true"
         case SyntaxKind.FalseKeyword:
