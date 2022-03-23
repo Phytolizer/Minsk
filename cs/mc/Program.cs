@@ -15,14 +15,16 @@ internal static class Program
 
         while (true)
         {
+            Console.ForegroundColor = ConsoleColor.Green;
             if (textBuilder.Length == 0)
             {
-                Console.Write("> ");
+                Console.Write("» ");
             }
             else
             {
-                Console.Write("| ");
+                Console.Write("· ");
             }
+            Console.ResetColor();
 
             var input = Console.ReadLine();
             if (input == null)
