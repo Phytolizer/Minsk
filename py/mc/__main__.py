@@ -1,3 +1,4 @@
+from minsk.analysis.evaluator import Evaluator
 from minsk.analysis.syntax.parser import Parser
 
 while True:
@@ -8,3 +9,5 @@ while True:
 
     expression = Parser(line).parse()
     expression.pretty_print()
+    evaluator = Evaluator(expression)
+    print(evaluator.evaluate())
