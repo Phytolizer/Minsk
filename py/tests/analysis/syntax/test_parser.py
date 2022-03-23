@@ -1,11 +1,11 @@
 from typing import Iterable, Iterator
 
 import pytest
-from analysis.syntax.parser import SyntaxTree
 
 from minsk.analysis.syntax import facts
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.node import SyntaxNode
+from minsk.analysis.syntax.parser import SyntaxTree
 from minsk.analysis.syntax.token import SyntaxToken
 
 
