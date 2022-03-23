@@ -7,7 +7,13 @@ while True:
     except EOFError:
         break
 
-    expression = Parser(line).parse()
-    expression.pretty_print()
-    evaluator = Evaluator(expression)
-    print(evaluator.evaluate())
+    parser = Parser(line)
+    expression = parser.parse()
+    diagnostics = parser.diagnostics
+    if len(diagnostics) == 0:
+        expression.pretty_print()
+        evaluator = Evaluator(expression)
+        print(evaluator.evaluate())
+    else:
+        for diagnostic in diagnostics:
+            print(diagnostic)

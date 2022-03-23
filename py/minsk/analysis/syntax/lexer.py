@@ -8,10 +8,12 @@ class Lexer:
     class _Iter:
         _text: str
         _position: int
+        _diagnostics: list[str]
 
-        def __init__(self, text):
+        def __init__(self, text: str, diagnostics: list[str]):
             self._text = text
             self._position = 0
+            self._diagnostics = diagnostics
 
         @property
         def _current(self) -> str:
@@ -39,7 +41,7 @@ class Lexer:
                     try:
                         value = int(current_text)
                     except ValueError:
-                        pass
+                        self._diagnostics.append(f"Number '{current_text}' is invalid")
                 case "+":
                     kind = SyntaxKind.PlusToken
                     self._position += 1
@@ -60,6 +62,7 @@ class Lexer:
                     self._position += 1
 
             if kind == SyntaxKind.BadToken:
+                self._diagnostics.append(f"Illegal character '{self._current}'")
                 self._position += 1
 
             if current_text is None:
@@ -77,9 +80,15 @@ class Lexer:
             return self._text[start:self._position]
 
     _text: str
+    _diagnostics: list[str]
 
     def __init__(self, text: str):
         self._text = text
+        self._diagnostics = []
 
     def __iter__(self):
-        return Lexer._Iter(self._text)
+        return Lexer._Iter(self._text, self._diagnostics)
+
+    @property
+    def diagnostics(self) -> list[str]:
+        return self._diagnostics

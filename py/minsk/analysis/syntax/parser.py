@@ -9,6 +9,7 @@ from minsk.analysis.syntax.token import SyntaxToken
 class Parser:
     _tokens: tuple[SyntaxToken, ...]
     _position: int
+    _diagnostics: list[str]
 
     def __init__(self, text: str):
         lexer = Lexer(text)
@@ -22,6 +23,7 @@ class Parser:
         tokens.append(SyntaxToken(SyntaxKind.EndOfFileToken, 0, "", None))
         self._tokens = tuple(tokens)
         self._position = 0
+        self._diagnostics = lexer.diagnostics
 
     def _peek(self, offset: int) -> SyntaxToken:
         index = self._position + offset
@@ -41,6 +43,9 @@ class Parser:
     def _match_token(self, kind: SyntaxKind) -> SyntaxToken:
         if self._current.kind == kind:
             return self._next_token()
+        self._diagnostics.append(
+            f"Expected next token to be {kind.name}, not {self._current.kind.name}"
+        )
         return SyntaxToken(kind, self._current.position, "", None)
 
     def parse(self) -> ExpressionSyntax:
@@ -72,3 +77,7 @@ class Parser:
     def _parse_primary_expression(self) -> ExpressionSyntax:
         number_token = self._match_token(SyntaxKind.NumberToken)
         return LiteralExpressionSyntax(number_token)
+
+    @property
+    def diagnostics(self) -> tuple[str, ...]:
+        return tuple(iter(self._diagnostics))
