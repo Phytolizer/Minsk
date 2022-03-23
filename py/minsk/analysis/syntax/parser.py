@@ -5,6 +5,7 @@ from minsk.analysis.syntax.expressions.literal import LiteralExpressionSyntax
 from minsk.analysis.syntax.expressions.parenthesized import (
     ParenthesizedExpressionSyntax,
 )
+from minsk.analysis.syntax.expressions.unary import UnaryExpressionSyntax
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.lexer import Lexer
 from minsk.analysis.syntax.token import SyntaxToken
@@ -64,7 +65,16 @@ class Parser:
         return self._parse_binary_expression(0)
 
     def _parse_binary_expression(self, parent_precedence: int) -> ExpressionSyntax:
-        left = self._parse_primary_expression()
+        unary_operator_precedence = facts.unary_operator_precedence(self._current.kind)
+        if (
+            unary_operator_precedence != 0
+            and unary_operator_precedence >= parent_precedence
+        ):
+            operator_token = self._next_token()
+            operand = self._parse_binary_expression(unary_operator_precedence)
+            left = UnaryExpressionSyntax(operator_token, operand)
+        else:
+            left = self._parse_primary_expression()
 
         while True:
             precedence = facts.binary_operator_precedence(self._current.kind)
