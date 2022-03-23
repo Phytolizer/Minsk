@@ -20,6 +20,12 @@ internal sealed class Binder
         var expression = binder.BindExpression(syntax.Expression);
         var variables = binder._scope.GetDeclaredVariables();
         var diagnostics = binder.Diagnostics.ToImmutableArray();
+
+        if (previous != null)
+        {
+            diagnostics = diagnostics.InsertRange(0, previous.Diagnostics);
+        }
+
         return new BoundGlobalScope(null, diagnostics, variables, expression);
     }
 
