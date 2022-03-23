@@ -23,13 +23,16 @@ enum class SyntaxKind {
     BangEqualsToken,
     EqualsToken,
 
-    TrueKeyword,
     FalseKeyword,
+    LetKeyword,
+    TrueKeyword,
+    VarKeyword,
 
     CompilationUnit,
 
     BlockStatement,
     ExpressionStatement,
+    VariableDeclaration,
 
     AssignmentExpression,
     BinaryExpression,

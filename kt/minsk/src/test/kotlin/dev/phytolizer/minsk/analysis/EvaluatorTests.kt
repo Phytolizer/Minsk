@@ -30,7 +30,7 @@ class EvaluatorTests : FunSpec({
             row("false", false),
             row("!true", false),
             row("!false", true),
-            row("(a = 10) * a", 100),
+            row("{ var a = 0 (a = 10) * a }", 100),
         ) { text, expected ->
             val syntaxTree = SyntaxTree.parse(text)
             val compilation = Compilation(syntaxTree)

@@ -18,6 +18,8 @@ object SyntaxFacts {
     fun keywordKind(text: String): SyntaxKind = when (text) {
         "true" -> SyntaxKind.TrueKeyword
         "false" -> SyntaxKind.FalseKeyword
+        "let" -> SyntaxKind.LetKeyword
+        "var" -> SyntaxKind.VarKeyword
         else -> SyntaxKind.IdentifierToken
     }
 
@@ -41,6 +43,8 @@ object SyntaxFacts {
         SyntaxKind.EqualsToken -> "="
         SyntaxKind.TrueKeyword -> "true"
         SyntaxKind.FalseKeyword -> "false"
+        SyntaxKind.LetKeyword -> "let"
+        SyntaxKind.VarKeyword -> "var"
         else -> null
     }
 }

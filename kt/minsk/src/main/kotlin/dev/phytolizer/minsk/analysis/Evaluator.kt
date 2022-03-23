@@ -13,6 +13,7 @@ internal class Evaluator(private val _variables: MutableMap<VariableSymbol, Any>
     private fun evaluateStatement(root: BoundStatement) = when (root.kind) {
         BoundNodeKind.BlockStatement -> evaluateBlockStatement(root as BoundBlockStatement)
         BoundNodeKind.ExpressionStatement -> evaluateExpressionStatement(root as BoundExpressionStatement)
+        BoundNodeKind.VariableDeclaration -> evaluateVariableDeclaration(root as BoundVariableDeclaration)
         else -> throw IllegalStateException()
     }
 
@@ -24,6 +25,12 @@ internal class Evaluator(private val _variables: MutableMap<VariableSymbol, Any>
 
     private fun evaluateExpressionStatement(root: BoundExpressionStatement) {
         _lastValue = evaluateExpression(root.expression)
+    }
+
+    private fun evaluateVariableDeclaration(root: BoundVariableDeclaration) {
+        val value = evaluateExpression(root.initializer)
+        _variables[root.variable] = value
+        _lastValue = value
     }
 
     private fun evaluateExpression(root: BoundExpression): Any = when (root.kind) {

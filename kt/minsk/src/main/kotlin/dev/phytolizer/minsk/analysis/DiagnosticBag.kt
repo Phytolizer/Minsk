@@ -52,4 +52,8 @@ internal class DiagnosticBag {
     fun reportCannotConvert(span: TextSpan, fromType: KClass<out Any>, toType: KClass<out Any>) {
         report(span, "Cannot convert from '$fromType' to '$toType'")
     }
+
+    fun reportCannotAssign(span: TextSpan, name: String) {
+        report(span, "Cannot assign to read-only variable '$name'")
+    }
 }

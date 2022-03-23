@@ -6,7 +6,7 @@ import dev.phytolizer.minsk.analysis.VariableSymbol
 import dev.phytolizer.minsk.analysis.syntax.*
 
 internal class Binder(parent: BoundScope?) {
-    private val _scope = BoundScope(parent)
+    private var _scope = BoundScope(parent)
     private val _diagnostics = DiagnosticBag()
     val diagnostics: List<Diagnostic>
         get() = _diagnostics.toList()
@@ -53,22 +53,38 @@ internal class Binder(parent: BoundScope?) {
     fun bindStatement(syntax: StatementSyntax): BoundStatement = when (syntax.kind) {
         SyntaxKind.ExpressionStatement -> bindExpressionStatement(syntax as ExpressionStatementSyntax)
         SyntaxKind.BlockStatement -> bindBlockStatement(syntax as BlockStatementSyntax)
+        SyntaxKind.VariableDeclaration -> bindVariableDeclaration(syntax as VariableDeclarationSyntax)
         else -> throw IllegalStateException()
     }
 
     private fun bindBlockStatement(syntax: BlockStatementSyntax): BoundStatement {
         val statements = mutableListOf<BoundStatement>()
+        _scope = BoundScope(_scope)
 
         for (statement in syntax.statements) {
             statements.add(bindStatement(statement))
         }
 
+        _scope = _scope.parent!!
         return BoundBlockStatement(statements)
     }
 
     private fun bindExpressionStatement(syntax: ExpressionStatementSyntax): BoundStatement {
         val expression = bindExpression(syntax.expression)
         return BoundExpressionStatement(expression)
+    }
+
+    private fun bindVariableDeclaration(syntax: VariableDeclarationSyntax): BoundStatement {
+        val name = syntax.identifierToken.text
+        val isReadOnly = syntax.keywordToken.kind == SyntaxKind.LetKeyword
+        val initializer = bindExpression(syntax.initializer)
+        val variable = VariableSymbol(name, isReadOnly, initializer.type)
+
+        if (!_scope.tryDeclare(variable)) {
+            _diagnostics.reportVariableAlreadyDeclared(syntax.identifierToken.span, name)
+        }
+
+        return BoundVariableDeclaration(variable, initializer)
     }
 
     private fun bindExpression(syntax: ExpressionSyntax): BoundExpression = when (syntax.kind) {
@@ -85,10 +101,14 @@ internal class Binder(parent: BoundScope?) {
         val expression = bindExpression(syntax.expression)
 
         val name = syntax.identifierToken.text
-        var variable = _scope.tryLookup(name)
+        val variable = _scope.tryLookup(name)
         if (variable == null) {
-            variable = VariableSymbol(name, expression.type)
-            _scope.tryDeclare(variable)
+            _diagnostics.reportUndefinedName(syntax.identifierToken.span, name)
+            return expression
+        }
+
+        if (variable.isReadOnly) {
+            _diagnostics.reportCannotAssign(syntax.equalsToken.span, name)
         }
 
         if (variable.type != expression.type) {
