@@ -36,6 +36,12 @@ _OPERATORS = (
         int,
         int,
     ),
+    BoundUnaryOperator(
+        SyntaxKind.BangToken,
+        BoundUnaryOperatorKind.LogicalNegation,
+        bool,
+        bool,
+    ),
 )
 
 

@@ -55,6 +55,20 @@ _OPERATORS = (
         int,
         int,
     ),
+    BoundBinaryOperator(
+        SyntaxKind.AmpersandAmpersandToken,
+        BoundBinaryOperatorKind.LogicalAnd,
+        bool,
+        bool,
+        bool,
+    ),
+    BoundBinaryOperator(
+        SyntaxKind.PipePipeToken,
+        BoundBinaryOperatorKind.LogicalOr,
+        bool,
+        bool,
+        bool,
+    ),
 )
 
 

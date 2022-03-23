@@ -1,6 +1,6 @@
 from typing import Any, Optional
-from minsk.analysis.syntax import facts
 
+from minsk.analysis.syntax import facts
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.token import SyntaxToken
 
@@ -60,6 +60,15 @@ class Lexer:
                 case "/":
                     kind = SyntaxKind.SlashToken
                     self._position += 1
+                case "!":
+                    kind = SyntaxKind.BangToken
+                    self._position += 1
+                case "&" if self._peek(1) == "&":
+                    kind = SyntaxKind.AmpersandAmpersandToken
+                    self._position += 2
+                case "|" if self._peek(1) == "|":
+                    kind = SyntaxKind.PipePipeToken
+                    self._position += 2
                 case "(":
                     kind = SyntaxKind.OpenParenthesisToken
                     self._position += 1

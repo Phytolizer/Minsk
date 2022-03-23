@@ -13,6 +13,9 @@ class SyntaxKind(Enum):
     MinusToken = auto()
     StarToken = auto()
     SlashToken = auto()
+    BangToken = auto()
+    AmpersandAmpersandToken = auto()
+    PipePipeToken = auto()
     OpenParenthesisToken = auto()
     CloseParenthesisToken = auto()
 

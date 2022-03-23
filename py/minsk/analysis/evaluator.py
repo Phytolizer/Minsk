@@ -48,6 +48,12 @@ class Evaluator:
                 return left * right
             case BoundBinaryOperatorKind.Division:
                 return left // right
+            case BoundBinaryOperatorKind.LogicalAnd:
+                return left and right
+            case BoundBinaryOperatorKind.LogicalOr:
+                return left or right
+            case _:
+                raise Exception(f"Unhandled operator kind {syntax.operator.kind}")
 
     @staticmethod
     def _evaluate_literal_expression(syntax: BoundLiteralExpression) -> Any:
@@ -61,3 +67,7 @@ class Evaluator:
                 return operand
             case BoundUnaryOperatorKind.Negation:
                 return -operand
+            case BoundUnaryOperatorKind.LogicalNegation:
+                return not operand
+            case _:
+                raise Exception(f"Unhandled operator kind {syntax.operator.kind}")

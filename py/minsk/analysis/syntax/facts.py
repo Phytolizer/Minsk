@@ -4,8 +4,12 @@ from minsk.analysis.syntax.kind import SyntaxKind
 def binary_operator_precedence(kind: SyntaxKind) -> int:
     match kind:
         case SyntaxKind.StarToken | SyntaxKind.SlashToken:
-            return 2
+            return 4
         case SyntaxKind.PlusToken | SyntaxKind.MinusToken:
+            return 3
+        case SyntaxKind.AmpersandAmpersandToken:
+            return 2
+        case SyntaxKind.PipePipeToken:
             return 1
         case _:
             return 0
@@ -13,8 +17,8 @@ def binary_operator_precedence(kind: SyntaxKind) -> int:
 
 def unary_operator_precedence(kind: SyntaxKind) -> int:
     match kind:
-        case SyntaxKind.PlusToken | SyntaxKind.MinusToken:
-            return 3
+        case SyntaxKind.PlusToken | SyntaxKind.MinusToken | SyntaxKind.BangToken:
+            return 5
         case _:
             return 0
 
