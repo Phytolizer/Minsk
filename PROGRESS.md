@@ -3,7 +3,7 @@
 Progress for each language implementation is detailed below.
 
 ## cs (C#)
-Episode 5.
+Episode 6.
 
 ## kt (Kotlin)
 Episode 6.
