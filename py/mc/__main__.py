@@ -1,16 +1,31 @@
 import colorama
 from colorama import Fore, Style
+from colorama.ansi import Cursor, clear_screen
 
 from minsk.analysis.evaluator import Evaluator
 from minsk.analysis.syntax.parser import Parser
 
 colorama.init()
 
+show_tree = False
+
 while True:
     try:
         line = input("> ")
     except EOFError:
         break
+
+    match line:
+        case "#showTree":
+            show_tree = not show_tree
+            if show_tree:
+                print("Showing parse trees.")
+            else:
+                print("Not showing parse trees.")
+            continue
+        case "#cls":
+            print(clear_screen(2) + Cursor.POS(0, 0))
+            continue
 
     parser = Parser(line)
     expression = parser.parse()
