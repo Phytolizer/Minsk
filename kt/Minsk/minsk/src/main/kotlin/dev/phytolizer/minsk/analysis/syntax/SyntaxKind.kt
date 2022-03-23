@@ -24,6 +24,8 @@ enum class SyntaxKind {
     TrueKeyword,
     FalseKeyword,
 
+    CompilationUnit,
+
     AssignmentExpression,
     BinaryExpression,
     LiteralExpression,

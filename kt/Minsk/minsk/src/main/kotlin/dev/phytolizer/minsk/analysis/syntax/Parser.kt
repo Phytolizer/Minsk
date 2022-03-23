@@ -7,6 +7,7 @@ internal class Parser(private val _text: SourceText) {
     private val _tokens: List<SyntaxToken>
     private var _position = 0
     private val _diagnostics = DiagnosticBag()
+    val diagnostics = _diagnostics.toList()
 
     init {
         val tempTokens = mutableListOf<SyntaxToken>()
@@ -48,8 +49,10 @@ internal class Parser(private val _text: SourceText) {
         return SyntaxToken(kind, current.position, "", null)
     }
 
-    fun parse(): SyntaxTree {
-        return SyntaxTree(_text, parseExpression(), matchToken(SyntaxKind.EndOfFileToken), _diagnostics.toList())
+    fun parseCompilationUnit(): CompilationUnitSyntax {
+        val expression = parseExpression()
+        val endOfFileToken = matchToken(SyntaxKind.EndOfFileToken)
+        return CompilationUnitSyntax(expression, endOfFileToken)
     }
 
     private fun parseExpression(): ExpressionSyntax {
