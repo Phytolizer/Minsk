@@ -1,3 +1,4 @@
+from minsk.analysis.syntax import facts
 from minsk.analysis.syntax.expression import ExpressionSyntax
 from minsk.analysis.syntax.expressions.binary import BinaryExpressionSyntax
 from minsk.analysis.syntax.expressions.literal import LiteralExpressionSyntax
@@ -60,24 +61,18 @@ class Parser:
         )
 
     def _parse_expression(self) -> ExpressionSyntax:
-        return self._parse_term()
+        return self._parse_binary_expression(0)
 
-    def _parse_term(self) -> ExpressionSyntax:
-        left = self._parse_factor()
-
-        while self._current.kind in (SyntaxKind.PlusToken, SyntaxKind.MinusToken):
-            operator_token = self._next_token()
-            right = self._parse_factor()
-            left = BinaryExpressionSyntax(left, operator_token, right)
-
-        return left
-
-    def _parse_factor(self) -> ExpressionSyntax:
+    def _parse_binary_expression(self, parent_precedence: int) -> ExpressionSyntax:
         left = self._parse_primary_expression()
 
-        while self._current.kind in (SyntaxKind.StarToken, SyntaxKind.SlashToken):
+        while True:
+            precedence = facts.binary_operator_precedence(self._current.kind)
+            if precedence == 0 or precedence <= parent_precedence:
+                break
+
             operator_token = self._next_token()
-            right = self._parse_primary_expression()
+            right = self._parse_binary_expression(precedence)
             left = BinaryExpressionSyntax(left, operator_token, right)
 
         return left
