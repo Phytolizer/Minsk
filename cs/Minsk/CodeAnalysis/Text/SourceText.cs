@@ -93,17 +93,12 @@ public sealed class SourceText
         var c = text[position];
         var l = position + 1 >= text.Length ? '\0' : text[position + 1];
 
-        if (c == '\r' && l == '\n')
+        return c switch
         {
-            return 2;
-        }
-
-        if (c is '\r' or '\n')
-        {
-            return 1;
-        }
-
-        return 0;
+            '\r' when l == '\n' => 2,
+            '\r' or '\n' => 1,
+            _ => 0
+        };
     }
 
     public static SourceText From(string text)
