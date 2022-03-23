@@ -17,7 +17,12 @@ internal class Binder(parent: BoundScope?) {
             val binder = Binder(parentScope)
             val expression = binder.bindExpression(syntax.expression)
             val variables = binder._scope.declaredVariables()
-            val diagnostics = binder.diagnostics
+            var diagnostics = binder.diagnostics
+
+            if (previous != null) {
+                diagnostics = listOf(previous.diagnostics, diagnostics).flatten()
+            }
+
             return BoundGlobalScope(previous, diagnostics, variables, expression)
         }
 
