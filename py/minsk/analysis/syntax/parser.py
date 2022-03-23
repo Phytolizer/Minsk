@@ -9,7 +9,6 @@ from minsk.analysis.syntax.expressions.unary import UnaryExpressionSyntax
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.lexer import Lexer
 from minsk.analysis.syntax.token import SyntaxToken
-from minsk.analysis.syntax.tree import SyntaxTree
 
 
 class Parser:
@@ -54,7 +53,7 @@ class Parser:
         )
         return SyntaxToken(kind, self._current.position, "", None)
 
-    def parse(self) -> SyntaxTree:
+    def parse(self) -> "SyntaxTree":
         return SyntaxTree(
             self._parse_expression(),
             self._match_token(SyntaxKind.EndOfFileToken),
@@ -109,3 +108,23 @@ class Parser:
         return ParenthesizedExpressionSyntax(
             open_parenthesis_token, expression, close_parenthesis_token
         )
+
+
+class SyntaxTree:
+    root: ExpressionSyntax
+    end_of_file_token: SyntaxToken
+    diagnostics: tuple[str, ...]
+
+    def __init__(
+        self,
+        root: ExpressionSyntax,
+        end_of_file_token: SyntaxToken,
+        diagnostics: tuple[str, ...],
+    ):
+        self.root = root
+        self.end_of_file_token = end_of_file_token
+        self.diagnostics = diagnostics
+
+    @staticmethod
+    def parse(text: str) -> "SyntaxTree":
+        return Parser(text).parse()
