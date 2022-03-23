@@ -141,11 +141,10 @@ class Binder:
     ) -> BoundExpression:
         expression = self.bind_expression(syntax.expression)
         name = syntax.identifier_token.text
-        variable = VariableSymbol(name, expression.ty)
-        if not self._scope.try_declare(variable):
-            self._diagnostics.report_variable_already_declared(
-                syntax.identifier_token.span, name
-            )
+        variable = self._scope.try_lookup(name)
+        if variable is None:
+            variable = VariableSymbol(name, expression.ty)
+            self._scope.try_declare(variable)
 
         return BoundAssignmentExpression(variable, expression)
 
