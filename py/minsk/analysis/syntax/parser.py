@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from minsk.analysis.diagnostic import Diagnostic
 from minsk.analysis.diagnostic.bag import DiagnosticBag
 from minsk.analysis.syntax import facts
@@ -142,21 +144,16 @@ class Parser:
         return NameExpressionSyntax(identifier_token)
 
 
+@dataclass(frozen=True)
 class SyntaxTree:
     root: ExpressionSyntax
     end_of_file_token: SyntaxToken
     diagnostics: tuple[Diagnostic, ...]
 
-    def __init__(
-        self,
-        root: ExpressionSyntax,
-        end_of_file_token: SyntaxToken,
-        diagnostics: tuple[Diagnostic, ...],
-    ):
-        self.root = root
-        self.end_of_file_token = end_of_file_token
-        self.diagnostics = diagnostics
-
     @staticmethod
     def parse(text: str) -> "SyntaxTree":
         return Parser(text).parse()
+
+    @staticmethod
+    def parse_tokens(text: str) -> tuple[SyntaxToken]:
+        return tuple(Lexer(text))
