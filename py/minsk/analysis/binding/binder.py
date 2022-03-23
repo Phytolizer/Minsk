@@ -1,4 +1,4 @@
-from typing import Any, cast
+from typing import Any, Optional, cast
 
 from minsk.analysis.binding.expression import BoundExpression
 from minsk.analysis.binding.expressions.assignment import BoundAssignmentExpression
@@ -8,6 +8,9 @@ from minsk.analysis.binding.expressions.unary import BoundUnaryExpression
 from minsk.analysis.binding.expressions.variable import BoundVariableExpression
 from minsk.analysis.binding.operators.binary import bind_binary_operator
 from minsk.analysis.binding.operators.unary import bind_unary_operator
+from minsk.analysis.binding.scope import BoundScope
+from minsk.analysis.binding.scope.globl import BoundGlobalScope
+from minsk.analysis.diagnostic import Diagnostic
 from minsk.analysis.diagnostic.bag import DiagnosticBag
 from minsk.analysis.syntax.expression import ExpressionSyntax
 from minsk.analysis.syntax.expressions.assignment import AssignmentExpressionSyntax
@@ -19,20 +22,29 @@ from minsk.analysis.syntax.expressions.parenthesized import (
 )
 from minsk.analysis.syntax.expressions.unary import UnaryExpressionSyntax
 from minsk.analysis.syntax.kind import SyntaxKind
+from minsk.analysis.syntax.unit import CompilationUnitSyntax
 from minsk.analysis.type import MinskType
 from minsk.analysis.variable import VariableSymbol
 
 
 class Binder:
     _diagnostics: DiagnosticBag
-    _variables: dict[VariableSymbol, Any]
+    _scope: BoundScope
 
-    def __init__(self, variables: dict[VariableSymbol, Any]):
+    def __init__(self, parent: Optional[BoundScope]):
         self._diagnostics = DiagnosticBag()
-        self._variables = variables
+        self._scope = BoundScope(parent)
+
+    @staticmethod
+    def bind_global_scope(syntax: CompilationUnitSyntax) -> BoundGlobalScope:
+        binder = Binder(None)
+        expression = binder.bind_expression(syntax.expression)
+        diagnostics = binder.diagnostics
+        variables = binder._scope.declared_variables
+        return BoundGlobalScope(None, diagnostics, variables, expression)
 
     @property
-    def diagnostics(self) -> tuple[str, ...]:
+    def diagnostics(self) -> tuple[Diagnostic, ...]:
         return tuple(iter(self._diagnostics))
 
     def bind_expression(self, syntax: ExpressionSyntax) -> BoundExpression:
@@ -102,26 +114,17 @@ class Binder:
     ) -> BoundExpression:
         expression = self.bind_expression(syntax.expression)
         name = syntax.identifier_token.text
-        existing_variable = next(
-            (v for v in self._variables.keys() if v.name == name), None
-        )
-        if existing_variable is not None:
-            del self._variables[existing_variable]
-
-        if expression.ty == MinskType.Int:
-            default_value = 0
-        elif expression.ty == MinskType.Bool:
-            default_value = False
-        else:
-            raise Exception(f"unsupported type {expression.ty}")
-
         variable = VariableSymbol(name, expression.ty)
-        self._variables[variable] = default_value
+        if not self._scope.try_declare(variable):
+            self._diagnostics.report_variable_already_declared(
+                syntax.identifier_token.span, name
+            )
+
         return BoundAssignmentExpression(variable, expression)
 
     def _bind_name_expression(self, syntax: NameExpressionSyntax) -> BoundExpression:
         name = syntax.identifier_token.text
-        variable = next((v for v in self._variables.keys() if v.name == name), None)
+        variable = self._scope.try_lookup(name)
         if variable is None:
             self._diagnostics.report_undefined_name(syntax.identifier_token.span, name)
             return BoundLiteralExpression(0)

@@ -15,6 +15,7 @@ from minsk.analysis.syntax.expressions.unary import UnaryExpressionSyntax
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.lexer import Lexer
 from minsk.analysis.syntax.token import SyntaxToken
+from minsk.analysis.syntax.unit import CompilationUnitSyntax
 from minsk.analysis.text.source import SourceText
 
 
@@ -63,12 +64,10 @@ class Parser:
         )
         return SyntaxToken(kind, self._current.position, "", None)
 
-    def parse(self) -> "SyntaxTree":
-        return SyntaxTree(
-            self._text,
+    def parse_compilation_unit(self) -> CompilationUnitSyntax:
+        return CompilationUnitSyntax(
             self._parse_expression(),
             self._match_token(SyntaxKind.EndOfFileToken),
-            self.diagnostics,
         )
 
     def _parse_expression(self) -> ExpressionSyntax:
@@ -148,18 +147,26 @@ class Parser:
         return NameExpressionSyntax(identifier_token)
 
 
-@dataclass(frozen=True)
+@dataclass(init=False)
 class SyntaxTree:
     text: SourceText
-    root: ExpressionSyntax
-    end_of_file_token: SyntaxToken
+    root: CompilationUnitSyntax
     diagnostics: tuple[Diagnostic, ...]
+
+    def __init__(self, text: SourceText):
+        parser = Parser(text)
+        root = parser.parse_compilation_unit()
+        diagnostics = parser.diagnostics
+
+        self.text = text
+        self.root = root
+        self.diagnostics = diagnostics
 
     @staticmethod
     def parse(text: str | SourceText) -> "SyntaxTree":
         if isinstance(text, str):
             text = SourceText(text)
-        return Parser(text).parse()
+        return SyntaxTree(text)
 
     @staticmethod
     def parse_tokens(text: str | SourceText) -> tuple[SyntaxToken]:

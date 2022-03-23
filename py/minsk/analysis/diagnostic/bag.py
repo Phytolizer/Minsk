@@ -54,6 +54,10 @@ class DiagnosticBag:
         message = f"Undefined name '{name}'"
         self._report(span, message)
 
+    def report_variable_already_declared(self, span: TextSpan, name: str):
+        message = f"Name '{name}' is already declared in this scope"
+        self._report(span, message)
+
     def __iter__(self):
         return iter(self._diagnostics)
 

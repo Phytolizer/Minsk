@@ -16,10 +16,9 @@ class Compilation:
         self.syntax = syntax
 
     def evaluate(self, variables: dict[VariableSymbol, Any]) -> EvaluationResult:
-        binder = Binder(variables)
-        expression = binder.bind_expression(self.syntax.root)
-        diagnostics = self.syntax.diagnostics + binder.diagnostics
+        global_scope = Binder.bind_global_scope(self.syntax.root)
+        diagnostics = self.syntax.diagnostics + global_scope.diagnostics
         if len(diagnostics) > 0:
             return diagnostics, None
-        evaluator = Evaluator(expression, variables)
+        evaluator = Evaluator(global_scope.expression, variables)
         return (), evaluator.evaluate()

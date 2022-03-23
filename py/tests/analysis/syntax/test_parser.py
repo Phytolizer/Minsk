@@ -3,6 +3,7 @@ from typing import Iterable, Iterator
 import pytest
 
 from minsk.analysis.syntax import facts
+from minsk.analysis.syntax.expression import ExpressionSyntax
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.node import SyntaxNode
 from minsk.analysis.syntax.parser import SyntaxTree
@@ -51,6 +52,10 @@ def get_binary_operator_pairs() -> Iterable[tuple[SyntaxKind, SyntaxKind]]:
             yield op1, op2
 
 
+def parse_expression(text: str) -> ExpressionSyntax:
+    return SyntaxTree.parse(text).root.expression
+
+
 @pytest.mark.parametrize("op1,op2", get_binary_operator_pairs())
 def test_binary_operator_precedence(op1: SyntaxKind, op2: SyntaxKind):
     op1_text = facts.get_text(op1)
@@ -59,7 +64,7 @@ def test_binary_operator_precedence(op1: SyntaxKind, op2: SyntaxKind):
     op2_precedence = facts.binary_operator_precedence(op2)
 
     text = f"a {op1_text} b {op2_text} c"
-    expression = SyntaxTree.parse(text).root
+    expression = parse_expression(text)
 
     if op1_precedence >= op2_precedence:
         i = AssertingIterator(expression)
@@ -88,4 +93,46 @@ def test_binary_operator_precedence(op1: SyntaxKind, op2: SyntaxKind):
         i.assert_token(op2, op2_text)
         i.assert_node(SyntaxKind.NameExpression)
         i.assert_token(SyntaxKind.IdentifierToken, "c")
+        i.assert_at_end()
+
+
+def get_unary_operator_pairs() -> Iterable[tuple[SyntaxKind, SyntaxKind]]:
+    for unary in facts.unary_operators():
+        for binary in facts.binary_operators():
+            yield unary, binary
+
+
+@pytest.mark.parametrize("unary,binary", get_unary_operator_pairs())
+def test_unary_operator_precedence(unary: SyntaxKind, binary: SyntaxKind):
+    unary_text = facts.get_text(unary)
+    binary_text = facts.get_text(binary)
+    unary_precedence = facts.unary_operator_precedence(unary)
+    binary_precedence = facts.binary_operator_precedence(binary)
+
+    text = f"{unary_text} a {binary_text} b"
+    expression = parse_expression(text)
+
+    if unary_precedence >= binary_precedence:
+        i = AssertingIterator(expression)
+
+        i.assert_node(SyntaxKind.BinaryExpression)
+        i.assert_node(SyntaxKind.UnaryExpression)
+        i.assert_token(unary, unary_text)
+        i.assert_node(SyntaxKind.NameExpression)
+        i.assert_token(SyntaxKind.IdentifierToken, "a")
+        i.assert_token(binary, binary_text)
+        i.assert_node(SyntaxKind.NameExpression)
+        i.assert_token(SyntaxKind.IdentifierToken, "b")
+        i.assert_at_end()
+    else:
+        i = AssertingIterator(expression)
+
+        i.assert_node(SyntaxKind.UnaryExpression)
+        i.assert_token(unary, unary_text)
+        i.assert_node(SyntaxKind.BinaryExpression)
+        i.assert_node(SyntaxKind.NameExpression)
+        i.assert_token(SyntaxKind.IdentifierToken, "a")
+        i.assert_token(binary, binary_text)
+        i.assert_node(SyntaxKind.NameExpression)
+        i.assert_token(SyntaxKind.IdentifierToken, "b")
         i.assert_at_end()
