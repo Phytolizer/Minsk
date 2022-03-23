@@ -67,6 +67,16 @@ def get_token_pairs() -> Iterable[tuple[SimpleToken, SimpleToken]]:
                 yield t1, t2
 
 
+def get_token_pairs_with_separator() -> Iterable[
+    tuple[SimpleToken, SimpleToken, SimpleToken]
+]:
+    for t1 in get_tokens():
+        for t2 in get_tokens():
+            if requires_separator(t1, t2):
+                for sep in get_separators():
+                    yield t1, sep, t2
+
+
 @pytest.mark.parametrize("t", get_tokens())
 def test_lexes_token(t: SimpleToken):
     tokens = SyntaxTree.parse_tokens(t.text)
@@ -77,10 +87,25 @@ def test_lexes_token(t: SimpleToken):
 
 @pytest.mark.parametrize("t1,t2", get_token_pairs())
 def test_lexes_token_pairs(t1: SimpleToken, t2: SimpleToken):
-    text = f"{t1.text}{t2.text}"
+    text = t1.text + t2.text
     tokens = SyntaxTree.parse_tokens(text)
     assert len(tokens) == 2
     assert tokens[0].kind == t1.kind
     assert tokens[0].text == t1.text
     assert tokens[1].kind == t2.kind
     assert tokens[1].text == t2.text
+
+
+@pytest.mark.parametrize("t1,sep,t2", get_token_pairs_with_separator())
+def test_lexes_token_pairs_with_separator(
+    t1: SimpleToken, sep: SimpleToken, t2: SimpleToken
+):
+    text = t1.text + sep.text + t2.text
+    tokens = SyntaxTree.parse_tokens(text)
+    assert len(tokens) == 3
+    assert tokens[0].kind == t1.kind
+    assert tokens[0].text == t1.text
+    assert tokens[1].kind == sep.kind
+    assert tokens[1].text == sep.text
+    assert tokens[2].kind == t2.kind
+    assert tokens[2].text == t2.text
