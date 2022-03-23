@@ -15,15 +15,14 @@ public sealed class Compilation
 
     public EvaluationResult Evaluate(Dictionary<VariableSymbol, object> variables)
     {
-        var binder = new Binder(variables);
-        var boundExpression = binder.BindExpression(_syntaxTree.Root.Expression);
-        var diagnostics = _syntaxTree.Diagnostics.Concat(binder.Diagnostics).ToImmutableArray();
+        var globalScope = Binder.BindGlobalScope(_syntaxTree.Root);
+        var diagnostics = _syntaxTree.Diagnostics.Concat(globalScope.Diagnostics).ToImmutableArray();
         if (diagnostics.Any())
         {
             return new EvaluationResult(diagnostics, null);
         }
 
-        var evaluator = new Evaluator(boundExpression, variables);
+        var evaluator = new Evaluator(globalScope.Expression, variables);
         return new EvaluationResult(ImmutableArray<Diagnostic>.Empty, evaluator.Evaluate());
     }
 }

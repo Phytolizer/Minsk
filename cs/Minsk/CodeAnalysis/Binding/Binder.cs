@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Minsk.CodeAnalysis.Syntax;
 
 namespace Minsk.CodeAnalysis.Binding;
@@ -5,11 +6,20 @@ namespace Minsk.CodeAnalysis.Binding;
 internal sealed class Binder
 {
     private readonly DiagnosticBag _diagnostics = new();
-    private readonly Dictionary<VariableSymbol, object> _variables;
+    private readonly BoundScope _scope;
 
-    public Binder(Dictionary<VariableSymbol, object> variables)
+    public Binder(BoundScope? parent)
     {
-        _variables = variables;
+        _scope = new BoundScope(parent);
+    }
+
+    public static BoundGlobalScope BindGlobalScope(CompilationUnitSyntax syntax)
+    {
+        var binder = new Binder(null);
+        var expression = binder.BindExpression(syntax.Expression);
+        var variables = binder._scope.GetDeclaredVariables();
+        var diagnostics = binder.Diagnostics.ToImmutableArray();
+        return new BoundGlobalScope(null, diagnostics, variables, expression);
     }
 
     public IEnumerable<Diagnostic> Diagnostics => _diagnostics;
@@ -32,8 +42,7 @@ internal sealed class Binder
     private BoundExpression BindNameExpression(NameExpressionSyntax syntax)
     {
         var name = syntax.IdentifierToken.Text;
-        var variable = _variables.Keys.FirstOrDefault(v => v.Name == name);
-        if (variable != null)
+        if (_scope.TryLookup(name, out var variable))
         {
             return new BoundVariableExpression(variable);
         }
@@ -46,16 +55,12 @@ internal sealed class Binder
     {
         var name = syntax.IdentifierToken.Text;
         var boundExpression = BindExpression(syntax.Expression);
-
-        var existingVariable = _variables.Keys.FirstOrDefault(v => v.Name == name);
-        if (existingVariable != null)
-        {
-            _variables.Remove(existingVariable);
-        }
-
         var variable = new VariableSymbol(name, boundExpression.Type);
 
-        _variables[variable] = 0;
+        if (!_scope.TryDeclare(variable))
+        {
+            _diagnostics.ReportVariableAlreadyDeclared(syntax.IdentifierToken.Span, name);
+        }
 
         return new BoundAssignmentExpression(variable, boundExpression);
     }

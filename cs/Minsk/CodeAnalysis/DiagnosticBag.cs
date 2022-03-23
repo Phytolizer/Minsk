@@ -65,4 +65,10 @@ internal sealed class DiagnosticBag : IEnumerable<Diagnostic>
         var message = $"Undefined name '{name}'";
         Report(span, message);
     }
+
+    public void ReportVariableAlreadyDeclared(TextSpan span, string name)
+    {
+        var message = $"Name '{name}' is already declared in this scope";
+        Report(span, message);
+    }
 }
