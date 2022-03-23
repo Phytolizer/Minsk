@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "py"
+name = "minsk"
 version = "0.1.0"
 description = ""
 authors = ["Kyle Coffey <me@phytolizer.dev>"]
