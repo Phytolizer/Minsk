@@ -22,6 +22,11 @@ public abstract class SyntaxNode
         PrettyPrintInternal(this, true, "", true);
     }
 
+    public void WriteTo(TextWriter writer)
+    {
+        PrettyPrintInternal(this, false, "", true);
+    }
+
     private static void PrettyPrintInternal(SyntaxNode node, bool isToConsole, string indent, bool isLast)
     {
         if (isToConsole)
