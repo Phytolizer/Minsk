@@ -32,6 +32,10 @@ class SyntaxToken(SyntaxNode):
     def children(self) -> Iterable[SyntaxNode]:
         return ()
 
+    @staticmethod
+    def is_token() -> bool:
+        return True
+
     @property
     def value(self) -> Optional[Any]:
         return self._value
