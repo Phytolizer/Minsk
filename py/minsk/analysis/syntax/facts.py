@@ -1,3 +1,5 @@
+from typing import Iterable, Optional
+
 from minsk.analysis.syntax.kind import SyntaxKind
 
 
@@ -33,3 +35,39 @@ def keyword_kind(text: str) -> SyntaxKind:
             return SyntaxKind.FalseKeyword
         case _:
             return SyntaxKind.IdentifierToken
+
+
+def binary_operators() -> Iterable[SyntaxKind]:
+    return filter(lambda kind: binary_operator_precedence(kind) > 0, SyntaxKind)
+
+
+def unary_operators() -> Iterable[SyntaxKind]:
+    return filter(lambda kind: unary_operator_precedence(kind) > 0, SyntaxKind)
+
+
+def get_text(kind: SyntaxKind) -> Optional[str]:
+    match kind:
+        case SyntaxKind.PlusToken:
+            return "+"
+        case SyntaxKind.MinusToken:
+            return "-"
+        case SyntaxKind.StarToken:
+            return "*"
+        case SyntaxKind.SlashToken:
+            return "/"
+        case SyntaxKind.BangToken:
+            return "!"
+        case SyntaxKind.AmpersandAmpersandToken:
+            return "&&"
+        case SyntaxKind.PipePipeToken:
+            return "||"
+        case SyntaxKind.BangEqualsToken:
+            return "!="
+        case SyntaxKind.EqualsEqualsToken:
+            return "=="
+        case SyntaxKind.EqualsToken:
+            return "="
+        case SyntaxKind.TrueKeyword:
+            return "true"
+        case SyntaxKind.FalseKeyword:
+            return "false"
