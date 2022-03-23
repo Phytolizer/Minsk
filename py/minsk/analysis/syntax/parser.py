@@ -15,6 +15,7 @@ from minsk.analysis.syntax.expressions.unary import UnaryExpressionSyntax
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.lexer import Lexer
 from minsk.analysis.syntax.token import SyntaxToken
+from minsk.analysis.text.source import SourceText
 
 
 class Parser:
@@ -22,7 +23,7 @@ class Parser:
     _position: int
     _diagnostics: DiagnosticBag
 
-    def __init__(self, text: str):
+    def __init__(self, text: SourceText):
         lexer = Lexer(text)
         tokens = list(
             filter(
@@ -151,9 +152,13 @@ class SyntaxTree:
     diagnostics: tuple[Diagnostic, ...]
 
     @staticmethod
-    def parse(text: str) -> "SyntaxTree":
+    def parse(text: str | SourceText) -> "SyntaxTree":
+        if isinstance(text, str):
+            text = SourceText(text)
         return Parser(text).parse()
 
     @staticmethod
-    def parse_tokens(text: str) -> tuple[SyntaxToken]:
+    def parse_tokens(text: str | SourceText) -> tuple[SyntaxToken]:
+        if isinstance(text, str):
+            text = SourceText(text)
         return tuple(Lexer(text))

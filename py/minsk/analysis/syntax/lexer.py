@@ -5,16 +5,17 @@ from minsk.analysis.diagnostic.bag import DiagnosticBag
 from minsk.analysis.syntax import facts
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.token import SyntaxToken
+from minsk.analysis.text.source import SourceText
 from minsk.analysis.text.span import TextSpan
 
 
 class Lexer:
     class _Iter:
-        _text: str
+        _text: SourceText
         _position: int
         _diagnostics: DiagnosticBag
 
-        def __init__(self, text: str, diagnostics: DiagnosticBag):
+        def __init__(self, text: SourceText, diagnostics: DiagnosticBag):
             self._text = text
             self._position = 0
             self._diagnostics = diagnostics
@@ -108,10 +109,10 @@ class Lexer:
         def _current_text(self, start: int) -> str:
             return self._text[start : self._position]
 
-    _text: str
+    _text: SourceText
     _diagnostics: DiagnosticBag
 
-    def __init__(self, text: str):
+    def __init__(self, text: SourceText):
         self._text = text
         self._diagnostics = DiagnosticBag()
 
