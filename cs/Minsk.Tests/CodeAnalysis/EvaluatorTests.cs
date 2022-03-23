@@ -2,7 +2,7 @@ using Minsk.CodeAnalysis;
 using Minsk.CodeAnalysis.Syntax;
 using Xunit;
 
-namespace Minsk.Tests.CodeAnalysis.Syntax;
+namespace Minsk.Tests.CodeAnalysis;
 
 public class EvaluatorTests
 {
