@@ -3,18 +3,36 @@ package dev.phytolizer.minsk.analysis
 import dev.phytolizer.minsk.analysis.binding.*
 
 internal class Evaluator(private val _variables: MutableMap<VariableSymbol, Any>) {
-    fun evaluate(root: BoundExpression): Any {
-        return evaluateExpression(root)
+    private var _lastValue: Any? = null
+
+    fun evaluate(root: BoundStatement): Any {
+        evaluateStatement(root)
+        return _lastValue!!
     }
 
-    private fun evaluateExpression(root: BoundExpression): Any {
-        return when (root.kind) {
-            BoundNodeKind.AssignmentExpression -> evaluateAssignmentExpression(root as BoundAssignmentExpression)
-            BoundNodeKind.BinaryExpression -> evaluateBinaryExpression(root as BoundBinaryExpression)
-            BoundNodeKind.LiteralExpression -> evaluateLiteralExpression(root as BoundLiteralExpression)
-            BoundNodeKind.UnaryExpression -> evaluateUnaryExpression(root as BoundUnaryExpression)
-            BoundNodeKind.VariableExpression -> evaluateVariableExpression(root as BoundVariableExpression)
+    private fun evaluateStatement(root: BoundStatement) = when (root.kind) {
+        BoundNodeKind.BlockStatement -> evaluateBlockStatement(root as BoundBlockStatement)
+        BoundNodeKind.ExpressionStatement -> evaluateExpressionStatement(root as BoundExpressionStatement)
+        else -> throw IllegalStateException()
+    }
+
+    private fun evaluateBlockStatement(root: BoundBlockStatement) {
+        for (statement in root.statements) {
+            evaluateStatement(statement)
         }
+    }
+
+    private fun evaluateExpressionStatement(root: BoundExpressionStatement) {
+        _lastValue = evaluateExpression(root.expression)
+    }
+
+    private fun evaluateExpression(root: BoundExpression): Any = when (root.kind) {
+        BoundNodeKind.AssignmentExpression -> evaluateAssignmentExpression(root as BoundAssignmentExpression)
+        BoundNodeKind.BinaryExpression -> evaluateBinaryExpression(root as BoundBinaryExpression)
+        BoundNodeKind.LiteralExpression -> evaluateLiteralExpression(root as BoundLiteralExpression)
+        BoundNodeKind.UnaryExpression -> evaluateUnaryExpression(root as BoundUnaryExpression)
+        BoundNodeKind.VariableExpression -> evaluateVariableExpression(root as BoundVariableExpression)
+        else -> throw IllegalStateException()
     }
 
     private fun evaluateAssignmentExpression(root: BoundAssignmentExpression): Any {

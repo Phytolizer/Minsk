@@ -31,6 +31,8 @@ object SyntaxFacts {
         SyntaxKind.SlashToken -> "/"
         SyntaxKind.OpenParenthesisToken -> "("
         SyntaxKind.CloseParenthesisToken -> ")"
+        SyntaxKind.OpenBraceToken -> "{"
+        SyntaxKind.CloseBraceToken -> "}"
         SyntaxKind.BangToken -> "!"
         SyntaxKind.AmpersandAmpersandToken -> "&&"
         SyntaxKind.PipePipeToken -> "||"

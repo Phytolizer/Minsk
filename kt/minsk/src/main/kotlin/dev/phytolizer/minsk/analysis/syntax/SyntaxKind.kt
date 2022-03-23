@@ -14,6 +14,8 @@ enum class SyntaxKind {
     SlashToken,
     OpenParenthesisToken,
     CloseParenthesisToken,
+    OpenBraceToken,
+    CloseBraceToken,
     BangToken,
     AmpersandAmpersandToken,
     PipePipeToken,
@@ -25,6 +27,9 @@ enum class SyntaxKind {
     FalseKeyword,
 
     CompilationUnit,
+
+    BlockStatement,
+    ExpressionStatement,
 
     AssignmentExpression,
     BinaryExpression,

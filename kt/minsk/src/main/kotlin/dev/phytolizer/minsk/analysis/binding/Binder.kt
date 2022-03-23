@@ -15,7 +15,7 @@ internal class Binder(parent: BoundScope?) {
         fun bindGlobalScope(previous: BoundGlobalScope?, syntax: CompilationUnitSyntax): BoundGlobalScope {
             val parentScope = createParentScopes(previous)
             val binder = Binder(parentScope)
-            val expression = binder.bindExpression(syntax.expression)
+            val statement = binder.bindStatement(syntax.statement)
             val variables = binder._scope.declaredVariables()
             var diagnostics = binder.diagnostics
 
@@ -23,7 +23,7 @@ internal class Binder(parent: BoundScope?) {
                 diagnostics = listOf(previous.diagnostics, diagnostics).flatten()
             }
 
-            return BoundGlobalScope(previous, diagnostics, variables, expression)
+            return BoundGlobalScope(previous, diagnostics, variables, statement)
         }
 
         private fun createParentScopes(previousIn: BoundGlobalScope?): BoundScope? {
@@ -50,7 +50,28 @@ internal class Binder(parent: BoundScope?) {
         }
     }
 
-    fun bindExpression(syntax: ExpressionSyntax): BoundExpression = when (syntax.kind) {
+    fun bindStatement(syntax: StatementSyntax): BoundStatement = when (syntax.kind) {
+        SyntaxKind.ExpressionStatement -> bindExpressionStatement(syntax as ExpressionStatementSyntax)
+        SyntaxKind.BlockStatement -> bindBlockStatement(syntax as BlockStatementSyntax)
+        else -> throw IllegalStateException()
+    }
+
+    private fun bindBlockStatement(syntax: BlockStatementSyntax): BoundStatement {
+        val statements = mutableListOf<BoundStatement>()
+
+        for (statement in syntax.statements) {
+            statements.add(bindStatement(statement))
+        }
+
+        return BoundBlockStatement(statements)
+    }
+
+    private fun bindExpressionStatement(syntax: ExpressionStatementSyntax): BoundStatement {
+        val expression = bindExpression(syntax.expression)
+        return BoundExpressionStatement(expression)
+    }
+
+    private fun bindExpression(syntax: ExpressionSyntax): BoundExpression = when (syntax.kind) {
         SyntaxKind.AssignmentExpression -> bindAssignmentExpression(syntax as AssignmentExpressionSyntax)
         SyntaxKind.BinaryExpression -> bindBinaryExpression(syntax as BinaryExpressionSyntax)
         SyntaxKind.LiteralExpression -> bindLiteralExpression(syntax as LiteralExpressionSyntax)

@@ -91,6 +91,14 @@ internal class Lexer(private val _text: SourceText) : Iterable<SyntaxToken> {
                     kind = SyntaxKind.CloseParenthesisToken
                     position += 1
                 }
+                '{' -> {
+                    kind = SyntaxKind.OpenBraceToken
+                    position += 1
+                }
+                '}' -> {
+                    kind = SyntaxKind.CloseBraceToken
+                    position += 1
+                }
                 '!' -> if (peek(1) == '=') {
                     kind = SyntaxKind.BangEqualsToken
                     position += 2

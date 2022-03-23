@@ -21,10 +21,10 @@ class Compilation private constructor(val previous: Compilation?, val syntax: Sy
     }
 
     fun evaluate(variables: MutableMap<VariableSymbol, Any>): EvaluationResult {
-        val expression = globalScope.expression
+        val statement = globalScope.statement
         val diagnostics = listOf(syntax.diagnostics, globalScope.diagnostics).flatten()
         return if (diagnostics.isEmpty()) {
-            EvaluationResult(Evaluator(variables).evaluate(expression), listOf())
+            EvaluationResult(Evaluator(variables).evaluate(statement), listOf())
         } else {
             EvaluationResult(null, diagnostics)
         }

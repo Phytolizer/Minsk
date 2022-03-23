@@ -50,9 +50,29 @@ internal class Parser(private val _text: SourceText) {
     }
 
     fun parseCompilationUnit(): CompilationUnitSyntax {
-        val expression = parseExpression()
+        val statement = parseStatement()
         val endOfFileToken = matchToken(SyntaxKind.EndOfFileToken)
-        return CompilationUnitSyntax(expression, endOfFileToken)
+        return CompilationUnitSyntax(statement, endOfFileToken)
+    }
+
+    private fun parseStatement(): StatementSyntax = when (current.kind) {
+        SyntaxKind.OpenBraceToken -> parseBlockStatement()
+        else -> parseExpressionStatement()
+    }
+
+    private fun parseBlockStatement(): StatementSyntax {
+        val openBraceToken = matchToken(SyntaxKind.OpenBraceToken)
+        val statements = mutableListOf<StatementSyntax>()
+        while (current.kind != SyntaxKind.CloseBraceToken && current.kind != SyntaxKind.EndOfFileToken) {
+            statements.add(parseStatement())
+        }
+        val closeBraceToken = matchToken(SyntaxKind.CloseBraceToken)
+        return BlockStatementSyntax(openBraceToken, statements, closeBraceToken)
+    }
+
+    private fun parseExpressionStatement(): StatementSyntax {
+        val expression = parseExpression()
+        return ExpressionStatementSyntax(expression)
     }
 
     private fun parseExpression(): ExpressionSyntax {

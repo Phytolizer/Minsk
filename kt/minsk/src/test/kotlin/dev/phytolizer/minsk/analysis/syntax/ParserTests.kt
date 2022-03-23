@@ -3,6 +3,7 @@ package dev.phytolizer.minsk.analysis.syntax
 import dev.phytolizer.minsk.TestUtils
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.withData
+import io.kotest.matchers.types.shouldBeTypeOf
 
 class ParserTests : FunSpec({
     context("binary expression honors precedence") {
@@ -96,7 +97,7 @@ class ParserTests : FunSpec({
         private fun unaryOperatorPairs() =
             TestUtils.cartesianProduct(SyntaxFacts.unaryOperators(), SyntaxFacts.binaryOperators())
 
-        private fun parseExpression(text: String) =
-            SyntaxTree.parse(text).root.expression
+        private fun parseExpression(text: String): ExpressionSyntax =
+            SyntaxTree.parse(text).root.statement.shouldBeTypeOf<ExpressionStatementSyntax>().expression
     }
 }
