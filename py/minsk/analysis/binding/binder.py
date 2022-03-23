@@ -44,6 +44,10 @@ class Binder:
         expression = binder.bind_expression(syntax.expression)
         diagnostics = binder.diagnostics
         variables = binder._scope.declared_variables
+
+        if previous is not None:
+            diagnostics = previous.diagnostics + diagnostics
+
         return BoundGlobalScope(previous, diagnostics, variables, expression)
 
     @staticmethod
