@@ -30,7 +30,7 @@ from minsk.analysis.variable import VariableSymbol
         ("false", False),
         ("!true", False),
         ("!false", True),
-        ("(a = 10) * a", 100),
+        ("{ var a = 0 (a = 10) * a }", 100),
     ),
 )
 def test_evaluates_correct_value(text, expected):
