@@ -5,10 +5,22 @@ import dev.phytolizer.minsk.analysis.DiagnosticBag
 import dev.phytolizer.minsk.analysis.VariableSymbol
 import dev.phytolizer.minsk.analysis.syntax.*
 
-internal class Binder(private val _variables: MutableMap<VariableSymbol, Any>) {
+internal class Binder(parent: BoundScope?) {
+    private val _scope = BoundScope(parent)
+    private val _variables = mutableMapOf<VariableSymbol, Any>()
     private val _diagnostics = DiagnosticBag()
     val diagnostics: List<Diagnostic>
         get() = _diagnostics.toList()
+
+    companion object {
+        fun bindGlobalScope(syntax: CompilationUnitSyntax): BoundGlobalScope {
+            val binder = Binder(null)
+            val expression = binder.bindExpression(syntax.expression)
+            val variables = binder._scope.declaredVariables()
+            val diagnostics = binder.diagnostics
+            return BoundGlobalScope(null, diagnostics, variables, expression)
+        }
+    }
 
     fun bindExpression(syntax: ExpressionSyntax): BoundExpression = when (syntax.kind) {
         SyntaxKind.AssignmentExpression -> bindAssignmentExpression(syntax as AssignmentExpressionSyntax)
