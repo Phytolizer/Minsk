@@ -39,6 +39,9 @@ while True:
             case "#cls":
                 print(clear_screen() + Cursor.POS(0, 0), end="")
                 continue
+            case "#reset":
+                previous = None
+                continue
 
     is_blank = input_line == ""
     text_builder += input_line + "\n"
