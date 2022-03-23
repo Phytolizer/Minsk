@@ -36,9 +36,7 @@ abstract class SyntaxNode {
             writer.print(Colorize.colorCode256(243))
         }
         writer.print(indent)
-        if (isToConsole) {
-            writer.print(marker)
-        }
+        writer.print(marker)
 
         if (isToConsole) {
             writer.print(Colorize.colorCode(if (node is SyntaxToken) {
