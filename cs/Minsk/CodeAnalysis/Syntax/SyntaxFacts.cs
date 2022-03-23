@@ -28,8 +28,10 @@ public static class SyntaxFacts
     {
         return text switch
         {
-            "true" => SyntaxKind.TrueKeyword,
             "false" => SyntaxKind.FalseKeyword,
+            "let" => SyntaxKind.LetKeyword,
+            "true" => SyntaxKind.TrueKeyword,
+            "var" => SyntaxKind.VarKeyword,
             _ => SyntaxKind.IdentifierToken
         };
     }
@@ -52,8 +54,10 @@ public static class SyntaxFacts
             SyntaxKind.OpenBraceToken => "{",
             SyntaxKind.CloseBraceToken => "}",
             SyntaxKind.EqualsEqualsToken => "==",
-            SyntaxKind.TrueKeyword => "true",
             SyntaxKind.FalseKeyword => "false",
+            SyntaxKind.LetKeyword => "let",
+            SyntaxKind.TrueKeyword => "true",
+            SyntaxKind.VarKeyword => "var",
             _ => null
         };
     }

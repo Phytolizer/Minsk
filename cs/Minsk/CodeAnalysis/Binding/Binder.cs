@@ -36,8 +36,24 @@ internal sealed class Binder
         {
             SyntaxKind.BlockStatement => BindBlockStatement((BlockStatementSyntax)syntax),
             SyntaxKind.ExpressionStatement => BindExpressionStatement((ExpressionStatementSyntax)syntax),
+            SyntaxKind.VariableDeclaration => BindVariableDeclaration((VariableDeclarationSyntax)syntax),
             _ => throw new InvalidOperationException(),
         };
+    }
+
+    private BoundStatement BindVariableDeclaration(VariableDeclarationSyntax syntax)
+    {
+        var name = syntax.IdentifierToken.Text;
+        var isReadOnly = syntax.KeywordToken.Kind == SyntaxKind.LetKeyword;
+        var initializer = BindExpression(syntax.Initializer);
+        var variable = new VariableSymbol(name, isReadOnly, initializer.Type);
+
+        if (!_scope.TryDeclare(variable))
+        {
+            _diagnostics.ReportVariableAlreadyDeclared(syntax.IdentifierToken.Span, name);
+        }
+
+        return new BoundVariableDeclaration(variable, initializer);
     }
 
     private BoundStatement BindBlockStatement(BlockStatementSyntax syntax)
@@ -119,8 +135,14 @@ internal sealed class Binder
         var boundExpression = BindExpression(syntax.Expression);
         if (!_scope.TryLookup(name, out var variable))
         {
-            variable = new VariableSymbol(name, boundExpression.Type);
-            _scope.TryDeclare(variable);
+            _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
+            return boundExpression;
+        }
+
+        if (variable.IsReadOnly)
+        {
+            _diagnostics.ReportCannotAssign(syntax.EqualsToken.Span, name);
+            return boundExpression;
         }
 
         if (boundExpression.Type == variable.Type)

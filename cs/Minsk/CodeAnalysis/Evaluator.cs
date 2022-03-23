@@ -31,9 +31,19 @@ internal sealed class Evaluator
             case BoundNodeKind.ExpressionStatement:
                 EvaluateExpressionStatement((BoundExpressionStatement)root);
                 break;
+            case BoundNodeKind.VariableDeclaration:
+                EvaluateVariableDeclaration((BoundVariableDeclaration)root);
+                break;
             default:
                 throw new InvalidOperationException();
         }
+    }
+
+    private void EvaluateVariableDeclaration(BoundVariableDeclaration root)
+    {
+        var initializer = EvaluateExpression(root.Initializer);
+        _variables[root.Variable] = initializer;
+        _lastValue = initializer;
     }
 
     private void EvaluateExpressionStatement(BoundExpressionStatement root)

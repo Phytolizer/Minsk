@@ -77,4 +77,10 @@ internal sealed class DiagnosticBag : IEnumerable<Diagnostic>
         var message = $"Cannot convert '{fromType}' to '{toType}'";
         Report(span, message);
     }
+
+    public void ReportCannotAssign(TextSpan span, string name)
+    {
+        var message = $"Cannot assign to read-only variable '{name}'";
+        Report(span, message);
+    }
 }

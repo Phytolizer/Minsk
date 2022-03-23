@@ -70,8 +70,20 @@ internal sealed class Parser
         return Current.Kind switch
         {
             SyntaxKind.OpenBraceToken => ParseBlockStatement(),
+            SyntaxKind.LetKeyword or SyntaxKind.VarKeyword => ParseVariableDeclaration(),
             _ => ParseExpressionStatement(),
         };
+    }
+
+    private StatementSyntax ParseVariableDeclaration()
+    {
+        var keywordKind = Current.Kind == SyntaxKind.LetKeyword ? SyntaxKind.LetKeyword : SyntaxKind.VarKeyword;
+        var keywordToken = MatchToken(keywordKind);
+        var identifierToken = MatchToken(SyntaxKind.IdentifierToken);
+        var equalsToken = MatchToken(SyntaxKind.EqualsToken);
+        var initializer = ParseExpression();
+
+        return new VariableDeclarationSyntax(keywordToken, identifierToken, equalsToken, initializer);
     }
 
     private StatementSyntax ParseBlockStatement()

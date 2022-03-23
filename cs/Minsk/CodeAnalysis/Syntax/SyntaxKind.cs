@@ -24,14 +24,17 @@ public enum SyntaxKind
     OpenBraceToken,
     CloseBraceToken,
 
-    TrueKeyword,
     FalseKeyword,
+    LetKeyword,
+    TrueKeyword,
+    VarKeyword,
 
     // Syntax nodes
     CompilationUnit,
 
     BlockStatement,
     ExpressionStatement,
+    VariableDeclaration,
 
     LiteralExpression,
     BinaryExpression,
