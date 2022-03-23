@@ -8,5 +8,8 @@ Episode 6.
 ## kt (Kotlin)
 Episode 6.
 
+## py (Python)
+Episode 1.
+
 ## rs (Rust)
 Episode 4.5. (Half of Episode 5 is implemented.)
