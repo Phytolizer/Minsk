@@ -19,13 +19,15 @@ from minsk.analysis.syntax.expressions.parenthesized import (
 )
 from minsk.analysis.syntax.expressions.unary import UnaryExpressionSyntax
 from minsk.analysis.syntax.kind import SyntaxKind
+from minsk.analysis.type import MinskType
+from minsk.analysis.variable import VariableSymbol
 
 
 class Binder:
     _diagnostics: DiagnosticBag
-    _variables: dict[str, Any]
+    _variables: dict[VariableSymbol, Any]
 
-    def __init__(self, variables: dict[str, Any]):
+    def __init__(self, variables: dict[VariableSymbol, Any]):
         self._diagnostics = DiagnosticBag()
         self._variables = variables
 
@@ -100,21 +102,28 @@ class Binder:
     ) -> BoundExpression:
         expression = self.bind_expression(syntax.expression)
         name = syntax.identifier_token.text
-        if expression.ty == int:
+        existing_variable = next(
+            (v for v in self._variables.keys() if v.name == name), None
+        )
+        if existing_variable is not None:
+            del self._variables[existing_variable]
+
+        if expression.ty == MinskType.Int:
             default_value = 0
-        elif expression.ty == bool:
+        elif expression.ty == MinskType.Bool:
             default_value = False
         else:
             raise Exception(f"unsupported type {expression.ty}")
-        self._variables[name] = default_value
-        return BoundAssignmentExpression(name, expression)
+
+        variable = VariableSymbol(name, expression.ty)
+        self._variables[variable] = default_value
+        return BoundAssignmentExpression(variable, expression)
 
     def _bind_name_expression(self, syntax: NameExpressionSyntax) -> BoundExpression:
         name = syntax.identifier_token.text
-        try:
-            value = self._variables[name]
-        except KeyError:
+        variable = next((v for v in self._variables.keys() if v.name == name), None)
+        if variable is None:
             self._diagnostics.report_undefined_name(syntax.identifier_token.span, name)
             return BoundLiteralExpression(0)
 
-        return BoundVariableExpression(name, type(value))
+        return BoundVariableExpression(variable)

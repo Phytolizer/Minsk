@@ -6,11 +6,12 @@ from colorama.ansi import Cursor, clear_screen
 
 from minsk.analysis.compilation import Compilation
 from minsk.analysis.syntax.parser import SyntaxTree
+from minsk.analysis.variable import VariableSymbol
 
 colorama.init()
 
 show_tree = False
-variables: dict[str, Any] = {}
+variables: dict[VariableSymbol, Any] = {}
 
 while True:
     try:

@@ -9,13 +9,16 @@ from minsk.analysis.binding.expressions.variable import BoundVariableExpression
 from minsk.analysis.binding.kind import BoundNodeKind
 from minsk.analysis.binding.operators.binary import BoundBinaryOperatorKind
 from minsk.analysis.binding.operators.unary import BoundUnaryOperatorKind
+from minsk.analysis.variable import VariableSymbol
 
 
 class Evaluator:
     _expression: BoundExpression
-    _variables: dict[str, Any]
+    _variables: dict[VariableSymbol, Any]
 
-    def __init__(self, expression: BoundExpression, variables: dict[str, Any]):
+    def __init__(
+        self, expression: BoundExpression, variables: dict[VariableSymbol, Any]
+    ):
         self._expression = expression
         self._variables = variables
 
@@ -90,8 +93,8 @@ class Evaluator:
 
     def _evaluate_assignment_expression(self, syntax: BoundAssignmentExpression) -> Any:
         value = self._evaluate_expression(syntax.expression)
-        self._variables[syntax.name] = value
+        self._variables[syntax.variable] = value
         return value
 
     def _evaluate_variable_expression(self, syntax: BoundVariableExpression) -> Any:
-        return self._variables[syntax.name]
+        return self._variables[syntax.variable]

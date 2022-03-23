@@ -1,13 +1,14 @@
 from dataclasses import dataclass
-from typing import Type
 
 from minsk.analysis.binding.expression import BoundExpression
 from minsk.analysis.binding.kind import BoundNodeKind
+from minsk.analysis.type import MinskType
+from minsk.analysis.variable import VariableSymbol
 
 
 @dataclass(frozen=True)
 class BoundAssignmentExpression(BoundExpression):
-    name: str
+    variable: VariableSymbol
     expression: BoundExpression
 
     @property
@@ -15,5 +16,5 @@ class BoundAssignmentExpression(BoundExpression):
         return BoundNodeKind.AssignmentExpression
 
     @property
-    def ty(self) -> Type:
-        return self.expression.ty
+    def ty(self) -> MinskType:
+        return self.variable.ty

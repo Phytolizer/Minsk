@@ -1,23 +1,24 @@
-from typing import Optional, Type
+from typing import Optional
 
 from minsk.analysis.binding.operators.binary.kind import BoundBinaryOperatorKind
 from minsk.analysis.syntax.kind import SyntaxKind
+from minsk.analysis.type import MinskType
 
 
 class BoundBinaryOperator:
     syntax_kind: SyntaxKind
     kind: BoundBinaryOperatorKind
-    left_type: Type
-    right_type: Type
-    result_type: Type
+    left_type: MinskType
+    right_type: MinskType
+    result_type: MinskType
 
     def __init__(
         self,
         syntax_kind: SyntaxKind,
         operator_kind: BoundBinaryOperatorKind,
-        left_type: Type,
-        right_type: Type,
-        result_type: Type,
+        left_type: MinskType,
+        right_type: MinskType,
+        result_type: MinskType,
     ):
         self.syntax_kind = syntax_kind
         self.kind = operator_kind
@@ -30,78 +31,78 @@ _OPERATORS = (
     BoundBinaryOperator(
         SyntaxKind.PlusToken,
         BoundBinaryOperatorKind.Addition,
-        int,
-        int,
-        int,
+        MinskType.Int,
+        MinskType.Int,
+        MinskType.Int,
     ),
     BoundBinaryOperator(
         SyntaxKind.MinusToken,
         BoundBinaryOperatorKind.Subtraction,
-        int,
-        int,
-        int,
+        MinskType.Int,
+        MinskType.Int,
+        MinskType.Int,
     ),
     BoundBinaryOperator(
         SyntaxKind.StarToken,
         BoundBinaryOperatorKind.Multiplication,
-        int,
-        int,
-        int,
+        MinskType.Int,
+        MinskType.Int,
+        MinskType.Int,
     ),
     BoundBinaryOperator(
         SyntaxKind.SlashToken,
         BoundBinaryOperatorKind.Division,
-        int,
-        int,
-        int,
+        MinskType.Int,
+        MinskType.Int,
+        MinskType.Int,
     ),
     BoundBinaryOperator(
         SyntaxKind.AmpersandAmpersandToken,
         BoundBinaryOperatorKind.LogicalAnd,
-        bool,
-        bool,
-        bool,
+        MinskType.Bool,
+        MinskType.Bool,
+        MinskType.Bool,
     ),
     BoundBinaryOperator(
         SyntaxKind.PipePipeToken,
         BoundBinaryOperatorKind.LogicalOr,
-        bool,
-        bool,
-        bool,
+        MinskType.Bool,
+        MinskType.Bool,
+        MinskType.Bool,
     ),
     BoundBinaryOperator(
         SyntaxKind.BangEqualsToken,
         BoundBinaryOperatorKind.Inequality,
-        int,
-        int,
-        bool,
+        MinskType.Int,
+        MinskType.Int,
+        MinskType.Bool,
     ),
     BoundBinaryOperator(
         SyntaxKind.EqualsEqualsToken,
         BoundBinaryOperatorKind.Equality,
-        int,
-        int,
-        bool,
+        MinskType.Int,
+        MinskType.Int,
+        MinskType.Bool,
     ),
     BoundBinaryOperator(
         SyntaxKind.BangEqualsToken,
         BoundBinaryOperatorKind.Inequality,
-        bool,
-        bool,
-        bool,
+        MinskType.Bool,
+        MinskType.Bool,
+        MinskType.Bool,
     ),
     BoundBinaryOperator(
         SyntaxKind.EqualsEqualsToken,
         BoundBinaryOperatorKind.Equality,
-        bool,
-        bool,
-        bool,
+        MinskType.Bool,
+        MinskType.Bool,
+        MinskType.Bool,
     ),
 )
 
 
 def bind_binary_operator(
-    syntax_kind: SyntaxKind, left_type: Type, right_type: Type
+    syntax_kind: SyntaxKind, left_type: MinskType, right_type: MinskType
 ) -> Optional[BoundBinaryOperator]:
     for op in _OPERATORS:
         if (

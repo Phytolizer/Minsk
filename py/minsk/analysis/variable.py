@@ -1,8 +1,9 @@
 from dataclasses import dataclass
-from typing import Type
+
+from minsk.analysis.type import MinskType
 
 
-@dataclass
+@dataclass(frozen=True)
 class VariableSymbol:
     name: str
-    ty: Type
+    ty: MinskType

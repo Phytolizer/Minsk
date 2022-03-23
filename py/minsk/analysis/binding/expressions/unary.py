@@ -1,9 +1,9 @@
 from dataclasses import dataclass
-from typing import Type
 
 from minsk.analysis.binding.expression import BoundExpression
 from minsk.analysis.binding.kind import BoundNodeKind
 from minsk.analysis.binding.operators.unary import BoundUnaryOperator
+from minsk.analysis.type import MinskType
 
 
 @dataclass(frozen=True)
@@ -16,5 +16,5 @@ class BoundUnaryExpression(BoundExpression):
         return BoundNodeKind.UnaryExpression
 
     @property
-    def ty(self) -> Type:
+    def ty(self) -> MinskType:
         return self.operator.result_type
