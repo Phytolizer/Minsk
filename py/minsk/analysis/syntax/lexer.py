@@ -1,4 +1,5 @@
 from typing import Any, Optional
+from minsk.analysis.syntax import facts
 
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.token import SyntaxToken
@@ -42,6 +43,11 @@ class Lexer:
                         value = int(current_text)
                     except ValueError:
                         self._diagnostics.append(f"Number '{current_text}' is invalid")
+                case c if c.isalpha():
+                    while self._current.isalpha():
+                        self._position += 1
+                    current_text = self._current_text(start)
+                    kind = facts.keyword_kind(current_text)
                 case "+":
                     kind = SyntaxKind.PlusToken
                     self._position += 1

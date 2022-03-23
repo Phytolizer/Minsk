@@ -90,6 +90,8 @@ class Parser:
         match self._current.kind:
             case SyntaxKind.OpenParenthesisToken:
                 return self._parse_parenthesized_expression()
+            case SyntaxKind.TrueKeyword | SyntaxKind.FalseKeyword:
+                return self._parse_boolean_literal()
             case _:
                 return self._parse_number_literal()
 
@@ -108,6 +110,13 @@ class Parser:
         return ParenthesizedExpressionSyntax(
             open_parenthesis_token, expression, close_parenthesis_token
         )
+
+    def _parse_boolean_literal(self):
+        is_true = self._current.kind == SyntaxKind.TrueKeyword
+        keyword_token = self._match_token(
+            SyntaxKind.TrueKeyword if is_true else SyntaxKind.FalseKeyword
+        )
+        return LiteralExpressionSyntax(keyword_token, is_true)
 
 
 class SyntaxTree:

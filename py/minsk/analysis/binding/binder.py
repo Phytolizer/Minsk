@@ -62,7 +62,7 @@ class Binder:
 
     @staticmethod
     def _bind_literal_expression(syntax: LiteralExpressionSyntax) -> BoundExpression:
-        return BoundLiteralExpression(syntax.literal_token.value)
+        return BoundLiteralExpression(syntax.value)
 
     def _bind_parenthesized_expression(
         self, syntax: ParenthesizedExpressionSyntax

@@ -6,6 +6,7 @@ class SyntaxKind(Enum):
     EndOfFileToken = auto()
 
     WhitespaceToken = auto()
+    IdentifierToken = auto()
     NumberToken = auto()
 
     PlusToken = auto()
@@ -14,6 +15,9 @@ class SyntaxKind(Enum):
     SlashToken = auto()
     OpenParenthesisToken = auto()
     CloseParenthesisToken = auto()
+
+    TrueKeyword = auto()
+    FalseKeyword = auto()
 
     BinaryExpression = auto()
     LiteralExpression = auto()

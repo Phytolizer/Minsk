@@ -17,3 +17,13 @@ def unary_operator_precedence(kind: SyntaxKind) -> int:
             return 3
         case _:
             return 0
+
+
+def keyword_kind(text: str) -> SyntaxKind:
+    match text:
+        case "true":
+            return SyntaxKind.TrueKeyword
+        case "false":
+            return SyntaxKind.FalseKeyword
+        case _:
+            return SyntaxKind.IdentifierToken
