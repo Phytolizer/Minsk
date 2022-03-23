@@ -20,7 +20,7 @@ jobs:
     
     defaults:
       run:
-        working-directory: kt/Minsk
+        working-directory: kt
 
     steps:
     - uses: actions/checkout@v2
@@ -33,4 +33,4 @@ jobs:
       uses: gradle/gradle-build-action@v2
       with:
         arguments: test
-        build-root-directory: kt/Minsk
+        build-root-directory: kt
