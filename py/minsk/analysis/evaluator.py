@@ -1,4 +1,4 @@
-from typing import Any, cast
+from typing import Any, Optional, cast
 
 from minsk.analysis.binding.expression import BoundExpression
 from minsk.analysis.binding.expressions.assignment import BoundAssignmentExpression
@@ -9,21 +9,41 @@ from minsk.analysis.binding.expressions.variable import BoundVariableExpression
 from minsk.analysis.binding.kind import BoundNodeKind
 from minsk.analysis.binding.operators.binary import BoundBinaryOperatorKind
 from minsk.analysis.binding.operators.unary import BoundUnaryOperatorKind
+from minsk.analysis.binding.statement import BoundStatement
+from minsk.analysis.binding.statements.block import BoundBlockStatement
+from minsk.analysis.binding.statements.expression import BoundExpressionStatement
 from minsk.analysis.variable import VariableSymbol
 
 
 class Evaluator:
-    _expression: BoundExpression
+    _statement: BoundStatement
     _variables: dict[VariableSymbol, Any]
+    _last_value: Optional[Any]
 
-    def __init__(
-        self, expression: BoundExpression, variables: dict[VariableSymbol, Any]
-    ):
-        self._expression = expression
+    def __init__(self, statement: BoundStatement, variables: dict[VariableSymbol, Any]):
+        self._statement = statement
         self._variables = variables
+        self._last_value = None
 
     def evaluate(self) -> Any:
-        return self._evaluate_expression(self._expression)
+        self._evaluate_statement(self._statement)
+        return self._last_value
+
+    def _evaluate_statement(self, statement: BoundStatement):
+        match statement.kind:
+            case BoundNodeKind.BlockStatement:
+                self._evaluate_block_statement(cast(BoundBlockStatement, statement))
+            case BoundNodeKind.ExpressionStatement:
+                self._evaluate_expression_statement(
+                    cast(BoundExpressionStatement, statement)
+                )
+
+    def _evaluate_block_statement(self, statement: BoundBlockStatement):
+        for s in statement.statements:
+            self._evaluate_statement(s)
+
+    def _evaluate_expression_statement(self, statement: BoundExpressionStatement):
+        self._last_value = self._evaluate_expression(statement.expression)
 
     def _evaluate_expression(self, syntax: BoundExpression) -> Any:
         match syntax.kind:

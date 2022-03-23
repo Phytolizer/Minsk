@@ -21,11 +21,16 @@ class SyntaxKind(Enum):
     EqualsToken = auto()
     OpenParenthesisToken = auto()
     CloseParenthesisToken = auto()
+    OpenBraceToken = auto()
+    CloseBraceToken = auto()
 
     TrueKeyword = auto()
     FalseKeyword = auto()
 
     CompilationUnit = auto()
+
+    BlockStatement = auto()
+    ExpressionStatement = auto()
 
     AssignmentExpression = auto()
     BinaryExpression = auto()

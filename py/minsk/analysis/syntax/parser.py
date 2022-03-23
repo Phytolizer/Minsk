@@ -14,6 +14,9 @@ from minsk.analysis.syntax.expressions.parenthesized import (
 from minsk.analysis.syntax.expressions.unary import UnaryExpressionSyntax
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.lexer import Lexer
+from minsk.analysis.syntax.statement import StatementSyntax
+from minsk.analysis.syntax.statements.block import BlockStatementSyntax
+from minsk.analysis.syntax.statements.expression import ExpressionStatementSyntax
 from minsk.analysis.syntax.token import SyntaxToken
 from minsk.analysis.syntax.unit import CompilationUnitSyntax
 from minsk.analysis.text.source import SourceText
@@ -66,9 +69,33 @@ class Parser:
 
     def parse_compilation_unit(self) -> CompilationUnitSyntax:
         return CompilationUnitSyntax(
-            self._parse_expression(),
+            self._parse_statement(),
             self._match_token(SyntaxKind.EndOfFileToken),
         )
+
+    def _parse_statement(self) -> StatementSyntax:
+        match self._current.kind:
+            case SyntaxKind.OpenBraceToken:
+                return self._parse_block_statement()
+            case _:
+                return self._parse_expression_statement()
+
+    def _parse_block_statement(self) -> StatementSyntax:
+        open_brace_token = self._match_token(SyntaxKind.OpenBraceToken)
+        statements: list[StatementSyntax] = []
+        while self._current.kind not in (
+            SyntaxKind.CloseBraceToken,
+            SyntaxKind.EndOfFileToken,
+        ):
+            statements.append(self._parse_statement())
+        close_brace_token = self._match_token(SyntaxKind.CloseBraceToken)
+        return BlockStatementSyntax(
+            open_brace_token, tuple(statements), close_brace_token
+        )
+
+    def _parse_expression_statement(self) -> StatementSyntax:
+        expression = self._parse_expression()
+        return ExpressionStatementSyntax(expression)
 
     def _parse_expression(self) -> ExpressionSyntax:
         return self._parse_assignment_expression()

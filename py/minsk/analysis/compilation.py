@@ -41,5 +41,5 @@ class Compilation:
         diagnostics = self.syntax.diagnostics + self.global_scope.diagnostics
         if len(diagnostics) > 0:
             return diagnostics, None
-        evaluator = Evaluator(self.global_scope.expression, variables)
+        evaluator = Evaluator(self.global_scope.statement, variables)
         return (), evaluator.evaluate()

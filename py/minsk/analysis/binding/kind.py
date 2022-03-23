@@ -2,6 +2,9 @@ from enum import Enum, auto
 
 
 class BoundNodeKind(Enum):
+    BlockStatement = auto()
+    ExpressionStatement = auto()
+
     AssignmentExpression = auto()
     BinaryExpression = auto()
     LiteralExpression = auto()

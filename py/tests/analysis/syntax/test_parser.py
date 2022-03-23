@@ -7,6 +7,7 @@ from minsk.analysis.syntax.expression import ExpressionSyntax
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.node import SyntaxNode
 from minsk.analysis.syntax.parser import SyntaxTree
+from minsk.analysis.syntax.statements.expression import ExpressionStatementSyntax
 from minsk.analysis.syntax.token import SyntaxToken
 
 
@@ -53,7 +54,9 @@ def get_binary_operator_pairs() -> Iterable[tuple[SyntaxKind, SyntaxKind]]:
 
 
 def parse_expression(text: str) -> ExpressionSyntax:
-    return SyntaxTree.parse(text).root.expression
+    statement = SyntaxTree.parse(text).root.statement
+    assert isinstance(statement, ExpressionStatementSyntax)
+    return statement.expression
 
 
 @pytest.mark.parametrize("op1,op2", get_binary_operator_pairs())

@@ -90,6 +90,12 @@ class Lexer:
                 case ")":
                     kind = SyntaxKind.CloseParenthesisToken
                     self._position += 1
+                case "{":
+                    kind = SyntaxKind.OpenBraceToken
+                    self._position += 1
+                case "}":
+                    kind = SyntaxKind.CloseBraceToken
+                    self._position += 1
 
             if kind == SyntaxKind.BadToken:
                 self._diagnostics.report_bad_character(start, self._current)
