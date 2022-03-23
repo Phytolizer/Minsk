@@ -30,9 +30,10 @@ while True:
     expression = parser.parse()
     diagnostics = parser.diagnostics
     if len(diagnostics) == 0:
-        print(Fore.WHITE + Style.DIM, end="")
-        expression.root.pretty_print()
-        print(Style.RESET_ALL, end="")
+        if show_tree:
+            print(Fore.WHITE + Style.DIM, end="")
+            expression.root.pretty_print()
+            print(Style.RESET_ALL, end="")
         evaluator = Evaluator(expression.root)
         print(evaluator.evaluate())
     else:
