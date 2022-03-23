@@ -12,12 +12,36 @@ internal class Binder(parent: BoundScope?) {
         get() = _diagnostics.toList()
 
     companion object {
-        fun bindGlobalScope(syntax: CompilationUnitSyntax): BoundGlobalScope {
-            val binder = Binder(null)
+        fun bindGlobalScope(previous: BoundGlobalScope?, syntax: CompilationUnitSyntax): BoundGlobalScope {
+            val parentScope = createParentScopes(previous)
+            val binder = Binder(parentScope)
             val expression = binder.bindExpression(syntax.expression)
             val variables = binder._scope.declaredVariables()
             val diagnostics = binder.diagnostics
-            return BoundGlobalScope(null, diagnostics, variables, expression)
+            return BoundGlobalScope(previous, diagnostics, variables, expression)
+        }
+
+        fun createParentScopes(previousIn: BoundGlobalScope?): BoundScope? {
+            val stack = mutableListOf<BoundGlobalScope>()
+            var previous = previousIn
+
+            while (previous != null) {
+                stack.add(previous)
+                previous = previous.previous
+            }
+
+            var current: BoundScope? = null
+
+            while (stack.isNotEmpty()) {
+                previous = stack.removeLast()
+                val scope = BoundScope(current)
+                for (v in previous.variables) {
+                    scope.tryDeclare(v)
+                }
+                current = scope
+            }
+
+            return current
         }
     }
 

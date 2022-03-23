@@ -12,6 +12,7 @@ fun main() {
     var showTree = false
     val variables = mutableMapOf<VariableSymbol, Any>()
     val textBuilder = StringBuilder()
+    var previous: Compilation? = null
 
     while (true) {
         print(Colorize.colorCode(AnsiColor.Green, ColorStyle.Regular))
@@ -50,7 +51,8 @@ fun main() {
             continue
         }
 
-        val result = Compilation().evaluate(syntaxTree, variables)
+        val compilation = previous?.continueWith(syntaxTree) ?: Compilation(syntaxTree)
+        val result = compilation.evaluate(variables)
         val diagnostics = result.diagnostics
 
         if (diagnostics.isEmpty()) {
@@ -93,6 +95,7 @@ fun main() {
             print(Colorize.RESET)
         }
 
+        previous = compilation
         textBuilder.clear()
     }
 }
