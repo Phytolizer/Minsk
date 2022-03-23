@@ -52,6 +52,7 @@ fun main() {
         }
 
         val compilation = previous?.continueWith(syntaxTree) ?: Compilation(syntaxTree)
+        previous = compilation
         val result = compilation.evaluate(variables)
         val diagnostics = result.diagnostics
 
@@ -95,7 +96,6 @@ fun main() {
             print(Colorize.RESET)
         }
 
-        previous = compilation
         textBuilder.clear()
     }
 }
