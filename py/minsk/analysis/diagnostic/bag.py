@@ -1,4 +1,5 @@
 from typing import Iterable, Type
+
 from minsk.analysis.diagnostic import Diagnostic
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.text.span import TextSpan

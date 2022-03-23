@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Any, Iterable, Optional
 
 from minsk.analysis.syntax.expression import ExpressionSyntax
@@ -6,15 +7,10 @@ from minsk.analysis.syntax.node import SyntaxNode
 from minsk.analysis.syntax.token import SyntaxToken
 
 
+@dataclass(frozen=True)
 class LiteralExpressionSyntax(ExpressionSyntax):
     literal_token: SyntaxToken
     _value: Any
-
-    def __init__(self, literal_token: SyntaxToken, value: Optional[Any] = None):
-        if value is None:
-            value = literal_token.value
-        self.literal_token = literal_token
-        self._value = value
 
     @property
     def kind(self) -> SyntaxKind:

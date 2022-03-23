@@ -24,7 +24,9 @@ class SyntaxKind(Enum):
     TrueKeyword = auto()
     FalseKeyword = auto()
 
+    AssignmentExpression = auto()
     BinaryExpression = auto()
     LiteralExpression = auto()
+    NameExpression = auto()
     ParenthesizedExpression = auto()
     UnaryExpression = auto()

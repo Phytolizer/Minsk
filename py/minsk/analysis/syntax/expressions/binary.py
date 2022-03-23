@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Iterable
 
 from minsk.analysis.syntax.expression import ExpressionSyntax
@@ -6,16 +7,11 @@ from minsk.analysis.syntax.node import SyntaxNode
 from minsk.analysis.syntax.token import SyntaxToken
 
 
+@dataclass(frozen=True)
 class BinaryExpressionSyntax(ExpressionSyntax):
-    def __init__(
-        self,
-        left: ExpressionSyntax,
-        operator_token: SyntaxToken,
-        right: ExpressionSyntax,
-    ):
-        self.left = left
-        self.operator_token = operator_token
-        self.right = right
+    left: ExpressionSyntax
+    operator_token: SyntaxToken
+    right: ExpressionSyntax
 
     @property
     def kind(self) -> SyntaxKind:

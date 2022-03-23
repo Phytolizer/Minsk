@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Iterable
 
 from minsk.analysis.syntax.expression import ExpressionSyntax
@@ -6,16 +7,11 @@ from minsk.analysis.syntax.node import SyntaxNode
 from minsk.analysis.syntax.token import SyntaxToken
 
 
+@dataclass(frozen=True)
 class ParenthesizedExpressionSyntax(ExpressionSyntax):
-    def __init__(
-        self,
-        open_parenthesis_token: SyntaxToken,
-        expression: ExpressionSyntax,
-        close_parenthesis_token: SyntaxToken,
-    ):
-        self.open_parenthesis_token = open_parenthesis_token
-        self.expression = expression
-        self.close_parenthesis_token = close_parenthesis_token
+    open_parenthesis_token: SyntaxToken
+    expression: ExpressionSyntax
+    close_parenthesis_token: SyntaxToken
 
     @property
     def kind(self) -> SyntaxKind:

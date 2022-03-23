@@ -1,7 +1,7 @@
 from typing import Any, Optional
+
 from minsk.analysis.diagnostic import Diagnostic
 from minsk.analysis.diagnostic.bag import DiagnosticBag
-
 from minsk.analysis.syntax import facts
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.token import SyntaxToken

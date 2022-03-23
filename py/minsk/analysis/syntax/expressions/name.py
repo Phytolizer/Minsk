@@ -8,15 +8,13 @@ from minsk.analysis.syntax.token import SyntaxToken
 
 
 @dataclass(frozen=True)
-class UnaryExpressionSyntax(ExpressionSyntax):
-    operator_token: SyntaxToken
-    operand: ExpressionSyntax
+class NameExpressionSyntax(ExpressionSyntax):
+    identifier_token: SyntaxToken
 
     @property
     def kind(self) -> SyntaxKind:
-        return SyntaxKind.UnaryExpression
+        return SyntaxKind.NameExpression
 
     @property
     def children(self) -> Iterable[SyntaxNode]:
-        yield self.operator_token
-        yield self.operand
+        yield self.identifier_token

@@ -100,7 +100,7 @@ class Parser:
 
     def _parse_number_literal(self) -> ExpressionSyntax:
         number_token = self._match_token(SyntaxKind.NumberToken)
-        return LiteralExpressionSyntax(number_token)
+        return LiteralExpressionSyntax(number_token, number_token.value)
 
     @property
     def diagnostics(self) -> tuple[Diagnostic, ...]:

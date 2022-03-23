@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 from minsk.analysis.text.span import TextSpan
 
 
