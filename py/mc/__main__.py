@@ -1,7 +1,6 @@
 import colorama
 from colorama import Fore, Style
 from colorama.ansi import Cursor, clear_screen
-
 from minsk.analysis.evaluator import Evaluator
 from minsk.analysis.syntax.parser import Parser
 
