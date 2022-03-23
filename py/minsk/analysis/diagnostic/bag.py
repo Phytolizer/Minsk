@@ -58,6 +58,12 @@ class DiagnosticBag:
         message = f"Name '{name}' is already declared in this scope"
         self._report(span, message)
 
+    def report_cannot_convert(
+        self, span: TextSpan, from_type: MinskType, to_type: MinskType
+    ):
+        message = f"Cannot convert type {from_type} to type {to_type}"
+        self._report(span, message)
+
     def __iter__(self):
         return iter(self._diagnostics)
 

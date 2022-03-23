@@ -146,6 +146,11 @@ class Binder:
             variable = VariableSymbol(name, expression.ty)
             self._scope.try_declare(variable)
 
+        if expression.ty != variable.ty:
+            self._diagnostics.report_cannot_convert(
+                syntax.equals_token.span, variable.ty, expression.ty
+            )
+
         return BoundAssignmentExpression(variable, expression)
 
     def _bind_name_expression(self, syntax: NameExpressionSyntax) -> BoundExpression:
