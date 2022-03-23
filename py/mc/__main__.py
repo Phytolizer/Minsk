@@ -23,7 +23,7 @@ while True:
                 print("Not showing parse trees.")
             continue
         case "#cls":
-            print(clear_screen(2) + Cursor.POS(0, 0))
+            print(clear_screen(2) + Cursor.POS(0, 0), end="")
             continue
 
     parser = Parser(line)
