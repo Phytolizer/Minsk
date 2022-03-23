@@ -97,7 +97,9 @@ internal static class Program
                     Console.ResetColor();
                 }
 
+                Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine(result.Value);
+                Console.ResetColor();
             }
 
             textBuilder.Clear();
