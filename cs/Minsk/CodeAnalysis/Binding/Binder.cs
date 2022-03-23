@@ -61,9 +61,8 @@ internal sealed class Binder
         var statements = ImmutableArray.CreateBuilder<BoundStatement>();
         _scope = new BoundScope(_scope);
 
-        foreach (var statement in syntax.Statements)
+        foreach (var boundStatement in syntax.Statements.Select(BindStatement))
         {
-            var boundStatement = BindStatement(statement);
             statements.Add(boundStatement);
         }
 
