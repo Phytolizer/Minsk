@@ -60,9 +60,38 @@ internal sealed class Parser
 
     internal CompilationUnitSyntax ParseCompilationUnit()
     {
-        var expression = ParseExpression();
+        var statement = ParseStatement();
         var endOfFileToken = MatchToken(SyntaxKind.EndOfFileToken);
-        return new CompilationUnitSyntax(expression, endOfFileToken);
+        return new CompilationUnitSyntax(statement, endOfFileToken);
+    }
+
+    private StatementSyntax ParseStatement()
+    {
+        return Current.Kind switch
+        {
+            SyntaxKind.OpenBraceToken => ParseBlockStatement(),
+            _ => ParseExpressionStatement(),
+        };
+    }
+
+    private StatementSyntax ParseBlockStatement()
+    {
+        var openBraceToken = MatchToken(SyntaxKind.OpenBraceToken);
+        var statements = ImmutableArray.CreateBuilder<StatementSyntax>();
+        while (Current.Kind != SyntaxKind.EndOfFileToken && Current.Kind != SyntaxKind.CloseBraceToken)
+        {
+            var statement = ParseStatement();
+            statements.Add(statement);
+        }
+
+        var closeBraceToken = MatchToken(SyntaxKind.CloseBraceToken);
+        return new BlockStatementSyntax(openBraceToken, statements.ToImmutable(), closeBraceToken);
+    }
+
+    private StatementSyntax ParseExpressionStatement()
+    {
+        var expression = ParseExpression();
+        return new ExpressionStatementSyntax(expression);
     }
 
     private ExpressionSyntax ParseExpression()

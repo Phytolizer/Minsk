@@ -21,12 +21,17 @@ public enum SyntaxKind
     EqualsToken,
     OpenParenthesisToken,
     CloseParenthesisToken,
+    OpenBraceToken,
+    CloseBraceToken,
 
     TrueKeyword,
     FalseKeyword,
 
     // Syntax nodes
     CompilationUnit,
+
+    BlockStatement,
+    ExpressionStatement,
 
     LiteralExpression,
     BinaryExpression,

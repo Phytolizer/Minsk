@@ -49,6 +49,8 @@ public static class SyntaxFacts
             SyntaxKind.PipePipeToken => "||",
             SyntaxKind.OpenParenthesisToken => "(",
             SyntaxKind.CloseParenthesisToken => ")",
+            SyntaxKind.OpenBraceToken => "{",
+            SyntaxKind.CloseBraceToken => "}",
             SyntaxKind.EqualsEqualsToken => "==",
             SyntaxKind.TrueKeyword => "true",
             SyntaxKind.FalseKeyword => "false",

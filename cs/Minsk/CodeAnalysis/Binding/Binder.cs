@@ -17,7 +17,7 @@ internal sealed class Binder
     {
         var parent = CreateParentScopes(previous);
         var binder = new Binder(parent);
-        var expression = binder.BindExpression(syntax.Expression);
+        var statement = binder.BindStatement(syntax.Statement);
         var variables = binder._scope.GetDeclaredVariables();
         var diagnostics = binder.Diagnostics.ToImmutableArray();
 
@@ -26,7 +26,36 @@ internal sealed class Binder
             diagnostics = diagnostics.InsertRange(0, previous.Diagnostics);
         }
 
-        return new BoundGlobalScope(null, diagnostics, variables, expression);
+        return new BoundGlobalScope(null, diagnostics, variables, statement);
+    }
+
+    private BoundStatement BindStatement(StatementSyntax syntax)
+    {
+        // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
+        return syntax.Kind switch
+        {
+            SyntaxKind.BlockStatement => BindBlockStatement((BlockStatementSyntax)syntax),
+            SyntaxKind.ExpressionStatement => BindExpressionStatement((ExpressionStatementSyntax)syntax),
+            _ => throw new InvalidOperationException(),
+        };
+    }
+
+    private BoundStatement BindBlockStatement(BlockStatementSyntax syntax)
+    {
+        var statements = ImmutableArray.CreateBuilder<BoundStatement>();
+        foreach (var statement in syntax.Statements)
+        {
+            var boundStatement = BindStatement(statement);
+            statements.Add(boundStatement);
+        }
+
+        return new BoundBlockStatement(statements.ToImmutable());
+    }
+
+    private BoundStatement BindExpressionStatement(ExpressionStatementSyntax syntax)
+    {
+        var expression = BindExpression(syntax.Expression);
+        return new BoundExpressionStatement(expression);
     }
 
     private static BoundScope? CreateParentScopes(BoundGlobalScope? previous)

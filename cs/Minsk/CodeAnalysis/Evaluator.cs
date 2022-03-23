@@ -4,10 +4,11 @@ namespace Minsk.CodeAnalysis;
 
 internal sealed class Evaluator
 {
-    private readonly BoundExpression _root;
+    private readonly BoundStatement _root;
     private readonly Dictionary<VariableSymbol, object> _variables;
+    private object? _lastValue;
 
-    public Evaluator(BoundExpression root, Dictionary<VariableSymbol, object> variables)
+    public Evaluator(BoundStatement root, Dictionary<VariableSymbol, object> variables)
     {
         _root = root;
         _variables = variables;
@@ -15,7 +16,37 @@ internal sealed class Evaluator
 
     public object Evaluate()
     {
-        return EvaluateExpression(_root);
+        EvaluateStatement(_root);
+        return _lastValue ?? throw new InvalidOperationException();
+    }
+
+    private void EvaluateStatement(BoundStatement root)
+    {
+        // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+        switch (root.Kind)
+        {
+            case BoundNodeKind.BlockStatement:
+                EvaluateBlockStatement((BoundBlockStatement)root);
+                break;
+            case BoundNodeKind.ExpressionStatement:
+                EvaluateExpressionStatement((BoundExpressionStatement)root);
+                break;
+            default:
+                throw new InvalidOperationException();
+        }
+    }
+
+    private void EvaluateExpressionStatement(BoundExpressionStatement root)
+    {
+        _lastValue = EvaluateExpression(root.Expression);
+    }
+
+    private void EvaluateBlockStatement(BoundBlockStatement root)
+    {
+        foreach (var statement in root.Statements)
+        {
+            EvaluateStatement(statement);
+        }
     }
 
     private object EvaluateExpression(BoundExpression root)

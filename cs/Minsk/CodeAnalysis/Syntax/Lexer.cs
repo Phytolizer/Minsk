@@ -86,6 +86,14 @@ internal sealed class Lexer : IEnumerable<SyntaxToken>
                         kind = SyntaxKind.OpenParenthesisToken;
                         _position++;
                         break;
+                    case '{':
+                        kind = SyntaxKind.OpenBraceToken;
+                        _position++;
+                        break;
+                    case '}':
+                        kind = SyntaxKind.CloseBraceToken;
+                        _position++;
+                        break;
                     case ')':
                         kind = SyntaxKind.CloseParenthesisToken;
                         _position++;
