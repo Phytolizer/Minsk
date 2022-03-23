@@ -12,26 +12,37 @@ colorama.init()
 
 show_tree = False
 variables: dict[VariableSymbol, Any] = {}
+text_builder = ""
 
 while True:
+    if len(text_builder) == 0:
+        print("> ", end="")
+    else:
+        print("| ", end="")
     try:
-        line = input("> ")
+        line = input()
     except EOFError:
         break
 
-    match line:
-        case "#showTree":
-            show_tree = not show_tree
-            if show_tree:
-                print("Showing parse trees.")
-            else:
-                print("Not showing parse trees.")
-            continue
-        case "#cls":
-            print(clear_screen() + Cursor.POS(0, 0), end="")
-            continue
+    if len(text_builder) == 0:
+        match line:
+            case "#showTree":
+                show_tree = not show_tree
+                if show_tree:
+                    print("Showing parse trees.")
+                else:
+                    print("Not showing parse trees.")
+                continue
+            case "#cls":
+                print(clear_screen() + Cursor.POS(0, 0), end="")
+                continue
 
-    syntax_tree = SyntaxTree.parse(line)
+    is_blank = line == ""
+    text_builder += line + "\n"
+
+    syntax_tree = SyntaxTree.parse(text_builder)
+    if (not is_blank) and len(syntax_tree.diagnostics) > 0:
+        continue
     diagnostics, value = Compilation(syntax_tree).evaluate(variables)
     if len(diagnostics) == 0:
         if show_tree:
@@ -62,3 +73,5 @@ while True:
             print(Style.RESET_ALL, end="")
             print(suffix)
         print(Style.RESET_ALL, end="")
+
+    text_builder = ""
