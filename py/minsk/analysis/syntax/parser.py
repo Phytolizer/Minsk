@@ -1,6 +1,9 @@
 from minsk.analysis.syntax.expression import ExpressionSyntax
 from minsk.analysis.syntax.expressions.binary import BinaryExpressionSyntax
 from minsk.analysis.syntax.expressions.literal import LiteralExpressionSyntax
+from minsk.analysis.syntax.expressions.parenthesized import (
+    ParenthesizedExpressionSyntax,
+)
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.lexer import Lexer
 from minsk.analysis.syntax.token import SyntaxToken
@@ -80,9 +83,24 @@ class Parser:
         return left
 
     def _parse_primary_expression(self) -> ExpressionSyntax:
+        match self._current.kind:
+            case SyntaxKind.OpenParenthesisToken:
+                return self._parse_parenthesized_expression()
+            case _:
+                return self._parse_number_literal()
+
+    def _parse_number_literal(self) -> ExpressionSyntax:
         number_token = self._match_token(SyntaxKind.NumberToken)
         return LiteralExpressionSyntax(number_token)
 
     @property
     def diagnostics(self) -> tuple[str, ...]:
         return tuple(iter(self._diagnostics))
+
+    def _parse_parenthesized_expression(self) -> ExpressionSyntax:
+        open_parenthesis_token = self._match_token(SyntaxKind.OpenParenthesisToken)
+        expression = self._parse_expression()
+        close_parenthesis_token = self._match_token(SyntaxKind.CloseParenthesisToken)
+        return ParenthesizedExpressionSyntax(
+            open_parenthesis_token, expression, close_parenthesis_token
+        )
