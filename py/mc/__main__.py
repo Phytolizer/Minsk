@@ -15,10 +15,12 @@ variables: dict[VariableSymbol, Any] = {}
 text_builder = ""
 
 while True:
+    print(Fore.GREEN, end="")
     if len(text_builder) == 0:
-        print("> ", end="")
+        print("» ", end="")
     else:
-        print("| ", end="")
+        print("· ", end="")
+    print(Style.RESET_ALL, end="")
     try:
         input_line = input()
     except EOFError:
@@ -49,7 +51,9 @@ while True:
             print(Fore.WHITE + Style.DIM, end="")
             syntax_tree.root.pretty_print()
             print(Style.RESET_ALL, end="")
+        print(Fore.MAGENTA, end="")
         print(value)
+        print(Style.RESET_ALL, end="")
     else:
         for diagnostic in diagnostics:
             line_index = syntax_tree.text.get_line_index(diagnostic.span.start)
