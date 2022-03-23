@@ -26,7 +26,7 @@ internal class Binder(parent: BoundScope?) {
             return BoundGlobalScope(previous, diagnostics, variables, expression)
         }
 
-        fun createParentScopes(previousIn: BoundGlobalScope?): BoundScope? {
+        private fun createParentScopes(previousIn: BoundGlobalScope?): BoundScope? {
             val stack = mutableListOf<BoundGlobalScope>()
             var previous = previousIn
 
