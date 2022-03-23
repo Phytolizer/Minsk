@@ -47,6 +47,9 @@ internal static class Program
                     case "#cls":
                         Console.Clear();
                         continue;
+                    case "#reset":
+                        previous = null;
+                        continue;
                 }
             }
 
