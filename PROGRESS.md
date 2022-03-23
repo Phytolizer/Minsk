@@ -9,7 +9,7 @@ Episode 6.
 Episode 6.
 
 ## py (Python)
-Episode 1.
+Episode 4.
 
 ## rs (Rust)
 Episode 4.5. (Half of Episode 5 is implemented.)
