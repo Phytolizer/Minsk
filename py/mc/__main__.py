@@ -2,6 +2,7 @@ import colorama
 from colorama import Fore, Style
 from colorama.ansi import Cursor, clear_screen
 from minsk.analysis.binding.binder import Binder
+from minsk.analysis.compilation import Compilation
 from minsk.analysis.evaluator import Evaluator
 from minsk.analysis.syntax.parser import Parser, SyntaxTree
 
@@ -28,16 +29,13 @@ while True:
             continue
 
     syntax_tree = SyntaxTree.parse(line)
-    binder = Binder()
-    expression = binder.bind_expression(syntax_tree.root)
-    diagnostics = syntax_tree.diagnostics + binder.diagnostics
+    diagnostics, value = Compilation(syntax_tree).evaluate()
     if len(diagnostics) == 0:
         if show_tree:
             print(Fore.WHITE + Style.DIM, end="")
             syntax_tree.root.pretty_print()
             print(Style.RESET_ALL, end="")
-        evaluator = Evaluator(expression)
-        print(evaluator.evaluate())
+        print(value)
     else:
         print(Fore.RED, end="")
         for diagnostic in diagnostics:

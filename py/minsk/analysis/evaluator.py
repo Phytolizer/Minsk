@@ -10,13 +10,13 @@ from minsk.analysis.binding.operators.unary import BoundUnaryOperatorKind
 
 
 class Evaluator:
-    syntax: BoundExpression
+    expression: BoundExpression
 
-    def __init__(self, syntax: BoundExpression):
-        self.syntax = syntax
+    def __init__(self, expression: BoundExpression):
+        self.expression = expression
 
     def evaluate(self) -> Any:
-        return self._evaluate_expression(self.syntax)
+        return self._evaluate_expression(self.expression)
 
     def _evaluate_expression(self, syntax: BoundExpression) -> Any:
         match syntax.kind:
