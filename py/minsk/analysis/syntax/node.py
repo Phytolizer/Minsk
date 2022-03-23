@@ -1,5 +1,6 @@
 import sys
 from abc import ABC, abstractmethod
+from io import StringIO
 from typing import Any, Iterable, Optional, TextIO
 
 from minsk.analysis.syntax.kind import SyntaxKind
@@ -37,6 +38,11 @@ class SyntaxNode(ABC):
 
     def write_to(self, writer: TextIO):
         SyntaxNode._pretty_print(self, writer, False, "", True)
+
+    def __str__(self):
+        writer = StringIO()
+        self.write_to(writer)
+        return str(writer)
 
     @staticmethod
     def _pretty_print(
