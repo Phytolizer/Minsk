@@ -1,10 +1,11 @@
 from typing import Any, Optional
 from minsk.analysis.binding.binder import Binder
+from minsk.analysis.diagnostic import Diagnostic
 from minsk.analysis.evaluator import Evaluator
 from minsk.analysis.syntax.parser import SyntaxTree
 
 
-EvaluationResult = tuple[tuple[str, ...], Optional[Any]]
+EvaluationResult = tuple[tuple[Diagnostic, ...], Optional[Any]]
 
 
 class Compilation:

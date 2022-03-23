@@ -37,7 +37,18 @@ while True:
             print(Style.RESET_ALL, end="")
         print(value)
     else:
-        print(Fore.RED, end="")
         for diagnostic in diagnostics:
+            prefix = line[: diagnostic.span.start]
+            error = line[diagnostic.span.start : diagnostic.span.end]
+            suffix = line[diagnostic.span.end :]
+
+            print(Fore.RED, end="")
             print(diagnostic)
+            print(Style.RESET_ALL, end="")
+            print("    ", end="")
+            print(prefix, end="")
+            print(Fore.RED, end="")
+            print(error, end="")
+            print(Style.RESET_ALL, end="")
+            print(suffix)
         print(Style.RESET_ALL, end="")
