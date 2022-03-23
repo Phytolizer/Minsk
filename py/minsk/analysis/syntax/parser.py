@@ -1,8 +1,9 @@
 from minsk.analysis.syntax.expression import ExpressionSyntax
 from minsk.analysis.syntax.expressions.binary import BinaryExpressionSyntax
 from minsk.analysis.syntax.expressions.literal import LiteralExpressionSyntax
-from minsk.analysis.syntax.expressions.parenthesized import \
-    ParenthesizedExpressionSyntax
+from minsk.analysis.syntax.expressions.parenthesized import (
+    ParenthesizedExpressionSyntax,
+)
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.lexer import Lexer
 from minsk.analysis.syntax.token import SyntaxToken
