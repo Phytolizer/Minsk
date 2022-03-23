@@ -19,11 +19,13 @@ from minsk.analysis.text.source import SourceText
 
 
 class Parser:
+    _text: SourceText
     _tokens: tuple[SyntaxToken, ...]
     _position: int
     _diagnostics: DiagnosticBag
 
     def __init__(self, text: SourceText):
+        self._text = text
         lexer = Lexer(text)
         tokens = list(
             filter(
@@ -63,6 +65,7 @@ class Parser:
 
     def parse(self) -> "SyntaxTree":
         return SyntaxTree(
+            self._text,
             self._parse_expression(),
             self._match_token(SyntaxKind.EndOfFileToken),
             self.diagnostics,
@@ -147,6 +150,7 @@ class Parser:
 
 @dataclass(frozen=True)
 class SyntaxTree:
+    text: SourceText
     root: ExpressionSyntax
     end_of_file_token: SyntaxToken
     diagnostics: tuple[Diagnostic, ...]

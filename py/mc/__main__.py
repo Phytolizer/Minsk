@@ -41,11 +41,18 @@ while True:
         print(value)
     else:
         for diagnostic in diagnostics:
+            line_index = syntax_tree.text.get_line_index(diagnostic.span.start)
+            line_number = line_index + 1
+            character = (
+                diagnostic.span.start - syntax_tree.text.lines[line_index].start + 1
+            )
+
             prefix = line[: diagnostic.span.start]
             error = line[diagnostic.span.start : diagnostic.span.end]
             suffix = line[diagnostic.span.end :]
 
             print(Fore.RED, end="")
+            print(f"({line_number}, {character}): ", end="")
             print(diagnostic)
             print(Style.RESET_ALL, end="")
             print("    ", end="")

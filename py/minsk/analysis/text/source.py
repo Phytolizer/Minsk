@@ -80,7 +80,7 @@ class SourceText:
 
     def get_line_index(self, position: int) -> int:
         lower = 0
-        upper = len(self._text) - 1
+        upper = len(self.lines) - 1
 
         while lower <= upper:
             index = lower + (upper - lower) // 2
@@ -94,7 +94,7 @@ class SourceText:
             else:
                 lower = index + 1
 
-        return lower + 1
+        return lower - 1
 
     def __str__(self):
         return self._text
