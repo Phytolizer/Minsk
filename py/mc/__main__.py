@@ -1,5 +1,10 @@
+import colorama
+from colorama import Fore, Style
+
 from minsk.analysis.evaluator import Evaluator
 from minsk.analysis.syntax.parser import Parser
+
+colorama.init()
 
 while True:
     try:
@@ -15,5 +20,7 @@ while True:
         evaluator = Evaluator(expression)
         print(evaluator.evaluate())
     else:
+        print(Fore.RED, end="")
         for diagnostic in diagnostics:
             print(diagnostic)
+        print(Style.RESET_ALL, end="")
