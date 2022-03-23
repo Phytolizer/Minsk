@@ -88,14 +88,19 @@ internal sealed class Binder
     {
         var name = syntax.IdentifierToken.Text;
         var boundExpression = BindExpression(syntax.Expression);
-        var variable = new VariableSymbol(name, boundExpression.Type);
-
-        if (!_scope.TryDeclare(variable))
+        if (!_scope.TryLookup(name, out var variable))
         {
-            _diagnostics.ReportVariableAlreadyDeclared(syntax.IdentifierToken.Span, name);
+            variable = new VariableSymbol(name, boundExpression.Type);
+            _scope.TryDeclare(variable);
         }
 
-        return new BoundAssignmentExpression(variable, boundExpression);
+        if (boundExpression.Type == variable.Type)
+        {
+            return new BoundAssignmentExpression(variable, boundExpression);
+        }
+
+        _diagnostics.ReportCannotConvert(syntax.EqualsToken.Span, variable.Type, boundExpression.Type);
+        return boundExpression;
     }
 
     private BoundExpression BindParenthesizedExpression(ParenthesizedExpressionSyntax syntax)
