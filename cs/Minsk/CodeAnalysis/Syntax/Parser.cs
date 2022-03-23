@@ -6,9 +6,9 @@ namespace Minsk.CodeAnalysis.Syntax;
 internal sealed class Parser
 {
     private readonly DiagnosticBag _diagnostics = new();
+    private readonly SourceText _text;
     private readonly ImmutableArray<SyntaxToken> _tokens;
     private int _position;
-    private readonly SourceText _text;
 
     internal Parser(SourceText text)
     {
@@ -21,6 +21,7 @@ internal sealed class Parser
     }
 
     private SyntaxToken Current => Peek(0);
+    public ImmutableArray<Diagnostic> Diagnostics => _diagnostics.ToImmutableArray();
 
     private SyntaxToken Peek(int offset)
     {
@@ -57,10 +58,11 @@ internal sealed class Parser
         return new SyntaxToken(kind, "", Current.Position, null);
     }
 
-    internal SyntaxTree Parse()
+    internal CompilationUnitSyntax ParseCompilationUnit()
     {
-        return new SyntaxTree(_text, ParseExpression(), MatchToken(SyntaxKind.EndOfFileToken),
-            _diagnostics.ToImmutableArray());
+        var expression = ParseExpression();
+        var endOfFileToken = MatchToken(SyntaxKind.EndOfFileToken);
+        return new CompilationUnitSyntax(expression, endOfFileToken);
     }
 
     private ExpressionSyntax ParseExpression()

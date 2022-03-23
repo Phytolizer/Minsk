@@ -5,22 +5,17 @@ namespace Minsk.CodeAnalysis.Syntax;
 
 public sealed class SyntaxTree
 {
-    internal SyntaxTree(
-        SourceText text,
-        ExpressionSyntax root,
-        SyntaxToken endOfFileToken,
-        ImmutableArray<Diagnostic> diagnostics
-    )
+    private SyntaxTree(SourceText text)
     {
         Text = text;
-        Root = root;
-        EndOfFileToken = endOfFileToken;
-        Diagnostics = diagnostics;
+
+        var parser = new Parser(text);
+        Root = parser.ParseCompilationUnit();
+        Diagnostics = parser.Diagnostics;
     }
 
     public SourceText Text { get; }
-    public ExpressionSyntax Root { get; }
-    public SyntaxToken EndOfFileToken { get; }
+    public CompilationUnitSyntax Root { get; }
     public ImmutableArray<Diagnostic> Diagnostics { get; }
 
     public static SyntaxTree Parse(string text)
@@ -31,8 +26,7 @@ public sealed class SyntaxTree
 
     public static SyntaxTree Parse(SourceText text)
     {
-        var parser = new Parser(text);
-        return parser.Parse();
+        return new SyntaxTree(text);
     }
 
     public static IEnumerable<SyntaxToken> ParseTokens(string text)
