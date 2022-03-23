@@ -55,7 +55,7 @@ fn main() -> std::io::Result<()> {
         let syntax_tree = SyntaxTree::parse(&line);
         if show_tree && syntax_tree.diagnostics.is_empty() {
             stdout().execute(SetForegroundColor(Color::DarkGrey))?;
-            syntax_tree.root.pretty_print(&mut stdout())?;
+            syntax_tree.root.pretty_print()?;
             stdout().execute(ResetColor)?;
         }
         let compilation = Compilation::new(syntax_tree);

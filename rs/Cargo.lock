@@ -81,6 +81,7 @@ dependencies = [
 name = "minsk"
 version = "0.1.0"
 dependencies = [
+ "crossterm",
  "strum",
 ]
 

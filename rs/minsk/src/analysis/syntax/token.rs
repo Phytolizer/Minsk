@@ -77,6 +77,10 @@ impl SyntaxNode for SyntaxToken {
         &self.text
     }
 
+    fn token_value(&self) -> Option<&Object> {
+        self.value.as_ref()
+    }
+
     fn span(&self) -> TextSpan {
         TextSpan::new(self.position, self.text.len())
     }
