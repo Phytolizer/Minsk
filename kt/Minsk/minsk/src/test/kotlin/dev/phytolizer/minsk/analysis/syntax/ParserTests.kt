@@ -18,6 +18,7 @@ class ParserTests : FunSpec({
             if (op1Precedence >= op2Precedence) {
                 val e = AssertingEnumerator(expression)
 
+                e.assertNode(SyntaxKind.CompilationUnit)
                 e.assertNode(SyntaxKind.BinaryExpression)
                 e.assertNode(SyntaxKind.BinaryExpression)
                 e.assertNode(SyntaxKind.NameExpression)
@@ -28,10 +29,12 @@ class ParserTests : FunSpec({
                 e.assertToken(it[1], op2Text)
                 e.assertNode(SyntaxKind.NameExpression)
                 e.assertToken(SyntaxKind.IdentifierToken, "c")
+                e.assertToken(SyntaxKind.EndOfFileToken, "")
                 e.assertAtEnd()
             } else {
                 val e = AssertingEnumerator(expression)
 
+                e.assertNode(SyntaxKind.CompilationUnit)
                 e.assertNode(SyntaxKind.BinaryExpression)
                 e.assertNode(SyntaxKind.NameExpression)
                 e.assertToken(SyntaxKind.IdentifierToken, "a")
@@ -42,6 +45,7 @@ class ParserTests : FunSpec({
                 e.assertToken(it[1], op2Text)
                 e.assertNode(SyntaxKind.NameExpression)
                 e.assertToken(SyntaxKind.IdentifierToken, "c")
+                e.assertToken(SyntaxKind.EndOfFileToken, "")
                 e.assertAtEnd()
             }
         }
@@ -64,6 +68,7 @@ class ParserTests : FunSpec({
             if (unaryPrecedence >= binaryPrecedence) {
                 val e = AssertingEnumerator(expression)
 
+                e.assertNode(SyntaxKind.CompilationUnit)
                 e.assertNode(SyntaxKind.BinaryExpression)
                 e.assertNode(SyntaxKind.UnaryExpression)
                 e.assertToken(unaryKind, unaryText)
@@ -72,10 +77,12 @@ class ParserTests : FunSpec({
                 e.assertToken(binaryKind, binaryText)
                 e.assertNode(SyntaxKind.NameExpression)
                 e.assertToken(SyntaxKind.IdentifierToken, "b")
+                e.assertToken(SyntaxKind.EndOfFileToken, "")
                 e.assertAtEnd()
             } else {
                 val e = AssertingEnumerator(expression)
 
+                e.assertNode(SyntaxKind.CompilationUnit)
                 e.assertNode(SyntaxKind.UnaryExpression)
                 e.assertToken(unaryKind, unaryText)
                 e.assertNode(SyntaxKind.BinaryExpression)
@@ -84,6 +91,7 @@ class ParserTests : FunSpec({
                 e.assertToken(binaryKind, binaryText)
                 e.assertNode(SyntaxKind.NameExpression)
                 e.assertToken(SyntaxKind.IdentifierToken, "b")
+                e.assertToken(SyntaxKind.EndOfFileToken, "")
                 e.assertAtEnd()
             }
         }
