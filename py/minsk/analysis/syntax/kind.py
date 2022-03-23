@@ -14,3 +14,8 @@ class SyntaxKind(Enum):
     SlashToken = auto()
     OpenParenthesisToken = auto()
     CloseParenthesisToken = auto()
+
+    BinaryExpression = auto()
+    LiteralExpression = auto()
+    ParenthesizedExpression = auto()
+    UnaryExpression = auto()

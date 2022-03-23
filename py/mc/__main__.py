@@ -1,4 +1,4 @@
-from minsk.analysis.syntax.lexer import Lexer
+from minsk.analysis.syntax.parser import Parser
 
 while True:
     try:
@@ -6,5 +6,5 @@ while True:
     except EOFError:
         break
 
-    for token in Lexer(line):
-        print(token)
+    expression = Parser(line).parse()
+    print(expression)
