@@ -1,3 +1,5 @@
+from minsk.analysis.diagnostic import Diagnostic
+from minsk.analysis.diagnostic.bag import DiagnosticBag
 from minsk.analysis.syntax import facts
 from minsk.analysis.syntax.expression import ExpressionSyntax
 from minsk.analysis.syntax.expressions.binary import BinaryExpressionSyntax
@@ -14,7 +16,7 @@ from minsk.analysis.syntax.token import SyntaxToken
 class Parser:
     _tokens: tuple[SyntaxToken, ...]
     _position: int
-    _diagnostics: list[str]
+    _diagnostics: DiagnosticBag
 
     def __init__(self, text: str):
         lexer = Lexer(text)
@@ -28,7 +30,8 @@ class Parser:
         tokens.append(SyntaxToken(SyntaxKind.EndOfFileToken, 0, "", None))
         self._tokens = tuple(tokens)
         self._position = 0
-        self._diagnostics = lexer.diagnostics
+        self._diagnostics = DiagnosticBag()
+        self._diagnostics.extend(lexer.diagnostics)
 
     def _peek(self, offset: int) -> SyntaxToken:
         index = self._position + offset
@@ -48,8 +51,8 @@ class Parser:
     def _match_token(self, kind: SyntaxKind) -> SyntaxToken:
         if self._current.kind == kind:
             return self._next_token()
-        self._diagnostics.append(
-            f"Expected next token to be {kind.name}, not {self._current.kind.name}"
+        self._diagnostics.report_unexpected_token(
+            self._current.span, kind, self._current.kind
         )
         return SyntaxToken(kind, self._current.position, "", None)
 
@@ -100,7 +103,7 @@ class Parser:
         return LiteralExpressionSyntax(number_token)
 
     @property
-    def diagnostics(self) -> tuple[str, ...]:
+    def diagnostics(self) -> tuple[Diagnostic, ...]:
         return tuple(iter(self._diagnostics))
 
     def _parse_parenthesized_expression(self) -> ExpressionSyntax:
@@ -122,13 +125,13 @@ class Parser:
 class SyntaxTree:
     root: ExpressionSyntax
     end_of_file_token: SyntaxToken
-    diagnostics: tuple[str, ...]
+    diagnostics: tuple[Diagnostic, ...]
 
     def __init__(
         self,
         root: ExpressionSyntax,
         end_of_file_token: SyntaxToken,
-        diagnostics: tuple[str, ...],
+        diagnostics: tuple[Diagnostic, ...],
     ):
         self.root = root
         self.end_of_file_token = end_of_file_token

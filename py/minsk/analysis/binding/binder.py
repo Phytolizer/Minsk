@@ -6,6 +6,7 @@ from minsk.analysis.binding.expressions.literal import BoundLiteralExpression
 from minsk.analysis.binding.expressions.unary import BoundUnaryExpression
 from minsk.analysis.binding.operators.binary import bind_binary_operator
 from minsk.analysis.binding.operators.unary import bind_unary_operator
+from minsk.analysis.diagnostic.bag import DiagnosticBag
 from minsk.analysis.syntax.expression import ExpressionSyntax
 from minsk.analysis.syntax.expressions.binary import BinaryExpressionSyntax
 from minsk.analysis.syntax.expressions.literal import LiteralExpressionSyntax
@@ -17,10 +18,10 @@ from minsk.analysis.syntax.kind import SyntaxKind
 
 
 class Binder:
-    _diagnostics: list[str]
+    _diagnostics: DiagnosticBag
 
     def __init__(self):
-        self._diagnostics = []
+        self._diagnostics = DiagnosticBag()
 
     @property
     def diagnostics(self) -> tuple[str, ...]:
@@ -52,9 +53,11 @@ class Binder:
         right = self.bind_expression(syntax.right)
         op = bind_binary_operator(syntax.operator_token.kind, left.ty, right.ty)
         if op is None:
-            self._diagnostics.append(
-                f"Binary operator '{syntax.operator_token.text}' isn't defined "
-                + f"for types {left.ty} and {right.ty}"
+            self._diagnostics.report_undefined_binary_operator(
+                syntax.operator_token.span,
+                syntax.operator_token.text,
+                left.ty,
+                right.ty,
             )
             return left
 
@@ -73,9 +76,8 @@ class Binder:
         operand = self.bind_expression(syntax.operand)
         op = bind_unary_operator(syntax.operator_token.kind, operand.ty)
         if op is None:
-            self._diagnostics.append(
-                f"Unary operator '{syntax.operator_token.text}' "
-                + f"isn't defined for type {operand.ty}"
+            self._diagnostics.report_undefined_unary_operator(
+                syntax.operator_token.span, syntax.operator_token.text, operand.ty
             )
             return operand
 

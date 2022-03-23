@@ -2,6 +2,7 @@ from typing import Any, Iterable, Optional
 
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.node import SyntaxNode
+from minsk.analysis.text.span import TextSpan
 
 
 class SyntaxToken(SyntaxNode):
@@ -22,6 +23,10 @@ class SyntaxToken(SyntaxNode):
     @property
     def kind(self) -> SyntaxKind:
         return self._kind
+
+    @property
+    def span(self) -> TextSpan:
+        return TextSpan(self.position, len(self.text))
 
     @property
     def children(self) -> Iterable[SyntaxNode]:

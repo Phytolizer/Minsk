@@ -1,17 +1,20 @@
 from typing import Any, Optional
+from minsk.analysis.diagnostic import Diagnostic
+from minsk.analysis.diagnostic.bag import DiagnosticBag
 
 from minsk.analysis.syntax import facts
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.token import SyntaxToken
+from minsk.analysis.text.span import TextSpan
 
 
 class Lexer:
     class _Iter:
         _text: str
         _position: int
-        _diagnostics: list[str]
+        _diagnostics: DiagnosticBag
 
-        def __init__(self, text: str, diagnostics: list[str]):
+        def __init__(self, text: str, diagnostics: DiagnosticBag):
             self._text = text
             self._position = 0
             self._diagnostics = diagnostics
@@ -42,7 +45,9 @@ class Lexer:
                     try:
                         value = int(current_text)
                     except ValueError:
-                        self._diagnostics.append(f"Number '{current_text}' is invalid")
+                        self._diagnostics.report_invalid_int(
+                            TextSpan(start, len(current_text)), current_text
+                        )
                 case c if c.isalpha():
                     while self._current.isalpha():
                         self._position += 1
@@ -83,7 +88,7 @@ class Lexer:
                     self._position += 1
 
             if kind == SyntaxKind.BadToken:
-                self._diagnostics.append(f"Illegal character '{self._current}'")
+                self._diagnostics.report_bad_character(start, self._current)
                 self._position += 1
 
             if current_text is None:
@@ -101,15 +106,15 @@ class Lexer:
             return self._text[start : self._position]
 
     _text: str
-    _diagnostics: list[str]
+    _diagnostics: DiagnosticBag
 
     def __init__(self, text: str):
         self._text = text
-        self._diagnostics = []
+        self._diagnostics = DiagnosticBag()
 
     def __iter__(self):
         return Lexer._Iter(self._text, self._diagnostics)
 
     @property
-    def diagnostics(self) -> list[str]:
-        return self._diagnostics
+    def diagnostics(self) -> list[Diagnostic]:
+        return list(self._diagnostics)
