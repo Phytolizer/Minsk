@@ -33,9 +33,9 @@ class EvaluatorTests : FunSpec({
             row("(a = 10) * a", 100),
         ) { text, expected ->
             val syntaxTree = SyntaxTree.parse(text)
-            val compilation = Compilation()
+            val compilation = Compilation(syntaxTree)
             val variables = mutableMapOf<VariableSymbol, Any>()
-            val result = compilation.evaluate(syntaxTree, variables)
+            val result = compilation.evaluate(variables)
 
             result.diagnostics.shouldBeEmpty()
             result.value shouldBe expected
