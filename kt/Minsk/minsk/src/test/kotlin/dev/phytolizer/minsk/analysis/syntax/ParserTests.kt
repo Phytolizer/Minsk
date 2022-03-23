@@ -13,12 +13,11 @@ class ParserTests : FunSpec({
             val op2Precedence = SyntaxFacts.binaryOperatorPrecedence(it[1])
 
             val text = "a $op1Text b $op2Text c"
-            val expression = SyntaxTree.parse(text).root
+            val expression = parseExpression(text)
 
             if (op1Precedence >= op2Precedence) {
                 val e = AssertingEnumerator(expression)
 
-                e.assertNode(SyntaxKind.CompilationUnit)
                 e.assertNode(SyntaxKind.BinaryExpression)
                 e.assertNode(SyntaxKind.BinaryExpression)
                 e.assertNode(SyntaxKind.NameExpression)
@@ -29,12 +28,10 @@ class ParserTests : FunSpec({
                 e.assertToken(it[1], op2Text)
                 e.assertNode(SyntaxKind.NameExpression)
                 e.assertToken(SyntaxKind.IdentifierToken, "c")
-                e.assertToken(SyntaxKind.EndOfFileToken, "")
                 e.assertAtEnd()
             } else {
                 val e = AssertingEnumerator(expression)
 
-                e.assertNode(SyntaxKind.CompilationUnit)
                 e.assertNode(SyntaxKind.BinaryExpression)
                 e.assertNode(SyntaxKind.NameExpression)
                 e.assertToken(SyntaxKind.IdentifierToken, "a")
@@ -45,7 +42,6 @@ class ParserTests : FunSpec({
                 e.assertToken(it[1], op2Text)
                 e.assertNode(SyntaxKind.NameExpression)
                 e.assertToken(SyntaxKind.IdentifierToken, "c")
-                e.assertToken(SyntaxKind.EndOfFileToken, "")
                 e.assertAtEnd()
             }
         }
@@ -63,12 +59,11 @@ class ParserTests : FunSpec({
             val unaryPrecedence = SyntaxFacts.unaryOperatorPrecedence(unaryKind)
             val binaryPrecedence = SyntaxFacts.binaryOperatorPrecedence(binaryKind)
             val text = "$unaryText a $binaryText b"
-            val expression = SyntaxTree.parse(text).root
+            val expression = parseExpression(text)
 
             if (unaryPrecedence >= binaryPrecedence) {
                 val e = AssertingEnumerator(expression)
 
-                e.assertNode(SyntaxKind.CompilationUnit)
                 e.assertNode(SyntaxKind.BinaryExpression)
                 e.assertNode(SyntaxKind.UnaryExpression)
                 e.assertToken(unaryKind, unaryText)
@@ -77,12 +72,10 @@ class ParserTests : FunSpec({
                 e.assertToken(binaryKind, binaryText)
                 e.assertNode(SyntaxKind.NameExpression)
                 e.assertToken(SyntaxKind.IdentifierToken, "b")
-                e.assertToken(SyntaxKind.EndOfFileToken, "")
                 e.assertAtEnd()
             } else {
                 val e = AssertingEnumerator(expression)
 
-                e.assertNode(SyntaxKind.CompilationUnit)
                 e.assertNode(SyntaxKind.UnaryExpression)
                 e.assertToken(unaryKind, unaryText)
                 e.assertNode(SyntaxKind.BinaryExpression)
@@ -91,17 +84,19 @@ class ParserTests : FunSpec({
                 e.assertToken(binaryKind, binaryText)
                 e.assertNode(SyntaxKind.NameExpression)
                 e.assertToken(SyntaxKind.IdentifierToken, "b")
-                e.assertToken(SyntaxKind.EndOfFileToken, "")
                 e.assertAtEnd()
             }
         }
     }
 }) {
     companion object {
-        fun binaryOperatorPairs() =
+        private fun binaryOperatorPairs() =
             TestUtils.cartesianProduct(SyntaxFacts.binaryOperators(), SyntaxFacts.binaryOperators())
 
-        fun unaryOperatorPairs() =
+        private fun unaryOperatorPairs() =
             TestUtils.cartesianProduct(SyntaxFacts.unaryOperators(), SyntaxFacts.binaryOperators())
+
+        private fun parseExpression(text: String) =
+            SyntaxTree.parse(text).root.expression
     }
 }
