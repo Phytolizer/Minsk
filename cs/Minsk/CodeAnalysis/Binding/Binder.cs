@@ -6,7 +6,7 @@ namespace Minsk.CodeAnalysis.Binding;
 internal sealed class Binder
 {
     private readonly DiagnosticBag _diagnostics = new();
-    private readonly BoundScope _scope;
+    private BoundScope _scope;
 
     public Binder(BoundScope? parent)
     {
@@ -59,12 +59,15 @@ internal sealed class Binder
     private BoundStatement BindBlockStatement(BlockStatementSyntax syntax)
     {
         var statements = ImmutableArray.CreateBuilder<BoundStatement>();
+        _scope = new BoundScope(_scope);
+
         foreach (var statement in syntax.Statements)
         {
             var boundStatement = BindStatement(statement);
             statements.Add(boundStatement);
         }
 
+        _scope = _scope.Parent!;
         return new BoundBlockStatement(statements.ToImmutable());
     }
 
