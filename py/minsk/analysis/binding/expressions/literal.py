@@ -16,8 +16,8 @@ class BoundLiteralExpression(BoundExpression):
 
     @property
     def ty(self) -> MinskType:
-        if isinstance(self.value, int):
-            return MinskType.Int
         if isinstance(self.value, bool):
             return MinskType.Bool
+        if isinstance(self.value, int):
+            return MinskType.Int
         raise Exception(f"Unsupported variable type {type(self.value)}")
