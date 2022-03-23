@@ -11,7 +11,7 @@ class SyntaxToken(SyntaxNode):
         self._kind = kind
         self.position = position
         self.text = text
-        self.value = value
+        self._value = value
 
     def __str__(self):
         result = f"{self.kind.name} '{self.text}'"
@@ -26,3 +26,7 @@ class SyntaxToken(SyntaxNode):
     @property
     def children(self) -> Iterable[SyntaxNode]:
         return ()
+
+    @property
+    def value(self) -> Optional[Any]:
+        return self._value

@@ -7,4 +7,4 @@ while True:
         break
 
     expression = Parser(line).parse()
-    print(expression)
+    expression.pretty_print()
