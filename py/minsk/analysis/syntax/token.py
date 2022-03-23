@@ -6,7 +6,7 @@ from minsk.analysis.syntax.node import SyntaxNode
 
 class SyntaxToken(SyntaxNode):
     def __init__(
-            self, kind: SyntaxKind, position: int, text: str, value: Optional[Any]
+        self, kind: SyntaxKind, position: int, text: str, value: Optional[Any]
     ):
         self._kind = kind
         self.position = position

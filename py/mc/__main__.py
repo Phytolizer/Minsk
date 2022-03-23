@@ -17,9 +17,9 @@ while True:
     diagnostics = parser.diagnostics
     if len(diagnostics) == 0:
         print(Fore.WHITE + Style.DIM, end="")
-        expression.pretty_print()
+        expression.root.pretty_print()
         print(Style.RESET_ALL, end="")
-        evaluator = Evaluator(expression)
+        evaluator = Evaluator(expression.root)
         print(evaluator.evaluate())
     else:
         print(Fore.RED, end="")

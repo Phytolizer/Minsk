@@ -4,6 +4,7 @@ from minsk.analysis.syntax.expressions.literal import LiteralExpressionSyntax
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.lexer import Lexer
 from minsk.analysis.syntax.token import SyntaxToken
+from minsk.analysis.syntax.tree import SyntaxTree
 
 
 class Parser:
@@ -16,7 +17,7 @@ class Parser:
         tokens = list(
             filter(
                 lambda tok: tok.kind != SyntaxKind.BadToken
-                            and tok.kind != SyntaxKind.WhitespaceToken,
+                and tok.kind != SyntaxKind.WhitespaceToken,
                 lexer,
             )
         )
@@ -48,8 +49,12 @@ class Parser:
         )
         return SyntaxToken(kind, self._current.position, "", None)
 
-    def parse(self) -> ExpressionSyntax:
-        return self._parse_expression()
+    def parse(self) -> SyntaxTree:
+        return SyntaxTree(
+            self._parse_expression(),
+            self._match_token(SyntaxKind.EndOfFileToken),
+            self.diagnostics,
+        )
 
     def _parse_expression(self) -> ExpressionSyntax:
         return self._parse_term()

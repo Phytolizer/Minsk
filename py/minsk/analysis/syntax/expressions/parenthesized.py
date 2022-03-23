@@ -8,10 +8,10 @@ from minsk.analysis.syntax.token import SyntaxToken
 
 class ParenthesizedExpressionSyntax(ExpressionSyntax):
     def __init__(
-            self,
-            open_parenthesis_token: SyntaxToken,
-            expression: ExpressionSyntax,
-            close_parenthesis_token: SyntaxToken,
+        self,
+        open_parenthesis_token: SyntaxToken,
+        expression: ExpressionSyntax,
+        close_parenthesis_token: SyntaxToken,
     ):
         self.open_parenthesis_token = open_parenthesis_token
         self.expression = expression
