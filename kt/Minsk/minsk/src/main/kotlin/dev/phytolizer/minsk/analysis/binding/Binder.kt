@@ -64,9 +64,15 @@ internal class Binder(parent: BoundScope?) {
         val expression = bindExpression(syntax.expression)
 
         val name = syntax.identifierToken.text
-        val variable = VariableSymbol(name, expression.type)
-        if (!_scope.tryDeclare(variable)) {
-            _diagnostics.reportVariableAlreadyDeclared(syntax.identifierToken.span, name)
+        var variable = _scope.tryLookup(name)
+        if (variable == null) {
+            variable = VariableSymbol(name, expression.type)
+            _scope.tryDeclare(variable)
+        }
+
+        if (variable.type != expression.type) {
+            _diagnostics.reportCannotConvert(syntax.equalsToken.span, expression.type, variable.type)
+            return expression
         }
 
         return BoundAssignmentExpression(variable, expression)

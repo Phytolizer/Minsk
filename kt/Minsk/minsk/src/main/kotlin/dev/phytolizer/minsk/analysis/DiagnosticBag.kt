@@ -48,4 +48,8 @@ internal class DiagnosticBag {
     fun reportVariableAlreadyDeclared(span: TextSpan, name: String) {
         report(span, "Name '$name' is already declared in the same scope")
     }
+
+    fun reportCannotConvert(span: TextSpan, fromType: KClass<out Any>, toType: KClass<out Any>) {
+        report(span, "Cannot convert from '$fromType' to '$toType'")
+    }
 }
