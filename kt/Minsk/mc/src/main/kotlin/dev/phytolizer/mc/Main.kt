@@ -52,11 +52,11 @@ fun main() {
         }
 
         val compilation = previous?.continueWith(syntaxTree) ?: Compilation(syntaxTree)
-        previous = compilation
         val result = compilation.evaluate(variables)
         val diagnostics = result.diagnostics
 
         if (diagnostics.isEmpty()) {
+            previous = compilation
             if (showTree) {
                 print(Colorize.colorCode256(243))
                 syntaxTree.root.prettyPrint()
