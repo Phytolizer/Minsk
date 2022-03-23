@@ -20,12 +20,12 @@ while True:
     else:
         print("| ", end="")
     try:
-        line = input()
+        input_line = input()
     except EOFError:
         break
 
     if len(text_builder) == 0:
-        match line:
+        match input_line:
             case "#showTree":
                 show_tree = not show_tree
                 if show_tree:
@@ -37,8 +37,8 @@ while True:
                 print(clear_screen() + Cursor.POS(0, 0), end="")
                 continue
 
-    is_blank = line == ""
-    text_builder += line + "\n"
+    is_blank = input_line == ""
+    text_builder += input_line + "\n"
 
     syntax_tree = SyntaxTree.parse(text_builder)
     if (not is_blank) and len(syntax_tree.diagnostics) > 0:
@@ -54,13 +54,12 @@ while True:
         for diagnostic in diagnostics:
             line_index = syntax_tree.text.get_line_index(diagnostic.span.start)
             line_number = line_index + 1
-            character = (
-                diagnostic.span.start - syntax_tree.text.lines[line_index].start + 1
-            )
+            line = syntax_tree.text.lines[line_index]
+            character = diagnostic.span.start - line.start + 1
 
-            prefix = line[: diagnostic.span.start]
-            error = line[diagnostic.span.start : diagnostic.span.end]
-            suffix = line[diagnostic.span.end :]
+            prefix = text_builder[line.start : diagnostic.span.start]
+            error = text_builder[diagnostic.span.start : diagnostic.span.end]
+            suffix = text_builder[diagnostic.span.end : line.end]
 
             print(Fore.RED, end="")
             print(f"({line_number}, {character}): ", end="")
