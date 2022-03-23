@@ -16,7 +16,9 @@ while True:
     expression = parser.parse()
     diagnostics = parser.diagnostics
     if len(diagnostics) == 0:
+        print(Fore.WHITE + Style.DIM, end="")
         expression.pretty_print()
+        print(Style.RESET_ALL, end="")
         evaluator = Evaluator(expression)
         print(evaluator.evaluate())
     else:
