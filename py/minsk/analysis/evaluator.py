@@ -12,6 +12,7 @@ from minsk.analysis.binding.operators.unary import BoundUnaryOperatorKind
 from minsk.analysis.binding.statement import BoundStatement
 from minsk.analysis.binding.statements.block import BoundBlockStatement
 from minsk.analysis.binding.statements.expression import BoundExpressionStatement
+from minsk.analysis.binding.statements.variable import BoundVariableDeclaration
 from minsk.analysis.variable import VariableSymbol
 
 
@@ -33,6 +34,10 @@ class Evaluator:
         match statement.kind:
             case BoundNodeKind.BlockStatement:
                 self._evaluate_block_statement(cast(BoundBlockStatement, statement))
+            case BoundNodeKind.VariableDeclaration:
+                self._evaluate_variable_declaration(
+                    cast(BoundVariableDeclaration, statement)
+                )
             case BoundNodeKind.ExpressionStatement:
                 self._evaluate_expression_statement(
                     cast(BoundExpressionStatement, statement)
@@ -41,6 +46,11 @@ class Evaluator:
     def _evaluate_block_statement(self, statement: BoundBlockStatement):
         for s in statement.statements:
             self._evaluate_statement(s)
+
+    def _evaluate_variable_declaration(self, statement: BoundVariableDeclaration):
+        value = self._evaluate_expression(statement.initializer)
+        self._variables[statement.variable] = value
+        self._last_value = value
 
     def _evaluate_expression_statement(self, statement: BoundExpressionStatement):
         self._last_value = self._evaluate_expression(statement.expression)

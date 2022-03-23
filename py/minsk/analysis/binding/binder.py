@@ -13,6 +13,7 @@ from minsk.analysis.binding.scope.globl import BoundGlobalScope
 from minsk.analysis.binding.statement import BoundStatement
 from minsk.analysis.binding.statements.block import BoundBlockStatement
 from minsk.analysis.binding.statements.expression import BoundExpressionStatement
+from minsk.analysis.binding.statements.variable import BoundVariableDeclaration
 from minsk.analysis.diagnostic import Diagnostic
 from minsk.analysis.diagnostic.bag import DiagnosticBag
 from minsk.analysis.syntax.expression import ExpressionSyntax
@@ -28,6 +29,7 @@ from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.statement import StatementSyntax
 from minsk.analysis.syntax.statements.block import BlockStatementSyntax
 from minsk.analysis.syntax.statements.expression import ExpressionStatementSyntax
+from minsk.analysis.syntax.statements.variable import VariableDeclarationSyntax
 from minsk.analysis.syntax.unit import CompilationUnitSyntax
 from minsk.analysis.variable import VariableSymbol
 
@@ -87,16 +89,38 @@ class Binder:
                 return self._bind_expression_statement(
                     cast(ExpressionStatementSyntax, syntax)
                 )
+            case SyntaxKind.VariableDeclaration:
+                return self._bind_variable_declaration(
+                    cast(VariableDeclarationSyntax, syntax)
+                )
             case _:
                 raise Exception(f"Unhandled syntax {syntax.kind}")
 
     def _bind_block_statement(self, syntax: BlockStatementSyntax) -> BoundStatement:
         statements: list[BoundStatement] = []
+        self._scope = BoundScope(self._scope)
+
         for statement in syntax.statements:
             bound_statement = self.bind_statement(statement)
             statements.append(bound_statement)
 
+        self._scope = self._scope.parent
         return BoundBlockStatement(tuple(statements))
+
+    def _bind_variable_declaration(
+        self, syntax: VariableDeclarationSyntax
+    ) -> BoundStatement:
+        initializer = self._bind_expression(syntax.initializer)
+        name = syntax.identifier_token.text
+        is_read_only = syntax.keyword_token.kind == SyntaxKind.LetKeyword
+        variable = VariableSymbol(name, is_read_only, initializer.ty)
+
+        if not self._scope.try_declare(variable):
+            self._diagnostics.report_variable_already_declared(
+                syntax.identifier_token.span, name
+            )
+
+        return BoundVariableDeclaration(variable, initializer)
 
     def _bind_expression_statement(
         self, syntax: ExpressionStatementSyntax
@@ -173,8 +197,11 @@ class Binder:
         name = syntax.identifier_token.text
         variable = self._scope.try_lookup(name)
         if variable is None:
-            variable = VariableSymbol(name, expression.ty)
-            self._scope.try_declare(variable)
+            self._diagnostics.report_undefined_name(syntax.identifier_token.span, name)
+            return expression
+
+        if variable.is_read_only:
+            self._diagnostics.report_cannot_assign(syntax.equals_token.span, name)
 
         if expression.ty != variable.ty:
             self._diagnostics.report_cannot_convert(

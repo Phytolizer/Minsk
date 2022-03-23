@@ -64,6 +64,10 @@ class DiagnosticBag:
         message = f"Cannot convert type {from_type} to type {to_type}"
         self._report(span, message)
 
+    def report_cannot_assign(self, span: TextSpan, name: str):
+        message = f"Cannot assign to read-only variable '{name}'"
+        self._report(span, message)
+
     def __iter__(self):
         return iter(self._diagnostics)
 

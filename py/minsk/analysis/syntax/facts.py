@@ -29,10 +29,14 @@ def unary_operator_precedence(kind: SyntaxKind) -> int:
 
 def keyword_kind(text: str) -> SyntaxKind:
     match text:
-        case "true":
-            return SyntaxKind.TrueKeyword
         case "false":
             return SyntaxKind.FalseKeyword
+        case "let":
+            return SyntaxKind.LetKeyword
+        case "true":
+            return SyntaxKind.TrueKeyword
+        case "var":
+            return SyntaxKind.VarKeyword
         case _:
             return SyntaxKind.IdentifierToken
 
@@ -75,7 +79,11 @@ def get_text(kind: SyntaxKind) -> Optional[str]:
             return "{"
         case SyntaxKind.CloseBraceToken:
             return "}"
-        case SyntaxKind.TrueKeyword:
-            return "true"
         case SyntaxKind.FalseKeyword:
             return "false"
+        case SyntaxKind.LetKeyword:
+            return "let"
+        case SyntaxKind.TrueKeyword:
+            return "true"
+        case SyntaxKind.VarKeyword:
+            return "var"

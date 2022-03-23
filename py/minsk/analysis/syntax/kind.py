@@ -24,13 +24,16 @@ class SyntaxKind(Enum):
     OpenBraceToken = auto()
     CloseBraceToken = auto()
 
-    TrueKeyword = auto()
     FalseKeyword = auto()
+    LetKeyword = auto()
+    TrueKeyword = auto()
+    VarKeyword = auto()
 
     CompilationUnit = auto()
 
     BlockStatement = auto()
     ExpressionStatement = auto()
+    VariableDeclaration = auto()
 
     AssignmentExpression = auto()
     BinaryExpression = auto()
