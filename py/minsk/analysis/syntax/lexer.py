@@ -77,7 +77,7 @@ class Lexer:
             return self._text[index]
 
         def _current_text(self, start: int) -> str:
-            return self._text[start:self._position]
+            return self._text[start: self._position]
 
     _text: str
     _diagnostics: list[str]

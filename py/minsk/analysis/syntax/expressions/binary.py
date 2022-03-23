@@ -8,8 +8,10 @@ from minsk.analysis.syntax.token import SyntaxToken
 
 class BinaryExpressionSyntax(ExpressionSyntax):
     def __init__(
-            self, left: ExpressionSyntax, operator_token: SyntaxToken,
-            right: ExpressionSyntax
+            self,
+            left: ExpressionSyntax,
+            operator_token: SyntaxToken,
+            right: ExpressionSyntax,
     ):
         self.left = left
         self.operator_token = operator_token

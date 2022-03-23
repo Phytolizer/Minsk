@@ -15,9 +15,9 @@ class Parser:
         lexer = Lexer(text)
         tokens = list(
             filter(
-                lambda tok: tok.kind != SyntaxKind.BadToken and
-                            tok.kind != SyntaxKind.WhitespaceToken,
-                lexer
+                lambda tok: tok.kind != SyntaxKind.BadToken
+                            and tok.kind != SyntaxKind.WhitespaceToken,
+                lexer,
             )
         )
         tokens.append(SyntaxToken(SyntaxKind.EndOfFileToken, 0, "", None))
