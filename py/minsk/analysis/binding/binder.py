@@ -36,12 +36,35 @@ class Binder:
         self._scope = BoundScope(parent)
 
     @staticmethod
-    def bind_global_scope(syntax: CompilationUnitSyntax) -> BoundGlobalScope:
-        binder = Binder(None)
+    def bind_global_scope(
+        previous: Optional[BoundGlobalScope], syntax: CompilationUnitSyntax
+    ) -> BoundGlobalScope:
+        parent_scope = Binder._create_parent_scopes(previous)
+        binder = Binder(parent_scope)
         expression = binder.bind_expression(syntax.expression)
         diagnostics = binder.diagnostics
         variables = binder._scope.declared_variables
-        return BoundGlobalScope(None, diagnostics, variables, expression)
+        return BoundGlobalScope(previous, diagnostics, variables, expression)
+
+    @staticmethod
+    def _create_parent_scopes(
+        previous: Optional[BoundGlobalScope],
+    ) -> Optional[BoundScope]:
+        stack: list[BoundGlobalScope] = []
+
+        while previous is not None:
+            stack.append(previous)
+            previous = previous.previous
+
+        current: Optional[BoundScope] = None
+        while len(stack) > 0:
+            previous = stack.pop()
+            scope = BoundScope(current)
+            for v in previous.variables:
+                scope.try_declare(v)
+            current = scope
+
+        return current
 
     @property
     def diagnostics(self) -> tuple[Diagnostic, ...]:

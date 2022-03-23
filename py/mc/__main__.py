@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 import colorama
 from colorama import Fore, Style
@@ -13,6 +13,7 @@ colorama.init()
 show_tree = False
 variables: dict[VariableSymbol, Any] = {}
 text_builder = ""
+previous: Optional[Compilation] = None
 
 while True:
     print(Fore.GREEN, end="")
@@ -45,8 +46,13 @@ while True:
     syntax_tree = SyntaxTree.parse(text_builder)
     if (not is_blank) and len(syntax_tree.diagnostics) > 0:
         continue
-    diagnostics, value = Compilation(syntax_tree).evaluate(variables)
+    if previous is None:
+        compilation = Compilation(syntax_tree)
+    else:
+        compilation = previous.continue_with(syntax_tree)
+    diagnostics, value = compilation.evaluate(variables)
     if len(diagnostics) == 0:
+        previous = compilation
         if show_tree:
             print(Fore.WHITE + Style.DIM, end="")
             syntax_tree.root.pretty_print()
