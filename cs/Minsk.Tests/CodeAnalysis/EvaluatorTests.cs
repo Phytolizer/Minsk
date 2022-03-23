@@ -4,7 +4,7 @@ using Xunit;
 
 namespace Minsk.Tests.CodeAnalysis;
 
-public class EvaluatorTests
+public sealed class EvaluatorTests
 {
     [Theory]
     [InlineData("1", 1)]
