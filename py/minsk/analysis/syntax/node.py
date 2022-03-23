@@ -3,6 +3,8 @@ from abc import ABC, abstractmethod
 from io import StringIO
 from typing import Any, Iterable, Optional, TextIO
 
+from colorama import Fore, Style
+
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.text.span import TextSpan
 
@@ -52,13 +54,19 @@ class SyntaxNode(ABC):
         indent: str,
         is_last: bool,
     ):
+        if is_to_console:
+            writer.write(Fore.WHITE + Style.DIM)
         writer.write(indent)
         if is_last:
             marker = "└── "
         else:
             marker = "├── "
         writer.write(marker)
+        if is_to_console:
+            writer.write(Style.NORMAL + (Fore.CYAN if node.is_token() else Fore.BLUE))
         writer.write(node.kind.name)
+        if is_to_console:
+            writer.write(Style.RESET_ALL)
         if node.is_token() and node.value is not None:
             writer.write(f" {node.value}")
         writer.write("\n")
