@@ -44,4 +44,8 @@ internal class DiagnosticBag {
     fun reportUndefinedName(span: TextSpan, name: String) {
         report(span, "Undefined name '$name'")
     }
+
+    fun reportVariableAlreadyDeclared(span: TextSpan, name: String) {
+        report(span, "Name '$name' is already declared in the same scope")
+    }
 }

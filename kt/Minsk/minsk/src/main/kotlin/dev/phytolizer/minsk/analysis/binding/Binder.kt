@@ -7,7 +7,6 @@ import dev.phytolizer.minsk.analysis.syntax.*
 
 internal class Binder(parent: BoundScope?) {
     private val _scope = BoundScope(parent)
-    private val _variables = mutableMapOf<VariableSymbol, Any>()
     private val _diagnostics = DiagnosticBag()
     val diagnostics: List<Diagnostic>
         get() = _diagnostics.toList()
@@ -36,17 +35,11 @@ internal class Binder(parent: BoundScope?) {
         val expression = bindExpression(syntax.expression)
 
         val name = syntax.identifierToken.text
-        val existingVariable = _variables.keys.firstOrNull { it.name == name }
-        if (existingVariable != null) {
-            _variables.remove(existingVariable)
+        val variable = VariableSymbol(name, expression.type)
+        if (!_scope.tryDeclare(variable)) {
+            _diagnostics.reportVariableAlreadyDeclared(syntax.identifierToken.span, name)
         }
 
-        val variable = VariableSymbol(name, expression.type)
-        _variables[variable] = when (variable.type) {
-            Int::class -> 0
-            Boolean::class -> false
-            else -> throw IllegalStateException()
-        }
         return BoundAssignmentExpression(variable, expression)
     }
 
@@ -74,7 +67,7 @@ internal class Binder(parent: BoundScope?) {
 
     private fun bindNameExpression(syntax: NameExpressionSyntax): BoundExpression {
         val name = syntax.identifierToken.text
-        val variable = _variables.keys.firstOrNull { it.name == name }
+        val variable = _scope.tryLookup(name)
         return if (variable == null) {
             _diagnostics.reportUndefinedName(syntax.identifierToken.span, name)
             BoundLiteralExpression(0)
