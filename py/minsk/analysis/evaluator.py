@@ -1,81 +1,63 @@
 from typing import Any, cast
 
-from minsk.analysis.syntax.expression import ExpressionSyntax
-from minsk.analysis.syntax.expressions.binary import BinaryExpressionSyntax
-from minsk.analysis.syntax.expressions.literal import LiteralExpressionSyntax
-from minsk.analysis.syntax.expressions.parenthesized import (
-    ParenthesizedExpressionSyntax,
-)
-from minsk.analysis.syntax.expressions.unary import UnaryExpressionSyntax
-from minsk.analysis.syntax.kind import SyntaxKind
+from minsk.analysis.binding.expression import BoundExpression
+from minsk.analysis.binding.expressions.binary import BoundBinaryExpression
+from minsk.analysis.binding.expressions.literal import BoundLiteralExpression
+from minsk.analysis.binding.expressions.unary import BoundUnaryExpression
+from minsk.analysis.binding.kind import BoundNodeKind
+from minsk.analysis.binding.operators.binary import BoundBinaryOperatorKind
+from minsk.analysis.binding.operators.unary import BoundUnaryOperatorKind
 
 
 class Evaluator:
-    syntax: ExpressionSyntax
+    syntax: BoundExpression
 
-    def __init__(self, syntax: ExpressionSyntax):
+    def __init__(self, syntax: BoundExpression):
         self.syntax = syntax
 
     def evaluate(self) -> Any:
         return self._evaluate_expression(self.syntax)
 
-    def _evaluate_expression(self, syntax: ExpressionSyntax) -> Any:
+    def _evaluate_expression(self, syntax: BoundExpression) -> Any:
         match syntax.kind:
-            case SyntaxKind.BinaryExpression:
+            case BoundNodeKind.BinaryExpression:
                 return self._evaluate_binary_expression(
-                    cast(BinaryExpressionSyntax, syntax)
+                    cast(BoundBinaryExpression, syntax)
                 )
-            case SyntaxKind.LiteralExpression:
+            case BoundNodeKind.LiteralExpression:
                 return self._evaluate_literal_expression(
-                    cast(LiteralExpressionSyntax, syntax)
+                    cast(BoundLiteralExpression, syntax)
                 )
-            case SyntaxKind.ParenthesizedExpression:
-                return self._evaluate_parenthesized_expression(
-                    cast(ParenthesizedExpressionSyntax, syntax)
-                )
-            case SyntaxKind.UnaryExpression:
+            case BoundNodeKind.UnaryExpression:
                 return self._evaluate_unary_expression(
-                    cast(UnaryExpressionSyntax, syntax)
+                    cast(BoundUnaryExpression, syntax)
                 )
             case _:
                 raise Exception(f"unexpected syntax {syntax.kind}")
 
-    def _evaluate_binary_expression(self, syntax: BinaryExpressionSyntax) -> Any:
+    def _evaluate_binary_expression(self, syntax: BoundBinaryExpression) -> Any:
         left = self._evaluate_expression(syntax.left)
         right = self._evaluate_expression(syntax.right)
 
-        match syntax.operator_token.kind:
-            case SyntaxKind.PlusToken:
+        match syntax.operator.kind:
+            case BoundBinaryOperatorKind.Addition:
                 return left + right
-            case SyntaxKind.MinusToken:
+            case BoundBinaryOperatorKind.Subtraction:
                 return left - right
-            case SyntaxKind.StarToken:
+            case BoundBinaryOperatorKind.Multiplication:
                 return left * right
-            case SyntaxKind.SlashToken:
+            case BoundBinaryOperatorKind.Division:
                 return left // right
-            case _:
-                raise Exception(
-                    f"unexpected binary operator {syntax.operator_token.kind}"
-                )
 
     @staticmethod
-    def _evaluate_literal_expression(syntax: LiteralExpressionSyntax) -> Any:
-        return syntax.literal_token.value
+    def _evaluate_literal_expression(syntax: BoundLiteralExpression) -> Any:
+        return syntax.value
 
-    def _evaluate_parenthesized_expression(
-        self, syntax: ParenthesizedExpressionSyntax
-    ) -> Any:
-        return self._evaluate_expression(syntax.expression)
-
-    def _evaluate_unary_expression(self, syntax: UnaryExpressionSyntax) -> Any:
+    def _evaluate_unary_expression(self, syntax: BoundUnaryExpression) -> Any:
         operand = self._evaluate_expression(syntax.operand)
 
-        match syntax.operator_token.kind:
-            case SyntaxKind.PlusToken:
+        match syntax.operator.kind:
+            case BoundUnaryOperatorKind.Identity:
                 return operand
-            case SyntaxKind.MinusToken:
+            case BoundUnaryOperatorKind.Negation:
                 return -operand
-            case _:
-                raise Exception(
-                    f"unexpected unary operator {syntax.operator_token.kind}"
-                )

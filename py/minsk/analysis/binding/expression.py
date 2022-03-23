@@ -5,7 +5,7 @@ from minsk.analysis.binding.node import BoundNode
 
 
 class BoundExpression(BoundNode, ABC):
-    @abstractmethod
     @property
+    @abstractmethod
     def ty(self) -> Type:
         pass

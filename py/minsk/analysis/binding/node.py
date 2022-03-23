@@ -4,7 +4,7 @@ from minsk.analysis.binding.kind import BoundNodeKind
 
 
 class BoundNode(ABC):
-    @abstractmethod
     @property
+    @abstractmethod
     def kind(self) -> BoundNodeKind:
         pass
