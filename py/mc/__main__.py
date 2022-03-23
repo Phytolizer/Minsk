@@ -1,14 +1,16 @@
+from typing import Any
+
 import colorama
 from colorama import Fore, Style
 from colorama.ansi import Cursor, clear_screen
-from minsk.analysis.binding.binder import Binder
+
 from minsk.analysis.compilation import Compilation
-from minsk.analysis.evaluator import Evaluator
-from minsk.analysis.syntax.parser import Parser, SyntaxTree
+from minsk.analysis.syntax.parser import SyntaxTree
 
 colorama.init()
 
 show_tree = False
+variables: dict[str, Any] = {}
 
 while True:
     try:
@@ -29,7 +31,7 @@ while True:
             continue
 
     syntax_tree = SyntaxTree.parse(line)
-    diagnostics, value = Compilation(syntax_tree).evaluate()
+    diagnostics, value = Compilation(syntax_tree).evaluate(variables)
     if len(diagnostics) == 0:
         if show_tree:
             print(Fore.WHITE + Style.DIM, end="")

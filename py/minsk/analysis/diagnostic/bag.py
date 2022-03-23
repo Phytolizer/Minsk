@@ -49,6 +49,10 @@ class DiagnosticBag:
         )
         self._report(span, message)
 
+    def report_undefined_name(self, span: TextSpan, name: str):
+        message = f"Undefined name '{name}'"
+        self._report(span, message)
+
     def __iter__(self):
         return iter(self._diagnostics)
 

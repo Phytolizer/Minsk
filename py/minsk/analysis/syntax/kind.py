@@ -18,6 +18,7 @@ class SyntaxKind(Enum):
     PipePipeToken = auto()
     BangEqualsToken = auto()
     EqualsEqualsToken = auto()
+    EqualsToken = auto()
     OpenParenthesisToken = auto()
     CloseParenthesisToken = auto()
 

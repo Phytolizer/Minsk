@@ -14,11 +14,11 @@ class Compilation:
     def __init__(self, syntax: SyntaxTree):
         self.syntax = syntax
 
-    def evaluate(self) -> EvaluationResult:
-        binder = Binder()
+    def evaluate(self, variables: dict[str, Any]) -> EvaluationResult:
+        binder = Binder(variables)
         expression = binder.bind_expression(self.syntax.root)
         diagnostics = self.syntax.diagnostics + binder.diagnostics
         if len(diagnostics) > 0:
             return diagnostics, None
-        evaluator = Evaluator(expression)
+        evaluator = Evaluator(expression, variables)
         return (), evaluator.evaluate()

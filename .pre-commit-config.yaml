@@ -1,0 +1,18 @@
+repos:
+  - repo: local
+    hooks:
+      - id: isort
+        name: sort python imports
+        language: system
+        entry: bash -c 'cd py && poetry run isort .'
+        pass_filenames: false
+        types: [python]
+        files: ^py/
+      - id: black
+        name: format python
+        language: system
+        entry: bash -c 'cd py && poetry run black .'
+        pass_filenames: false
+        types: [python]
+        files: ^py/
+

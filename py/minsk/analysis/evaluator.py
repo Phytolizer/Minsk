@@ -1,25 +1,33 @@
 from typing import Any, cast
 
 from minsk.analysis.binding.expression import BoundExpression
+from minsk.analysis.binding.expressions.assignment import BoundAssignmentExpression
 from minsk.analysis.binding.expressions.binary import BoundBinaryExpression
 from minsk.analysis.binding.expressions.literal import BoundLiteralExpression
 from minsk.analysis.binding.expressions.unary import BoundUnaryExpression
+from minsk.analysis.binding.expressions.variable import BoundVariableExpression
 from minsk.analysis.binding.kind import BoundNodeKind
 from minsk.analysis.binding.operators.binary import BoundBinaryOperatorKind
 from minsk.analysis.binding.operators.unary import BoundUnaryOperatorKind
 
 
 class Evaluator:
-    expression: BoundExpression
+    _expression: BoundExpression
+    _variables: dict[str, Any]
 
-    def __init__(self, expression: BoundExpression):
-        self.expression = expression
+    def __init__(self, expression: BoundExpression, variables: dict[str, Any]):
+        self._expression = expression
+        self._variables = variables
 
     def evaluate(self) -> Any:
-        return self._evaluate_expression(self.expression)
+        return self._evaluate_expression(self._expression)
 
     def _evaluate_expression(self, syntax: BoundExpression) -> Any:
         match syntax.kind:
+            case BoundNodeKind.AssignmentExpression:
+                return self._evaluate_assignment_expression(
+                    cast(BoundAssignmentExpression, syntax)
+                )
             case BoundNodeKind.BinaryExpression:
                 return self._evaluate_binary_expression(
                     cast(BoundBinaryExpression, syntax)
@@ -31,6 +39,10 @@ class Evaluator:
             case BoundNodeKind.UnaryExpression:
                 return self._evaluate_unary_expression(
                     cast(BoundUnaryExpression, syntax)
+                )
+            case BoundNodeKind.VariableExpression:
+                return self._evaluate_variable_expression(
+                    cast(BoundVariableExpression, syntax)
                 )
             case _:
                 raise Exception(f"unexpected syntax {syntax.kind}")
@@ -75,3 +87,11 @@ class Evaluator:
                 return not operand
             case _:
                 raise Exception(f"Unhandled operator kind {syntax.operator.kind}")
+
+    def _evaluate_assignment_expression(self, syntax: BoundAssignmentExpression) -> Any:
+        value = self._evaluate_expression(syntax.expression)
+        self._variables[syntax.name] = value
+        return value
+
+    def _evaluate_variable_expression(self, syntax: BoundVariableExpression) -> Any:
+        return self._variables[syntax.name]

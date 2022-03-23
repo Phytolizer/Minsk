@@ -2,8 +2,10 @@ from minsk.analysis.diagnostic import Diagnostic
 from minsk.analysis.diagnostic.bag import DiagnosticBag
 from minsk.analysis.syntax import facts
 from minsk.analysis.syntax.expression import ExpressionSyntax
+from minsk.analysis.syntax.expressions.assignment import AssignmentExpressionSyntax
 from minsk.analysis.syntax.expressions.binary import BinaryExpressionSyntax
 from minsk.analysis.syntax.expressions.literal import LiteralExpressionSyntax
+from minsk.analysis.syntax.expressions.name import NameExpressionSyntax
 from minsk.analysis.syntax.expressions.parenthesized import (
     ParenthesizedExpressionSyntax,
 )
@@ -64,7 +66,19 @@ class Parser:
         )
 
     def _parse_expression(self) -> ExpressionSyntax:
-        return self._parse_binary_expression(0)
+        return self._parse_assignment_expression()
+
+    def _parse_assignment_expression(self) -> ExpressionSyntax:
+        if (
+            self._peek(0).kind != SyntaxKind.IdentifierToken
+            or self._peek(1).kind != SyntaxKind.EqualsToken
+        ):
+            return self._parse_binary_expression(0)
+
+        identifier_token = self._next_token()
+        equals_token = self._next_token()
+        expression = self._parse_assignment_expression()
+        return AssignmentExpressionSyntax(identifier_token, equals_token, expression)
 
     def _parse_binary_expression(self, parent_precedence: int) -> ExpressionSyntax:
         unary_operator_precedence = facts.unary_operator_precedence(self._current.kind)
@@ -95,8 +109,10 @@ class Parser:
                 return self._parse_parenthesized_expression()
             case SyntaxKind.TrueKeyword | SyntaxKind.FalseKeyword:
                 return self._parse_boolean_literal()
-            case _:
+            case SyntaxKind.NumberToken:
                 return self._parse_number_literal()
+            case _:
+                return self._parse_name_expression()
 
     def _parse_number_literal(self) -> ExpressionSyntax:
         number_token = self._match_token(SyntaxKind.NumberToken)
@@ -114,12 +130,16 @@ class Parser:
             open_parenthesis_token, expression, close_parenthesis_token
         )
 
-    def _parse_boolean_literal(self):
+    def _parse_boolean_literal(self) -> ExpressionSyntax:
         is_true = self._current.kind == SyntaxKind.TrueKeyword
         keyword_token = self._match_token(
             SyntaxKind.TrueKeyword if is_true else SyntaxKind.FalseKeyword
         )
         return LiteralExpressionSyntax(keyword_token, is_true)
+
+    def _parse_name_expression(self) -> ExpressionSyntax:
+        identifier_token = self._match_token(SyntaxKind.IdentifierToken)
+        return NameExpressionSyntax(identifier_token)
 
 
 class SyntaxTree:

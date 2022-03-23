@@ -71,6 +71,9 @@ class Lexer:
                 case "=" if self._peek(1) == "=":
                     kind = SyntaxKind.EqualsEqualsToken
                     self._position += 2
+                case "=":
+                    kind = SyntaxKind.EqualsToken
+                    self._position += 1
                 case "!":
                     kind = SyntaxKind.BangToken
                     self._position += 1
