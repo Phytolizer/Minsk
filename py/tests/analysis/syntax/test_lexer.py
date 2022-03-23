@@ -3,6 +3,7 @@ from typing import Iterable
 
 import pytest
 
+from minsk.analysis.syntax import facts
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.parser import SyntaxTree
 
@@ -14,18 +15,10 @@ class SimpleToken:
 
 
 def get_tokens() -> Iterable[SimpleToken]:
-    yield SimpleToken(SyntaxKind.PlusToken, "+")
-    yield SimpleToken(SyntaxKind.MinusToken, "-")
-    yield SimpleToken(SyntaxKind.StarToken, "*")
-    yield SimpleToken(SyntaxKind.SlashToken, "/")
-    yield SimpleToken(SyntaxKind.BangToken, "!")
-    yield SimpleToken(SyntaxKind.AmpersandAmpersandToken, "&&")
-    yield SimpleToken(SyntaxKind.PipePipeToken, "||")
-    yield SimpleToken(SyntaxKind.EqualsEqualsToken, "==")
-    yield SimpleToken(SyntaxKind.BangEqualsToken, "!=")
-    yield SimpleToken(SyntaxKind.EqualsToken, "=")
-    yield SimpleToken(SyntaxKind.TrueKeyword, "true")
-    yield SimpleToken(SyntaxKind.FalseKeyword, "false")
+    for static_kind in (
+        kind for kind in SyntaxKind if facts.get_text(kind) is not None
+    ):
+        yield SimpleToken(static_kind, facts.get_text(static_kind))
     yield SimpleToken(SyntaxKind.NumberToken, "1")
     yield SimpleToken(SyntaxKind.NumberToken, "123")
     yield SimpleToken(SyntaxKind.IdentifierToken, "a")
