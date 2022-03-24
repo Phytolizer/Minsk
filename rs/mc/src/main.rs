@@ -26,11 +26,13 @@ fn main() -> std::io::Result<()> {
     let mut variables = HashMap::<VariableSymbol, Object>::new();
     let mut text_builder = String::new();
     loop {
+        stdout().execute(SetForegroundColor(Color::Green))?;
         if text_builder.is_empty() {
-            print!("> ");
+            print!("» ");
         } else {
-            print!("| ");
+            print!("· ");
         }
+        stdout().execute(ResetColor)?;
         stdout().flush()?;
         input_line.clear();
         if reader.read_line(&mut input_line)? == 0 {
