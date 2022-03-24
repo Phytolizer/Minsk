@@ -77,7 +77,9 @@ fn main() -> std::io::Result<()> {
         let compilation = Compilation::new(&mut syntax_tree);
         match compilation.evaluate(&mut variables) {
             Ok(result) => {
+                stdout().execute(SetForegroundColor(Color::Magenta))?;
                 println!("{}", result);
+                stdout().execute(ResetColor)?;
             }
             Err(diagnostics) => {
                 for diagnostic in diagnostics {
