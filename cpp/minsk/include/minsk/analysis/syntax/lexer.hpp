@@ -1,17 +1,20 @@
 #ifndef MINSK_LEXER_HPP
 #define MINSK_LEXER_HPP
 
+#include "minsk/analysis/diagnostic_bag.hpp"
 #include "token.hpp"
 #include <concepts>
+#include <ranges>
 
 namespace minsk::analysis::syntax {
 
 class lexer {
   std::string_view m_text;
+  diagnostic_bag m_diagnostics;
 
 public:
   class iterator {
-    const lexer *m_lexer;
+    lexer *m_lexer;
     int m_position;
     bool m_at_end;
     syntax_token m_just_scanned;
@@ -22,7 +25,7 @@ public:
     [[nodiscard]] std::string current_text(int start) const;
 
   public:
-    explicit iterator(const lexer *lex);
+    explicit iterator(lexer *lex);
     iterator();
 
     [[nodiscard]] const syntax_token &operator*() const;
@@ -33,8 +36,9 @@ public:
 
   explicit lexer(std::string_view text);
 
-  iterator begin() const;
-  iterator end() const;
+  iterator begin();
+  iterator end();
+  const diagnostic_bag &diagnostics() const;
 };
 
 } // namespace minsk::analysis::syntax

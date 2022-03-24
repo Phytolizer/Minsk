@@ -1,9 +1,10 @@
 #include "minsk/analysis/syntax/lexer.hpp"
+#include "fmt/format.h"
 #include <cctype>
 #include <optional>
 #include <sstream>
 minsk::analysis::syntax::lexer::iterator::iterator(
-    const minsk::analysis::syntax::lexer *lex)
+    minsk::analysis::syntax::lexer *lex)
     : m_lexer(lex), m_position(0), m_at_end(false), m_just_scanned(scan()) {}
 minsk::analysis::syntax::lexer::iterator::iterator()
     : m_lexer(nullptr), m_position(0), m_at_end(true),
@@ -42,7 +43,8 @@ minsk::analysis::syntax::lexer::iterator::scan() {
     std::istringstream ss{*text};
     int int_value;
     if (!(ss >> int_value)) {
-      // TODO
+      m_lexer->m_diagnostics.emplace_back(
+          fmt::format("Number {} doesn't fit in an int.", *text));
     }
 
     value = std::make_unique<runtime::integer>(int_value);
@@ -83,6 +85,8 @@ minsk::analysis::syntax::lexer::iterator::scan() {
   }
 
   if (kind == syntax_kind::bad_token) {
+    m_lexer->m_diagnostics.emplace_back(
+        fmt::format("Bad character in input: '{}'", current()));
     m_position += 1;
   }
 
@@ -132,11 +136,14 @@ minsk::analysis::syntax::lexer::iterator::current_text(int start) const {
   };
 }
 minsk::analysis::syntax::lexer::iterator
-minsk::analysis::syntax::lexer::begin() const {
+minsk::analysis::syntax::lexer::begin() {
   return iterator{this};
 }
-minsk::analysis::syntax::lexer::iterator
-minsk::analysis::syntax::lexer::end() const {
+minsk::analysis::syntax::lexer::iterator minsk::analysis::syntax::lexer::end() {
   return iterator{};
 }
 minsk::analysis::syntax::lexer::lexer(std::string_view text) : m_text(text) {}
+const minsk::analysis::diagnostic_bag &
+minsk::analysis::syntax::lexer::diagnostics() const {
+  return m_diagnostics;
+}

@@ -1,4 +1,5 @@
 #include "minsk/analysis/syntax/parser.hpp"
+#include "fmt/format.h"
 #include "minsk/analysis/syntax/lexer.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/binary.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/literal.hpp"
@@ -11,6 +12,8 @@ minsk::analysis::syntax::parser::parser(std::string_view text) : m_position(0) {
                  return token.kind() != syntax_kind::bad_token &&
                         token.kind() != syntax_kind::whitespace_token;
                });
+  std::copy(lex.diagnostics().begin(), lex.diagnostics().end(),
+            std::back_inserter(m_diagnostics));
 }
 const minsk::analysis::syntax::syntax_token &
 minsk::analysis::syntax::parser::peek(int offset) const {
@@ -43,6 +46,9 @@ minsk::analysis::syntax::parser::match_token(
     return next_token();
   }
 
+  m_diagnostics.emplace_back(fmt::format(
+      "Expected next token to be <{}>, got <{}> instead",
+      magic_enum::enum_name(kind), magic_enum::enum_name(current().kind())));
   return syntax_token{kind, current().position(), "", nullptr};
 }
 std::unique_ptr<minsk::analysis::syntax::expression_syntax>
@@ -64,4 +70,8 @@ std::unique_ptr<minsk::analysis::syntax::expression_syntax>
 minsk::analysis::syntax::parser::parse_primary_expression() {
   syntax_token number_token = match_token(syntax_kind::number_token);
   return std::make_unique<literal_expression_syntax>(std::move(number_token));
+}
+const minsk::analysis::diagnostic_bag &
+minsk::analysis::syntax::parser::diagnostics() const {
+  return m_diagnostics;
 }

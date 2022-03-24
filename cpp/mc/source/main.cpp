@@ -1,4 +1,5 @@
 #include "minsk/analysis/syntax/parser.hpp"
+#include "rang.hpp"
 #include <iostream>
 #include <string>
 
@@ -14,6 +15,13 @@ int main() {
     std::unique_ptr<minsk::analysis::syntax::expression_syntax> expression =
         parser.parse_expression();
     expression->pretty_print();
+    if (parser.diagnostics().size() > 0) {
+      std::cout << rang::fg::red << rang::style::dim;
+      for (const auto &diagnostic : parser.diagnostics()) {
+        std::cout << diagnostic << '\n';
+      }
+      std::cout << rang::fg::reset << rang::style::reset;
+    }
   }
   return 0;
 }
