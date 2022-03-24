@@ -7,7 +7,7 @@
 minsk::analysis::syntax::parser::parser(std::string_view text) : m_position(0) {
   lexer lex{text};
   std::copy_if(lex.begin(), lex.end(), std::back_inserter(m_tokens),
-               [](const auto &token) {
+               [](const syntax_token &token) {
                  return token.kind() != syntax_kind::bad_token &&
                         token.kind() != syntax_kind::whitespace_token;
                });
