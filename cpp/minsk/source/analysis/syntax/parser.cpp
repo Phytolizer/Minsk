@@ -71,10 +71,6 @@ minsk::analysis::syntax::parser::parse_primary_expression() {
   syntax_token number_token = match_token(syntax_kind::number_token);
   return std::make_unique<literal_expression_syntax>(std::move(number_token));
 }
-const minsk::analysis::diagnostic_bag &
-minsk::analysis::syntax::parser::diagnostics() const {
-  return m_diagnostics;
-}
 minsk::analysis::syntax::syntax_tree minsk::analysis::syntax::parser::parse() {
   return syntax_tree{
       parse_expression(),

@@ -26,7 +26,6 @@ class parser {
 public:
   explicit parser(std::string_view text);
   syntax_tree parse();
-  const diagnostic_bag &diagnostics() const;
 };
 
 } // namespace minsk::analysis::syntax

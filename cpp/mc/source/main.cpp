@@ -16,7 +16,7 @@ int main() {
     syntax_tree.root()->pretty_print();
     if (syntax_tree.diagnostics().size() > 0) {
       std::cout << rang::fg::red << rang::style::dim;
-      for (const auto &diagnostic : parser.diagnostics()) {
+      for (const auto &diagnostic : syntax_tree.diagnostics()) {
         std::cout << diagnostic << '\n';
       }
       std::cout << rang::fg::reset << rang::style::reset;
