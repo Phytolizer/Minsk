@@ -9,7 +9,7 @@ Episode 6.
 Episode 6.
 
 ## py (Python)
-Episode 5.
+Episode 6.
 
 ## rs (Rust)
 Episode 5.
