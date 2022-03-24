@@ -13,8 +13,7 @@ int main() {
       break;
     }
 
-    minsk::analysis::syntax::parser parser{line};
-    minsk::analysis::syntax::syntax_tree syntax_tree = parser.parse();
+    auto syntax_tree = minsk::analysis::syntax::syntax_tree::parse(line);
     syntax_tree.root()->pretty_print();
     if (syntax_tree.diagnostics().size() > 0) {
       std::cout << rang::fg::red << rang::style::dim;

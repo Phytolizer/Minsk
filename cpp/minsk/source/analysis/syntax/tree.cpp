@@ -1,4 +1,5 @@
 #include "minsk/analysis/syntax/tree.hpp"
+#include "minsk/analysis/syntax/parser.hpp"
 #include <utility>
 
 minsk::analysis::syntax::syntax_tree::syntax_tree(
@@ -19,4 +20,9 @@ minsk::analysis::syntax::syntax_tree::end_of_file_token() const {
 const minsk::analysis::diagnostic_bag &
 minsk::analysis::syntax::syntax_tree::diagnostics() const {
   return m_diagnostics;
+}
+minsk::analysis::syntax::syntax_tree
+minsk::analysis::syntax::syntax_tree::parse(std::string_view text) {
+  minsk::analysis::syntax::parser parser{text};
+  return parser.parse();
 }

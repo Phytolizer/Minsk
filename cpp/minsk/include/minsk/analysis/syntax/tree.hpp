@@ -5,6 +5,7 @@
 #include "minsk/analysis/syntax/nodes/expression.hpp"
 #include "minsk/analysis/syntax/token.hpp"
 #include <memory>
+#include <string_view>
 
 namespace minsk::analysis::syntax {
 
@@ -20,6 +21,8 @@ public:
   const expression_syntax *root() const;
   const syntax_token &end_of_file_token() const;
   const diagnostic_bag &diagnostics() const;
+
+  static syntax_tree parse(std::string_view text);
 };
 
 } // namespace minsk::analysis::syntax
