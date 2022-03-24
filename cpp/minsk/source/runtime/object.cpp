@@ -18,16 +18,18 @@ minsk::runtime::object_kind minsk::runtime::boolean::kind() const {
   return object_kind::boolean;
 }
 std::unique_ptr<minsk::runtime::object>
-minsk::runtime::copy_object_ptr(minsk::runtime::object *ptr) {
+minsk::runtime::copy_object_ptr(const minsk::runtime::object *ptr) {
   if (ptr == nullptr) {
     return nullptr;
   }
 
   switch (ptr->kind()) {
   case object_kind::integer:
-    return std::make_unique<integer>(dynamic_cast<integer *>(ptr)->value());
+    return std::make_unique<integer>(
+        dynamic_cast<const integer *>(ptr)->value());
   case object_kind::boolean:
-    return std::make_unique<boolean>(dynamic_cast<boolean *>(ptr)->value());
+    return std::make_unique<boolean>(
+        dynamic_cast<const boolean *>(ptr)->value());
   }
 
   throw std::runtime_error{"unreachable"};

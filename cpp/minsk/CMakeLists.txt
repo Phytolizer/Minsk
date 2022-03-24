@@ -1,5 +1,11 @@
 add_library(
   minsk
+  source/analysis/binding/binder.cpp
+  source/analysis/binding/nodes/expressions/binary.cpp
+  source/analysis/binding/nodes/expressions/binary/operator.cpp
+  source/analysis/binding/nodes/expressions/literal.cpp
+  source/analysis/binding/nodes/expressions/unary.cpp
+  source/analysis/binding/nodes/expressions/unary/operator.cpp
   source/analysis/evaluator.cpp
   source/analysis/syntax/facts.cpp
   source/analysis/syntax/lexer.cpp

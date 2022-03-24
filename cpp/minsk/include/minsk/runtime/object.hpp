@@ -40,7 +40,7 @@ public:
   bool value() const;
 };
 
-std::unique_ptr<object> copy_object_ptr(object *ptr);
+std::unique_ptr<object> copy_object_ptr(const object *ptr);
 
 } // namespace minsk::runtime
 
