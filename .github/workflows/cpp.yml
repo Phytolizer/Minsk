@@ -1,0 +1,40 @@
+name: C++
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
+    # You can convert this to a matrix build if you need cross-platform coverage.
+    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: cpp
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: get-cmake
+      uses: lukka/get-cmake@v3.22.2
+
+    - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run: cmake --preset dev-make
+
+    - name: Build
+      # Build your program with the given configuration
+      run: cmake --build --preset dev-make
+
+    - name: Test
+      working-directory: cpp/build/dev-make
+      # Execute tests defined by the CMake configuration.  
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      run: ctest -C ${{env.BUILD_TYPE}}
+      
