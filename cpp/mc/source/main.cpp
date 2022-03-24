@@ -1,19 +1,36 @@
 #include "minsk/analysis/evaluator.hpp"
 #include "minsk/analysis/syntax/tree.hpp"
 #include "rang.hpp"
+#include "util/terminal.hpp"
 #include <iostream>
 #include <string>
 
 int main() {
   std::string line;
+  bool show_tree = false;
   while (true) {
     std::cout << "> " << std::flush;
     if (!std::getline(std::cin, line)) {
       break;
     }
 
+    if (line == "#showTree") {
+      show_tree = !show_tree;
+      if (show_tree) {
+        std::cout << "Showing parse trees.\n";
+      } else {
+        std::cout << "Not showing parse trees.\n";
+      };
+      continue;
+    } else if (line == "#cls") {
+      util::terminal::clear();
+      continue;
+    }
+
     auto syntax_tree = minsk::analysis::syntax::syntax_tree::parse(line);
-    syntax_tree.root()->pretty_print();
+    if (show_tree) {
+      syntax_tree.root()->pretty_print();
+    }
     if (syntax_tree.diagnostics().size() > 0) {
       std::cout << rang::fg::red << rang::style::dim;
       for (const auto &diagnostic : syntax_tree.diagnostics()) {
