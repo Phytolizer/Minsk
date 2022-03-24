@@ -36,3 +36,7 @@ minsk::analysis::syntax::syntax_token::operator=(
   }
   return *this;
 }
+std::vector<const minsk::analysis::syntax::node *>
+minsk::analysis::syntax::syntax_token::children() const {
+  return {};
+}

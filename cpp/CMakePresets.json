@@ -15,6 +15,14 @@
       "displayName": "Development (Make)",
       "binaryDir": "build/dev-make",
       "generator": "Unix Makefiles"
+    },
+    {
+      "name": "dist",
+      "binaryDir": "build/dist",
+      "generator": "Unix Makefiles",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
     }
   ],
   "buildPresets": [

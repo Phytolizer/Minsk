@@ -18,8 +18,13 @@ enum class syntax_kind {
   slash_token,
   open_parenthesis_token,
   close_parenthesis_token,
+
+  binary_expression,
+  literal_expression,
+  parenthesized_expression,
+  unary_expression,
 };
 
-}
+} // namespace minsk::analysis::syntax
 
 #endif // MINSK_KIND_HPP
