@@ -25,6 +25,8 @@ pub enum SyntaxKind {
     TrueKeyword,
     FalseKeyword,
 
+    CompilationUnit,
+
     AssignmentExpression,
     BinaryExpression,
     LiteralExpression,

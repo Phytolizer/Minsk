@@ -43,7 +43,7 @@ impl<'v> Binder<'v> {
         let mut dummy_diagnostics = Vec::new();
         std::mem::swap(&mut dummy_diagnostics, &mut syntax.diagnostics);
         (
-            self.bind_expression(&syntax.root),
+            self.bind_expression(&syntax.root.expression),
             dummy_diagnostics
                 .into_iter()
                 .chain(self.diagnostics.into_iter())

@@ -1,3 +1,4 @@
+use crate::analysis::diagnostic::Diagnostic;
 use crate::analysis::diagnostic_bag::DiagnosticBag;
 use crate::analysis::text::source_text::SourceText;
 use crate::object::Object;
@@ -12,9 +13,9 @@ use super::node::expression::name::NameExpressionSyntax;
 use super::node::expression::parenthesized::ParenthesizedExpressionSyntax;
 use super::node::expression::unary::UnaryExpressionSyntax;
 use super::node::expression::ExpressionSyntax;
+use super::node::unit::CompilationUnitSyntax;
 use super::node::SyntaxNode;
 use super::token::SyntaxToken;
-use super::tree::SyntaxTree;
 
 pub(crate) struct Parser {
     tokens: Vec<SyntaxToken>,
@@ -91,12 +92,10 @@ impl Parser {
         }
     }
 
-    pub(crate) fn parse(mut self) -> SyntaxTree {
-        SyntaxTree::new(
+    pub(crate) fn parse_compilation_unit(&mut self) -> CompilationUnitSyntax {
+        CompilationUnitSyntax::new(
             self.parse_expression(),
             self.match_token(SyntaxKind::EndOfFileToken),
-            self.diagnostics.into_iter().collect(),
-            self.text,
         )
     }
 
@@ -198,6 +197,10 @@ impl Parser {
             close_parenthesis_token,
         })
     }
+
+    pub(crate) fn unpack(self) -> (SourceText, Vec<Diagnostic>) {
+        (self.text, self.diagnostics.into_iter().collect())
+    }
 }
 
 #[cfg(test)]
@@ -205,7 +208,12 @@ mod tests {
     use crate::analysis::syntax::asserting_enumerator::AssertingEnumerator;
     use crate::analysis::syntax::facts;
     use crate::analysis::syntax::kind::SyntaxKind;
+    use crate::analysis::syntax::node::expression::ExpressionSyntax;
     use crate::analysis::syntax::tree::SyntaxTree;
+
+    fn parse_expression(text: &str) -> ExpressionSyntax {
+        SyntaxTree::parse(text).root.expression
+    }
 
     #[test]
     fn binary_expression_honors_precedence() {
@@ -216,10 +224,10 @@ mod tests {
                 let op1_text = facts::get_text(op1).unwrap();
                 let op2_text = facts::get_text(op2).unwrap();
                 let text = format!("a {} b {} c", op1_text, op2_text);
-                let expression = SyntaxTree::parse(&text);
+                let expression = parse_expression(&text);
 
                 if op1_precedence >= op2_precedence {
-                    let mut e = AssertingEnumerator::new(&expression.root);
+                    let mut e = AssertingEnumerator::new(&expression);
 
                     e.assert_node(SyntaxKind::BinaryExpression);
                     e.assert_node(SyntaxKind::BinaryExpression);
@@ -233,7 +241,7 @@ mod tests {
                     e.assert_token(SyntaxKind::IdentifierToken, "c");
                     e.assert_at_end();
                 } else {
-                    let mut e = AssertingEnumerator::new(&expression.root);
+                    let mut e = AssertingEnumerator::new(&expression);
 
                     e.assert_node(SyntaxKind::BinaryExpression);
                     e.assert_node(SyntaxKind::NameExpression);
@@ -260,10 +268,10 @@ mod tests {
                 let unary_text = facts::get_text(unary).unwrap();
                 let binary_text = facts::get_text(binary).unwrap();
                 let text = format!("{} a {} b", unary_text, binary_text);
-                let expression = SyntaxTree::parse(&text);
+                let expression = parse_expression(&text);
 
                 if unary_precedence >= binary_precedence {
-                    let mut e = AssertingEnumerator::new(&expression.root);
+                    let mut e = AssertingEnumerator::new(&expression);
 
                     e.assert_node(SyntaxKind::BinaryExpression);
                     e.assert_node(SyntaxKind::UnaryExpression);
@@ -275,7 +283,7 @@ mod tests {
                     e.assert_token(SyntaxKind::IdentifierToken, "b");
                     e.assert_at_end();
                 } else {
-                    let mut e = AssertingEnumerator::new(&expression.root);
+                    let mut e = AssertingEnumerator::new(&expression);
 
                     e.assert_node(SyntaxKind::UnaryExpression);
                     e.assert_token(unary, unary_text);
