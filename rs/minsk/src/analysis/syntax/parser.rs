@@ -1,4 +1,5 @@
 use crate::analysis::diagnostic_bag::DiagnosticBag;
+use crate::analysis::text::source_text::SourceText;
 use crate::object::Object;
 
 use super::facts;
@@ -19,16 +20,18 @@ pub(crate) struct Parser {
     tokens: Vec<SyntaxToken>,
     diagnostics: DiagnosticBag,
     position: usize,
+    text: SourceText,
 }
 
 impl Parser {
-    pub(crate) fn new(text: &str) -> Self {
-        let lex = Lexer::new(text);
+    pub(crate) fn new(text: SourceText) -> Self {
+        let lex = Lexer::new(&text);
         let (tokens, diagnostics) = lex.into_tokens_and_diagnostics();
         Self {
             tokens,
             diagnostics,
             position: 0,
+            text,
         }
     }
 
@@ -93,6 +96,7 @@ impl Parser {
             self.parse_expression(),
             self.match_token(SyntaxKind::EndOfFileToken),
             self.diagnostics.into_iter().collect(),
+            self.text,
         )
     }
 

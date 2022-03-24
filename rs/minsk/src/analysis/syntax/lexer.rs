@@ -1,4 +1,5 @@
 use crate::analysis::diagnostic_bag::DiagnosticBag;
+use crate::analysis::text::source_text::SourceText;
 use crate::analysis::text::span::TextSpan;
 use crate::object::Object;
 
@@ -7,15 +8,15 @@ use super::kind::SyntaxKind;
 use super::node::SyntaxNode;
 use super::token::SyntaxToken;
 
-pub(crate) struct Lexer {
-    text: Vec<char>,
+pub(crate) struct Lexer<'src> {
+    text: &'src SourceText,
     diagnostics: DiagnosticBag,
 }
 
-impl Lexer {
-    pub(crate) fn new(text: &str) -> Self {
+impl<'src> Lexer<'src> {
+    pub(crate) fn new(text: &'src SourceText) -> Self {
         Self {
-            text: text.chars().collect(),
+            text: text,
             diagnostics: DiagnosticBag::new(),
         }
     }
@@ -34,13 +35,13 @@ impl Lexer {
     }
 }
 
-struct LexerIterator<'a> {
-    lex: &'a mut Lexer,
+struct LexerIterator<'a, 'src: 'a> {
+    lex: &'a mut Lexer<'src>,
     position: usize,
 }
 
-impl<'a> LexerIterator<'a> {
-    fn new(lex: &'a mut Lexer) -> Self {
+impl<'a, 'src: 'a> LexerIterator<'a, 'src> {
+    fn new(lex: &'a mut Lexer<'src>) -> Self {
         Self { lex, position: 0 }
     }
 
@@ -61,7 +62,7 @@ impl<'a> LexerIterator<'a> {
     }
 }
 
-impl<'a> Iterator for LexerIterator<'a> {
+impl<'a, 'src> Iterator for LexerIterator<'a, 'src> {
     type Item = SyntaxToken;
 
     fn next(&mut self) -> Option<Self::Item> {

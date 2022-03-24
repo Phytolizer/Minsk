@@ -38,19 +38,20 @@ impl<'v> Binder<'v> {
 
     pub(crate) fn into_expression_and_diagnostics(
         mut self,
-        syntax: SyntaxTree,
+        syntax: &SyntaxTree,
     ) -> (BoundExpression, Vec<Diagnostic>) {
         (
-            self.bind_expression(syntax.root),
+            self.bind_expression(&syntax.root),
             syntax
                 .diagnostics
-                .into_iter()
+                .iter()
+                .cloned()
                 .chain(self.diagnostics.into_iter())
                 .collect(),
         )
     }
 
-    fn bind_expression(&mut self, syntax: ExpressionSyntax) -> BoundExpression {
+    fn bind_expression(&mut self, syntax: &ExpressionSyntax) -> BoundExpression {
         match syntax {
             ExpressionSyntax::Assignment(a) => self.bind_assignment_expression(a),
             ExpressionSyntax::Binary(b) => self.bind_binary_expression(b),
@@ -63,17 +64,17 @@ impl<'v> Binder<'v> {
 
     fn bind_assignment_expression(
         &mut self,
-        syntax: AssignmentExpressionSyntax,
+        syntax: &AssignmentExpressionSyntax,
     ) -> BoundExpression {
-        let name = syntax.identifier_token.text;
-        let bound_expression = self.bind_expression(*syntax.expression);
+        let name = &syntax.identifier_token.text;
+        let bound_expression = self.bind_expression(&syntax.expression);
 
-        let existing_variable = self.variables.keys().find(|k| k.name == name);
+        let existing_variable = self.variables.keys().find(|k| &k.name == name);
         if let Some(existing_variable) = existing_variable.cloned() {
             self.variables.remove(&existing_variable);
         }
         let variable = VariableSymbol {
-            name,
+            name: name.to_string(),
             ty: bound_expression.ty(),
         };
         // will be overwritten pretty quickly, so this is a dummy
@@ -86,9 +87,9 @@ impl<'v> Binder<'v> {
         })
     }
 
-    fn bind_binary_expression(&mut self, syntax: BinaryExpressionSyntax) -> BoundExpression {
-        let bound_left = self.bind_expression(*syntax.left);
-        let bound_right = self.bind_expression(*syntax.right);
+    fn bind_binary_expression(&mut self, syntax: &BinaryExpressionSyntax) -> BoundExpression {
+        let bound_left = self.bind_expression(&syntax.left);
+        let bound_right = self.bind_expression(&syntax.right);
         match BoundBinaryOperator::bind(
             syntax.operator_token.kind(),
             bound_left.ty(),
@@ -111,16 +112,16 @@ impl<'v> Binder<'v> {
         }
     }
 
-    fn bind_literal_expression(&mut self, syntax: LiteralExpressionSyntax) -> BoundExpression {
+    fn bind_literal_expression(&mut self, syntax: &LiteralExpressionSyntax) -> BoundExpression {
         BoundExpression::Literal(BoundLiteralExpression {
-            value: syntax.value.unwrap_or(Object::Number(0)),
+            value: syntax.value.clone().unwrap_or(Object::Number(0)),
         })
     }
 
-    fn bind_name_expression(&mut self, syntax: NameExpressionSyntax) -> BoundExpression {
+    fn bind_name_expression(&mut self, syntax: &NameExpressionSyntax) -> BoundExpression {
         let identifier_span = syntax.identifier_token.span();
-        let name = syntax.identifier_token.text;
-        match self.variables.keys().find(|k| k.name == name).cloned() {
+        let name = &syntax.identifier_token.text;
+        match self.variables.keys().find(|k| &k.name == name).cloned() {
             Some(variable) => BoundExpression::Variable(BoundVariableExpression { variable }),
             None => {
                 self.diagnostics
@@ -134,13 +135,13 @@ impl<'v> Binder<'v> {
 
     fn bind_parenthesized_expression(
         &mut self,
-        syntax: ParenthesizedExpressionSyntax,
+        syntax: &ParenthesizedExpressionSyntax,
     ) -> BoundExpression {
-        self.bind_expression(*syntax.expression)
+        self.bind_expression(&syntax.expression)
     }
 
-    fn bind_unary_expression(&mut self, syntax: UnaryExpressionSyntax) -> BoundExpression {
-        let bound_operand = self.bind_expression(*syntax.operand);
+    fn bind_unary_expression(&mut self, syntax: &UnaryExpressionSyntax) -> BoundExpression {
+        let bound_operand = self.bind_expression(&syntax.operand);
         match BoundUnaryOperator::bind(syntax.operator_token.kind(), bound_operand.ty()) {
             Some(operator) => BoundExpression::Unary(BoundUnaryExpression {
                 operator,

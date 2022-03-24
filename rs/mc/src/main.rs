@@ -58,7 +58,7 @@ fn main() -> std::io::Result<()> {
             syntax_tree.root.pretty_print()?;
             stdout().execute(ResetColor)?;
         }
-        let compilation = Compilation::new(syntax_tree);
+        let compilation = Compilation::new(&syntax_tree);
         match compilation.evaluate(&mut variables) {
             Ok(result) => {
                 println!("{}", result);
@@ -66,6 +66,14 @@ fn main() -> std::io::Result<()> {
             Err(diagnostics) => {
                 for diagnostic in diagnostics {
                     stdout().execute(SetForegroundColor(Color::DarkRed))?;
+                    let line_index = syntax_tree
+                        .source_text
+                        .line_index(diagnostic.span().start());
+                    let line_number = line_index + 1;
+                    let character = diagnostic.span().start()
+                        - syntax_tree.source_text.lines[line_index].start
+                        + 1;
+                    print!("({}, {}): ", line_number, character);
                     println!("{}", diagnostic);
                     println!();
                     let error_span = diagnostic.span();

@@ -8,12 +8,12 @@ use super::evaluator::Evaluator;
 use super::syntax::tree::SyntaxTree;
 use super::variable_symbol::VariableSymbol;
 
-pub struct Compilation {
-    syntax_tree: SyntaxTree,
+pub struct Compilation<'t> {
+    syntax_tree: &'t SyntaxTree,
 }
 
-impl Compilation {
-    pub fn new(syntax_tree: SyntaxTree) -> Self {
+impl<'t> Compilation<'t> {
+    pub fn new(syntax_tree: &'t SyntaxTree) -> Self {
         Self { syntax_tree }
     }
 
