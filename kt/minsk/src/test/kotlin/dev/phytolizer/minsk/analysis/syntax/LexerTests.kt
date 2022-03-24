@@ -105,7 +105,7 @@ private fun requiresSeparator(t1: SimpleToken, t2: SimpleToken): Boolean {
 }
 
 private fun isEqualsSensitive(t1: SimpleToken): Boolean {
-    return (t1.kind == SyntaxKind.BangToken || t1.kind == SyntaxKind.EqualsToken || t1.kind == SyntaxKind.LessToken || t1.kind == SyntaxKind.GreaterToken)
+    return t1.kind == SyntaxKind.BangToken || t1.kind == SyntaxKind.EqualsToken || t1.kind == SyntaxKind.LessToken || t1.kind == SyntaxKind.GreaterToken
 }
 
 data class SimpleToken(val kind: SyntaxKind, val text: String)
