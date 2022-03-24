@@ -2,6 +2,9 @@
 
 Progress for each language implementation is detailed below.
 
+## cpp (C++)
+Episode 1.
+
 ## cs (C#)
 Episode 6.
 
