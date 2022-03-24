@@ -1,10 +1,16 @@
 #include "minsk/analysis/syntax/parser.hpp"
 #include "minsk/analysis/syntax/lexer.hpp"
+#include "minsk/analysis/syntax/nodes/expressions/binary.hpp"
+#include "minsk/analysis/syntax/nodes/expressions/literal.hpp"
 #include <algorithm>
 
-minsk::analysis::syntax::parser::parser(std::string_view text) {
+minsk::analysis::syntax::parser::parser(std::string_view text) : m_position(0) {
   lexer lex{text};
-  std::copy(lex.begin(), lex.end(), std::back_inserter(m_tokens));
+  std::copy_if(lex.begin(), lex.end(), std::back_inserter(m_tokens),
+               [](const auto &token) {
+                 return token.kind() != syntax_kind::bad_token &&
+                        token.kind() != syntax_kind::whitespace_token;
+               });
 }
 const minsk::analysis::syntax::syntax_token &
 minsk::analysis::syntax::parser::peek(int offset) const {
@@ -28,5 +34,34 @@ minsk::analysis::syntax::parser::next_token() {
 }
 std::unique_ptr<minsk::analysis::syntax::expression_syntax>
 minsk::analysis::syntax::parser::parse_expression() {
-  return nullptr;
+  return parse_binary_expression(0);
+}
+minsk::analysis::syntax::syntax_token
+minsk::analysis::syntax::parser::match_token(
+    minsk::analysis::syntax::syntax_kind kind) {
+  if (current().kind() == kind) {
+    return next_token();
+  }
+
+  return syntax_token{kind, current().position(), "", nullptr};
+}
+std::unique_ptr<minsk::analysis::syntax::expression_syntax>
+minsk::analysis::syntax::parser::parse_binary_expression(
+    int parent_precedence) {
+  std::unique_ptr<expression_syntax> left = parse_primary_expression();
+
+  while (current().kind() == syntax_kind::plus_token ||
+         current().kind() == syntax_kind::minus_token) {
+    syntax_token operator_token = next_token();
+    std::unique_ptr<expression_syntax> right = parse_primary_expression();
+    left = std::make_unique<binary_expression_syntax>(
+        std::move(left), std::move(operator_token), std::move(right));
+  }
+
+  return left;
+}
+std::unique_ptr<minsk::analysis::syntax::expression_syntax>
+minsk::analysis::syntax::parser::parse_primary_expression() {
+  syntax_token number_token = match_token(syntax_kind::number_token);
+  return std::make_unique<literal_expression_syntax>(std::move(number_token));
 }

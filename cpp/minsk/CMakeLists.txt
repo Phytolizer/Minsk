@@ -1,6 +1,7 @@
 add_library(
   minsk
   source/analysis/syntax/lexer.cpp
+  source/analysis/syntax/node.cpp
   source/analysis/syntax/nodes/expressions/binary.cpp
   source/analysis/syntax/nodes/expressions/literal.cpp
   source/analysis/syntax/nodes/expressions/parenthesized.cpp

@@ -1,5 +1,5 @@
+#include "minsk/analysis/syntax/parser.hpp"
 #include <iostream>
-#include <minsk/analysis/syntax/lexer.hpp>
 #include <string>
 
 int main() {
@@ -10,15 +10,10 @@ int main() {
       break;
     }
 
-    minsk::analysis::syntax::lexer lex{line};
-    for (auto tok : lex) {
-      std::cout << magic_enum::enum_name(tok.kind());
-      if (tok.value() != nullptr) {
-        std::cout << ' ';
-        tok.value()->print(std::cout);
-      }
-      std::cout << '\n';
-    }
+    minsk::analysis::syntax::parser parser{line};
+    std::unique_ptr<minsk::analysis::syntax::expression_syntax> expression =
+        parser.parse_expression();
+    expression->pretty_print();
   }
   return 0;
 }
