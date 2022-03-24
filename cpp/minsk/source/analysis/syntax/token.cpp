@@ -14,7 +14,7 @@ int minsk::analysis::syntax::syntax_token::position() const {
 std::string_view minsk::analysis::syntax::syntax_token::text() const {
   return m_text;
 }
-minsk::runtime::object *minsk::analysis::syntax::syntax_token::value() const {
+const minsk::runtime::object *minsk::analysis::syntax::syntax_token::value() const {
   return m_value.get();
 }
 minsk::analysis::syntax::syntax_token::syntax_token(

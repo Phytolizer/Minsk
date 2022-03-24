@@ -25,7 +25,7 @@ public:
   [[nodiscard]] std::vector<const node *> children() const override;
   [[nodiscard]] int position() const;
   [[nodiscard]] std::string_view text() const;
-  [[nodiscard]] runtime::object *value() const;
+  [[nodiscard]] const runtime::object *value() const;
 };
 
 } // namespace minsk::analysis::syntax

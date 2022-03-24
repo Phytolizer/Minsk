@@ -1,3 +1,4 @@
+#include "minsk/analysis/evaluator.hpp"
 #include "minsk/analysis/syntax/parser.hpp"
 #include "rang.hpp"
 #include <iostream>
@@ -20,6 +21,9 @@ int main() {
         std::cout << diagnostic << '\n';
       }
       std::cout << rang::fg::reset << rang::style::reset;
+    } else {
+      minsk::analysis::evaluator evaluator{syntax_tree.root()};
+      std::cout << evaluator.evaluate() << '\n';
     }
   }
   return 0;
