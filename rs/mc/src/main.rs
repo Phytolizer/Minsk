@@ -21,39 +21,52 @@ use minsk::object::Object;
 
 fn main() -> std::io::Result<()> {
     let mut reader = BufReader::new(stdin());
-    let mut line = String::new();
+    let mut input_line = String::new();
     let mut show_tree = false;
     let mut variables = HashMap::<VariableSymbol, Object>::new();
+    let mut text_builder = String::new();
     loop {
-        print!("> ");
+        if text_builder.is_empty() {
+            print!("> ");
+        } else {
+            print!("| ");
+        }
         stdout().flush()?;
-        line.clear();
-        if reader.read_line(&mut line)? == 0 {
+        input_line.clear();
+        if reader.read_line(&mut input_line)? == 0 {
             break;
         }
 
-        match line.trim() {
-            "#showTree" => {
-                show_tree = !show_tree;
-                println!(
-                    "{}",
-                    if show_tree {
-                        "Showing parse trees."
-                    } else {
-                        "Not showing parse trees."
-                    }
-                );
-                continue;
+        if text_builder.len() == 0 {
+            match input_line.trim() {
+                "#showTree" => {
+                    show_tree = !show_tree;
+                    println!(
+                        "{}",
+                        if show_tree {
+                            "Showing parse trees."
+                        } else {
+                            "Not showing parse trees."
+                        }
+                    );
+                    continue;
+                }
+                "#cls" => {
+                    stdout().execute(Clear(ClearType::All))?;
+                    continue;
+                }
+                _ => {}
             }
-            "#cls" => {
-                stdout().execute(Clear(ClearType::All))?;
-                continue;
-            }
-            _ => {}
         }
 
+        let is_blank = input_line.chars().all(|c| c.is_whitespace());
+        text_builder.push_str(&input_line);
+
         // mutable so diagnostics may be swapped out
-        let mut syntax_tree = SyntaxTree::parse(&line);
+        let mut syntax_tree = SyntaxTree::parse(&text_builder);
+        if !is_blank && !syntax_tree.diagnostics.is_empty() {
+            continue;
+        }
         if show_tree && syntax_tree.diagnostics.is_empty() {
             stdout().execute(SetForegroundColor(Color::DarkGrey))?;
             syntax_tree.root.pretty_print()?;
@@ -70,27 +83,31 @@ fn main() -> std::io::Result<()> {
                     let line_index = syntax_tree
                         .source_text
                         .line_index(diagnostic.span().start());
+                    let line = &syntax_tree.source_text.lines[line_index];
                     let line_number = line_index + 1;
-                    let character = diagnostic.span().start()
-                        - syntax_tree.source_text.lines[line_index].start
-                        + 1;
+                    let character = diagnostic.span().start() - line.start + 1;
                     print!("({}, {}): ", line_number, character);
                     println!("{}", diagnostic);
                     println!();
                     let error_span = diagnostic.span();
-                    let prefix_span = TextSpan::new(0, error_span.start());
-                    let suffix_span = TextSpan::from_bounds(error_span.end(), line.trim().len());
+                    let prefix_span = TextSpan::new(line.start, error_span.start());
+                    let suffix_span = TextSpan::from_bounds(error_span.end(), line.end());
                     stdout().execute(ResetColor)?;
-                    print!("    {}", &line[prefix_span.start()..prefix_span.end()]);
+                    print!(
+                        "    {}",
+                        &text_builder[prefix_span.start()..prefix_span.end()]
+                    );
                     stdout().execute(SetForegroundColor(Color::DarkRed))?;
-                    print!("{}", &line[error_span.start()..error_span.end()]);
+                    print!("{}", &text_builder[error_span.start()..error_span.end()]);
                     stdout().execute(ResetColor)?;
-                    println!("{}", &line[suffix_span.start()..suffix_span.end()]);
+                    println!("{}", &text_builder[suffix_span.start()..suffix_span.end()]);
                     println!();
                 }
                 stdout().execute(ResetColor)?;
             }
         }
+
+        text_builder.clear();
     }
 
     Ok(())
