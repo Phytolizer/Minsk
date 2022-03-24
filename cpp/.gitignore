@@ -39,3 +39,4 @@ crashlytics-build.properties
 fabric.properties
 
 build/
+.vscode/
