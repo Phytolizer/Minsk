@@ -1,12 +1,17 @@
 #include "minsk/analysis/syntax/parser.hpp"
 #include "fmt/format.h"
 #include "minsk/analysis/syntax/facts.hpp"
+#include "minsk/analysis/syntax/kind.hpp"
 #include "minsk/analysis/syntax/lexer.hpp"
+#include "minsk/analysis/syntax/nodes/expression.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/binary.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/literal.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/parenthesized.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/unary.hpp"
+#include "minsk/analysis/syntax/token.hpp"
+#include "minsk/runtime/object.hpp"
 #include <algorithm>
+#include <memory>
 
 minsk::analysis::syntax::parser::parser(std::string_view text) : m_position(0) {
   lexer lex{text};
@@ -90,6 +95,9 @@ minsk::analysis::syntax::parser::parse_primary_expression() {
   switch (current().kind()) {
   case syntax_kind::open_parenthesis_token:
     return parse_parenthesized_expression();
+  case syntax_kind::true_keyword:
+  case syntax_kind::false_keyword:
+    return parse_boolean_literal();
   default:
     return parse_number_literal();
   }
@@ -109,6 +117,14 @@ std::unique_ptr<minsk::analysis::syntax::expression_syntax>
 minsk::analysis::syntax::parser::parse_number_literal() {
   syntax_token number_token = match_token(syntax_kind::number_token);
   return std::make_unique<literal_expression_syntax>(std::move(number_token));
+}
+std::unique_ptr<minsk::analysis::syntax::expression_syntax>
+minsk::analysis::syntax::parser::parse_boolean_literal() {
+  bool is_true = current().kind() == syntax_kind::true_keyword;
+  syntax_token keyword_token = match_token(
+      is_true ? syntax_kind::true_keyword : syntax_kind::false_keyword);
+  return std::make_unique<literal_expression_syntax>(
+      std::move(keyword_token), std::make_unique<runtime::boolean>(is_true));
 }
 minsk::analysis::syntax::syntax_tree minsk::analysis::syntax::parser::parse() {
   std::unique_ptr<expression_syntax> expression = parse_expression();

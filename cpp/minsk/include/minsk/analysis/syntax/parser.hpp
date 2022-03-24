@@ -23,6 +23,7 @@ class parser final {
   parse_binary_expression(int parent_precedence);
   [[nodiscard]] std::unique_ptr<expression_syntax> parse_primary_expression();
   [[nodiscard]] std::unique_ptr<expression_syntax> parse_number_literal();
+  [[nodiscard]] std::unique_ptr<expression_syntax> parse_boolean_literal();
   [[nodiscard]] std::unique_ptr<expression_syntax>
   parse_parenthesized_expression();
 

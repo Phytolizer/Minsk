@@ -10,6 +10,7 @@ enum class syntax_kind {
   end_of_file_token,
 
   whitespace_token,
+  identifier_token,
   number_token,
 
   plus_token,
@@ -18,6 +19,9 @@ enum class syntax_kind {
   slash_token,
   open_parenthesis_token,
   close_parenthesis_token,
+
+  true_keyword,
+  false_keyword,
 
   binary_expression,
   literal_expression,

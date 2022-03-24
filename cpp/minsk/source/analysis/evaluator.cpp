@@ -60,8 +60,7 @@ minsk::analysis::evaluator::evaluate_binary_expression(
 minsk::runtime::object_ptr
 minsk::analysis::evaluator::evaluate_literal_expression(
     const binding::bound_literal_expression *root) const {
-  return runtime::copy_object_ptr(
-      dynamic_cast<const runtime::integer *>(root->value()));
+  return runtime::copy_object_ptr(root->value());
 }
 minsk::runtime::object_ptr
 minsk::analysis::evaluator::evaluate_unary_expression(

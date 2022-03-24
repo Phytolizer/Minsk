@@ -1,5 +1,6 @@
 #include "minsk/analysis/syntax/lexer.hpp"
 #include "fmt/format.h"
+#include "minsk/analysis/syntax/facts.hpp"
 #include <cctype>
 #include <optional>
 #include <sstream>
@@ -49,6 +50,13 @@ minsk::analysis::syntax::lexer::iterator::scan() {
 
     value = std::make_unique<runtime::integer>(int_value);
     kind = syntax_kind::number_token;
+  } else if (std::isalpha(current())) {
+    while (std::isalpha(current())) {
+      m_position += 1;
+    }
+
+    text = current_text(start);
+    kind = facts::keyword_kind(*text);
   } else if (std::isspace(current())) {
     while (std::isspace(current())) {
       m_position += 1;

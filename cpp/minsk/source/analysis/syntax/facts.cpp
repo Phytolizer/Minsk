@@ -23,3 +23,14 @@ int minsk::analysis::syntax::facts::unary_operator_precedence(
     return 0;
   }
 }
+
+minsk::analysis::syntax::syntax_kind
+minsk::analysis::syntax::facts::keyword_kind(std::string_view text) {
+  if (text == "true") {
+    return syntax_kind::true_keyword;
+  }
+  if (text == "false") {
+    return syntax_kind::false_keyword;
+  }
+  return syntax_kind::identifier_token;
+}

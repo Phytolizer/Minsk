@@ -40,7 +40,7 @@ std::unique_ptr<minsk::analysis::binding::bound_expression>
 minsk::analysis::binding::binder::bind_literal_expression(
     const syntax::literal_expression_syntax *syntax) {
   return std::make_unique<bound_literal_expression>(
-      runtime::copy_object_ptr(syntax->literal_token().value()));
+      runtime::copy_object_ptr(syntax->value()));
 }
 
 std::unique_ptr<minsk::analysis::binding::bound_expression>
