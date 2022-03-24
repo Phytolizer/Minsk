@@ -18,4 +18,8 @@ class TextSpan(val start: Int, val length: Int) {
         }
         return other.start == start && other.length == length
     }
+
+    override fun toString(): String {
+        return "$start..$end"
+    }
 }
