@@ -42,6 +42,10 @@ class EvaluatorTests : FunSpec({
             row("!true", false),
             row("!false", true),
             row("{ var a = 0 (a = 10) * a }", 100),
+            row("{ var a = 0 if a == 0 a = 10 a }", 10),
+            row("{ var a = 0 if a == 5 a = 10 a }", 0),
+            row("{ var a = 0 if a == 0 a = 10 else a = 20 a }", 10),
+            row("{ var a = 0 if a == 5 a = 10 else a = 20 a }", 20),
         ) { text, expected ->
             assertValue(text, expected)
         }
