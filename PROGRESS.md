@@ -6,7 +6,7 @@ Progress for each language implementation is detailed below.
 Episode 6.
 
 ## kt (Kotlin)
-Episode 6.
+Episode 6.5.
 
 ## py (Python)
 Episode 6.
