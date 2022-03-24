@@ -4,6 +4,7 @@
 #include "minsk/analysis/syntax/lexer.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/binary.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/literal.hpp"
+#include "minsk/analysis/syntax/nodes/expressions/parenthesized.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/unary.hpp"
 #include <algorithm>
 
@@ -86,6 +87,15 @@ minsk::analysis::syntax::parser::parse_binary_expression(
 }
 std::unique_ptr<minsk::analysis::syntax::expression_syntax>
 minsk::analysis::syntax::parser::parse_primary_expression() {
+  if (current().kind() == syntax_kind::open_parenthesis_token) {
+    syntax_token open_parenthesis_token = next_token();
+    std::unique_ptr<expression_syntax> expression = parse_expression();
+    syntax_token close_parenthesis_token =
+        match_token(syntax_kind::close_parenthesis_token);
+    return std::make_unique<parenthesized_expression_syntax>(
+        std::move(open_parenthesis_token), std::move(expression),
+        std::move(close_parenthesis_token));
+  }
   syntax_token number_token = match_token(syntax_kind::number_token);
   return std::make_unique<literal_expression_syntax>(std::move(number_token));
 }
