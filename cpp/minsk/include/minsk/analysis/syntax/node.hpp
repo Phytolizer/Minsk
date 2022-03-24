@@ -4,6 +4,7 @@
 #include "kind.hpp"
 #include <ostream>
 #include <vector>
+#include <string>
 
 namespace minsk::analysis::syntax {
 

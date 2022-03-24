@@ -1,4 +1,6 @@
 #include "minsk/analysis/syntax/token.hpp"
+#include "minsk/analysis/syntax/kind.hpp"
+#include <utility>
 minsk::analysis::syntax::syntax_token::syntax_token(
     minsk::analysis::syntax::syntax_kind kind, int position, std::string text,
     minsk::runtime::object_ptr value)
@@ -14,7 +16,8 @@ int minsk::analysis::syntax::syntax_token::position() const {
 std::string_view minsk::analysis::syntax::syntax_token::text() const {
   return m_text;
 }
-const minsk::runtime::object *minsk::analysis::syntax::syntax_token::value() const {
+const minsk::runtime::object *
+minsk::analysis::syntax::syntax_token::value() const {
   return m_value.get();
 }
 minsk::analysis::syntax::syntax_token::syntax_token(

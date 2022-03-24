@@ -1,4 +1,6 @@
 #include "minsk/analysis/syntax/tree.hpp"
+#include <utility>
+
 minsk::analysis::syntax::syntax_tree::syntax_tree(
     std::unique_ptr<expression_syntax> root,
     minsk::analysis::syntax::syntax_token &&end_of_file_token,

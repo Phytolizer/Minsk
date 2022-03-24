@@ -1,6 +1,9 @@
 #include "minsk/analysis/syntax/node.hpp"
+#include "magic_enum.hpp"
 #include "minsk/analysis/syntax/token.hpp"
 #include <iostream>
+#include <string>
+#include <string_view>
 void minsk::analysis::syntax::node::pretty_print() const {
   pretty_print(this, std::cout, true, "", true);
 }

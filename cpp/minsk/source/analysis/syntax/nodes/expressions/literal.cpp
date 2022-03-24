@@ -1,4 +1,6 @@
 #include "minsk/analysis/syntax/nodes/expressions/literal.hpp"
+#include <utility>
+
 minsk::analysis::syntax::literal_expression_syntax::literal_expression_syntax(
     minsk::analysis::syntax::syntax_token &&literal_token)
     : m_literal_token(std::move(literal_token)) {}

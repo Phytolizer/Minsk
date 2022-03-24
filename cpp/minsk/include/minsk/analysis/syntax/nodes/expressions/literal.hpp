@@ -1,10 +1,14 @@
 #ifndef MINSK_LITERAL_HPP
 #define MINSK_LITERAL_HPP
 
+#include "minsk/analysis/syntax/kind.hpp"
 #include "minsk/analysis/syntax/nodes/expression.hpp"
 #include "minsk/analysis/syntax/token.hpp"
+#include <vector>
 
 namespace minsk::analysis::syntax {
+
+class node;
 
 class literal_expression_syntax : public expression_syntax {
   syntax_token m_literal_token;

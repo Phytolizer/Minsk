@@ -6,6 +6,7 @@
 #include "node.hpp"
 #include <string>
 #include <string_view>
+#include <vector>
 
 namespace minsk::analysis::syntax {
 

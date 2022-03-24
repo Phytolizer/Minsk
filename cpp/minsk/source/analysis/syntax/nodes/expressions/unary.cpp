@@ -1,4 +1,6 @@
 #include "minsk/analysis/syntax/nodes/expressions/unary.hpp"
+#include <utility>
+
 minsk::analysis::syntax::unary_expression_syntax::unary_expression_syntax(
     minsk::analysis::syntax::syntax_token &&operator_token,
     std::unique_ptr<expression_syntax> operand)

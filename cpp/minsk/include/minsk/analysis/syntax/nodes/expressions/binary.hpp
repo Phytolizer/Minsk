@@ -1,11 +1,15 @@
 #ifndef MINSK_BINARY_HPP
 #define MINSK_BINARY_HPP
 
+#include "minsk/analysis/syntax/kind.hpp"
 #include "minsk/analysis/syntax/nodes/expression.hpp"
 #include "minsk/analysis/syntax/token.hpp"
 #include <memory>
+#include <vector>
 
 namespace minsk::analysis::syntax {
+
+class node;
 
 class binary_expression_syntax : public expression_syntax {
   std::unique_ptr<expression_syntax> m_left;

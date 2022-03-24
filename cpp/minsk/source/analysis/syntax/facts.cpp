@@ -1,4 +1,5 @@
 #include "minsk/analysis/syntax/facts.hpp"
+#include "minsk/analysis/syntax/kind.hpp"
 int minsk::analysis::syntax::facts::binary_operator_precedence(
     minsk::analysis::syntax::syntax_kind kind) {
   switch (kind) {

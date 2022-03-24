@@ -1,10 +1,15 @@
 #ifndef MINSK_UNARY_HPP_55416D5ACFCB4B69A7B256567E4DA453
 #define MINSK_UNARY_HPP_55416D5ACFCB4B69A7B256567E4DA453
 
+#include "minsk/analysis/syntax/kind.hpp"
 #include "minsk/analysis/syntax/nodes/expression.hpp"
 #include "minsk/analysis/syntax/token.hpp"
+#include <memory>
+#include <vector>
 
 namespace minsk::analysis::syntax {
+
+class node;
 
 class unary_expression_syntax : public expression_syntax {
   syntax_token m_operator_token;

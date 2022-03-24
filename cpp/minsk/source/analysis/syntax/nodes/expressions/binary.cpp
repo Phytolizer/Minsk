@@ -1,4 +1,5 @@
 #include "minsk/analysis/syntax/nodes/expressions/binary.hpp"
+#include <utility>
 minsk::analysis::syntax::binary_expression_syntax::binary_expression_syntax(
     std::unique_ptr<expression_syntax> left,
     minsk::analysis::syntax::syntax_token &&operator_token,

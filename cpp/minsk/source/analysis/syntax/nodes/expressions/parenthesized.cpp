@@ -1,4 +1,6 @@
 #include "minsk/analysis/syntax/nodes/expressions/parenthesized.hpp"
+#include <utility>
+
 minsk::analysis::syntax::parenthesized_expression_syntax::
     parenthesized_expression_syntax(
         minsk::analysis::syntax::syntax_token &&open_parenthesis_token,
