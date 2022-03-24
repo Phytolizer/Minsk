@@ -26,6 +26,8 @@ class parser {
 public:
   explicit parser(std::string_view text);
   syntax_tree parse();
+  std::unique_ptr<expression_syntax> parse_number_literal();
+  std::unique_ptr<expression_syntax> parse_parenthesized_expression();
 };
 
 } // namespace minsk::analysis::syntax

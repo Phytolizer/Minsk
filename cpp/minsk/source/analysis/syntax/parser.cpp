@@ -87,15 +87,26 @@ minsk::analysis::syntax::parser::parse_binary_expression(
 }
 std::unique_ptr<minsk::analysis::syntax::expression_syntax>
 minsk::analysis::syntax::parser::parse_primary_expression() {
-  if (current().kind() == syntax_kind::open_parenthesis_token) {
-    syntax_token open_parenthesis_token = next_token();
-    std::unique_ptr<expression_syntax> expression = parse_expression();
-    syntax_token close_parenthesis_token =
-        match_token(syntax_kind::close_parenthesis_token);
-    return std::make_unique<parenthesized_expression_syntax>(
-        std::move(open_parenthesis_token), std::move(expression),
-        std::move(close_parenthesis_token));
+  switch (current().kind()) {
+  case syntax_kind::open_parenthesis_token:
+    return parse_parenthesized_expression();
+  default:
+    return parse_number_literal();
   }
+}
+std::unique_ptr<minsk::analysis::syntax::expression_syntax>
+minsk::analysis::syntax::parser::parse_parenthesized_expression() {
+  syntax_token open_parenthesis_token =
+      match_token(syntax_kind::open_parenthesis_token);
+  std::unique_ptr<expression_syntax> expression = parse_expression();
+  syntax_token close_parenthesis_token =
+      match_token(syntax_kind::close_parenthesis_token);
+  return std::make_unique<parenthesized_expression_syntax>(
+      std::move(open_parenthesis_token), std::move(expression),
+      std::move(close_parenthesis_token));
+}
+std::unique_ptr<minsk::analysis::syntax::expression_syntax>
+minsk::analysis::syntax::parser::parse_number_literal() {
   syntax_token number_token = match_token(syntax_kind::number_token);
   return std::make_unique<literal_expression_syntax>(std::move(number_token));
 }
