@@ -12,4 +12,4 @@ Episode 6.
 Episode 5.
 
 ## rs (Rust)
-Episode 5. (Half of Episode 5 is implemented.)
+Episode 5.
