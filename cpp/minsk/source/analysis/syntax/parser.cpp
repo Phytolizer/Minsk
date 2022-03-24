@@ -1,8 +1,10 @@
 #include "minsk/analysis/syntax/parser.hpp"
 #include "fmt/format.h"
+#include "minsk/analysis/syntax/facts.hpp"
 #include "minsk/analysis/syntax/lexer.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/binary.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/literal.hpp"
+#include "minsk/analysis/syntax/nodes/expressions/unary.hpp"
 #include <algorithm>
 
 minsk::analysis::syntax::parser::parser(std::string_view text) : m_position(0) {
@@ -54,12 +56,28 @@ minsk::analysis::syntax::parser::match_token(
 std::unique_ptr<minsk::analysis::syntax::expression_syntax>
 minsk::analysis::syntax::parser::parse_binary_expression(
     int parent_precedence) {
-  std::unique_ptr<expression_syntax> left = parse_primary_expression();
-
-  while (current().kind() == syntax_kind::plus_token ||
-         current().kind() == syntax_kind::minus_token) {
+  int unary_operator_precedence =
+      facts::unary_operator_precedence(current().kind());
+  std::unique_ptr<expression_syntax> left;
+  if (unary_operator_precedence != 0 &&
+      unary_operator_precedence >= parent_precedence) {
     syntax_token operator_token = next_token();
-    std::unique_ptr<expression_syntax> right = parse_primary_expression();
+    std::unique_ptr<expression_syntax> operand =
+        parse_binary_expression(unary_operator_precedence);
+    left = std::make_unique<unary_expression_syntax>(std::move(operator_token),
+                                                     std::move(operand));
+  } else {
+    left = parse_primary_expression();
+  }
+
+  while (true) {
+    int precedence = facts::binary_operator_precedence(current().kind());
+    if (precedence == 0 || precedence <= parent_precedence) {
+      break;
+    }
+    syntax_token operator_token = next_token();
+    std::unique_ptr<expression_syntax> right =
+        parse_binary_expression(precedence);
     left = std::make_unique<binary_expression_syntax>(
         std::move(left), std::move(operator_token), std::move(right));
   }
