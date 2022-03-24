@@ -29,6 +29,10 @@
     {
       "name": "dev-make",
       "configurePreset": "dev-make"
+    },
+    {
+      "name": "dist",
+      "configurePreset": "dist"
     }
   ]
 }
