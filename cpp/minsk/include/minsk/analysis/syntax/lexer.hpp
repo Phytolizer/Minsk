@@ -8,7 +8,7 @@
 
 namespace minsk::analysis::syntax {
 
-class lexer {
+class lexer final {
   std::string_view m_text;
   diagnostic_bag m_diagnostics;
 

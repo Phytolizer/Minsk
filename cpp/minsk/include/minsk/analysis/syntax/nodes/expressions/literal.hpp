@@ -10,7 +10,7 @@ namespace minsk::analysis::syntax {
 
 class node;
 
-class literal_expression_syntax : public expression_syntax {
+class literal_expression_syntax final : public expression_syntax {
   syntax_token m_literal_token;
 
 public:

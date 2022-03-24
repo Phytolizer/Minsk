@@ -20,7 +20,7 @@ public:
 
 using object_ptr = std::unique_ptr<object>;
 
-class integer : public object {
+class integer final : public object {
   int m_value;
 
 public:
@@ -30,7 +30,7 @@ public:
   int value() const;
 };
 
-class boolean : public object {
+class boolean final : public object {
   bool m_value;
 
 public:

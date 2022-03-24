@@ -11,7 +11,7 @@ namespace minsk::analysis::syntax {
 
 class node;
 
-class unary_expression_syntax : public expression_syntax {
+class unary_expression_syntax final : public expression_syntax {
   syntax_token m_operator_token;
   std::unique_ptr<expression_syntax> m_operand;
 

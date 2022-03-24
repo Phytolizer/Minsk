@@ -9,7 +9,7 @@
 
 namespace minsk::analysis::syntax {
 
-class syntax_tree {
+class syntax_tree final {
   std::unique_ptr<expression_syntax> m_root;
   syntax_token m_end_of_file_token;
   diagnostic_bag m_diagnostics;

@@ -11,7 +11,7 @@ namespace minsk::analysis::syntax {
 
 class node;
 
-class parenthesized_expression_syntax : public expression_syntax {
+class parenthesized_expression_syntax final : public expression_syntax {
   syntax_token m_open_parenthesis_token;
   std::unique_ptr<expression_syntax> m_expression;
   syntax_token m_close_parenthesis_token;

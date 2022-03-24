@@ -10,7 +10,7 @@
 
 namespace minsk::analysis::syntax {
 
-class syntax_token : public node {
+class syntax_token final : public node {
   syntax_kind m_kind;
   int m_position;
   std::string m_text;

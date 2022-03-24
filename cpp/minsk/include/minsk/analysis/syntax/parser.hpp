@@ -9,7 +9,7 @@
 
 namespace minsk::analysis::syntax {
 
-class parser {
+class parser final {
   std::vector<syntax_token> m_tokens;
   int m_position;
   diagnostic_bag m_diagnostics;

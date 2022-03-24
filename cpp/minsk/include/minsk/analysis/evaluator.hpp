@@ -10,7 +10,7 @@
 
 namespace minsk::analysis {
 
-class evaluator {
+class evaluator final {
   const syntax::expression_syntax *m_root;
 
   int evaluate_expression(const syntax::expression_syntax *root) const;
