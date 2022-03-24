@@ -13,7 +13,8 @@ public:
   class iterator {
     const lexer *m_lexer;
     int m_position;
-    syntax_token just_scanned;
+    bool m_at_end;
+    syntax_token m_just_scanned;
 
     syntax_token scan();
     [[nodiscard]] char peek(int offset) const;

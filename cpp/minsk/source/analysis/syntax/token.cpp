@@ -20,8 +20,7 @@ minsk::runtime::object *minsk::analysis::syntax::syntax_token::value() const {
 minsk::analysis::syntax::syntax_token::syntax_token(
     const minsk::analysis::syntax::syntax_token &other)
     : m_kind(other.m_kind), m_position(other.m_position), m_text(other.m_text),
-      m_value(other.m_value ? std::make_unique<runtime::object>(*other.m_value)
-                            : nullptr) {}
+      m_value(runtime::copy_object_ptr(other.m_value.get())) {}
 minsk::analysis::syntax::syntax_token &
 minsk::analysis::syntax::syntax_token::operator=(
     const minsk::analysis::syntax::syntax_token &other) {
@@ -30,7 +29,7 @@ minsk::analysis::syntax::syntax_token::operator=(
     m_position = other.m_position;
     m_text = other.m_text;
     if (other.m_value) {
-      m_value = std::make_unique<runtime::object>(*other.m_value);
+      m_value = runtime::copy_object_ptr(other.m_value.get());
     } else {
       m_value = nullptr;
     }

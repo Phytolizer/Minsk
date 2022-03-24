@@ -4,14 +4,23 @@
 #include <sstream>
 minsk::analysis::syntax::lexer::iterator::iterator(
     const minsk::analysis::syntax::lexer *lex)
-    : m_lexer(lex), m_position(0), just_scanned(scan()) {}
+    : m_lexer(lex), m_position(0), m_at_end(false), m_just_scanned(scan()) {}
 minsk::analysis::syntax::lexer::iterator::iterator()
-    : m_lexer(nullptr), m_position(0),
-      just_scanned(syntax_kind::bad_token, 0, "", nullptr) {}
+    : m_lexer(nullptr), m_position(0), m_at_end(true),
+      m_just_scanned(syntax_kind::bad_token, 0, "", nullptr) {}
 minsk::analysis::syntax::syntax_token
 minsk::analysis::syntax::lexer::iterator::scan() {
-  if (m_lexer == nullptr || m_position >= m_lexer->m_text.length()) {
+  if (m_at_end) {
     m_lexer = nullptr;
+    return syntax_token{
+        syntax_kind::bad_token,
+        m_position,
+        "",
+        nullptr,
+    };
+  }
+  if (m_position >= m_lexer->m_text.length()) {
+    m_at_end = true;
     return syntax_token{
         syntax_kind::end_of_file_token,
         m_position,
@@ -85,11 +94,11 @@ minsk::analysis::syntax::lexer::iterator::scan() {
 }
 const minsk::analysis::syntax::syntax_token &
 minsk::analysis::syntax::lexer::iterator::operator*() const {
-  return just_scanned;
+  return m_just_scanned;
 }
 minsk::analysis::syntax::lexer::iterator &
 minsk::analysis::syntax::lexer::iterator::operator++() {
-  just_scanned = scan();
+  m_just_scanned = scan();
   return *this;
 }
 minsk::analysis::syntax::lexer::iterator

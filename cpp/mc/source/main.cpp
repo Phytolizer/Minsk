@@ -12,7 +12,12 @@ int main() {
 
     minsk::analysis::syntax::lexer lex{line};
     for (auto tok : lex) {
-      std::cout << magic_enum::enum_name(tok.kind()) << '\n';
+      std::cout << magic_enum::enum_name(tok.kind());
+      if (tok.value() != nullptr) {
+        std::cout << ' ';
+        tok.value()->print(std::cout);
+      }
+      std::cout << '\n';
     }
   }
   return 0;
