@@ -97,16 +97,25 @@ private fun requiresSeparator(t1: SimpleToken, t2: SimpleToken): Boolean {
     val t1IsKeyword = t1.kind.toString().endsWith("Keyword")
     val t2IsKeyword = t2.kind.toString().endsWith("Keyword")
 
-    return if ((t1.kind == SyntaxKind.IdentifierToken || t1IsKeyword) && (t2.kind == SyntaxKind.IdentifierToken || t2IsKeyword)) {
+    return if (isIdentifierLike(t1, t1IsKeyword) && isIdentifierLike(t2, t2IsKeyword)) {
         true
-    } else if ((t1.kind == SyntaxKind.NumberToken || t1.kind == SyntaxKind.IdentifierToken || t1IsKeyword) && t2.kind == SyntaxKind.NumberToken) {
+    } else if (isNumberSensitive(t1, t1IsKeyword) && t2.kind == SyntaxKind.NumberToken) {
         true
     } else isEqualsSensitive(t1) && (t2.kind == SyntaxKind.EqualsToken || t2.kind == SyntaxKind.EqualsEqualsToken)
 }
 
-private fun isEqualsSensitive(t1: SimpleToken): Boolean {
-    return t1.kind == SyntaxKind.BangToken || t1.kind == SyntaxKind.EqualsToken || t1.kind == SyntaxKind.LessToken || t1.kind == SyntaxKind.GreaterToken
-}
+private fun isIdentifierLike(
+    t1: SimpleToken,
+    t1IsKeyword: Boolean,
+) = t1.kind == SyntaxKind.IdentifierToken || t1IsKeyword
+
+private fun isNumberSensitive(
+    t1: SimpleToken,
+    t1IsKeyword: Boolean,
+) = t1.kind == SyntaxKind.NumberToken || t1.kind == SyntaxKind.IdentifierToken || t1IsKeyword
+
+private fun isEqualsSensitive(t1: SimpleToken) =
+    t1.kind == SyntaxKind.BangToken || t1.kind == SyntaxKind.EqualsToken || t1.kind == SyntaxKind.LessToken || t1.kind == SyntaxKind.GreaterToken
 
 data class SimpleToken(val kind: SyntaxKind, val text: String)
 
