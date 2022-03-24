@@ -58,6 +58,7 @@ internal class Parser(private val _text: SourceText) {
     private fun parseStatement(): StatementSyntax = when (current.kind) {
         SyntaxKind.OpenBraceToken -> parseBlockStatement()
         SyntaxKind.LetKeyword, SyntaxKind.VarKeyword -> parseVariableDeclaration()
+        SyntaxKind.IfKeyword -> parseIfStatement()
         else -> parseExpressionStatement()
     }
 
@@ -69,6 +70,24 @@ internal class Parser(private val _text: SourceText) {
         }
         val closeBraceToken = matchToken(SyntaxKind.CloseBraceToken)
         return BlockStatementSyntax(openBraceToken, statements, closeBraceToken)
+    }
+
+    private fun parseIfStatement(): StatementSyntax {
+        val ifKeyword = matchToken(SyntaxKind.IfKeyword)
+        val condition = parseExpression()
+        val thenStatement = parseStatement()
+        val elseClause = parseElseClause()
+        return IfStatementSyntax(ifKeyword, condition, thenStatement, elseClause)
+    }
+
+    private fun parseElseClause(): ElseClauseSyntax? {
+        if (current.kind != SyntaxKind.ElseKeyword) {
+            return null
+        }
+
+        val elseKeyword = nextToken()
+        val elseStatement = parseStatement()
+        return ElseClauseSyntax(elseKeyword, elseStatement)
     }
 
     private fun parseVariableDeclaration(): StatementSyntax {

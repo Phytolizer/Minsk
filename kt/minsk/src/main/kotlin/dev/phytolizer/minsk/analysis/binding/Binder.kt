@@ -4,6 +4,7 @@ import dev.phytolizer.minsk.analysis.Diagnostic
 import dev.phytolizer.minsk.analysis.DiagnosticBag
 import dev.phytolizer.minsk.analysis.VariableSymbol
 import dev.phytolizer.minsk.analysis.syntax.*
+import kotlin.reflect.KClass
 
 internal class Binder(parent: BoundScope?) {
     private var _scope = BoundScope(parent)
@@ -53,8 +54,20 @@ internal class Binder(parent: BoundScope?) {
     fun bindStatement(syntax: StatementSyntax): BoundStatement = when (syntax.kind) {
         SyntaxKind.ExpressionStatement -> bindExpressionStatement(syntax as ExpressionStatementSyntax)
         SyntaxKind.BlockStatement -> bindBlockStatement(syntax as BlockStatementSyntax)
+        SyntaxKind.IfStatement -> bindIfStatement(syntax as IfStatementSyntax)
         SyntaxKind.VariableDeclaration -> bindVariableDeclaration(syntax as VariableDeclarationSyntax)
         else -> throw IllegalStateException()
+    }
+
+    private fun bindIfStatement(syntax: IfStatementSyntax): BoundStatement {
+        val condition = bindExpression(syntax.condition, Boolean::class)
+        val thenStatement = bindStatement(syntax.thenStatement)
+        val elseStatement = if (syntax.elseClause == null) {
+            null
+        } else {
+            bindStatement(syntax.elseClause.elseStatement)
+        }
+        return BoundIfStatement(condition, thenStatement, elseStatement)
     }
 
     private fun bindBlockStatement(syntax: BlockStatementSyntax): BoundStatement {
@@ -87,14 +100,20 @@ internal class Binder(parent: BoundScope?) {
         return BoundVariableDeclaration(variable, initializer)
     }
 
-    private fun bindExpression(syntax: ExpressionSyntax): BoundExpression = when (syntax.kind) {
-        SyntaxKind.AssignmentExpression -> bindAssignmentExpression(syntax as AssignmentExpressionSyntax)
-        SyntaxKind.BinaryExpression -> bindBinaryExpression(syntax as BinaryExpressionSyntax)
-        SyntaxKind.LiteralExpression -> bindLiteralExpression(syntax as LiteralExpressionSyntax)
-        SyntaxKind.NameExpression -> bindNameExpression(syntax as NameExpressionSyntax)
-        SyntaxKind.ParenthesizedExpression -> bindParenthesizedExpression(syntax as ParenthesizedExpressionSyntax)
-        SyntaxKind.UnaryExpression -> bindUnaryExpression(syntax as UnaryExpressionSyntax)
-        else -> throw IllegalStateException()
+    private fun bindExpression(syntax: ExpressionSyntax, targetType: KClass<Boolean>? = null): BoundExpression {
+        val result = when (syntax.kind) {
+            SyntaxKind.AssignmentExpression -> bindAssignmentExpression(syntax as AssignmentExpressionSyntax)
+            SyntaxKind.BinaryExpression -> bindBinaryExpression(syntax as BinaryExpressionSyntax)
+            SyntaxKind.LiteralExpression -> bindLiteralExpression(syntax as LiteralExpressionSyntax)
+            SyntaxKind.NameExpression -> bindNameExpression(syntax as NameExpressionSyntax)
+            SyntaxKind.ParenthesizedExpression -> bindParenthesizedExpression(syntax as ParenthesizedExpressionSyntax)
+            SyntaxKind.UnaryExpression -> bindUnaryExpression(syntax as UnaryExpressionSyntax)
+            else -> throw IllegalStateException()
+        }
+        if (targetType != null && result.type != targetType) {
+            _diagnostics.reportCannotConvert(syntax.span, result.type, targetType)
+        }
+        return result
     }
 
     private fun bindAssignmentExpression(syntax: AssignmentExpressionSyntax): BoundExpression {

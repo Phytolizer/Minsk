@@ -21,9 +21,11 @@ object SyntaxFacts {
     }
 
     fun keywordKind(text: String): SyntaxKind = when (text) {
-        "true" -> SyntaxKind.TrueKeyword
+        "else" -> SyntaxKind.ElseKeyword
         "false" -> SyntaxKind.FalseKeyword
+        "if" -> SyntaxKind.IfKeyword
         "let" -> SyntaxKind.LetKeyword
+        "true" -> SyntaxKind.TrueKeyword
         "var" -> SyntaxKind.VarKeyword
         else -> SyntaxKind.IdentifierToken
     }
@@ -50,9 +52,11 @@ object SyntaxFacts {
         SyntaxKind.LessOrEqualsToken -> "<="
         SyntaxKind.GreaterToken -> ">"
         SyntaxKind.GreaterOrEqualsToken -> ">="
-        SyntaxKind.TrueKeyword -> "true"
+        SyntaxKind.ElseKeyword -> "else"
         SyntaxKind.FalseKeyword -> "false"
+        SyntaxKind.IfKeyword -> "if"
         SyntaxKind.LetKeyword -> "let"
+        SyntaxKind.TrueKeyword -> "true"
         SyntaxKind.VarKeyword -> "var"
         else -> null
     }

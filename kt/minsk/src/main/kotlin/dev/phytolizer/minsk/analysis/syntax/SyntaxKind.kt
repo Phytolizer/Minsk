@@ -27,15 +27,19 @@ enum class SyntaxKind {
     GreaterToken,
     GreaterOrEqualsToken,
 
+    ElseKeyword,
     FalseKeyword,
+    IfKeyword,
     LetKeyword,
     TrueKeyword,
     VarKeyword,
 
     CompilationUnit,
+    ElseClause,
 
     BlockStatement,
     ExpressionStatement,
+    IfStatement,
     VariableDeclaration,
 
     AssignmentExpression,
