@@ -1,5 +1,4 @@
 #include "minsk/analysis/evaluator.hpp"
-#include "minsk/analysis/syntax/parser.hpp"
 #include "minsk/analysis/syntax/tree.hpp"
 #include "rang.hpp"
 #include <iostream>
