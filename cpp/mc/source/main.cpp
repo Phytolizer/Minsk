@@ -54,7 +54,7 @@ int main() {
       }
       std::cout << rang::fg::reset;
     } else {
-      minsk::analysis::evaluator evaluator{syntax_tree.root()};
+      minsk::analysis::evaluator evaluator{expression.get()};
       std::cout << evaluator.evaluate() << '\n';
     }
   }

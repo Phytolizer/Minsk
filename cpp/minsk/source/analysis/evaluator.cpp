@@ -1,28 +1,28 @@
 #include "minsk/analysis/evaluator.hpp"
 #include "fmt/format.h"
-#include "minsk/analysis/syntax/nodes/expressions/binary.hpp"
-#include "minsk/analysis/syntax/nodes/expressions/literal.hpp"
-#include "minsk/analysis/syntax/nodes/expressions/parenthesized.hpp"
-#include "minsk/analysis/syntax/nodes/expressions/unary.hpp"
+#include "minsk/analysis/binding/kind.hpp"
+#include "minsk/analysis/binding/nodes/expression.hpp"
+#include "minsk/analysis/binding/nodes/expressions/binary.hpp"
+#include "minsk/analysis/binding/nodes/expressions/binary/kind.hpp"
+#include "minsk/analysis/binding/nodes/expressions/literal.hpp"
+#include "minsk/analysis/binding/nodes/expressions/unary.hpp"
+#include "minsk/analysis/binding/nodes/expressions/unary/kind.hpp"
 #include <stdexcept>
 minsk::analysis::evaluator::evaluator(
-    const minsk::analysis::syntax::expression_syntax *root)
+    const minsk::analysis::binding::bound_expression *root)
     : m_root(root) {}
 int minsk::analysis::evaluator::evaluate_expression(
-    const minsk::analysis::syntax::expression_syntax *root) const {
+    const minsk::analysis::binding::bound_expression *root) const {
   switch (root->kind()) {
-  case syntax::syntax_kind::literal_expression:
-    return evaluate_literal_expression(
-        dynamic_cast<const syntax::literal_expression_syntax *>(root));
-  case syntax::syntax_kind::binary_expression:
+  case binding::bound_node_kind::binary_expression:
     return evaluate_binary_expression(
-        dynamic_cast<const syntax::binary_expression_syntax *>(root));
-  case syntax::syntax_kind::unary_expression:
+        dynamic_cast<const binding::bound_binary_expression *>(root));
+  case binding::bound_node_kind::literal_expression:
+    return evaluate_literal_expression(
+        dynamic_cast<const binding::bound_literal_expression *>(root));
+  case binding::bound_node_kind::unary_expression:
     return evaluate_unary_expression(
-        dynamic_cast<const syntax::unary_expression_syntax *>(root));
-  case syntax::syntax_kind::parenthesized_expression:
-    return evaluate_parenthesized_expression(
-        dynamic_cast<const syntax::parenthesized_expression_syntax *>(root));
+        dynamic_cast<const binding::bound_unary_expression *>(root));
   default:
     throw std::runtime_error{fmt::format("unexpected syntax {}",
                                          magic_enum::enum_name(root->kind()))};
@@ -32,45 +32,33 @@ int minsk::analysis::evaluator::evaluate() const {
   return evaluate_expression(m_root);
 }
 int minsk::analysis::evaluator::evaluate_binary_expression(
-    const minsk::analysis::syntax::binary_expression_syntax *root) const {
+    const binding::bound_binary_expression *root) const {
   int left = evaluate_expression(root->left());
   int right = evaluate_expression(root->right());
-  switch (root->operator_token().kind()) {
-  case syntax::syntax_kind::plus_token:
+  switch (root->op()->kind()) {
+  case binding::bound_binary_operator_kind::addition:
     return left + right;
-  case syntax::syntax_kind::minus_token:
+  case binding::bound_binary_operator_kind::subtraction:
     return left - right;
-  case syntax::syntax_kind::star_token:
+  case binding::bound_binary_operator_kind::multiplication:
     return left * right;
-  case syntax::syntax_kind::slash_token:
+  case binding::bound_binary_operator_kind::division:
     return left / right;
-  default:
-    throw std::runtime_error{
-        fmt::format("unknown binary operator {}",
-                    magic_enum::enum_name(root->operator_token().kind()))};
   }
+  throw std::runtime_error{"corrupt operator kind"};
 }
 int minsk::analysis::evaluator::evaluate_literal_expression(
-    const minsk::analysis::syntax::literal_expression_syntax *root) const {
-  return dynamic_cast<const runtime::integer *>(root->literal_token().value())
-      ->value();
-}
-int minsk::analysis::evaluator::evaluate_parenthesized_expression(
-    const minsk::analysis::syntax::parenthesized_expression_syntax *root)
-    const {
-  return evaluate_expression(root->expression());
+    const binding::bound_literal_expression *root) const {
+  return dynamic_cast<const runtime::integer *>(root->value())->value();
 }
 int minsk::analysis::evaluator::evaluate_unary_expression(
-    const minsk::analysis::syntax::unary_expression_syntax *root) const {
+    const binding::bound_unary_expression *root) const {
   int operand = evaluate_expression(root->operand());
-  switch (root->operator_token().kind()) {
-  case syntax::syntax_kind::plus_token:
+  switch (root->op()->kind()) {
+  case binding::bound_unary_operator_kind::identity:
     return operand;
-  case syntax::syntax_kind::minus_token:
+  case binding::bound_unary_operator_kind::negation:
     return -operand;
-  default:
-    throw std::runtime_error{
-        fmt::format("unknown unary operator {}",
-                    magic_enum::enum_name(root->operator_token().kind()))};
   }
+  throw std::runtime_error{"corrupt operator kind"};
 }
