@@ -5,15 +5,11 @@
       "Specify structure for custom cmake functions"
     ],
     "additional_commands": {
-      "foo": {
-        "flags": [
-          "BAR",
-          "BAZ"
-        ],
+      "CPMAddPackage": {
         "kwargs": {
-          "HEADERS": "*",
-          "SOURCES": "*",
-          "DEPENDS": "*"
+          "NAME": 1,
+          "GITHUB_REPOSITORY": 1,
+          "GIT_TAG": 1
         }
       }
     },
