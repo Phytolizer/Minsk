@@ -1,0 +1,12 @@
+[*]
+trim_trailing_whitespace = true
+insert_final_newline = true
+charset = utf-8
+
+[*.{cpp,hpp}]
+indent_size = 2
+indent_style = space
+
+[*.json]
+indent_size = 2
+indent_style = space
