@@ -6,6 +6,8 @@ project(
   HOMEPAGE_URL "https://github.com/Phytolizer/Minsk"
 )
 
+set(CMAKE_CXX_STANDARD 20)
+
 include(cmake/CPM.cmake)
 
 CPMAddPackage(
