@@ -9,11 +9,11 @@ use super::syntax::tree::SyntaxTree;
 use super::variable_symbol::VariableSymbol;
 
 pub struct Compilation<'t> {
-    syntax_tree: &'t SyntaxTree,
+    syntax_tree: &'t mut SyntaxTree,
 }
 
 impl<'t> Compilation<'t> {
-    pub fn new(syntax_tree: &'t SyntaxTree) -> Self {
+    pub fn new(syntax_tree: &'t mut SyntaxTree) -> Self {
         Self { syntax_tree }
     }
 

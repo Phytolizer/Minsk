@@ -137,8 +137,8 @@ mod tests {
     fn evaluates_correct_value() {
         for test in TESTS {
             let Test { text, expected } = test;
-            let syntax_tree = SyntaxTree::parse(text);
-            let compilation = Compilation::new(&syntax_tree);
+            let mut syntax_tree = SyntaxTree::parse(text);
+            let compilation = Compilation::new(&mut syntax_tree);
             let mut variables = HashMap::<VariableSymbol, Object>::new();
             let result = compilation.evaluate(&mut variables).unwrap();
             assert_eq!(*expected, result);

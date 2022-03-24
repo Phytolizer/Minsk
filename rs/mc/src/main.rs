@@ -52,13 +52,14 @@ fn main() -> std::io::Result<()> {
             _ => {}
         }
 
-        let syntax_tree = SyntaxTree::parse(&line);
+        // mutable so diagnostics may be swapped out
+        let mut syntax_tree = SyntaxTree::parse(&line);
         if show_tree && syntax_tree.diagnostics.is_empty() {
             stdout().execute(SetForegroundColor(Color::DarkGrey))?;
             syntax_tree.root.pretty_print()?;
             stdout().execute(ResetColor)?;
         }
-        let compilation = Compilation::new(&syntax_tree);
+        let compilation = Compilation::new(&mut syntax_tree);
         match compilation.evaluate(&mut variables) {
             Ok(result) => {
                 println!("{}", result);

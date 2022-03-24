@@ -38,14 +38,14 @@ impl<'v> Binder<'v> {
 
     pub(crate) fn into_expression_and_diagnostics(
         mut self,
-        syntax: &SyntaxTree,
+        syntax: &mut SyntaxTree,
     ) -> (BoundExpression, Vec<Diagnostic>) {
+        let mut dummy_diagnostics = Vec::new();
+        std::mem::swap(&mut dummy_diagnostics, &mut syntax.diagnostics);
         (
             self.bind_expression(&syntax.root),
-            syntax
-                .diagnostics
-                .iter()
-                .cloned()
+            dummy_diagnostics
+                .into_iter()
                 .chain(self.diagnostics.into_iter())
                 .collect(),
         )
