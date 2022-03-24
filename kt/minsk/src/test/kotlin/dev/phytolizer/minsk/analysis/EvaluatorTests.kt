@@ -33,13 +33,7 @@ class EvaluatorTests : FunSpec({
             row("!false", true),
             row("{ var a = 0 (a = 10) * a }", 100),
         ) { text, expected ->
-            val syntaxTree = SyntaxTree.parse(text)
-            val compilation = Compilation(syntaxTree)
-            val variables = mutableMapOf<VariableSymbol, Any>()
-            val result = compilation.evaluate(variables)
-
-            result.diagnostics.shouldBeEmpty()
-            result.value shouldBe expected
+            assertValue(text, expected)
         }
     }
 
@@ -57,11 +51,79 @@ class EvaluatorTests : FunSpec({
         val diagnostics = """
             Name 'x' is already declared in the same scope
         """
-        assertHasDiagnostics(text, diagnostics)
+        assertDiagnostics(text, diagnostics)
+    }
+
+    test("name expression reports undefined") {
+        val text = "[x] + 5"
+        val diagnostics = """
+            Undefined name 'x'
+        """
+        assertDiagnostics(text, diagnostics)
+    }
+
+    test("assignment expression reports undefined") {
+        val text = "[x] = 10"
+        val diagnostics = """
+            Undefined name 'x'
+        """
+        assertDiagnostics(text, diagnostics)
+    }
+
+    test("assignment expression reports cannot assign") {
+        val text = """
+            {
+                let x = 10
+                x [=] 20
+            }
+        """
+        val diagnostics = """
+            Cannot assign to read-only variable 'x'
+        """
+        assertDiagnostics(text, diagnostics)
+    }
+
+    test("assignment expression reports cannot convert") {
+        val text = """
+            {
+                var x = 10
+                x [=] true
+            }
+        """
+        val diagnostics = """
+            Cannot convert from 'class kotlin.Boolean' to 'class kotlin.Int'
+        """
+        assertDiagnostics(text, diagnostics)
+    }
+
+    test("unary operator reports undefined") {
+        val text = "[+]true"
+        val diagnostics = """
+            The unary operator '+' isn't defined for 'class kotlin.Boolean'
+        """
+        assertDiagnostics(text, diagnostics)
+    }
+
+    test("binary operator reports undefined") {
+        val text = "true [-] false"
+        val diagnostics = """
+            The binary operator '-' isn't defined for 'class kotlin.Boolean' and 'class kotlin.Boolean'
+        """
+        assertDiagnostics(text, diagnostics)
     }
 })
 
-fun assertHasDiagnostics(text: String, diagnosticText: String) {
+private fun assertValue(text: String, expected: Any) {
+    val syntaxTree = SyntaxTree.parse(text)
+    val compilation = Compilation(syntaxTree)
+    val variables = mutableMapOf<VariableSymbol, Any>()
+    val result = compilation.evaluate(variables)
+
+    result.diagnostics.shouldBeEmpty()
+    result.value shouldBe expected
+}
+
+private fun assertDiagnostics(text: String, diagnosticText: String) {
     val annotatedText = AnnotatedText.parse(text)
     val syntaxTree = SyntaxTree.parse(annotatedText.text)
     val compilation = Compilation(syntaxTree)
