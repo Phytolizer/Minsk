@@ -3,6 +3,7 @@
 #include "minsk/analysis/diagnostic_bag.hpp"
 #include "minsk/analysis/evaluator.hpp"
 #include "minsk/analysis/syntax/tree.hpp"
+#include "minsk/runtime/object.hpp"
 #include "rang.hpp"
 #include "util/terminal.hpp"
 #include <algorithm>
@@ -55,7 +56,9 @@ int main() {
       std::cout << rang::fg::reset;
     } else {
       minsk::analysis::evaluator evaluator{expression.get()};
-      std::cout << evaluator.evaluate() << '\n';
+      minsk::runtime::object_ptr value = evaluator.evaluate();
+      value->print(std::cout);
+      std::cout << '\n';
     }
   }
   return 0;

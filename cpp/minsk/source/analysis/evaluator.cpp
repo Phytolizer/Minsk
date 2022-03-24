@@ -7,11 +7,12 @@
 #include "minsk/analysis/binding/nodes/expressions/literal.hpp"
 #include "minsk/analysis/binding/nodes/expressions/unary.hpp"
 #include "minsk/analysis/binding/nodes/expressions/unary/kind.hpp"
+#include "minsk/runtime/object.hpp"
 #include <stdexcept>
 minsk::analysis::evaluator::evaluator(
     const minsk::analysis::binding::bound_expression *root)
     : m_root(root) {}
-int minsk::analysis::evaluator::evaluate_expression(
+minsk::runtime::object_ptr minsk::analysis::evaluator::evaluate_expression(
     const minsk::analysis::binding::bound_expression *root) const {
   switch (root->kind()) {
   case binding::bound_node_kind::binary_expression:
@@ -28,37 +29,50 @@ int minsk::analysis::evaluator::evaluate_expression(
                                          magic_enum::enum_name(root->kind()))};
   }
 }
-int minsk::analysis::evaluator::evaluate() const {
+minsk::runtime::object_ptr minsk::analysis::evaluator::evaluate() const {
   return evaluate_expression(m_root);
 }
-int minsk::analysis::evaluator::evaluate_binary_expression(
+minsk::runtime::object_ptr
+minsk::analysis::evaluator::evaluate_binary_expression(
     const binding::bound_binary_expression *root) const {
-  int left = evaluate_expression(root->left());
-  int right = evaluate_expression(root->right());
+  runtime::object_ptr left = evaluate_expression(root->left());
+  runtime::object_ptr right = evaluate_expression(root->right());
   switch (root->op()->kind()) {
   case binding::bound_binary_operator_kind::addition:
-    return left + right;
+    return std::make_unique<runtime::integer>(
+        dynamic_cast<runtime::integer *>(left.get())->value() +
+        dynamic_cast<runtime::integer *>(right.get())->value());
   case binding::bound_binary_operator_kind::subtraction:
-    return left - right;
+    return std::make_unique<runtime::integer>(
+        dynamic_cast<runtime::integer *>(left.get())->value() -
+        dynamic_cast<runtime::integer *>(right.get())->value());
   case binding::bound_binary_operator_kind::multiplication:
-    return left * right;
+    return std::make_unique<runtime::integer>(
+        dynamic_cast<runtime::integer *>(left.get())->value() *
+        dynamic_cast<runtime::integer *>(right.get())->value());
   case binding::bound_binary_operator_kind::division:
-    return left / right;
+    return std::make_unique<runtime::integer>(
+        dynamic_cast<runtime::integer *>(left.get())->value() /
+        dynamic_cast<runtime::integer *>(right.get())->value());
   }
   throw std::runtime_error{"corrupt operator kind"};
 }
-int minsk::analysis::evaluator::evaluate_literal_expression(
+minsk::runtime::object_ptr
+minsk::analysis::evaluator::evaluate_literal_expression(
     const binding::bound_literal_expression *root) const {
-  return dynamic_cast<const runtime::integer *>(root->value())->value();
+  return runtime::copy_object_ptr(
+      dynamic_cast<const runtime::integer *>(root->value()));
 }
-int minsk::analysis::evaluator::evaluate_unary_expression(
+minsk::runtime::object_ptr
+minsk::analysis::evaluator::evaluate_unary_expression(
     const binding::bound_unary_expression *root) const {
-  int operand = evaluate_expression(root->operand());
+  runtime::object_ptr operand = evaluate_expression(root->operand());
   switch (root->op()->kind()) {
   case binding::bound_unary_operator_kind::identity:
     return operand;
   case binding::bound_unary_operator_kind::negation:
-    return -operand;
+    return std::make_unique<runtime::integer>(
+        -dynamic_cast<runtime::integer *>(operand.get())->value());
   }
   throw std::runtime_error{"corrupt operator kind"};
 }

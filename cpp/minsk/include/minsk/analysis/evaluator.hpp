@@ -5,6 +5,7 @@
 #include "minsk/analysis/binding/nodes/expressions/binary.hpp"
 #include "minsk/analysis/binding/nodes/expressions/literal.hpp"
 #include "minsk/analysis/binding/nodes/expressions/unary.hpp"
+#include "minsk/runtime/object.hpp"
 #include <memory>
 
 namespace minsk::analysis {
@@ -12,17 +13,18 @@ namespace minsk::analysis {
 class evaluator final {
   const binding::bound_expression *m_root;
 
-  int evaluate_expression(const binding::bound_expression *root) const;
-  int evaluate_binary_expression(
+  runtime::object_ptr
+  evaluate_expression(const binding::bound_expression *root) const;
+  runtime::object_ptr evaluate_binary_expression(
       const binding::bound_binary_expression *root) const;
-  int evaluate_literal_expression(
+  runtime::object_ptr evaluate_literal_expression(
       const binding::bound_literal_expression *root) const;
-  int evaluate_unary_expression(
-      const binding::bound_unary_expression *root) const;
+  runtime::object_ptr
+  evaluate_unary_expression(const binding::bound_unary_expression *root) const;
 
 public:
   explicit evaluator(const binding::bound_expression *root);
-  int evaluate() const;
+  runtime::object_ptr evaluate() const;
 };
 
 } // namespace minsk::analysis
