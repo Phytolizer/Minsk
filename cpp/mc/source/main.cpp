@@ -14,7 +14,7 @@ int main() {
     minsk::analysis::syntax::parser parser{line};
     minsk::analysis::syntax::syntax_tree syntax_tree = parser.parse();
     syntax_tree.root()->pretty_print();
-    if (parser.diagnostics().size() > 0) {
+    if (syntax_tree.diagnostics().size() > 0) {
       std::cout << rang::fg::red << rang::style::dim;
       for (const auto &diagnostic : parser.diagnostics()) {
         std::cout << diagnostic << '\n';

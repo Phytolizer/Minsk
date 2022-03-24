@@ -11,7 +11,9 @@
     },
     {
       "name": "dev-make",
-      "inherits": ["dev-base"],
+      "inherits": [
+        "dev-base"
+      ],
       "displayName": "Development (Make)",
       "binaryDir": "build/dev-make",
       "generator": "Unix Makefiles"
