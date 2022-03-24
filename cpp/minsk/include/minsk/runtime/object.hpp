@@ -15,6 +15,7 @@ class object {
 public:
   virtual object_kind kind() const = 0;
   virtual std::ostream &print(std::ostream &os) const = 0;
+  virtual ~object() = default;
 };
 
 using object_ptr = std::unique_ptr<object>;

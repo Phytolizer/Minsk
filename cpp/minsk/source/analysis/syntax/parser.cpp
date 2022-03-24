@@ -75,3 +75,6 @@ const minsk::analysis::diagnostic_bag &
 minsk::analysis::syntax::parser::diagnostics() const {
   return m_diagnostics;
 }
+minsk::analysis::syntax::syntax_tree minsk::analysis::syntax::parser::parse() {
+  return {parse_expression(), match_token(syntax_kind::end_of_file_token)};
+}

@@ -15,6 +15,7 @@ class node {
 public:
   [[nodiscard]] virtual syntax_kind kind() const = 0;
   [[nodiscard]] virtual std::vector<const node *> children() const = 0;
+  virtual ~node() = default;
 
   void pretty_print() const;
 };
