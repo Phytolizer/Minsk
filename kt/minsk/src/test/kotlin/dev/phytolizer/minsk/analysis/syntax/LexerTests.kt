@@ -61,51 +61,52 @@ class LexerTests : FunSpec({
             tokens[2].text shouldBe tt[2].text
         }
     }
-}) {
-    companion object {
-        private fun tokens(): List<SimpleToken> {
-            val fixedTokens = SyntaxKind.values().filter { SyntaxFacts.getText(it) != null }
-                .map { SimpleToken(it, SyntaxFacts.getText(it)!!) }
-            return listOf(
-                fixedTokens,
-                listOf(
-                    SimpleToken(SyntaxKind.IdentifierToken, "a"),
-                    SimpleToken(SyntaxKind.IdentifierToken, "abc"),
-                    SimpleToken(SyntaxKind.NumberToken, "1"),
-                    SimpleToken(SyntaxKind.NumberToken, "123"),
-                ),
-            ).flatten()
-        }
+})
 
-        private fun separators(): List<SimpleToken> = listOf(
-            SimpleToken(SyntaxKind.WhitespaceToken, " "),
-            SimpleToken(SyntaxKind.WhitespaceToken, "  "),
-            SimpleToken(SyntaxKind.WhitespaceToken, "\r"),
-            SimpleToken(SyntaxKind.WhitespaceToken, "\n"),
-            SimpleToken(SyntaxKind.WhitespaceToken, "\r\n"),
-        )
-
-        private fun tokenPairs() =
-            TestUtils.cartesianProduct(tokens(), tokens()).filter { !requiresSeparator(it[0], it[1]) }
-
-        private fun tokenPairsWithSeparator() = TestUtils.cartesianProduct(
-            tokens(),
-            separators(),
-            tokens(),
-        ).filter { requiresSeparator(it[0], it[2]) }
-
-        private fun requiresSeparator(t1: SimpleToken, t2: SimpleToken): Boolean {
-            val t1IsKeyword = t1.kind.toString().endsWith("Keyword")
-            val t2IsKeyword = t2.kind.toString().endsWith("Keyword")
-
-            return if ((t1.kind == SyntaxKind.IdentifierToken || t1IsKeyword) && (t2.kind == SyntaxKind.IdentifierToken || t2IsKeyword)) {
-                true
-            } else if ((t1.kind == SyntaxKind.NumberToken || t1.kind == SyntaxKind.IdentifierToken || t1IsKeyword) && t2.kind == SyntaxKind.NumberToken) {
-                true
-            } else (t1.kind == SyntaxKind.BangToken || t1.kind == SyntaxKind.EqualsToken) && (t2.kind == SyntaxKind.EqualsToken || t2.kind == SyntaxKind.EqualsEqualsToken)
-        }
-    }
-
-    data class SimpleToken(val kind: SyntaxKind, val text: String)
+private fun tokens(): List<SimpleToken> {
+    val fixedTokens = SyntaxKind.values().filter { SyntaxFacts.getText(it) != null }
+        .map { SimpleToken(it, SyntaxFacts.getText(it)!!) }
+    return listOf(
+        fixedTokens,
+        listOf(
+            SimpleToken(SyntaxKind.IdentifierToken, "a"),
+            SimpleToken(SyntaxKind.IdentifierToken, "abc"),
+            SimpleToken(SyntaxKind.NumberToken, "1"),
+            SimpleToken(SyntaxKind.NumberToken, "123"),
+        ),
+    ).flatten()
 }
+
+private fun separators(): List<SimpleToken> = listOf(
+    SimpleToken(SyntaxKind.WhitespaceToken, " "),
+    SimpleToken(SyntaxKind.WhitespaceToken, "  "),
+    SimpleToken(SyntaxKind.WhitespaceToken, "\r"),
+    SimpleToken(SyntaxKind.WhitespaceToken, "\n"),
+    SimpleToken(SyntaxKind.WhitespaceToken, "\r\n"),
+)
+
+private fun tokenPairs() = TestUtils.cartesianProduct(tokens(), tokens()).filter { !requiresSeparator(it[0], it[1]) }
+
+private fun tokenPairsWithSeparator() = TestUtils.cartesianProduct(
+    tokens(),
+    separators(),
+    tokens(),
+).filter { requiresSeparator(it[0], it[2]) }
+
+private fun requiresSeparator(t1: SimpleToken, t2: SimpleToken): Boolean {
+    val t1IsKeyword = t1.kind.toString().endsWith("Keyword")
+    val t2IsKeyword = t2.kind.toString().endsWith("Keyword")
+
+    return if ((t1.kind == SyntaxKind.IdentifierToken || t1IsKeyword) && (t2.kind == SyntaxKind.IdentifierToken || t2IsKeyword)) {
+        true
+    } else if ((t1.kind == SyntaxKind.NumberToken || t1.kind == SyntaxKind.IdentifierToken || t1IsKeyword) && t2.kind == SyntaxKind.NumberToken) {
+        true
+    } else isEqualsSensitive(t1) && (t2.kind == SyntaxKind.EqualsToken || t2.kind == SyntaxKind.EqualsEqualsToken)
+}
+
+private fun isEqualsSensitive(t1: SimpleToken): Boolean {
+    return (t1.kind == SyntaxKind.BangToken || t1.kind == SyntaxKind.EqualsToken || t1.kind == SyntaxKind.LessToken || t1.kind == SyntaxKind.GreaterToken)
+}
+
+data class SimpleToken(val kind: SyntaxKind, val text: String)
 

@@ -121,6 +121,20 @@ internal class Lexer(private val _text: SourceText) : Iterable<SyntaxToken> {
                     kind = SyntaxKind.EqualsToken
                     position += 1
                 }
+                '<' -> if (peek(1) == '=') {
+                    kind = SyntaxKind.LessOrEqualsToken
+                    position += 2
+                } else {
+                    kind = SyntaxKind.LessToken
+                    position += 1
+                }
+                '>' -> if (peek(1) == '=') {
+                    kind = SyntaxKind.GreaterOrEqualsToken
+                    position += 2
+                } else {
+                    kind = SyntaxKind.GreaterToken
+                    position += 1
+                }
                 else -> {}
             }
 

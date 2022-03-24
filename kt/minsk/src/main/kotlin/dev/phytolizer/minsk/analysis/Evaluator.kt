@@ -61,6 +61,10 @@ internal class Evaluator(private val _variables: MutableMap<VariableSymbol, Any>
             BoundBinaryOperatorKind.LogicalOr -> left as Boolean || right as Boolean
             BoundBinaryOperatorKind.Equality -> left == right
             BoundBinaryOperatorKind.Inequality -> left != right
+            BoundBinaryOperatorKind.LessThan -> (left as Int) < (right as Int)
+            BoundBinaryOperatorKind.LessOrEquals -> (left as Int) <= (right as Int)
+            BoundBinaryOperatorKind.GreaterThan -> (left as Int) > (right as Int)
+            BoundBinaryOperatorKind.GreaterOrEquals -> (left as Int) >= (right as Int)
         }
     }
 

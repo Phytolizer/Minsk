@@ -82,6 +82,34 @@ internal class BoundBinaryOperator private constructor(
                 Boolean::class,
                 Boolean::class,
             ),
+            BoundBinaryOperator(
+                SyntaxKind.LessToken,
+                BoundBinaryOperatorKind.LessThan,
+                Int::class,
+                Int::class,
+                Boolean::class,
+            ),
+            BoundBinaryOperator(
+                SyntaxKind.LessOrEqualsToken,
+                BoundBinaryOperatorKind.LessOrEquals,
+                Int::class,
+                Int::class,
+                Boolean::class,
+            ),
+            BoundBinaryOperator(
+                SyntaxKind.GreaterToken,
+                BoundBinaryOperatorKind.GreaterThan,
+                Int::class,
+                Int::class,
+                Boolean::class,
+            ),
+            BoundBinaryOperator(
+                SyntaxKind.GreaterOrEqualsToken,
+                BoundBinaryOperatorKind.GreaterOrEquals,
+                Int::class,
+                Int::class,
+                Boolean::class,
+            ),
         )
 
         fun bind(syntaxKind: SyntaxKind, leftType: KClass<out Any>, rightType: KClass<out Any>): BoundBinaryOperator? {

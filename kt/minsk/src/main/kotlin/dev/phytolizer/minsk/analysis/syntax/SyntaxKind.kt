@@ -22,6 +22,10 @@ enum class SyntaxKind {
     EqualsEqualsToken,
     BangEqualsToken,
     EqualsToken,
+    LessToken,
+    LessOrEqualsToken,
+    GreaterToken,
+    GreaterOrEqualsToken,
 
     FalseKeyword,
     LetKeyword,
