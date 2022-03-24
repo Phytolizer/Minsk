@@ -111,9 +111,11 @@ minsk::analysis::syntax::parser::parse_number_literal() {
   return std::make_unique<literal_expression_syntax>(std::move(number_token));
 }
 minsk::analysis::syntax::syntax_tree minsk::analysis::syntax::parser::parse() {
+  std::unique_ptr<expression_syntax> expression = parse_expression();
+  syntax_token end_of_file_token = match_token(syntax_kind::end_of_file_token);
   return syntax_tree{
-      parse_expression(),
-      match_token(syntax_kind::end_of_file_token),
+      std::move(expression),
+      std::move(end_of_file_token),
       std::move(m_diagnostics),
   };
 }
