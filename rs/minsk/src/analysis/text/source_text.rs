@@ -112,3 +112,16 @@ impl Index<Range<usize>> for SourceText {
         &self.text[index]
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::SourceText;
+
+    #[test]
+    fn reports_correct_line_count() {
+        for (text, expected_line_count) in &[(".", 1usize), (".\r\n", 2), (".\r\n\r\n", 3)] {
+            let text = SourceText::from(text.chars().collect::<Vec<_>>());
+            assert_eq!(text.lines.len(), *expected_line_count);
+        }
+    }
+}
