@@ -1,6 +1,7 @@
 package dev.phytolizer.minsk.analysis
 
 import dev.phytolizer.minsk.analysis.syntax.SyntaxTree
+import dev.phytolizer.minsk.analysis.text.AnnotatedText
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.data.forAll
 import io.kotest.data.row
@@ -41,4 +42,36 @@ class EvaluatorTests : FunSpec({
             result.value shouldBe expected
         }
     }
+
+    test("variable declaration reports redeclaration") {
+        val text = """
+            {
+                var x = 10
+                var y = 100
+                {
+                    var x = 10
+                }
+                var [x] = 5
+            }
+        """
+        val diagnostics = """
+            Name 'x' is already declared in the same scope
+        """
+        assertHasDiagnostics(text, diagnostics)
+    }
 })
+
+fun assertHasDiagnostics(text: String, diagnosticText: String) {
+    val annotatedText = AnnotatedText.parse(text)
+    val syntaxTree = SyntaxTree.parse(annotatedText.text)
+    val compilation = Compilation(syntaxTree)
+    val variables = mutableMapOf<VariableSymbol, Any>()
+    val result = compilation.evaluate(variables)
+    val diagnostics = AnnotatedText.unindentLines(diagnosticText)
+    annotatedText.spans.size shouldBe diagnostics.size
+    result.diagnostics.size shouldBe diagnostics.size
+    for (i in diagnostics.indices) {
+        result.diagnostics[i].message shouldBe diagnostics[i]
+        result.diagnostics[i].span shouldBe annotatedText.spans[i]
+    }
+}

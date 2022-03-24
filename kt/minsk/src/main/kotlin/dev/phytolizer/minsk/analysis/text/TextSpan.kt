@@ -11,4 +11,11 @@ class TextSpan(val start: Int, val length: Int) {
             return TextSpan(start, end - start)
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is TextSpan) {
+            return false
+        }
+        return other.start == start && other.length == length
+    }
 }
