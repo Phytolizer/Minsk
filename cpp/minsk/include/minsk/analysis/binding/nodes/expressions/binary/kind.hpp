@@ -8,8 +8,10 @@ enum class bound_binary_operator_kind {
   subtraction,
   multiplication,
   division,
+  logical_and,
+  logical_or,
 };
 
-}
+} // namespace minsk::analysis::binding
 
 #endif // MINSK_ANALYSIS_BINDING_NODES_EXPRESSIONS_BINARY_KIND_HPP

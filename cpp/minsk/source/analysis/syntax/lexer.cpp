@@ -81,6 +81,22 @@ minsk::analysis::syntax::lexer::iterator::scan() {
       kind = syntax_kind::slash_token;
       m_position += 1;
       break;
+    case '!':
+      kind = syntax_kind::bang_token;
+      m_position += 1;
+      break;
+    case '&':
+      if (peek(1) == '&') {
+        kind = syntax_kind::ampersand_ampersand_token;
+        m_position += 2;
+      }
+      break;
+    case '|':
+      if (peek(1) == '|') {
+        kind = syntax_kind::pipe_pipe_token;
+        m_position += 2;
+      }
+      break;
     case '(':
       kind = syntax_kind::open_parenthesis_token;
       m_position += 1;

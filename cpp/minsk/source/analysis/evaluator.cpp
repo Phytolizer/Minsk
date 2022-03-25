@@ -8,6 +8,7 @@
 #include "minsk/analysis/binding/nodes/expressions/unary.hpp"
 #include "minsk/analysis/binding/nodes/expressions/unary/kind.hpp"
 #include "minsk/runtime/object.hpp"
+#include <memory>
 #include <stdexcept>
 minsk::analysis::evaluator::evaluator(
     const minsk::analysis::binding::bound_expression *root)
@@ -54,6 +55,14 @@ minsk::analysis::evaluator::evaluate_binary_expression(
     return std::make_unique<runtime::integer>(
         dynamic_cast<runtime::integer *>(left.get())->value() /
         dynamic_cast<runtime::integer *>(right.get())->value());
+  case binding::bound_binary_operator_kind::logical_and:
+    return std::make_unique<runtime::boolean>(
+        dynamic_cast<runtime::boolean *>(left.get())->value() &&
+        dynamic_cast<runtime::boolean *>(right.get())->value());
+  case binding::bound_binary_operator_kind::logical_or:
+    return std::make_unique<runtime::boolean>(
+        dynamic_cast<runtime::boolean *>(left.get())->value() ||
+        dynamic_cast<runtime::boolean *>(right.get())->value());
   }
   throw std::runtime_error{"corrupt operator kind"};
 }
@@ -72,6 +81,9 @@ minsk::analysis::evaluator::evaluate_unary_expression(
   case binding::bound_unary_operator_kind::negation:
     return std::make_unique<runtime::integer>(
         -dynamic_cast<runtime::integer *>(operand.get())->value());
+  case binding::bound_unary_operator_kind::logical_negation:
+    return std::make_unique<runtime::boolean>(
+        !dynamic_cast<runtime::boolean *>(operand.get())->value());
   }
   throw std::runtime_error{"corrupt operator kind"};
 }

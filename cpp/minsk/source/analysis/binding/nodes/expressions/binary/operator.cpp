@@ -1,4 +1,7 @@
 #include "minsk/analysis/binding/nodes/expressions/binary/operator.hpp"
+#include "minsk/analysis/binding/nodes/expressions/binary/kind.hpp"
+#include "minsk/analysis/syntax/kind.hpp"
+#include "minsk/runtime/object.hpp"
 
 namespace syntax = minsk::analysis::syntax;
 namespace binding = minsk::analysis::binding;
@@ -32,6 +35,20 @@ constexpr std::array operators = {
         runtime::object_kind::integer,
         runtime::object_kind::integer,
         runtime::object_kind::integer,
+    },
+    binding::bound_binary_operator{
+        syntax::syntax_kind::ampersand_ampersand_token,
+        binding::bound_binary_operator_kind::logical_and,
+        runtime::object_kind::boolean,
+        runtime::object_kind::boolean,
+        runtime::object_kind::boolean,
+    },
+    binding::bound_binary_operator{
+        syntax::syntax_kind::pipe_pipe_token,
+        binding::bound_binary_operator_kind::logical_or,
+        runtime::object_kind::boolean,
+        runtime::object_kind::boolean,
+        runtime::object_kind::boolean,
     },
 };
 

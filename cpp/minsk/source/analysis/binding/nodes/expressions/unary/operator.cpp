@@ -20,6 +20,12 @@ constexpr std::array operators = {
         runtime::object_kind::integer,
         runtime::object_kind::integer,
     },
+    binding::bound_unary_operator{
+        syntax::syntax_kind::bang_token,
+        binding::bound_unary_operator_kind::logical_negation,
+        runtime::object_kind::boolean,
+        runtime::object_kind::boolean,
+    },
 };
 
 const binding::bound_unary_operator *

@@ -17,6 +17,9 @@ enum class syntax_kind {
   minus_token,
   star_token,
   slash_token,
+  bang_token,
+  ampersand_ampersand_token,
+  pipe_pipe_token,
   open_parenthesis_token,
   close_parenthesis_token,
 
