@@ -22,14 +22,17 @@ enum class syntax_kind {
   pipe_pipe_token,
   equals_equals_token,
   bang_equals_token,
+  equals_token,
   open_parenthesis_token,
   close_parenthesis_token,
 
   true_keyword,
   false_keyword,
 
+  assignment_expression,
   binary_expression,
   literal_expression,
+  name_expression,
   parenthesized_expression,
   unary_expression,
 };

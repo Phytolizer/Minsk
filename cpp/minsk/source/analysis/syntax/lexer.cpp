@@ -86,6 +86,9 @@ minsk::analysis::syntax::lexer::iterator::scan() {
       if (peek(1) == '=') {
         kind = syntax_kind::equals_equals_token;
         m_position += 2;
+      } else {
+        kind = syntax_kind::equals_token;
+        m_position += 1;
       }
       break;
     case '!':
@@ -161,7 +164,7 @@ char minsk::analysis::syntax::lexer::iterator::peek(int offset) const {
   if (index >= m_lexer->m_text.length()) {
     return '\0';
   }
-  return m_lexer->m_text[m_position];
+  return m_lexer->m_text[index];
 }
 std::string
 minsk::analysis::syntax::lexer::iterator::current_text(int start) const {

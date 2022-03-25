@@ -5,6 +5,7 @@
 #include "minsk/analysis/evaluation_result.hpp"
 #include "minsk/analysis/evaluator.hpp"
 #include "minsk/analysis/syntax/tree.hpp"
+#include "minsk/analysis/variable_map.hpp"
 #include "minsk/runtime/object.hpp"
 #include "rang.hpp"
 #include "util/terminal.hpp"
@@ -17,6 +18,7 @@
 int main() {
   std::string line;
   bool show_tree = false;
+  minsk::analysis::variable_map variables;
   while (true) {
     std::cout << "> " << std::flush;
     if (!std::getline(std::cin, line)) {
@@ -41,7 +43,8 @@ int main() {
       syntax_tree.root()->pretty_print();
     }
     minsk::analysis::compilation compilation{std::move(syntax_tree)};
-    minsk::analysis::evaluation_result result = compilation.evaluate();
+    minsk::analysis::evaluation_result result =
+        compilation.evaluate(&variables);
     if (result.diagnostics().size() > 0) {
       for (const auto &diagnostic : result.diagnostics()) {
         std::cout << rang::fg::red;

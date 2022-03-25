@@ -3,6 +3,7 @@
 
 #include "minsk/analysis/evaluation_result.hpp"
 #include "minsk/analysis/syntax/tree.hpp"
+#include "minsk/analysis/variable_map.hpp"
 #include "minsk/runtime/object.hpp"
 namespace minsk::analysis {
 
@@ -14,7 +15,7 @@ public:
 
   const syntax::syntax_tree &syntax() const;
 
-  evaluation_result evaluate() const;
+  evaluation_result evaluate(variable_map *variables) const;
 };
 
 } // namespace minsk::analysis

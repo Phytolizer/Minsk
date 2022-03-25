@@ -3,6 +3,7 @@
 #include "minsk/analysis/diagnostic_bag.hpp"
 #include "minsk/analysis/evaluation_result.hpp"
 #include "minsk/analysis/evaluator.hpp"
+#include "minsk/analysis/variable_map.hpp"
 #include <algorithm>
 #include <iterator>
 
@@ -14,9 +15,9 @@ minsk::analysis::compilation::syntax() const {
   return m_syntax;
 }
 
-minsk::analysis::evaluation_result
-minsk::analysis::compilation::evaluate() const {
-  binding::binder binder;
+minsk::analysis::evaluation_result minsk::analysis::compilation::evaluate(
+    minsk::analysis::variable_map *variables) const {
+  binding::binder binder{variables};
   auto expression = binder.bind_expression(m_syntax.root());
   diagnostic_bag diagnostics;
   std::copy(m_syntax.diagnostics().begin(), m_syntax.diagnostics().end(),
@@ -26,5 +27,5 @@ minsk::analysis::compilation::evaluate() const {
   if (!diagnostics.empty()) {
     return evaluation_result{std::move(diagnostics)};
   }
-  return evaluation_result{evaluator{expression.get()}.evaluate()};
+  return evaluation_result{evaluator{expression.get(), variables}.evaluate()};
 }

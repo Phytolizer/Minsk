@@ -20,9 +20,12 @@ class parser final {
   syntax_token match_token(syntax_kind kind);
   [[nodiscard]] std::unique_ptr<expression_syntax> parse_expression();
   [[nodiscard]] std::unique_ptr<expression_syntax>
+  parse_assignment_expression();
+  [[nodiscard]] std::unique_ptr<expression_syntax>
   parse_binary_expression(int parent_precedence);
   [[nodiscard]] std::unique_ptr<expression_syntax> parse_primary_expression();
   [[nodiscard]] std::unique_ptr<expression_syntax> parse_number_literal();
+  [[nodiscard]] std::unique_ptr<expression_syntax> parse_name_expression();
   [[nodiscard]] std::unique_ptr<expression_syntax> parse_boolean_literal();
   [[nodiscard]] std::unique_ptr<expression_syntax>
   parse_parenthesized_expression();

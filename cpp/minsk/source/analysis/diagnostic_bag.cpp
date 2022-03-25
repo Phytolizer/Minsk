@@ -65,3 +65,8 @@ void minsk::analysis::diagnostic_bag::report_undefined_unary_operator(
   report(span, fmt::format("Unary operator '{}' isn't defined for type '{}'",
                            operator_text, magic_enum::enum_name(operand_type)));
 }
+
+void minsk::analysis::diagnostic_bag::report_undefined_name(
+    text::text_span span, std::string_view name) {
+  report(span, fmt::format("Name '{}' is undeclared", name));
+}
