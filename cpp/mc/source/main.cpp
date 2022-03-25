@@ -23,7 +23,7 @@ int main() {
   std::ostringstream text_builder;
 
   while (true) {
-    std::cout << "> " << std::flush;
+    std::cout << (text_builder.str().empty() ? "> " : "| ") << std::flush;
     if (!std::getline(std::cin, input_line)) {
       break;
     }
