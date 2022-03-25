@@ -32,6 +32,8 @@ minsk::runtime::copy_object_ptr(const minsk::runtime::object *ptr) {
   }
 
   switch (ptr->kind()) {
+  case object_kind::null:
+    return nullptr;
   case object_kind::integer:
     return std::make_unique<integer>(ptr->as_integer()->value());
   case object_kind::boolean:
