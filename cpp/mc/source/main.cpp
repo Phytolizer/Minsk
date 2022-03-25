@@ -43,6 +43,9 @@ int main() {
       } else if (input_line == "#cls") {
         util::terminal::clear();
         continue;
+      } else if (input_line == "#reset") {
+        previous = nullptr;
+        continue;
       }
     }
 
