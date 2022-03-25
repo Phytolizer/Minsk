@@ -43,11 +43,24 @@ int main() {
     minsk::analysis::compilation compilation{std::move(syntax_tree)};
     minsk::analysis::evaluation_result result = compilation.evaluate();
     if (result.diagnostics().size() > 0) {
-      std::cout << rang::fg::red;
       for (const auto &diagnostic : result.diagnostics()) {
-        std::cout << diagnostic << '\n';
+        std::cout << rang::fg::red;
+        auto prefix = std::string_view{
+            line.begin(),
+            line.begin() + diagnostic.span().start(),
+        };
+        auto error = std::string_view{
+            line.begin() + diagnostic.span().start(),
+            line.begin() + diagnostic.span().end(),
+        };
+        auto suffix = std::string_view{
+            line.begin() + diagnostic.span().end(),
+            line.end(),
+        };
+        std::cout << diagnostic << '\n'
+                  << "    " << rang::fg::reset << prefix << rang::fg::red
+                  << error << rang::fg::reset << suffix << '\n';
       }
-      std::cout << rang::fg::reset;
     } else {
       result.value()->print(std::cout);
       std::cout << '\n';

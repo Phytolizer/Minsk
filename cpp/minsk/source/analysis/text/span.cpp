@@ -8,4 +8,8 @@ minsk::analysis::text::text_span::from_bounds(int start, int end) {
   return text_span{start, end - start};
 }
 
+int minsk::analysis::text::text_span::start() const { return m_start; }
+
+int minsk::analysis::text::text_span::length() const { return m_length; }
+
 int minsk::analysis::text::text_span::end() const { return m_start + m_length; }

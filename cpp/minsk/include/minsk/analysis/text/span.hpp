@@ -10,6 +10,8 @@ class text_span final {
 public:
   text_span(int start, int length);
   static text_span from_bounds(int start, int end);
+  int start() const;
+  int length() const;
   int end() const;
 };
 
