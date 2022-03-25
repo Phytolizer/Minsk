@@ -5,6 +5,7 @@
 #include "minsk/analysis/evaluation_result.hpp"
 #include "minsk/analysis/evaluator.hpp"
 #include "minsk/analysis/syntax/tree.hpp"
+#include "minsk/analysis/text/span.hpp"
 #include "minsk/analysis/variable_map.hpp"
 #include "minsk/runtime/object.hpp"
 #include "rang.hpp"
@@ -44,8 +45,8 @@ int main() {
     }
 
     text_builder << input_line << '\n';
-    auto text = text_builder.str();
-    auto syntax_tree = minsk::analysis::syntax::syntax_tree::parse(text);
+    auto syntax_tree =
+        minsk::analysis::syntax::syntax_tree::parse(text_builder.str());
     if (!input_line.empty() && !syntax_tree.diagnostics().empty()) {
       continue;
     }
@@ -62,18 +63,15 @@ int main() {
         const auto &line = compilation.syntax().text().lines()[line_index];
         auto line_number = line_index + 1;
         auto character = diagnostic.span().start() - line.start() + 1;
-        auto prefix = std::string_view{
-            text.begin() + line.start(),
-            text.begin() + diagnostic.span().start(),
-        };
-        auto error = std::string_view{
-            text.begin() + diagnostic.span().start(),
-            text.begin() + diagnostic.span().end(),
-        };
-        auto suffix = std::string_view{
-            text.begin() + diagnostic.span().end(),
-            text.begin() + line.end(),
-        };
+        auto prefix_span = minsk::analysis::text::text_span::from_bounds(
+            line.start(), diagnostic.span().start());
+        auto error_span = diagnostic.span();
+        auto suffix_span = minsk::analysis::text::text_span::from_bounds(
+            diagnostic.span().end(), line.end());
+
+        auto prefix = compilation.syntax().text().to_string(prefix_span);
+        auto error = compilation.syntax().text().to_string(error_span);
+        auto suffix = compilation.syntax().text().to_string(suffix_span);
         std::cout << rang::fg::red << "(" << line_number << ", " << character
                   << "): " << diagnostic << '\n'
                   << "    " << rang::fg::reset << prefix << rang::fg::red
