@@ -28,7 +28,7 @@ public:
   [[nodiscard]] int position() const;
   [[nodiscard]] std::string_view text() const;
   [[nodiscard]] const runtime::object *value() const;
-  [[nodiscard]] text::text_span span() const;
+  [[nodiscard]] text::text_span span() const override;
 };
 
 } // namespace minsk::analysis::syntax

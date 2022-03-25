@@ -2,6 +2,7 @@
 #define MINSK_NODE_HPP
 
 #include "kind.hpp"
+#include "minsk/analysis/text/span.hpp"
 #include <ostream>
 #include <vector>
 #include <string>
@@ -16,6 +17,7 @@ class syntax_node {
 public:
   [[nodiscard]] virtual syntax_kind kind() const = 0;
   [[nodiscard]] virtual std::vector<const syntax_node *> children() const = 0;
+  [[nodiscard]] virtual text::text_span span() const;
   virtual ~syntax_node() = default;
 
   void pretty_print() const;

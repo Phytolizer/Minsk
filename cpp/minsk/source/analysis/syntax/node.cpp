@@ -1,6 +1,7 @@
 #include "minsk/analysis/syntax/node.hpp"
 #include "magic_enum.hpp"
 #include "minsk/analysis/syntax/token.hpp"
+#include "minsk/analysis/text/span.hpp"
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -28,4 +29,13 @@ void minsk::analysis::syntax::syntax_node::pretty_print(
       pretty_print(child, writer, is_to_console, indent, child == last_child);
     }
   }
+}
+
+minsk::analysis::text::text_span
+minsk::analysis::syntax::syntax_node::span() const {
+  auto c = children();
+  auto first = c[0];
+  auto last = c[c.size() - 1];
+  return text::text_span::from_bounds(first->span().start(),
+                                      last->span().end());
 }
