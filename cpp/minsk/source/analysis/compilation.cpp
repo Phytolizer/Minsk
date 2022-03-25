@@ -36,3 +36,6 @@ minsk::analysis::evaluation_result minsk::analysis::compilation::evaluate(
   auto evaluator = analysis::evaluator{m_global_scope.statement(), variables};
   return evaluation_result{evaluator.evaluate()};
 }
+std::unique_ptr<minsk::analysis::compilation> minsk::analysis::compilation::take_previous() {
+  return std::move(m_previous);
+}

@@ -58,6 +58,7 @@ int main() {
     minsk::analysis::evaluation_result result =
         compilation->evaluate(&variables);
     if (result.diagnostics().size() > 0) {
+      previous = compilation->take_previous();
       for (const auto &diagnostic : result.diagnostics()) {
         auto line_index = compilation->syntax().text().get_line_index(
             diagnostic.span().start());

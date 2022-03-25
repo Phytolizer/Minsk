@@ -21,6 +21,7 @@ public:
               syntax::syntax_tree syntax);
 
   const syntax::syntax_tree &syntax() const;
+  std::unique_ptr<compilation> take_previous();
 
   evaluation_result evaluate(variable_map *variables) const;
 };
