@@ -16,7 +16,8 @@ class bound_scope final {
 
 public:
   explicit bound_scope(std::unique_ptr<bound_scope> parent);
-  bound_scope *parent();
+  const bound_scope *parent() const;
+  std::unique_ptr<bound_scope> take_parent();
   std::vector<variable_symbol> get_declared_variables() const;
   bool try_declare(variable_symbol &&variable);
   std::optional<variable_symbol> try_lookup(std::string_view name);

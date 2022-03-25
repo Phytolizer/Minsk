@@ -8,9 +8,14 @@ minsk::analysis::binding::bound_scope::bound_scope(
     std::unique_ptr<bound_scope> parent)
     : m_parent(std::move(parent)) {}
 
-minsk::analysis::binding::bound_scope *
-minsk::analysis::binding::bound_scope::parent() {
+const minsk::analysis::binding::bound_scope *
+minsk::analysis::binding::bound_scope::parent() const {
   return m_parent.get();
+}
+
+std::unique_ptr<minsk::analysis::binding::bound_scope>
+minsk::analysis::binding::bound_scope::take_parent() {
+  return std::move(m_parent);
 }
 
 std::vector<minsk::analysis::variable_symbol>

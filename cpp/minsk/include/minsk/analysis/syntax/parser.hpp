@@ -3,6 +3,7 @@
 
 #include "minsk/analysis/diagnostic_bag.hpp"
 #include "minsk/analysis/syntax/nodes/expression.hpp"
+#include "minsk/analysis/syntax/nodes/statement.hpp"
 #include "minsk/analysis/syntax/nodes/unit.hpp"
 #include "minsk/analysis/text/source.hpp"
 #include "token.hpp"
@@ -22,6 +23,9 @@ class parser final {
   const syntax_token &current() const;
   syntax_token next_token();
   syntax_token match_token(syntax_kind kind);
+  [[nodiscard]] std::unique_ptr<statement_syntax> parse_statement();
+  [[nodiscard]] std::unique_ptr<statement_syntax> parse_block_statement();
+  [[nodiscard]] std::unique_ptr<statement_syntax> parse_expression_statement();
   [[nodiscard]] std::unique_ptr<expression_syntax> parse_expression();
   [[nodiscard]] std::unique_ptr<expression_syntax>
   parse_assignment_expression();

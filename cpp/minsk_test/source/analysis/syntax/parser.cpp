@@ -5,6 +5,7 @@
 #include "minsk/analysis/syntax/kind.hpp"
 #include "minsk/analysis/syntax/node.hpp"
 #include "minsk/analysis/syntax/nodes/expression.hpp"
+#include "minsk/analysis/syntax/nodes/statements/expression.hpp"
 #include "minsk/analysis/syntax/token.hpp"
 #include "minsk/analysis/syntax/tree.hpp"
 #include "minsk_test/parametrize.hpp"
@@ -119,6 +120,15 @@ std::vector<syntax_kind_pair> get_unary_operator_pairs() {
   return result;
 }
 
+const minsk::analysis::syntax::expression_syntax *
+get_expression(const syntax_tree &tree) {
+  auto statement = tree.root()->statement();
+  return dynamic_cast<
+             const minsk::analysis::syntax::expression_statement_syntax *>(
+             statement)
+      ->expression();
+}
+
 TEST_CASE("binary operators honor precedence") {
   syntax_kind_pair data;
   auto pairs = get_binary_operator_pairs();
@@ -132,7 +142,7 @@ TEST_CASE("binary operators honor precedence") {
 
   auto text = fmt::format("a {} b {} c", op1_text, op2_text);
   auto syntax_tree = syntax_tree::parse(std::move(text));
-  auto expression = syntax_tree.root()->expression();
+  auto expression = get_expression(syntax_tree);
 
   if (op1_precedence >= op2_precedence) {
     auto it = asserting_iterator{expression};
@@ -176,7 +186,7 @@ TEST_CASE("unary operators honor precedence") {
 
   auto text = fmt::format("{} a {} b", op1_text, op2_text);
   auto syntax_tree = syntax_tree::parse(std::move(text));
-  auto expression = syntax_tree.root()->expression();
+  auto expression = get_expression(syntax_tree);
 
   if (op1_precedence >= op2_precedence) {
     auto it = asserting_iterator{expression};

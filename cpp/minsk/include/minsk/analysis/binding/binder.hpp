@@ -2,6 +2,7 @@
 #define MINSK_ANALYSIS_BINDING_BINDER_HPP
 
 #include "minsk/analysis/binding/nodes/expression.hpp"
+#include "minsk/analysis/binding/nodes/statement.hpp"
 #include "minsk/analysis/binding/scope.hpp"
 #include "minsk/analysis/binding/scope/global.hpp"
 #include "minsk/analysis/compilation.hpp"
@@ -13,6 +14,9 @@
 #include "minsk/analysis/syntax/nodes/expressions/name.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/parenthesized.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/unary.hpp"
+#include "minsk/analysis/syntax/nodes/statement.hpp"
+#include "minsk/analysis/syntax/nodes/statements/block.hpp"
+#include "minsk/analysis/syntax/nodes/statements/expression.hpp"
 #include "minsk/analysis/syntax/nodes/unit.hpp"
 #include "minsk/analysis/variable_map.hpp"
 #include <memory>
@@ -21,7 +25,13 @@ namespace minsk::analysis::binding {
 
 class binder final {
   diagnostic_bag m_diagnostics;
-  bound_scope m_scope;
+  std::unique_ptr<bound_scope> m_scope;
+  std::unique_ptr<bound_statement>
+  bind_block_statement(const syntax::block_statement_syntax *syntax);
+  std::unique_ptr<bound_statement>
+  bind_expression_statement(const syntax::expression_statement_syntax *syntax);
+  std::unique_ptr<bound_expression>
+  bind_expression(const syntax::expression_syntax *syntax);
   std::unique_ptr<bound_expression> bind_assignment_expression(
       const syntax::assignment_expression_syntax *syntax);
   std::unique_ptr<bound_expression>
@@ -42,8 +52,8 @@ public:
   static bound_global_scope
   bind_global_scope(bound_global_scope *previous,
                     const syntax::compilation_unit_syntax *syntax);
-  std::unique_ptr<bound_expression>
-  bind_expression(const syntax::expression_syntax *syntax);
+  std::unique_ptr<bound_statement>
+  bind_statement(const syntax::statement_syntax *syntax);
   const diagnostic_bag &diagnostics() const;
 };
 

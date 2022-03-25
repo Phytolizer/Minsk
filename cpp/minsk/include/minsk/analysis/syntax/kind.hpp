@@ -25,11 +25,16 @@ enum class syntax_kind {
   equals_token,
   open_parenthesis_token,
   close_parenthesis_token,
+  open_brace_token,
+  close_brace_token,
 
   true_keyword,
   false_keyword,
 
   compilation_unit,
+
+  block_statement,
+  expression_statement,
 
   assignment_expression,
   binary_expression,

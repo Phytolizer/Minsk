@@ -9,9 +9,40 @@
 #include "minsk/analysis/binding/nodes/expressions/unary.hpp"
 #include "minsk/analysis/binding/nodes/expressions/unary/kind.hpp"
 #include "minsk/analysis/binding/nodes/expressions/variable.hpp"
+#include "minsk/analysis/binding/nodes/statements/block.hpp"
+#include "minsk/analysis/binding/nodes/statements/expression.hpp"
 #include "minsk/runtime/object.hpp"
 #include <memory>
 #include <stdexcept>
+
+void minsk::analysis::evaluator::evaluate_statement(
+    const binding::bound_statement *root) {
+  switch (root->kind()) {
+  case binding::bound_node_kind::block_statement:
+    evaluate_block_statement(
+        dynamic_cast<const binding::bound_block_statement *>(root));
+    break;
+  case binding::bound_node_kind::expression_statement:
+    evaluate_expression_statement(
+        dynamic_cast<const binding::bound_expression_statement *>(root));
+    break;
+  default:
+    throw std::runtime_error{
+        fmt::format("unexpected node {}", magic_enum::enum_name(root->kind()))};
+  }
+}
+
+void minsk::analysis::evaluator::evaluate_block_statement(
+    const binding::bound_block_statement *root) {
+  for (const auto &stmt : root->statements()) {
+    evaluate_statement(stmt.get());
+  }
+}
+
+void minsk::analysis::evaluator::evaluate_expression_statement(
+    const binding::bound_expression_statement *root) {
+  m_last_value = evaluate_expression(root->expression());
+}
 
 minsk::runtime::object_ptr minsk::analysis::evaluator::evaluate_expression(
     const minsk::analysis::binding::bound_expression *root) {
@@ -48,7 +79,8 @@ minsk::analysis::evaluator::evaluate_assignment_expression(
   return std::move(value);
 }
 minsk::runtime::object_ptr minsk::analysis::evaluator::evaluate() {
-  return evaluate_expression(m_root);
+  evaluate_statement(m_root);
+  return std::move(m_last_value);
 }
 minsk::runtime::object_ptr
 minsk::analysis::evaluator::evaluate_binary_expression(
@@ -107,6 +139,6 @@ minsk::analysis::evaluator::evaluate_variable_expression(
   return runtime::copy_object_ptr((*m_variables)[root->variable()].get());
 }
 
-minsk::analysis::evaluator::evaluator(const binding::bound_expression *root,
+minsk::analysis::evaluator::evaluator(const binding::bound_statement *root,
                                       variable_map *variables)
     : m_root(root), m_variables(variables) {}

@@ -1,10 +1,11 @@
 #include "minsk/analysis/syntax/nodes/unit.hpp"
 #include "minsk/analysis/syntax/kind.hpp"
+#include "minsk/analysis/syntax/nodes/statement.hpp"
 
 minsk::analysis::syntax::compilation_unit_syntax::compilation_unit_syntax(
-    std::unique_ptr<expression_syntax> expression,
+    std::unique_ptr<statement_syntax> statement,
     syntax_token &&end_of_file_token)
-    : m_expression(std::move(expression)),
+    : m_statement(std::move(statement)),
       m_end_of_file_token(std::move(end_of_file_token)) {}
 
 minsk::analysis::syntax::syntax_kind
@@ -15,14 +16,14 @@ minsk::analysis::syntax::compilation_unit_syntax::kind() const {
 std::vector<const minsk::analysis::syntax::syntax_node *>
 minsk::analysis::syntax::compilation_unit_syntax::children() const {
   return {
-      m_expression.get(),
+      m_statement.get(),
       &m_end_of_file_token,
   };
 }
 
-const minsk::analysis::syntax::expression_syntax *
-minsk::analysis::syntax::compilation_unit_syntax::expression() const {
-  return m_expression.get();
+const minsk::analysis::syntax::statement_syntax *
+minsk::analysis::syntax::compilation_unit_syntax::statement() const {
+  return m_statement.get();
 }
 
 const minsk::analysis::syntax::syntax_token &

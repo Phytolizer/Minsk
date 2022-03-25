@@ -121,6 +121,14 @@ minsk::analysis::syntax::lexer::iterator::scan() {
       kind = syntax_kind::close_parenthesis_token;
       m_position += 1;
       break;
+    case '{':
+      kind = syntax_kind::open_brace_token;
+      m_position += 1;
+      break;
+    case '}':
+      kind = syntax_kind::close_brace_token;
+      m_position += 1;
+      break;
     }
   }
 

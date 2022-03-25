@@ -9,6 +9,9 @@
 #include "minsk/analysis/binding/nodes/expressions/unary.hpp"
 #include "minsk/analysis/binding/nodes/expressions/unary/operator.hpp"
 #include "minsk/analysis/binding/nodes/expressions/variable.hpp"
+#include "minsk/analysis/binding/nodes/statement.hpp"
+#include "minsk/analysis/binding/nodes/statements/block.hpp"
+#include "minsk/analysis/binding/nodes/statements/expression.hpp"
 #include "minsk/analysis/binding/scope.hpp"
 #include "minsk/analysis/binding/scope/global.hpp"
 #include "minsk/analysis/diagnostic.hpp"
@@ -19,6 +22,7 @@
 #include "minsk/analysis/syntax/nodes/expressions/name.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/parenthesized.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/unary.hpp"
+#include "minsk/analysis/syntax/nodes/statements/block.hpp"
 #include "minsk/analysis/variable_symbol.hpp"
 #include "minsk/runtime/object.hpp"
 #include <algorithm>
@@ -34,10 +38,10 @@ minsk::analysis::binding::binder::bind_assignment_expression(
     const syntax::assignment_expression_syntax *syntax) {
   auto expression = bind_expression(syntax->expression());
   auto name = syntax->identifier_token().text();
-  auto variable = m_scope.try_lookup(name);
+  auto variable = m_scope->try_lookup(name);
   if (!variable) {
     variable = variable_symbol{std::string{name}, expression->type()};
-    m_scope.try_declare(variable_symbol{*variable});
+    m_scope->try_declare(variable_symbol{*variable});
   }
 
   if (expression->type() != variable->type()) {
@@ -80,7 +84,7 @@ std::unique_ptr<minsk::analysis::binding::bound_expression>
 minsk::analysis::binding::binder::bind_name_expression(
     const syntax::name_expression_syntax *syntax) {
   auto name = syntax->identifier_token().text();
-  auto variable = m_scope.try_lookup(name);
+  auto variable = m_scope->try_lookup(name);
   if (!variable) {
     m_diagnostics.report_undefined_name(syntax->identifier_token().span(),
                                         name);
@@ -140,7 +144,7 @@ minsk::analysis::binding::binder::create_parent_scope(
 }
 
 minsk::analysis::binding::binder::binder(std::unique_ptr<bound_scope> parent)
-    : m_scope(std::move(parent)) {}
+    : m_scope(std::make_unique<bound_scope>(std::move(parent))) {}
 
 minsk::analysis::binding::bound_global_scope
 minsk::analysis::binding::binder::bind_global_scope(
@@ -148,8 +152,8 @@ minsk::analysis::binding::binder::bind_global_scope(
     const syntax::compilation_unit_syntax *syntax) {
   auto parent_scope = create_parent_scope(previous);
   auto binder = binding::binder{std::move(parent_scope)};
-  auto expression = binder.bind_expression(syntax->expression());
-  auto variables = binder.m_scope.get_declared_variables();
+  auto expression = binder.bind_statement(syntax->statement());
+  auto variables = binder.m_scope->get_declared_variables();
   auto diagnostics = std::vector<diagnostic>{};
 
   if (previous != nullptr) {
@@ -163,6 +167,41 @@ minsk::analysis::binding::binder::bind_global_scope(
       std::move(variables),
       std::move(expression),
   };
+}
+
+std::unique_ptr<minsk::analysis::binding::bound_statement>
+minsk::analysis::binding::binder::bind_statement(
+    const syntax::statement_syntax *syntax) {
+  switch (syntax->kind()) {
+  case syntax::syntax_kind::block_statement:
+    return bind_block_statement(
+        dynamic_cast<const syntax::block_statement_syntax *>(syntax));
+  case syntax::syntax_kind::expression_statement:
+    return bind_expression_statement(
+        dynamic_cast<const syntax::expression_statement_syntax *>(syntax));
+  default:
+    throw std::runtime_error{fmt::format(
+        "Unexpected syntax {}", magic_enum::enum_name(syntax->kind()))};
+  }
+}
+
+std::unique_ptr<minsk::analysis::binding::bound_statement>
+minsk::analysis::binding::binder::bind_block_statement(
+    const syntax::block_statement_syntax *syntax) {
+  auto statements = std::vector<std::unique_ptr<bound_statement>>{};
+  m_scope = std::make_unique<bound_scope>(std::move(m_scope));
+  for (const auto &statement : syntax->statements()) {
+    statements.emplace_back(bind_statement(statement.get()));
+  }
+  m_scope = m_scope->take_parent();
+  return std::make_unique<bound_block_statement>(std::move(statements));
+}
+
+std::unique_ptr<minsk::analysis::binding::bound_statement>
+minsk::analysis::binding::binder::bind_expression_statement(
+    const syntax::expression_statement_syntax *syntax) {
+  auto expression = bind_expression(syntax->expression());
+  return std::make_unique<bound_expression_statement>(std::move(expression));
 }
 
 std::unique_ptr<minsk::analysis::binding::bound_expression>

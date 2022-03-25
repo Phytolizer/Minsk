@@ -33,6 +33,6 @@ minsk::analysis::evaluation_result minsk::analysis::compilation::evaluate(
   if (!diagnostics.empty()) {
     return evaluation_result{std::move(diagnostics)};
   }
-  auto evaluator = analysis::evaluator{m_global_scope.expression(), variables};
+  auto evaluator = analysis::evaluator{m_global_scope.statement(), variables};
   return evaluation_result{evaluator.evaluate()};
 }

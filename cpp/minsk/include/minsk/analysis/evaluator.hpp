@@ -7,6 +7,9 @@
 #include "minsk/analysis/binding/nodes/expressions/literal.hpp"
 #include "minsk/analysis/binding/nodes/expressions/unary.hpp"
 #include "minsk/analysis/binding/nodes/expressions/variable.hpp"
+#include "minsk/analysis/binding/nodes/statement.hpp"
+#include "minsk/analysis/binding/nodes/statements/block.hpp"
+#include "minsk/analysis/binding/nodes/statements/expression.hpp"
 #include "minsk/analysis/variable_map.hpp"
 #include "minsk/runtime/object.hpp"
 #include <memory>
@@ -14,9 +17,14 @@
 namespace minsk::analysis {
 
 class evaluator final {
-  const binding::bound_expression *m_root;
+  const binding::bound_statement *m_root;
   variable_map *m_variables;
+  runtime::object_ptr m_last_value;
 
+  void evaluate_statement(const binding::bound_statement *root);
+  void evaluate_block_statement(const binding::bound_block_statement *root);
+  void evaluate_expression_statement(
+      const binding::bound_expression_statement *root);
   runtime::object_ptr
   evaluate_expression(const binding::bound_expression *root);
   runtime::object_ptr evaluate_assignment_expression(
@@ -31,7 +39,7 @@ class evaluator final {
   evaluate_variable_expression(const binding::bound_variable_expression *root);
 
 public:
-  evaluator(const binding::bound_expression *root, variable_map *variables);
+  evaluator(const binding::bound_statement *root, variable_map *variables);
   runtime::object_ptr evaluate();
 };
 

@@ -70,6 +70,10 @@ minsk::analysis::syntax::facts::get_text(syntax_kind kind) {
     return "(";
   case syntax_kind::close_parenthesis_token:
     return ")";
+  case syntax_kind::open_brace_token:
+    return "{";
+  case syntax_kind::close_brace_token:
+    return "}";
   case syntax_kind::true_keyword:
     return "true";
   case syntax_kind::false_keyword:

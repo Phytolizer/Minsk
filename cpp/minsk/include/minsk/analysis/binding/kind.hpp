@@ -4,6 +4,9 @@
 namespace minsk::analysis::binding {
 
 enum class bound_node_kind {
+  block_statement,
+  expression_statement,
+
   assignment_expression,
   binary_expression,
   literal_expression,

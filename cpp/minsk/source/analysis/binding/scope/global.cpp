@@ -4,9 +4,9 @@
 minsk::analysis::binding::bound_global_scope::bound_global_scope(
     bound_global_scope *previous, std::vector<diagnostic> &&diagnostics,
     std::vector<variable_symbol> &&variables,
-    std::unique_ptr<bound_expression> expression)
+    std::unique_ptr<bound_statement> statement)
     : m_previous(previous), m_diagnostics(std::move(diagnostics)),
-      m_variables(std::move(variables)), m_expression(std::move(expression)) {}
+      m_variables(std::move(variables)), m_statement(std::move(statement)) {}
 
 minsk::analysis::binding::bound_global_scope *
 minsk::analysis::binding::bound_global_scope::previous() const {
@@ -23,7 +23,7 @@ minsk::analysis::binding::bound_global_scope::variables() const {
   return m_variables;
 }
 
-const minsk::analysis::binding::bound_expression *
-minsk::analysis::binding::bound_global_scope::expression() const {
-  return m_expression.get();
+const minsk::analysis::binding::bound_statement *
+minsk::analysis::binding::bound_global_scope::statement() const {
+  return m_statement.get();
 }
