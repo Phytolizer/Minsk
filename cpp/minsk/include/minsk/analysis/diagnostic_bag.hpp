@@ -43,6 +43,8 @@ public:
                                        std::string_view operator_text,
                                        runtime::object_kind operand_type);
   void report_undefined_name(text::text_span span, std::string_view name);
+  void report_variable_already_declared(text::text_span span,
+                                        std::string_view name);
 };
 
 } // namespace minsk::analysis

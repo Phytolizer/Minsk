@@ -8,6 +8,8 @@ add_library(
   "source/analysis/binding/nodes/expressions/unary.cpp"
   "source/analysis/binding/nodes/expressions/unary/operator.cpp"
   "source/analysis/binding/nodes/expressions/variable.cpp"
+  "source/analysis/binding/scope.cpp"
+  "source/analysis/binding/scope/global.cpp"
   "source/analysis/compilation.cpp"
   "source/analysis/diagnostic.cpp"
   "source/analysis/diagnostic_bag.cpp"

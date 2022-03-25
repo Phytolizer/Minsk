@@ -70,3 +70,8 @@ void minsk::analysis::diagnostic_bag::report_undefined_name(
     text::text_span span, std::string_view name) {
   report(span, fmt::format("Name '{}' is undeclared", name));
 }
+
+void minsk::analysis::diagnostic_bag::report_variable_already_declared(
+    text::text_span span, std::string_view name) {
+  report(span, fmt::format("Name '{}' is already declared", name));
+}

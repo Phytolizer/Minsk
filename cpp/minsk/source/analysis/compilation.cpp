@@ -6,6 +6,7 @@
 #include "minsk/analysis/variable_map.hpp"
 #include <algorithm>
 #include <iterator>
+#include <ranges>
 
 minsk::analysis::compilation::compilation(syntax::syntax_tree syntax)
     : m_syntax(std::move(syntax)) {}
@@ -17,15 +18,14 @@ minsk::analysis::compilation::syntax() const {
 
 minsk::analysis::evaluation_result minsk::analysis::compilation::evaluate(
     minsk::analysis::variable_map *variables) const {
-  binding::binder binder{variables};
-  auto expression = binder.bind_expression(m_syntax.root()->expression());
+  auto global_scope = binding::binder::bind_global_scope(m_syntax.root());
   diagnostic_bag diagnostics;
-  std::copy(m_syntax.diagnostics().begin(), m_syntax.diagnostics().end(),
-            std::back_inserter(diagnostics));
-  std::copy(binder.diagnostics().begin(), binder.diagnostics().end(),
-            std::back_inserter(diagnostics));
+  std::ranges::copy(m_syntax.diagnostics(), std::back_inserter(diagnostics));
+  std::ranges::copy(global_scope.diagnostics(),
+                    std::back_inserter(diagnostics));
   if (!diagnostics.empty()) {
     return evaluation_result{std::move(diagnostics)};
   }
-  return evaluation_result{evaluator{expression.get(), variables}.evaluate()};
+  auto evaluator = analysis::evaluator{global_scope.expression(), variables};
+  return evaluation_result{evaluator.evaluate()};
 }

@@ -9,6 +9,8 @@
 #include "minsk/analysis/binding/nodes/expressions/unary.hpp"
 #include "minsk/analysis/binding/nodes/expressions/unary/operator.hpp"
 #include "minsk/analysis/binding/nodes/expressions/variable.hpp"
+#include "minsk/analysis/binding/scope/global.hpp"
+#include "minsk/analysis/diagnostic.hpp"
 #include "minsk/analysis/syntax/kind.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/assignment.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/binary.hpp"
@@ -19,7 +21,10 @@
 #include "minsk/analysis/variable_symbol.hpp"
 #include "minsk/runtime/object.hpp"
 #include <algorithm>
+#include <bits/ranges_algobase.h>
+#include <iterator>
 #include <memory>
+#include <ranges>
 #include <stdexcept>
 
 std::unique_ptr<minsk::analysis::binding::bound_expression>
@@ -27,20 +32,12 @@ minsk::analysis::binding::binder::bind_assignment_expression(
     const syntax::assignment_expression_syntax *syntax) {
   auto expression = bind_expression(syntax->expression());
   auto name = syntax->identifier_token().text();
-  auto entry = std::find_if(
-      m_variables->begin(), m_variables->end(),
-      [&name](const auto &entry) { return entry.first.name() == name; });
-  if (entry == m_variables->end()) {
-    auto default_value = expression->type() == runtime::object_kind::integer
-                             ? std::make_unique<runtime::integer>(0)
-                         : expression->type() == runtime::object_kind::boolean
-                             ? std::make_unique<runtime::boolean>(false)
-                             : std::unique_ptr<runtime::object>{nullptr};
-    m_variables->emplace(variable_symbol{std::string{name}, expression->type()},
-                         std::move(default_value));
-  }
-
   auto variable = variable_symbol{std::string{name}, expression->type()};
+
+  if (!m_scope.try_declare(variable_symbol{variable})) {
+    m_diagnostics.report_variable_already_declared(
+        syntax->identifier_token().span(), name);
+  }
 
   return std::make_unique<bound_assignment_expression>(std::move(variable),
                                                        std::move(expression));
@@ -76,19 +73,16 @@ std::unique_ptr<minsk::analysis::binding::bound_expression>
 minsk::analysis::binding::binder::bind_name_expression(
     const syntax::name_expression_syntax *syntax) {
   auto name = syntax->identifier_token().text();
-  auto entry = std::find_if(
-      m_variables->begin(), m_variables->end(),
-      [&name](const auto &entry) { return entry.first.name() == name; });
-  if (entry == m_variables->end()) {
+  auto variable = m_scope.try_lookup(name);
+  if (!variable) {
     m_diagnostics.report_undefined_name(syntax->identifier_token().span(),
                                         name);
     return std::make_unique<bound_literal_expression>(
         std::make_unique<runtime::integer>(0));
   }
 
-  auto type = entry->second->kind();
-  return std::make_unique<bound_variable_expression>(
-      variable_symbol{entry->first});
+  auto type = variable->type();
+  return std::make_unique<bound_variable_expression>(std::move(*variable));
 }
 
 std::unique_ptr<minsk::analysis::binding::bound_expression>
@@ -114,8 +108,24 @@ minsk::analysis::binding::binder::bind_unary_expression(
   return std::make_unique<bound_unary_expression>(op, std::move(operand));
 }
 
-minsk::analysis::binding::binder::binder(variable_map *variables)
-    : m_variables(variables) {}
+minsk::analysis::binding::binder::binder(bound_scope *parent)
+    : m_scope(parent) {}
+
+minsk::analysis::binding::bound_global_scope
+minsk::analysis::binding::binder::bind_global_scope(
+    const syntax::compilation_unit_syntax *syntax) {
+  auto binder = binding::binder{nullptr};
+  auto expression = binder.bind_expression(syntax->expression());
+  auto variables = binder.m_scope.get_declared_variables();
+  auto diagnostics = std::vector<diagnostic>{};
+  std::ranges::copy(binder.diagnostics(), std::back_inserter(diagnostics));
+  return bound_global_scope{
+      nullptr,
+      std::move(diagnostics),
+      std::move(variables),
+      std::move(expression),
+  };
+}
 
 std::unique_ptr<minsk::analysis::binding::bound_expression>
 minsk::analysis::binding::binder::bind_expression(

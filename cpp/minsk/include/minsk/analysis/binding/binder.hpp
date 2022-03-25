@@ -2,6 +2,8 @@
 #define MINSK_ANALYSIS_BINDING_BINDER_HPP
 
 #include "minsk/analysis/binding/nodes/expression.hpp"
+#include "minsk/analysis/binding/scope.hpp"
+#include "minsk/analysis/binding/scope/global.hpp"
 #include "minsk/analysis/diagnostic_bag.hpp"
 #include "minsk/analysis/syntax/nodes/expression.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/assignment.hpp"
@@ -10,6 +12,7 @@
 #include "minsk/analysis/syntax/nodes/expressions/name.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/parenthesized.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/unary.hpp"
+#include "minsk/analysis/syntax/nodes/unit.hpp"
 #include "minsk/analysis/variable_map.hpp"
 #include <memory>
 
@@ -17,7 +20,7 @@ namespace minsk::analysis::binding {
 
 class binder final {
   diagnostic_bag m_diagnostics;
-  variable_map *m_variables;
+  bound_scope m_scope;
   std::unique_ptr<bound_expression> bind_assignment_expression(
       const syntax::assignment_expression_syntax *syntax);
   std::unique_ptr<bound_expression>
@@ -32,7 +35,9 @@ class binder final {
   bind_unary_expression(const syntax::unary_expression_syntax *syntax);
 
 public:
-  explicit binder(variable_map *variables);
+  explicit binder(bound_scope *parent);
+  static bound_global_scope
+  bind_global_scope(const syntax::compilation_unit_syntax *syntax);
   std::unique_ptr<bound_expression>
   bind_expression(const syntax::expression_syntax *syntax);
   const diagnostic_bag &diagnostics() const;
