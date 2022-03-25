@@ -42,3 +42,39 @@ minsk::analysis::syntax::facts::keyword_kind(std::string_view text) {
   }
   return syntax_kind::identifier_token;
 }
+
+std::optional<std::string>
+minsk::analysis::syntax::facts::get_text(syntax_kind kind) {
+  switch (kind) {
+  case syntax_kind::plus_token:
+    return "+";
+  case syntax_kind::minus_token:
+    return "-";
+  case syntax_kind::star_token:
+    return "*";
+  case syntax_kind::slash_token:
+    return "/";
+  case syntax_kind::bang_token:
+    return "!";
+  case syntax_kind::ampersand_ampersand_token:
+    return "&&";
+  case syntax_kind::pipe_pipe_token:
+    return "||";
+  case syntax_kind::equals_equals_token:
+    return "==";
+  case syntax_kind::bang_equals_token:
+    return "!=";
+  case syntax_kind::equals_token:
+    return "=";
+  case syntax_kind::open_parenthesis_token:
+    return "(";
+  case syntax_kind::close_parenthesis_token:
+    return ")";
+  case syntax_kind::true_keyword:
+    return "true";
+  case syntax_kind::false_keyword:
+    return "false";
+  default:
+    return {};
+  }
+}
