@@ -7,6 +7,7 @@
 namespace minsk::runtime {
 
 enum class object_kind {
+  null,
   integer,
   boolean,
 };

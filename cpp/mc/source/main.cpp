@@ -1,6 +1,8 @@
 #include "minsk/analysis/binding/binder.hpp"
 #include "minsk/analysis/binding/nodes/expression.hpp"
+#include "minsk/analysis/compilation.hpp"
 #include "minsk/analysis/diagnostic_bag.hpp"
+#include "minsk/analysis/evaluation_result.hpp"
 #include "minsk/analysis/evaluator.hpp"
 #include "minsk/analysis/syntax/tree.hpp"
 #include "minsk/runtime/object.hpp"
@@ -38,26 +40,16 @@ int main() {
     if (show_tree) {
       syntax_tree.root()->pretty_print();
     }
-    minsk::analysis::binding::binder binder;
-    std::unique_ptr<minsk::analysis::binding::bound_expression> expression;
-    if (syntax_tree.diagnostics().size() == 0) {
-      expression = binder.bind_expression(syntax_tree.root());
-    }
-    minsk::analysis::diagnostic_bag diagnostics;
-    std::copy(syntax_tree.diagnostics().begin(),
-              syntax_tree.diagnostics().end(), std::back_inserter(diagnostics));
-    std::copy(binder.diagnostics().begin(), binder.diagnostics().end(),
-              std::back_inserter(diagnostics));
-    if (diagnostics.size() > 0) {
+    minsk::analysis::compilation compilation{std::move(syntax_tree)};
+    minsk::analysis::evaluation_result result = compilation.evaluate();
+    if (result.diagnostics().size() > 0) {
       std::cout << rang::fg::red;
-      for (const auto &diagnostic : diagnostics) {
+      for (const auto &diagnostic : result.diagnostics()) {
         std::cout << diagnostic << '\n';
       }
       std::cout << rang::fg::reset;
     } else {
-      minsk::analysis::evaluator evaluator{expression.get()};
-      minsk::runtime::object_ptr value = evaluator.evaluate();
-      value->print(std::cout);
+      result.value()->print(std::cout);
       std::cout << '\n';
     }
   }

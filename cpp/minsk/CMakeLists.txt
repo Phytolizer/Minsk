@@ -6,6 +6,8 @@ add_library(
   source/analysis/binding/nodes/expressions/literal.cpp
   source/analysis/binding/nodes/expressions/unary.cpp
   source/analysis/binding/nodes/expressions/unary/operator.cpp
+  source/analysis/compilation.cpp
+  source/analysis/evaluation_result.cpp
   source/analysis/evaluator.cpp
   source/analysis/syntax/facts.cpp
   source/analysis/syntax/lexer.cpp

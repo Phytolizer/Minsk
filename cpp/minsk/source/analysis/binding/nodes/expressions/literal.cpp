@@ -11,6 +11,9 @@ minsk::analysis::binding::bound_literal_expression::kind() const {
 }
 minsk::runtime::object_kind
 minsk::analysis::binding::bound_literal_expression::type() const {
+  if (!m_value) {
+    return runtime::object_kind::null;
+  }
   return m_value->kind();
 }
 const minsk::runtime::object *
