@@ -1,6 +1,8 @@
 add_executable(
-  minsk_test source/analysis/syntax/facts.cpp source/analysis/syntax/lexer.cpp
-             source/analysis/syntax/parser.cpp source/doctest_main.cpp
+  minsk_test
+  source/analysis/evaluator.cpp source/analysis/syntax/facts.cpp
+  source/analysis/syntax/lexer.cpp source/analysis/syntax/parser.cpp
+  source/doctest_main.cpp
 )
 target_link_libraries(minsk_test PRIVATE minsk::minsk doctest::doctest)
 target_include_directories(
