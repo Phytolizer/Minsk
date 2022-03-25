@@ -34,14 +34,19 @@ minsk::analysis::binding::binder::bind_assignment_expression(
     const syntax::assignment_expression_syntax *syntax) {
   auto expression = bind_expression(syntax->expression());
   auto name = syntax->identifier_token().text();
-  auto variable = variable_symbol{std::string{name}, expression->type()};
-
-  if (!m_scope.try_declare(variable_symbol{variable})) {
-    m_diagnostics.report_variable_already_declared(
-        syntax->identifier_token().span(), name);
+  auto variable = m_scope.try_lookup(name);
+  if (!variable) {
+    variable = variable_symbol{std::string{name}, expression->type()};
+    m_scope.try_declare(variable_symbol{*variable});
   }
 
-  return std::make_unique<bound_assignment_expression>(std::move(variable),
+  if (expression->type() != variable->type()) {
+    m_diagnostics.report_cannot_convert(syntax->expression()->span(),
+                                        expression->type(), variable->type());
+    return expression;
+  }
+
+  return std::make_unique<bound_assignment_expression>(std::move(*variable),
                                                        std::move(expression));
 }
 

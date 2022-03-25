@@ -75,3 +75,11 @@ void minsk::analysis::diagnostic_bag::report_variable_already_declared(
     text::text_span span, std::string_view name) {
   report(span, fmt::format("Name '{}' is already declared", name));
 }
+
+void minsk::analysis::diagnostic_bag::report_cannot_convert(
+    text::text_span span, runtime::object_kind from_type,
+    runtime::object_kind to_type) {
+  report(span, fmt::format("Cannot convert type '{}' to '{}'",
+                           magic_enum::enum_name(from_type),
+                           magic_enum::enum_name(to_type)));
+}

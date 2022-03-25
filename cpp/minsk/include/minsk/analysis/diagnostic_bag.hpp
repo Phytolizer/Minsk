@@ -45,6 +45,9 @@ public:
   void report_undefined_name(text::text_span span, std::string_view name);
   void report_variable_already_declared(text::text_span span,
                                         std::string_view name);
+  void report_cannot_convert(text::text_span span,
+                             runtime::object_kind from_type,
+                             runtime::object_kind to_type);
 };
 
 } // namespace minsk::analysis
