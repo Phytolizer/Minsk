@@ -6,6 +6,7 @@
 #include "minsk/analysis/syntax/token.hpp"
 #include "minsk/analysis/text/source.hpp"
 #include <memory>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -26,9 +27,9 @@ public:
   const syntax_token &end_of_file_token() const;
   const diagnostic_bag &diagnostics() const;
 
-  static syntax_tree parse(std::string_view text);
+  static syntax_tree parse(std::string &&text);
   static syntax_tree parse(text::source_text &&text);
-  static std::vector<syntax_token> parse_tokens(std::string_view text);
+  static std::vector<syntax_token> parse_tokens(std::string &&text);
 };
 
 } // namespace minsk::analysis::syntax

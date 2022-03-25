@@ -56,7 +56,8 @@ TEST_CASE("correct evaluation") {
 
   DOCTEST_VALUE_PARAMETERIZED_DATA(data, evaluator_tests);
 
-  auto syntax_tree = minsk::analysis::syntax::syntax_tree::parse(data.text);
+  auto syntax_tree =
+      minsk::analysis::syntax::syntax_tree::parse(std::string{data.text});
   auto compilation = minsk::analysis::compilation{std::move(syntax_tree)};
   auto variables = minsk::analysis::variable_map{};
   auto result = compilation.evaluate(&variables);

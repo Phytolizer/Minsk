@@ -148,7 +148,7 @@ TEST_CASE("lexes token") {
 
   DOCTEST_VALUE_PARAMETERIZED_DATA(data, tokens);
 
-  auto lexed_tokens = syntax_tree::parse_tokens(data.text);
+  auto lexed_tokens = syntax_tree::parse_tokens(std::string{data.text});
   REQUIRE(lexed_tokens.size() == 1);
   CHECK(lexed_tokens[0].kind() == data.kind);
   CHECK(lexed_tokens[0].text() == data.text);
@@ -161,7 +161,7 @@ TEST_CASE("lexes token pairs") {
   DOCTEST_VALUE_PARAMETERIZED_DATA(data, token_pairs);
 
   auto text = fmt::format("{}{}", data.t1.text, data.t2.text);
-  auto tokens = syntax_tree::parse_tokens(text);
+  auto tokens = syntax_tree::parse_tokens(std::move(text));
   REQUIRE(tokens.size() == 2);
   CHECK(tokens[0].kind() == data.t1.kind);
   CHECK(tokens[0].text() == data.t1.text);
@@ -176,7 +176,7 @@ TEST_CASE("lexes token pairs with separator") {
   DOCTEST_VALUE_PARAMETERIZED_DATA(data, token_pairs_with_separator);
 
   auto text = fmt::format("{}{}{}", data.t1.text, data.sep.text, data.t2.text);
-  auto tokens = syntax_tree::parse_tokens(text);
+  auto tokens = syntax_tree::parse_tokens(std::move(text));
   REQUIRE(tokens.size() == 3);
   CHECK(tokens[0].kind() == data.t1.kind);
   CHECK(tokens[0].text() == data.t1.text);

@@ -130,7 +130,7 @@ TEST_CASE("binary operators honor precedence") {
   auto op2_precedence = facts::binary_operator_precedence(data.op2);
 
   auto text = fmt::format("a {} b {} c", op1_text, op2_text);
-  auto syntax_tree = syntax_tree::parse(text);
+  auto syntax_tree = syntax_tree::parse(std::move(text));
   auto expression = syntax_tree.root();
 
   if (op1_precedence >= op2_precedence) {
@@ -174,7 +174,7 @@ TEST_CASE("unary operators honor precedence") {
   auto op2_precedence = facts::binary_operator_precedence(data.op2);
 
   auto text = fmt::format("{} a {} b", op1_text, op2_text);
-  auto syntax_tree = syntax_tree::parse(text);
+  auto syntax_tree = syntax_tree::parse(std::move(text));
   auto expression = syntax_tree.root();
 
   if (op1_precedence >= op2_precedence) {

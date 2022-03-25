@@ -30,7 +30,7 @@ TEST_CASE("get_text() round trips") {
   DOCTEST_VALUE_PARAMETERIZED_DATA(data, kinds);
 
   auto text = facts::get_text(data);
-  auto tokens = syntax_tree::parse_tokens(*text);
+  auto tokens = syntax_tree::parse_tokens(std::string{*text});
   REQUIRE(tokens.size() == 1);
   CHECK(tokens[0].kind() == data);
   CHECK(tokens[0].text() == text);

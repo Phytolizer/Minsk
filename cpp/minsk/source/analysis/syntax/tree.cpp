@@ -32,8 +32,8 @@ minsk::analysis::syntax::syntax_tree::diagnostics() const {
   return m_diagnostics;
 }
 minsk::analysis::syntax::syntax_tree
-minsk::analysis::syntax::syntax_tree::parse(std::string_view text) {
-  auto source_text = text::source_text::from(std::string{text});
+minsk::analysis::syntax::syntax_tree::parse(std::string &&text) {
+  auto source_text = text::source_text::from(std::move(text));
   return parse(std::move(source_text));
 }
 
@@ -44,9 +44,9 @@ minsk::analysis::syntax::syntax_tree::parse(text::source_text &&text) {
 }
 
 std::vector<minsk::analysis::syntax::syntax_token>
-minsk::analysis::syntax::syntax_tree::parse_tokens(std::string_view text) {
+minsk::analysis::syntax::syntax_tree::parse_tokens(std::string &&text) {
   auto tokens = std::vector<syntax_token>{};
-  auto source_text = text::source_text::from(std::string{text});
+  auto source_text = text::source_text::from(std::move(text));
   auto lexer = minsk::analysis::syntax::lexer{&source_text};
   std::copy_if(lexer.begin(), lexer.end(), std::back_inserter(tokens),
                [](const auto &token) {
