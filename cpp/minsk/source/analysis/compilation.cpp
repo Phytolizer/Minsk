@@ -9,7 +9,8 @@
 #include <ranges>
 
 minsk::analysis::compilation::compilation(syntax::syntax_tree syntax)
-    : m_syntax(std::move(syntax)) {}
+    : m_syntax(std::move(syntax)),
+      m_global_scope(binding::binder::bind_global_scope(m_syntax.root())) {}
 
 const minsk::analysis::syntax::syntax_tree &
 minsk::analysis::compilation::syntax() const {
@@ -18,14 +19,13 @@ minsk::analysis::compilation::syntax() const {
 
 minsk::analysis::evaluation_result minsk::analysis::compilation::evaluate(
     minsk::analysis::variable_map *variables) const {
-  auto global_scope = binding::binder::bind_global_scope(m_syntax.root());
   diagnostic_bag diagnostics;
   std::ranges::copy(m_syntax.diagnostics(), std::back_inserter(diagnostics));
-  std::ranges::copy(global_scope.diagnostics(),
+  std::ranges::copy(m_global_scope.diagnostics(),
                     std::back_inserter(diagnostics));
   if (!diagnostics.empty()) {
     return evaluation_result{std::move(diagnostics)};
   }
-  auto evaluator = analysis::evaluator{global_scope.expression(), variables};
+  auto evaluator = analysis::evaluator{m_global_scope.expression(), variables};
   return evaluation_result{evaluator.evaluate()};
 }
