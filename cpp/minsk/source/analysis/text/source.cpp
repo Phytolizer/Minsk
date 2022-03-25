@@ -50,7 +50,7 @@ minsk::analysis::text::source_text::from(std::string &&text) {
   return source_text{std::move(text)};
 }
 
-int minsk::analysis::text::source_text::get_line_index(int position) {
+int minsk::analysis::text::source_text::get_line_index(int position) const {
   int lower = 0;
   int upper = static_cast<int>(m_lines.size()) - 1;
 

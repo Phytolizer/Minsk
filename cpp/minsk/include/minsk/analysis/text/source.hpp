@@ -24,7 +24,7 @@ class source_text final {
 public:
   static source_text from(std::string &&text);
 
-  int get_line_index(int position);
+  int get_line_index(int position) const;
 
   std::string_view text() const;
   const std::vector<text_line> &lines() const;

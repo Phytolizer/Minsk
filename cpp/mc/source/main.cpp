@@ -47,7 +47,12 @@ int main() {
         compilation.evaluate(&variables);
     if (result.diagnostics().size() > 0) {
       for (const auto &diagnostic : result.diagnostics()) {
-        std::cout << rang::fg::red;
+        auto line_index = compilation.syntax().text().get_line_index(
+            diagnostic.span().start());
+        auto line_number = line_index + 1;
+        auto character =
+            diagnostic.span().start() -
+            compilation.syntax().text().lines()[line_index].start() + 1;
         auto prefix = std::string_view{
             line.begin(),
             line.begin() + diagnostic.span().start(),
@@ -60,7 +65,8 @@ int main() {
             line.begin() + diagnostic.span().end(),
             line.end(),
         };
-        std::cout << diagnostic << '\n'
+        std::cout << rang::fg::red << "(" << line_number << ", " << character
+                  << "): " << diagnostic << '\n'
                   << "    " << rang::fg::reset << prefix << rang::fg::red
                   << error << rang::fg::reset << suffix << '\n';
       }
