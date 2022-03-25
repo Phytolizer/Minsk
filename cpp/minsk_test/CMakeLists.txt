@@ -9,5 +9,4 @@ target_include_directories(
   minsk_test PRIVATE include "${doctest_SOURCE_DIR}/doctest"
 )
 
-enable_testing()
 add_test(NAME minsk_test COMMAND minsk_test)

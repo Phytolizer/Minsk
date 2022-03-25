@@ -34,6 +34,8 @@ CPMAddPackage(
   GIT_TAG v2.4.8
 )
 
+enable_testing()
+
 add_subdirectory(util)
 add_subdirectory(minsk)
 add_subdirectory(minsk_test)
