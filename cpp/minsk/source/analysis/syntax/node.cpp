@@ -8,7 +8,11 @@
 void minsk::analysis::syntax::syntax_node::pretty_print() const {
   pretty_print(this, std::cout, true, "", true);
 }
-void minsk::analysis::syntax::syntax_node::pretty_print(
+std::ostream &
+minsk::analysis::syntax::syntax_node::write_to(std::ostream &os) const {
+  return pretty_print(this, os, false, "", true);
+}
+std::ostream &minsk::analysis::syntax::syntax_node::pretty_print(
     const minsk::analysis::syntax::syntax_node *n, std::ostream &writer,
     bool is_to_console, std::string indent, bool is_last) {
   writer << indent;
@@ -29,6 +33,7 @@ void minsk::analysis::syntax::syntax_node::pretty_print(
       pretty_print(child, writer, is_to_console, indent, child == last_child);
     }
   }
+  return writer;
 }
 
 minsk::analysis::text::text_span
@@ -38,4 +43,9 @@ minsk::analysis::syntax::syntax_node::span() const {
   auto last = c[c.size() - 1];
   return text::text_span::from_bounds(first->span().start(),
                                       last->span().end());
+}
+
+std::ostream &operator<<(std::ostream &os,
+                         const minsk::analysis::syntax::syntax_node &node) {
+  return node.write_to(os);
 }
