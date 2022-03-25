@@ -81,9 +81,20 @@ minsk::analysis::syntax::lexer::iterator::scan() {
       kind = syntax_kind::slash_token;
       m_position += 1;
       break;
+    case '=':
+      if (peek(1) == '=') {
+        kind = syntax_kind::equals_equals_token;
+        m_position += 2;
+      }
+      break;
     case '!':
-      kind = syntax_kind::bang_token;
-      m_position += 1;
+      if (peek(1) == '=') {
+        kind = syntax_kind::bang_equals_token;
+        m_position += 2;
+      } else {
+        kind = syntax_kind::bang_token;
+        m_position += 1;
+      }
       break;
     case '&':
       if (peek(1) == '&') {

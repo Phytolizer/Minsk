@@ -20,6 +20,8 @@ enum class syntax_kind {
   bang_token,
   ampersand_ampersand_token,
   pipe_pipe_token,
+  equals_equals_token,
+  bang_equals_token,
   open_parenthesis_token,
   close_parenthesis_token,
 

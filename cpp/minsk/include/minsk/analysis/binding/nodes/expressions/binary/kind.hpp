@@ -10,6 +10,8 @@ enum class bound_binary_operator_kind {
   division,
   logical_and,
   logical_or,
+  equality,
+  inequality,
 };
 
 } // namespace minsk::analysis::binding

@@ -6,6 +6,10 @@ int minsk::runtime::integer::value() const { return m_value; }
 std::ostream &minsk::runtime::integer::print(std::ostream &os) const {
   return os << m_value;
 }
+bool minsk::runtime::integer::operator==(const object &other) const {
+  return other.kind() == object_kind::integer &&
+         dynamic_cast<const integer *>(&other)->value() == m_value;
+}
 minsk::runtime::object_kind minsk::runtime::integer::kind() const {
   return object_kind::integer;
 }
@@ -13,6 +17,10 @@ minsk::runtime::boolean::boolean(bool value) : m_value(value) {}
 bool minsk::runtime::boolean::value() const { return m_value; }
 std::ostream &minsk::runtime::boolean::print(std::ostream &os) const {
   return os << (m_value ? "true" : "false");
+}
+bool minsk::runtime::boolean::operator==(const object &other) const {
+  return other.kind() == object_kind::boolean &&
+         dynamic_cast<const boolean *>(&other)->value() == m_value;
 }
 minsk::runtime::object_kind minsk::runtime::boolean::kind() const {
   return object_kind::boolean;

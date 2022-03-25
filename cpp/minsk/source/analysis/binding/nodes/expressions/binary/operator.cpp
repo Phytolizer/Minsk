@@ -50,6 +50,34 @@ constexpr std::array operators = {
         runtime::object_kind::boolean,
         runtime::object_kind::boolean,
     },
+    binding::bound_binary_operator{
+        syntax::syntax_kind::equals_equals_token,
+        binding::bound_binary_operator_kind::equality,
+        runtime::object_kind::integer,
+        runtime::object_kind::integer,
+        runtime::object_kind::boolean,
+    },
+    binding::bound_binary_operator{
+        syntax::syntax_kind::bang_equals_token,
+        binding::bound_binary_operator_kind::inequality,
+        runtime::object_kind::integer,
+        runtime::object_kind::integer,
+        runtime::object_kind::boolean,
+    },
+    binding::bound_binary_operator{
+        syntax::syntax_kind::equals_equals_token,
+        binding::bound_binary_operator_kind::equality,
+        runtime::object_kind::boolean,
+        runtime::object_kind::boolean,
+        runtime::object_kind::boolean,
+    },
+    binding::bound_binary_operator{
+        syntax::syntax_kind::bang_equals_token,
+        binding::bound_binary_operator_kind::inequality,
+        runtime::object_kind::boolean,
+        runtime::object_kind::boolean,
+        runtime::object_kind::boolean,
+    },
 };
 
 const binding::bound_binary_operator *

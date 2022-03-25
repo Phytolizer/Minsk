@@ -16,6 +16,7 @@ public:
   virtual object_kind kind() const = 0;
   virtual std::ostream &print(std::ostream &os) const = 0;
   virtual ~object() = default;
+  virtual bool operator==(const object &other) const = 0;
 };
 
 using object_ptr = std::unique_ptr<object>;
@@ -27,6 +28,7 @@ public:
   explicit integer(int value);
   object_kind kind() const override;
   std::ostream &print(std::ostream &os) const override;
+  bool operator==(const object &other) const override;
   int value() const;
 };
 
@@ -37,6 +39,7 @@ public:
   explicit boolean(bool value);
   object_kind kind() const override;
   std::ostream &print(std::ostream &os) const override;
+  bool operator==(const object &other) const override;
   bool value() const;
 };
 

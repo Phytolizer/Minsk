@@ -63,6 +63,10 @@ minsk::analysis::evaluator::evaluate_binary_expression(
     return std::make_unique<runtime::boolean>(
         dynamic_cast<runtime::boolean *>(left.get())->value() ||
         dynamic_cast<runtime::boolean *>(right.get())->value());
+  case binding::bound_binary_operator_kind::equality:
+    return std::make_unique<runtime::boolean>(*left == *right);
+  case binding::bound_binary_operator_kind::inequality:
+    return std::make_unique<runtime::boolean>(*left != *right);
   }
   throw std::runtime_error{"corrupt operator kind"};
 }

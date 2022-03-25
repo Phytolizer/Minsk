@@ -5,9 +5,12 @@ int minsk::analysis::syntax::facts::binary_operator_precedence(
   switch (kind) {
   case syntax_kind::star_token:
   case syntax_kind::slash_token:
-    return 4;
+    return 5;
   case syntax_kind::plus_token:
   case syntax_kind::minus_token:
+    return 4;
+  case syntax_kind::equals_equals_token:
+  case syntax_kind::bang_equals_token:
     return 3;
   case syntax_kind::ampersand_ampersand_token:
     return 2;
@@ -23,7 +26,7 @@ int minsk::analysis::syntax::facts::unary_operator_precedence(
   case syntax_kind::plus_token:
   case syntax_kind::minus_token:
   case syntax_kind::bang_token:
-    return 5;
+    return 6;
   default:
     return 0;
   }
