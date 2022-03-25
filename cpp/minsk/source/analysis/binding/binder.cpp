@@ -9,6 +9,7 @@
 #include "minsk/analysis/binding/nodes/expressions/unary.hpp"
 #include "minsk/analysis/binding/nodes/expressions/unary/operator.hpp"
 #include "minsk/analysis/binding/nodes/expressions/variable.hpp"
+#include "minsk/analysis/binding/scope.hpp"
 #include "minsk/analysis/binding/scope/global.hpp"
 #include "minsk/analysis/diagnostic.hpp"
 #include "minsk/analysis/syntax/kind.hpp"
@@ -25,6 +26,7 @@
 #include <iterator>
 #include <memory>
 #include <ranges>
+#include <stack>
 #include <stdexcept>
 
 std::unique_ptr<minsk::analysis::binding::bound_expression>
@@ -108,13 +110,39 @@ minsk::analysis::binding::binder::bind_unary_expression(
   return std::make_unique<bound_unary_expression>(op, std::move(operand));
 }
 
-minsk::analysis::binding::binder::binder(bound_scope *parent)
-    : m_scope(parent) {}
+std::unique_ptr<minsk::analysis::binding::bound_scope>
+minsk::analysis::binding::binder::create_parent_scope(
+    bound_global_scope *previous) {
+  auto stack = std::stack<bound_global_scope *>{};
+  while (previous != nullptr) {
+    stack.push(previous);
+    previous = previous->previous();
+  }
+
+  std::unique_ptr<bound_scope> current;
+
+  while (!stack.empty()) {
+    auto global_scope = stack.top();
+    stack.pop();
+    auto scope = std::make_unique<bound_scope>(std::move(current));
+    for (const auto &v : global_scope->variables()) {
+      scope->try_declare(variable_symbol{v});
+    }
+    current = std::move(scope);
+  }
+
+  return current;
+}
+
+minsk::analysis::binding::binder::binder(std::unique_ptr<bound_scope> parent)
+    : m_scope(std::move(parent)) {}
 
 minsk::analysis::binding::bound_global_scope
 minsk::analysis::binding::binder::bind_global_scope(
+    minsk::analysis::binding::bound_global_scope *previous,
     const syntax::compilation_unit_syntax *syntax) {
-  auto binder = binding::binder{nullptr};
+  auto parent_scope = create_parent_scope(previous);
+  auto binder = binding::binder{std::move(parent_scope)};
   auto expression = binder.bind_expression(syntax->expression());
   auto variables = binder.m_scope.get_declared_variables();
   auto diagnostics = std::vector<diagnostic>{};

@@ -6,15 +6,19 @@
 #include "minsk/analysis/syntax/tree.hpp"
 #include "minsk/analysis/variable_map.hpp"
 #include "minsk/runtime/object.hpp"
+#include <memory>
 
 namespace minsk::analysis {
 
 class compilation final {
+  std::unique_ptr<compilation> m_previous;
   syntax::syntax_tree m_syntax;
   binding::bound_global_scope m_global_scope;
 
 public:
   explicit compilation(syntax::syntax_tree syntax);
+  compilation(std::unique_ptr<compilation> previous,
+              syntax::syntax_tree syntax);
 
   const syntax::syntax_tree &syntax() const;
 

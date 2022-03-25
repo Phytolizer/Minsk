@@ -2,6 +2,7 @@
 #define MINSK_ANALYSIS_BINDING_SCOPE_HPP
 
 #include "minsk/analysis/variable_symbol.hpp"
+#include <memory>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -10,11 +11,11 @@
 namespace minsk::analysis::binding {
 
 class bound_scope final {
-  bound_scope *m_parent;
+  std::unique_ptr<bound_scope> m_parent;
   std::unordered_map<std::string, variable_symbol> m_variables;
 
 public:
-  explicit bound_scope(bound_scope *previous);
+  explicit bound_scope(std::unique_ptr<bound_scope> parent);
   bound_scope *parent();
   std::vector<variable_symbol> get_declared_variables() const;
   bool try_declare(variable_symbol &&variable);

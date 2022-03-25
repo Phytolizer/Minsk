@@ -22,6 +22,7 @@ int main() {
   bool show_tree = true;
   minsk::analysis::variable_map variables;
   std::ostringstream text_builder;
+  std::unique_ptr<minsk::analysis::compilation> previous;
 
   while (true) {
     std::cout << rang::fg::green << (text_builder.str().empty() ? "» " : "· ")
@@ -54,14 +55,15 @@ int main() {
     if (show_tree) {
       syntax_tree.root()->pretty_print();
     }
-    minsk::analysis::compilation compilation{std::move(syntax_tree)};
+    auto compilation = std::make_unique<minsk::analysis::compilation>(
+        std::move(previous), std::move(syntax_tree));
     minsk::analysis::evaluation_result result =
-        compilation.evaluate(&variables);
+        compilation->evaluate(&variables);
     if (result.diagnostics().size() > 0) {
       for (const auto &diagnostic : result.diagnostics()) {
-        auto line_index = compilation.syntax().text().get_line_index(
+        auto line_index = compilation->syntax().text().get_line_index(
             diagnostic.span().start());
-        const auto &line = compilation.syntax().text().lines()[line_index];
+        const auto &line = compilation->syntax().text().lines()[line_index];
         auto line_number = line_index + 1;
         auto character = diagnostic.span().start() - line.start() + 1;
         auto prefix_span = minsk::analysis::text::text_span::from_bounds(
@@ -70,15 +72,16 @@ int main() {
         auto suffix_span = minsk::analysis::text::text_span::from_bounds(
             diagnostic.span().end(), line.end());
 
-        auto prefix = compilation.syntax().text().to_string(prefix_span);
-        auto error = compilation.syntax().text().to_string(error_span);
-        auto suffix = compilation.syntax().text().to_string(suffix_span);
+        auto prefix = compilation->syntax().text().to_string(prefix_span);
+        auto error = compilation->syntax().text().to_string(error_span);
+        auto suffix = compilation->syntax().text().to_string(suffix_span);
         std::cout << rang::fg::red << "(" << line_number << ", " << character
                   << "): " << diagnostic << '\n'
                   << "    " << rang::fg::reset << prefix << rang::fg::red
                   << error << rang::fg::reset << suffix << '\n';
       }
     } else {
+      previous = std::move(compilation);
       std::cout << rang::fg::magenta;
       result.value()->print(std::cout);
       std::cout << rang::fg::reset << '\n';

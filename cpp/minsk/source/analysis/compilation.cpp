@@ -6,11 +6,18 @@
 #include "minsk/analysis/variable_map.hpp"
 #include <algorithm>
 #include <iterator>
+#include <memory>
 #include <ranges>
 
+minsk::analysis::compilation::compilation(std::unique_ptr<compilation> previous,
+                                          syntax::syntax_tree syntax)
+    : m_previous(std::move(previous)), m_syntax(std::move(syntax)),
+      m_global_scope(binding::binder::bind_global_scope(
+          m_previous ? &m_previous->m_global_scope : nullptr,
+          m_syntax.root())) {}
+
 minsk::analysis::compilation::compilation(syntax::syntax_tree syntax)
-    : m_syntax(std::move(syntax)),
-      m_global_scope(binding::binder::bind_global_scope(m_syntax.root())) {}
+    : compilation(nullptr, std::move(syntax)) {}
 
 const minsk::analysis::syntax::syntax_tree &
 minsk::analysis::compilation::syntax() const {

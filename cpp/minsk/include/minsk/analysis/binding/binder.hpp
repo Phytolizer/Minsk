@@ -4,6 +4,7 @@
 #include "minsk/analysis/binding/nodes/expression.hpp"
 #include "minsk/analysis/binding/scope.hpp"
 #include "minsk/analysis/binding/scope/global.hpp"
+#include "minsk/analysis/compilation.hpp"
 #include "minsk/analysis/diagnostic_bag.hpp"
 #include "minsk/analysis/syntax/nodes/expression.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/assignment.hpp"
@@ -33,11 +34,14 @@ class binder final {
       const syntax::parenthesized_expression_syntax *syntax);
   std::unique_ptr<bound_expression>
   bind_unary_expression(const syntax::unary_expression_syntax *syntax);
+  static std::unique_ptr<bound_scope>
+  create_parent_scope(bound_global_scope *previous);
 
 public:
-  explicit binder(bound_scope *parent);
+  explicit binder(std::unique_ptr<bound_scope> parent);
   static bound_global_scope
-  bind_global_scope(const syntax::compilation_unit_syntax *syntax);
+  bind_global_scope(bound_global_scope *previous,
+                    const syntax::compilation_unit_syntax *syntax);
   std::unique_ptr<bound_expression>
   bind_expression(const syntax::expression_syntax *syntax);
   const diagnostic_bag &diagnostics() const;

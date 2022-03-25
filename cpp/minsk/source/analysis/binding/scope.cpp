@@ -4,12 +4,13 @@
 #include <iterator>
 #include <ranges>
 
-minsk::analysis::binding::bound_scope::bound_scope(bound_scope *previous)
-    : m_parent(previous) {}
+minsk::analysis::binding::bound_scope::bound_scope(
+    std::unique_ptr<bound_scope> parent)
+    : m_parent(std::move(parent)) {}
 
 minsk::analysis::binding::bound_scope *
 minsk::analysis::binding::bound_scope::parent() {
-  return m_parent;
+  return m_parent.get();
 }
 
 std::vector<minsk::analysis::variable_symbol>
