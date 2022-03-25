@@ -13,32 +13,42 @@
 #include <iostream>
 #include <iterator>
 #include <memory>
+#include <sstream>
 #include <string>
 
 int main() {
-  std::string line;
+  std::string input_line;
   bool show_tree = true;
   minsk::analysis::variable_map variables;
+  std::ostringstream text_builder;
+
   while (true) {
     std::cout << "> " << std::flush;
-    if (!std::getline(std::cin, line)) {
+    if (!std::getline(std::cin, input_line)) {
       break;
     }
 
-    if (line == "#showTree") {
-      show_tree = !show_tree;
-      if (show_tree) {
-        std::cout << "Showing parse trees.\n";
-      } else {
-        std::cout << "Not showing parse trees.\n";
-      };
-      continue;
-    } else if (line == "#cls") {
-      util::terminal::clear();
-      continue;
+    if (text_builder.str().empty()) {
+      if (input_line == "#showTree") {
+        show_tree = !show_tree;
+        if (show_tree) {
+          std::cout << "Showing parse trees.\n";
+        } else {
+          std::cout << "Not showing parse trees.\n";
+        };
+        continue;
+      } else if (input_line == "#cls") {
+        util::terminal::clear();
+        continue;
+      }
     }
 
-    auto syntax_tree = minsk::analysis::syntax::syntax_tree::parse(line);
+    text_builder << input_line << '\n';
+    auto text = text_builder.str();
+    auto syntax_tree = minsk::analysis::syntax::syntax_tree::parse(text);
+    if (!input_line.empty() && !syntax_tree.diagnostics().empty()) {
+      continue;
+    }
     if (show_tree) {
       syntax_tree.root()->pretty_print();
     }
@@ -49,21 +59,20 @@ int main() {
       for (const auto &diagnostic : result.diagnostics()) {
         auto line_index = compilation.syntax().text().get_line_index(
             diagnostic.span().start());
+        const auto &line = compilation.syntax().text().lines()[line_index];
         auto line_number = line_index + 1;
-        auto character =
-            diagnostic.span().start() -
-            compilation.syntax().text().lines()[line_index].start() + 1;
+        auto character = diagnostic.span().start() - line.start() + 1;
         auto prefix = std::string_view{
-            line.begin(),
-            line.begin() + diagnostic.span().start(),
+            text.begin() + line.start(),
+            text.begin() + diagnostic.span().start(),
         };
         auto error = std::string_view{
-            line.begin() + diagnostic.span().start(),
-            line.begin() + diagnostic.span().end(),
+            text.begin() + diagnostic.span().start(),
+            text.begin() + diagnostic.span().end(),
         };
         auto suffix = std::string_view{
-            line.begin() + diagnostic.span().end(),
-            line.end(),
+            text.begin() + diagnostic.span().end(),
+            text.begin() + line.end(),
         };
         std::cout << rang::fg::red << "(" << line_number << ", " << character
                   << "): " << diagnostic << '\n'
@@ -74,6 +83,7 @@ int main() {
       result.value()->print(std::cout);
       std::cout << '\n';
     }
+    text_builder.str("");
   }
   return 0;
 }
