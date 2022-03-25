@@ -7,6 +7,8 @@ add_library(
   source/analysis/binding/nodes/expressions/unary.cpp
   source/analysis/binding/nodes/expressions/unary/operator.cpp
   source/analysis/compilation.cpp
+  source/analysis/diagnostic.cpp
+  source/analysis/diagnostic_bag.cpp
   source/analysis/evaluation_result.cpp
   source/analysis/evaluator.cpp
   source/analysis/syntax/facts.cpp
@@ -19,6 +21,7 @@ add_library(
   source/analysis/syntax/parser.cpp
   source/analysis/syntax/token.cpp
   source/analysis/syntax/tree.cpp
+  source/analysis/text/span.cpp
   source/runtime/object.cpp
 )
 add_library(minsk::minsk ALIAS minsk)

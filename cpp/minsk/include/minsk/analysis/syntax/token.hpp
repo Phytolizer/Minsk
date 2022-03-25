@@ -2,6 +2,7 @@
 #define MINSK_TOKEN_HPP
 
 #include "kind.hpp"
+#include "minsk/analysis/text/span.hpp"
 #include "minsk/runtime/object.hpp"
 #include "node.hpp"
 #include <string>
@@ -27,6 +28,7 @@ public:
   [[nodiscard]] int position() const;
   [[nodiscard]] std::string_view text() const;
   [[nodiscard]] const runtime::object *value() const;
+  [[nodiscard]] text::text_span span() const;
 };
 
 } // namespace minsk::analysis::syntax

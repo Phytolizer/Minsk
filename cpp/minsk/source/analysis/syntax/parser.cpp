@@ -54,9 +54,8 @@ minsk::analysis::syntax::parser::match_token(
     return next_token();
   }
 
-  m_diagnostics.emplace_back(fmt::format(
-      "Expected next token to be <{}>, got <{}> instead",
-      magic_enum::enum_name(kind), magic_enum::enum_name(current().kind())));
+  m_diagnostics.report_unexpected_token(current().span(), kind,
+                                        current().kind());
   return syntax_token{kind, current().position(), "", nullptr};
 }
 std::unique_ptr<minsk::analysis::syntax::expression_syntax>

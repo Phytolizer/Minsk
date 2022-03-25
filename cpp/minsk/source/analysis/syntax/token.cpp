@@ -1,5 +1,6 @@
 #include "minsk/analysis/syntax/token.hpp"
 #include "minsk/analysis/syntax/kind.hpp"
+#include "minsk/analysis/text/span.hpp"
 #include <utility>
 minsk::analysis::syntax::syntax_token::syntax_token(
     minsk::analysis::syntax::syntax_kind kind, int position, std::string text,
@@ -19,6 +20,10 @@ std::string_view minsk::analysis::syntax::syntax_token::text() const {
 const minsk::runtime::object *
 minsk::analysis::syntax::syntax_token::value() const {
   return m_value.get();
+}
+minsk::analysis::text::text_span
+minsk::analysis::syntax::syntax_token::span() const {
+  return text::text_span{m_position, static_cast<int>(m_text.length())};
 }
 minsk::analysis::syntax::syntax_token::syntax_token(
     const minsk::analysis::syntax::syntax_token &other)

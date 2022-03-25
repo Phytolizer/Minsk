@@ -38,7 +38,7 @@ public:
 
   iterator begin();
   iterator end();
-  const diagnostic_bag &diagnostics() const;
+  diagnostic_bag &diagnostics();
 };
 
 } // namespace minsk::analysis::syntax

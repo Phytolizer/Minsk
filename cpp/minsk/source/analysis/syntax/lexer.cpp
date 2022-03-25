@@ -1,6 +1,7 @@
 #include "minsk/analysis/syntax/lexer.hpp"
 #include "fmt/format.h"
 #include "minsk/analysis/syntax/facts.hpp"
+#include "minsk/analysis/text/span.hpp"
 #include <cctype>
 #include <optional>
 #include <sstream>
@@ -44,8 +45,8 @@ minsk::analysis::syntax::lexer::iterator::scan() {
     std::istringstream ss{*text};
     int int_value;
     if (!(ss >> int_value)) {
-      m_lexer->m_diagnostics.emplace_back(
-          fmt::format("Number {} doesn't fit in an int.", *text));
+      m_lexer->m_diagnostics.report_invalid_int(
+          text::text_span::from_bounds(start, m_position), *text);
     }
 
     value = std::make_unique<runtime::integer>(int_value);
@@ -120,8 +121,7 @@ minsk::analysis::syntax::lexer::iterator::scan() {
   }
 
   if (kind == syntax_kind::bad_token) {
-    m_lexer->m_diagnostics.emplace_back(
-        fmt::format("Bad character in input: '{}'", current()));
+    m_lexer->m_diagnostics.report_bad_character(m_position, current());
     m_position += 1;
   }
 
@@ -178,7 +178,6 @@ minsk::analysis::syntax::lexer::iterator minsk::analysis::syntax::lexer::end() {
   return iterator{};
 }
 minsk::analysis::syntax::lexer::lexer(std::string_view text) : m_text(text) {}
-const minsk::analysis::diagnostic_bag &
-minsk::analysis::syntax::lexer::diagnostics() const {
+minsk::analysis::diagnostic_bag &minsk::analysis::syntax::lexer::diagnostics() {
   return m_diagnostics;
 }

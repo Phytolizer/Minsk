@@ -25,10 +25,9 @@ minsk::analysis::binding::binder::bind_binary_expression(
   const bound_binary_operator *op = bound_binary_operator::bind(
       syntax->operator_token().kind(), left->type(), right->type());
   if (op == nullptr) {
-    m_diagnostics.emplace_back(fmt::format(
-        "Binary operator '{}' isn't defined for types {} and {}",
-        syntax->operator_token().text(), magic_enum::enum_name(left->type()),
-        magic_enum::enum_name(right->type())));
+    m_diagnostics.report_undefined_binary_operator(
+        syntax->operator_token().span(), syntax->operator_token().text(),
+        left->type(), right->type());
     return left;
   }
 
@@ -57,10 +56,9 @@ minsk::analysis::binding::binder::bind_unary_expression(
   const bound_unary_operator *op = bound_unary_operator::bind(
       syntax->operator_token().kind(), operand->type());
   if (op == nullptr) {
-    m_diagnostics.emplace_back(
-        fmt::format("Unary operator '{}' isn't defined for type {}",
-                    syntax->operator_token().text(),
-                    magic_enum::enum_name(operand->type())));
+    m_diagnostics.report_undefined_unary_operator(
+        syntax->operator_token().span(), syntax->operator_token().text(),
+        operand->type());
     return operand;
   }
 
