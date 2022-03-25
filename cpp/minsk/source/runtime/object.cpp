@@ -8,7 +8,7 @@ std::ostream &minsk::runtime::integer::print(std::ostream &os) const {
 }
 bool minsk::runtime::integer::operator==(const object &other) const {
   return other.kind() == object_kind::integer &&
-         dynamic_cast<const integer *>(&other)->value() == m_value;
+         other.as_integer()->value() == m_value;
 }
 minsk::runtime::object_kind minsk::runtime::integer::kind() const {
   return object_kind::integer;
@@ -20,7 +20,7 @@ std::ostream &minsk::runtime::boolean::print(std::ostream &os) const {
 }
 bool minsk::runtime::boolean::operator==(const object &other) const {
   return other.kind() == object_kind::boolean &&
-         dynamic_cast<const boolean *>(&other)->value() == m_value;
+         other.as_boolean()->value() == m_value;
 }
 minsk::runtime::object_kind minsk::runtime::boolean::kind() const {
   return object_kind::boolean;
@@ -33,12 +33,18 @@ minsk::runtime::copy_object_ptr(const minsk::runtime::object *ptr) {
 
   switch (ptr->kind()) {
   case object_kind::integer:
-    return std::make_unique<integer>(
-        dynamic_cast<const integer *>(ptr)->value());
+    return std::make_unique<integer>(ptr->as_integer()->value());
   case object_kind::boolean:
-    return std::make_unique<boolean>(
-        dynamic_cast<const boolean *>(ptr)->value());
+    return std::make_unique<boolean>(ptr->as_boolean()->value());
   }
 
   throw std::runtime_error{"unreachable"};
+}
+
+const minsk::runtime::boolean *minsk::runtime::object::as_boolean() const {
+  return dynamic_cast<const boolean *>(this);
+}
+
+const minsk::runtime::integer *minsk::runtime::object::as_integer() const {
+  return dynamic_cast<const integer *>(this);
 }

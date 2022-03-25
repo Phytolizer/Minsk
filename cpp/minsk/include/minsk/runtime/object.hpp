@@ -11,12 +11,17 @@ enum class object_kind {
   boolean,
 };
 
+class integer;
+class boolean;
+
 class object {
 public:
   virtual object_kind kind() const = 0;
   virtual std::ostream &print(std::ostream &os) const = 0;
   virtual ~object() = default;
   virtual bool operator==(const object &other) const = 0;
+  const boolean *as_boolean() const;
+  const integer *as_integer() const;
 };
 
 using object_ptr = std::unique_ptr<object>;

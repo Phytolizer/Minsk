@@ -40,29 +40,23 @@ minsk::analysis::evaluator::evaluate_binary_expression(
   runtime::object_ptr right = evaluate_expression(root->right());
   switch (root->op()->kind()) {
   case binding::bound_binary_operator_kind::addition:
-    return std::make_unique<runtime::integer>(
-        dynamic_cast<runtime::integer *>(left.get())->value() +
-        dynamic_cast<runtime::integer *>(right.get())->value());
+    return std::make_unique<runtime::integer>(left->as_integer()->value() +
+                                              right->as_integer()->value());
   case binding::bound_binary_operator_kind::subtraction:
-    return std::make_unique<runtime::integer>(
-        dynamic_cast<runtime::integer *>(left.get())->value() -
-        dynamic_cast<runtime::integer *>(right.get())->value());
+    return std::make_unique<runtime::integer>(left->as_integer()->value() -
+                                              right->as_integer()->value());
   case binding::bound_binary_operator_kind::multiplication:
-    return std::make_unique<runtime::integer>(
-        dynamic_cast<runtime::integer *>(left.get())->value() *
-        dynamic_cast<runtime::integer *>(right.get())->value());
+    return std::make_unique<runtime::integer>(left->as_integer()->value() *
+                                              right->as_integer()->value());
   case binding::bound_binary_operator_kind::division:
-    return std::make_unique<runtime::integer>(
-        dynamic_cast<runtime::integer *>(left.get())->value() /
-        dynamic_cast<runtime::integer *>(right.get())->value());
+    return std::make_unique<runtime::integer>(left->as_integer()->value() /
+                                              right->as_integer()->value());
   case binding::bound_binary_operator_kind::logical_and:
-    return std::make_unique<runtime::boolean>(
-        dynamic_cast<runtime::boolean *>(left.get())->value() &&
-        dynamic_cast<runtime::boolean *>(right.get())->value());
+    return std::make_unique<runtime::boolean>(left->as_boolean()->value() &&
+                                              right->as_boolean()->value());
   case binding::bound_binary_operator_kind::logical_or:
-    return std::make_unique<runtime::boolean>(
-        dynamic_cast<runtime::boolean *>(left.get())->value() ||
-        dynamic_cast<runtime::boolean *>(right.get())->value());
+    return std::make_unique<runtime::boolean>(left->as_boolean()->value() ||
+                                              right->as_boolean()->value());
   case binding::bound_binary_operator_kind::equality:
     return std::make_unique<runtime::boolean>(*left == *right);
   case binding::bound_binary_operator_kind::inequality:
@@ -83,11 +77,9 @@ minsk::analysis::evaluator::evaluate_unary_expression(
   case binding::bound_unary_operator_kind::identity:
     return operand;
   case binding::bound_unary_operator_kind::negation:
-    return std::make_unique<runtime::integer>(
-        -dynamic_cast<runtime::integer *>(operand.get())->value());
+    return std::make_unique<runtime::integer>(-operand->as_integer()->value());
   case binding::bound_unary_operator_kind::logical_negation:
-    return std::make_unique<runtime::boolean>(
-        !dynamic_cast<runtime::boolean *>(operand.get())->value());
+    return std::make_unique<runtime::boolean>(!operand->as_boolean()->value());
   }
   throw std::runtime_error{"corrupt operator kind"};
 }
