@@ -1,6 +1,7 @@
 #include "minsk/analysis/syntax/lexer.hpp"
 #include "fmt/format.h"
 #include "minsk/analysis/syntax/facts.hpp"
+#include "minsk/analysis/text/source.hpp"
 #include "minsk/analysis/text/span.hpp"
 #include <cctype>
 #include <optional>
@@ -22,7 +23,7 @@ minsk::analysis::syntax::lexer::iterator::scan() {
         nullptr,
     };
   }
-  if (m_position >= m_lexer->m_text.length()) {
+  if (m_position >= m_lexer->m_text->length()) {
     m_at_end = true;
     return syntax_token{
         syntax_kind::end_of_file_token,
@@ -161,17 +162,14 @@ char minsk::analysis::syntax::lexer::iterator::current() const {
 }
 char minsk::analysis::syntax::lexer::iterator::peek(int offset) const {
   int index = m_position + offset;
-  if (index >= m_lexer->m_text.length()) {
+  if (index >= m_lexer->m_text->length()) {
     return '\0';
   }
-  return m_lexer->m_text[index];
+  return (*m_lexer->m_text)[index];
 }
 std::string
 minsk::analysis::syntax::lexer::iterator::current_text(int start) const {
-  return std::string{
-      m_lexer->m_text.begin() + start,
-      m_lexer->m_text.begin() + m_position,
-  };
+  return m_lexer->m_text->to_string(start, m_position - start);
 }
 minsk::analysis::syntax::lexer::iterator
 minsk::analysis::syntax::lexer::begin() {
@@ -180,7 +178,8 @@ minsk::analysis::syntax::lexer::begin() {
 minsk::analysis::syntax::lexer::iterator minsk::analysis::syntax::lexer::end() {
   return iterator{};
 }
-minsk::analysis::syntax::lexer::lexer(std::string_view text) : m_text(text) {}
+minsk::analysis::syntax::lexer::lexer(const text::source_text *text)
+    : m_text(text) {}
 minsk::analysis::diagnostic_bag &minsk::analysis::syntax::lexer::diagnostics() {
   return m_diagnostics;
 }

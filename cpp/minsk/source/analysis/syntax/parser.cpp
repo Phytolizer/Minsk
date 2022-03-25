@@ -11,12 +11,15 @@
 #include "minsk/analysis/syntax/nodes/expressions/parenthesized.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/unary.hpp"
 #include "minsk/analysis/syntax/token.hpp"
+#include "minsk/analysis/text/source.hpp"
 #include "minsk/runtime/object.hpp"
 #include <algorithm>
 #include <memory>
 
-minsk::analysis::syntax::parser::parser(std::string_view text) : m_position(0) {
-  lexer lex{text};
+minsk::analysis::syntax::parser::parser(
+    minsk::analysis::text::source_text &&text)
+    : m_text(std::move(text)), m_position(0) {
+  auto lex = lexer{&m_text};
   std::copy_if(lex.begin(), lex.end(), std::back_inserter(m_tokens),
                [](const syntax_token &token) {
                  return token.kind() != syntax_kind::bad_token &&
@@ -152,6 +155,7 @@ minsk::analysis::syntax::syntax_tree minsk::analysis::syntax::parser::parse() {
   std::unique_ptr<expression_syntax> expression = parse_expression();
   syntax_token end_of_file_token = match_token(syntax_kind::end_of_file_token);
   return syntax_tree{
+      std::move(m_text),
       std::move(expression),
       std::move(end_of_file_token),
       std::move(m_diagnostics),

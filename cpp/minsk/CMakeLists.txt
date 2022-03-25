@@ -25,6 +25,8 @@ add_library(
   "source/analysis/syntax/parser.cpp"
   "source/analysis/syntax/token.cpp"
   "source/analysis/syntax/tree.cpp"
+  "source/analysis/text/line.cpp"
+  "source/analysis/text/source.cpp"
   "source/analysis/text/span.cpp"
   "source/analysis/variable_symbol.cpp"
   "source/runtime/object.cpp"

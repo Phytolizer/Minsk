@@ -2,6 +2,7 @@
 #define MINSK_LEXER_HPP
 
 #include "minsk/analysis/diagnostic_bag.hpp"
+#include "minsk/analysis/text/source.hpp"
 #include "token.hpp"
 #include <concepts>
 #include <ranges>
@@ -9,7 +10,7 @@
 namespace minsk::analysis::syntax {
 
 class lexer final {
-  std::string_view m_text;
+  const text::source_text *m_text;
   diagnostic_bag m_diagnostics;
 
 public:
@@ -34,7 +35,7 @@ public:
     [[nodiscard]] bool operator==(const iterator &other) const;
   };
 
-  explicit lexer(std::string_view text);
+  explicit lexer(const text::source_text *text);
 
   iterator begin();
   iterator end();
