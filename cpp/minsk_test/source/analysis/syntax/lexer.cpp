@@ -7,8 +7,12 @@
 #include "minsk_test/parametrize.hpp"
 #include <algorithm>
 #include <array>
+#include <bits/ranges_algo.h>
+#include <bits/ranges_algobase.h>
 #include <iterator>
+#include <ranges>
 #include <string_view>
+#include <unordered_set>
 #include <vector>
 
 using minsk::analysis::syntax::syntax_kind;
@@ -20,7 +24,7 @@ struct simple_token final {
   std::string text;
 };
 
-std::array separators = {
+std::vector separators = {
     simple_token{syntax_kind::whitespace_token, " "},
     simple_token{syntax_kind::whitespace_token, "  "},
     simple_token{syntax_kind::whitespace_token, "\r"},
@@ -111,6 +115,31 @@ std::vector<simple_token_pair_with_separator> get_token_pairs_with_separator() {
     }
   }
   return result;
+}
+
+TEST_CASE("tests all tokens") {
+  auto token_kinds = std::unordered_set<syntax_kind>{};
+  std::ranges::copy_if(
+      magic_enum::enum_values<syntax_kind>(),
+      std::inserter(token_kinds, token_kinds.end()), [](syntax_kind k) {
+        auto name = magic_enum::enum_name(k);
+        return name.ends_with("keyword") || name.ends_with("token");
+      });
+
+  auto tested_token_kinds = std::unordered_set<syntax_kind>{};
+  std::ranges::transform(
+      get_tokens(), std::inserter(tested_token_kinds, tested_token_kinds.end()),
+      [](const simple_token &tok) { return tok.kind; });
+  std::ranges::transform(
+      separators, std::inserter(tested_token_kinds, tested_token_kinds.end()),
+      [](const simple_token &tok) { return tok.kind; });
+
+  auto untested_token_kinds = token_kinds;
+  std::erase_if(untested_token_kinds, [&tested_token_kinds](const auto &k) {
+    return k == syntax_kind::bad_token || k == syntax_kind::end_of_file_token ||
+           tested_token_kinds.find(k) != tested_token_kinds.end();
+  });
+  CHECK(untested_token_kinds.size() == 0);
 }
 
 TEST_CASE("lexes token") {
