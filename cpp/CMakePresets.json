@@ -17,6 +17,14 @@
       "generator": "Unix Makefiles"
     },
     {
+      "name": "dev-make-clang",
+      "inherits": ["dev-make"],
+      "binaryDir": "build/dev-make-clang",
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "clang++"
+      }
+    },
+    {
       "name": "dist",
       "binaryDir": "build/dist",
       "generator": "Unix Makefiles",
@@ -29,6 +37,10 @@
     {
       "name": "dev-make",
       "configurePreset": "dev-make"
+    },
+    {
+      "name": "dev-make-clang",
+      "configurePreset": "dev-make-clang"
     },
     {
       "name": "dist",

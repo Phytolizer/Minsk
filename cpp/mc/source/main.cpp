@@ -17,7 +17,7 @@
 
 int main() {
   std::string line;
-  bool show_tree = false;
+  bool show_tree = true;
   minsk::analysis::variable_map variables;
   while (true) {
     std::cout << "> " << std::flush;

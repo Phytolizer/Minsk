@@ -85,7 +85,7 @@ std::vector<simple_token_pair> get_token_pairs() {
   for (const auto &t1 : tokens) {
     for (const auto &t2 : tokens) {
       if (!requires_separator(t1, t2)) {
-        result.emplace_back(t1, t2);
+        result.emplace_back(simple_token_pair{t1, t2});
       }
     }
   }
@@ -105,7 +105,7 @@ std::vector<simple_token_pair_with_separator> get_token_pairs_with_separator() {
     for (const auto &t2 : tokens) {
       if (requires_separator(t1, t2)) {
         for (const auto &sep : separators) {
-          result.emplace_back(t1, sep, t2);
+          result.emplace_back(simple_token_pair_with_separator{t1, sep, t2});
         }
       }
     }
