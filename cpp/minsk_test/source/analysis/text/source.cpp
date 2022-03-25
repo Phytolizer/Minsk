@@ -1,6 +1,7 @@
 #include "minsk/analysis/text/source.hpp"
 #include "doctest.h"
 #include "minsk_test/parametrize.hpp"
+#include <array>
 #include <string_view>
 
 TEST_CASE("includes last line") {

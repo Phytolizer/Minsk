@@ -1,8 +1,9 @@
 #include "minsk/analysis/syntax/nodes/statements/block.hpp"
 #include "minsk/analysis/syntax/node.hpp"
 #include "minsk/analysis/syntax/nodes/statement.hpp"
-#include <bits/ranges_algo.h>
+#include <algorithm>
 #include <iterator>
+#include <ranges>
 #include <vector>
 
 minsk::analysis::syntax::block_statement_syntax::block_statement_syntax(

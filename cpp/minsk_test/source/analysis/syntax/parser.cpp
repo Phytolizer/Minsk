@@ -10,7 +10,6 @@
 #include "minsk/analysis/syntax/tree.hpp"
 #include "minsk_test/parametrize.hpp"
 #include <algorithm>
-#include <bits/ranges_algo.h>
 #include <cstddef>
 #include <iterator>
 #include <ranges>

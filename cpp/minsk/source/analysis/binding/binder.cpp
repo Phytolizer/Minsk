@@ -28,7 +28,6 @@
 #include "minsk/analysis/variable_symbol.hpp"
 #include "minsk/runtime/object.hpp"
 #include <algorithm>
-#include <bits/ranges_algobase.h>
 #include <iterator>
 #include <memory>
 #include <ranges>

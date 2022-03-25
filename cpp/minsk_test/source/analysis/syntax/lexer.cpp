@@ -7,8 +7,6 @@
 #include "minsk_test/parametrize.hpp"
 #include <algorithm>
 #include <array>
-#include <bits/ranges_algo.h>
-#include <bits/ranges_algobase.h>
 #include <iterator>
 #include <ranges>
 #include <string_view>
