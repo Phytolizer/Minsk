@@ -146,7 +146,12 @@ minsk::analysis::binding::binder::bind_global_scope(
   auto expression = binder.bind_expression(syntax->expression());
   auto variables = binder.m_scope.get_declared_variables();
   auto diagnostics = std::vector<diagnostic>{};
+
+  if (previous != nullptr) {
+    std::ranges::copy(previous->diagnostics(), std::back_inserter(diagnostics));
+  }
   std::ranges::copy(binder.diagnostics(), std::back_inserter(diagnostics));
+
   return bound_global_scope{
       nullptr,
       std::move(diagnostics),
