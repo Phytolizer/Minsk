@@ -39,4 +39,6 @@ if(false)
   target_compile_options(minsk PUBLIC -fsanitize=address,undefined)
   target_link_options(minsk PUBLIC -fsanitize=address,undefined)
 endif()
-target_link_libraries(minsk PUBLIC magic_enum::magic_enum util::util fmt::fmt)
+target_link_libraries(
+  minsk PUBLIC magic_enum::magic_enum util::util fmt::fmt rang
+)

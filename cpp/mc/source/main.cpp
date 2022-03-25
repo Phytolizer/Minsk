@@ -24,7 +24,8 @@ int main() {
   std::ostringstream text_builder;
 
   while (true) {
-    std::cout << (text_builder.str().empty() ? "> " : "| ") << std::flush;
+    std::cout << rang::fg::green << (text_builder.str().empty() ? "» " : "· ")
+              << rang::fg::reset << std::flush;
     if (!std::getline(std::cin, input_line)) {
       break;
     }
@@ -78,8 +79,9 @@ int main() {
                   << error << rang::fg::reset << suffix << '\n';
       }
     } else {
+      std::cout << rang::fg::magenta;
       result.value()->print(std::cout);
-      std::cout << '\n';
+      std::cout << rang::fg::reset << '\n';
     }
     text_builder.str("");
   }
