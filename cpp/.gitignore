@@ -40,3 +40,4 @@ fabric.properties
 
 build/
 .vscode/
+.vs/
