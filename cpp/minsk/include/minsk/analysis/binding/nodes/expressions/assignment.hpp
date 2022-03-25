@@ -3,6 +3,7 @@
 
 #include "minsk/analysis/binding/kind.hpp"
 #include "minsk/analysis/binding/nodes/expression.hpp"
+#include "minsk/analysis/variable_symbol.hpp"
 #include "minsk/runtime/object.hpp"
 #include <memory>
 #include <string>
@@ -10,17 +11,17 @@
 namespace minsk::analysis::binding {
 
 class bound_assignment_expression final : public bound_expression {
-  std::string m_name;
+  variable_symbol m_variable;
   std::unique_ptr<bound_expression> m_expression;
 
 public:
-  bound_assignment_expression(std::string &&name,
+  bound_assignment_expression(variable_symbol &&variable,
                               std::unique_ptr<bound_expression> expression);
 
   bound_node_kind kind() const override;
   runtime::object_kind type() const override;
 
-  std::string_view name() const;
+  const variable_symbol &variable() const;
   const bound_expression *expression() const;
 };
 

@@ -1,9 +1,11 @@
 #include "minsk/analysis/binding/nodes/expressions/variable.hpp"
 #include "minsk/analysis/binding/kind.hpp"
+#include "minsk/analysis/variable_symbol.hpp"
 #include "minsk/runtime/object.hpp"
+
 minsk::analysis::binding::bound_variable_expression::bound_variable_expression(
-    std::string &&name, runtime::object_kind type)
-    : m_name(std::move(name)), m_type(type) {}
+    variable_symbol &&variable)
+    : m_variable(std::move(variable)) {}
 
 minsk::analysis::binding::bound_node_kind
 minsk::analysis::binding::bound_variable_expression::kind() const {
@@ -12,9 +14,10 @@ minsk::analysis::binding::bound_variable_expression::kind() const {
 
 minsk::runtime::object_kind
 minsk::analysis::binding::bound_variable_expression::type() const {
-  return m_type;
+  return m_variable.type();
 }
 
-std::string_view minsk::analysis::binding::bound_variable_expression::name() const {
-  return m_name;
+const minsk::analysis::variable_symbol &
+minsk::analysis::binding::bound_variable_expression::variable() const {
+  return m_variable;
 }

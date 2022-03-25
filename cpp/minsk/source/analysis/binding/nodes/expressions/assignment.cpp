@@ -1,12 +1,13 @@
 #include "minsk/analysis/binding/nodes/expressions/assignment.hpp"
 #include "minsk/analysis/binding/kind.hpp"
 #include "minsk/analysis/binding/nodes/expression.hpp"
+#include "minsk/analysis/variable_symbol.hpp"
 #include "minsk/runtime/object.hpp"
 
 minsk::analysis::binding::bound_assignment_expression::
-    bound_assignment_expression(std::string &&name,
+    bound_assignment_expression(variable_symbol &&variable,
                                 std::unique_ptr<bound_expression> expression)
-    : m_name(std::move(name)), m_expression(std::move(expression)) {}
+    : m_variable(std::move(variable)), m_expression(std::move(expression)) {}
 
 minsk::analysis::binding::bound_node_kind
 minsk::analysis::binding::bound_assignment_expression::kind() const {
@@ -15,12 +16,12 @@ minsk::analysis::binding::bound_assignment_expression::kind() const {
 
 minsk::runtime::object_kind
 minsk::analysis::binding::bound_assignment_expression::type() const {
-  return m_expression->type();
+  return m_variable.type();
 }
 
-std::string_view
-minsk::analysis::binding::bound_assignment_expression::name() const {
-  return m_name;
+const minsk::analysis::variable_symbol &
+minsk::analysis::binding::bound_assignment_expression::variable() const {
+  return m_variable;
 }
 
 const minsk::analysis::binding::bound_expression *

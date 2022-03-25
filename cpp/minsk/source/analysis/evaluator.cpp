@@ -41,10 +41,9 @@ minsk::analysis::evaluator::evaluate_assignment_expression(
     const binding::bound_assignment_expression *root) {
   auto value = evaluate_expression(root->expression());
   auto [_, inserted] = m_variables->emplace(
-      std::string{root->name()}, runtime::copy_object_ptr(value.get()));
+      root->variable(), runtime::copy_object_ptr(value.get()));
   if (!inserted) {
-    (*m_variables)[std::string{root->name()}] =
-        runtime::copy_object_ptr(value.get());
+    (*m_variables)[root->variable()] = runtime::copy_object_ptr(value.get());
   }
   return std::move(value);
 }
@@ -105,8 +104,7 @@ minsk::analysis::evaluator::evaluate_unary_expression(
 minsk::runtime::object_ptr
 minsk::analysis::evaluator::evaluate_variable_expression(
     const binding::bound_variable_expression *root) {
-  return runtime::copy_object_ptr(
-      (*m_variables)[std::string{root->name()}].get());
+  return runtime::copy_object_ptr((*m_variables)[root->variable()].get());
 }
 
 minsk::analysis::evaluator::evaluator(const binding::bound_expression *root,

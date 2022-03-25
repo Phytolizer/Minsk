@@ -16,6 +16,7 @@
 #include "minsk/analysis/syntax/nodes/expressions/name.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/parenthesized.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/unary.hpp"
+#include "minsk/analysis/variable_symbol.hpp"
 #include "minsk/runtime/object.hpp"
 #include <algorithm>
 #include <memory>
@@ -26,17 +27,22 @@ minsk::analysis::binding::binder::bind_assignment_expression(
     const syntax::assignment_expression_syntax *syntax) {
   auto expression = bind_expression(syntax->expression());
   auto name = syntax->identifier_token().text();
-  auto entry = m_variables->find(std::string{name});
+  auto entry = std::find_if(
+      m_variables->begin(), m_variables->end(),
+      [&name](const auto &entry) { return entry.first.name() == name; });
   if (entry == m_variables->end()) {
     auto default_value = expression->type() == runtime::object_kind::integer
                              ? std::make_unique<runtime::integer>(0)
                          : expression->type() == runtime::object_kind::boolean
                              ? std::make_unique<runtime::boolean>(false)
                              : std::unique_ptr<runtime::object>{nullptr};
-    m_variables->emplace(std::string{name}, std::move(default_value));
+    m_variables->emplace(variable_symbol{std::string{name}, expression->type()},
+                         std::move(default_value));
   }
 
-  return std::make_unique<bound_assignment_expression>(std::string{name},
+  auto variable = variable_symbol{std::string{name}, expression->type()};
+
+  return std::make_unique<bound_assignment_expression>(std::move(variable),
                                                        std::move(expression));
 }
 
@@ -70,9 +76,9 @@ std::unique_ptr<minsk::analysis::binding::bound_expression>
 minsk::analysis::binding::binder::bind_name_expression(
     const syntax::name_expression_syntax *syntax) {
   auto name = syntax->identifier_token().text();
-  auto entry =
-      std::find_if(m_variables->begin(), m_variables->end(),
-                   [&name](const auto &entry) { return entry.first == name; });
+  auto entry = std::find_if(
+      m_variables->begin(), m_variables->end(),
+      [&name](const auto &entry) { return entry.first.name() == name; });
   if (entry == m_variables->end()) {
     m_diagnostics.report_undefined_name(syntax->identifier_token().span(),
                                         name);
@@ -81,7 +87,8 @@ minsk::analysis::binding::binder::bind_name_expression(
   }
 
   auto type = entry->second->kind();
-  return std::make_unique<bound_variable_expression>(std::string{name}, type);
+  return std::make_unique<bound_variable_expression>(
+      variable_symbol{entry->first});
 }
 
 std::unique_ptr<minsk::analysis::binding::bound_expression>

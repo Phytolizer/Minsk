@@ -26,6 +26,7 @@ add_library(
   source/analysis/syntax/token.cpp
   source/analysis/syntax/tree.cpp
   source/analysis/text/span.cpp
+  source/analysis/variable_symbol.cpp
   source/runtime/object.cpp
 )
 add_library(minsk::minsk ALIAS minsk)
