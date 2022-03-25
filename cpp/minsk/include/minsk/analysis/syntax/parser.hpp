@@ -26,6 +26,7 @@ class parser final {
   [[nodiscard]] std::unique_ptr<statement_syntax> parse_statement();
   [[nodiscard]] std::unique_ptr<statement_syntax> parse_block_statement();
   [[nodiscard]] std::unique_ptr<statement_syntax> parse_expression_statement();
+  [[nodiscard]] std::unique_ptr<statement_syntax> parse_variable_declaration();
   [[nodiscard]] std::unique_ptr<expression_syntax> parse_expression();
   [[nodiscard]] std::unique_ptr<expression_syntax>
   parse_assignment_expression();

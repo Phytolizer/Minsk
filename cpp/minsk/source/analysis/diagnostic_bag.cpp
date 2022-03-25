@@ -83,3 +83,8 @@ void minsk::analysis::diagnostic_bag::report_cannot_convert(
                            magic_enum::enum_name(from_type),
                            magic_enum::enum_name(to_type)));
 }
+
+void minsk::analysis::diagnostic_bag::report_cannot_assign(
+    text::text_span span, std::string_view name) {
+  report(span, fmt::format("Variable '{}' is read-only", name));
+}

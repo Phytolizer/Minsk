@@ -13,6 +13,7 @@
 #include "minsk/analysis/syntax/nodes/statement.hpp"
 #include "minsk/analysis/syntax/nodes/statements/block.hpp"
 #include "minsk/analysis/syntax/nodes/statements/expression.hpp"
+#include "minsk/analysis/syntax/nodes/statements/variable.hpp"
 #include "minsk/analysis/syntax/nodes/unit.hpp"
 #include "minsk/analysis/syntax/token.hpp"
 #include "minsk/analysis/text/source.hpp"
@@ -67,6 +68,9 @@ minsk::analysis::syntax::parser::parse_statement() {
   switch (current().kind()) {
   case syntax_kind::open_brace_token:
     return parse_block_statement();
+  case syntax_kind::let_keyword:
+  case syntax_kind::var_keyword:
+    return parse_variable_declaration();
   default:
     return parse_expression_statement();
   }
@@ -89,6 +93,18 @@ std::unique_ptr<minsk::analysis::syntax::statement_syntax>
 minsk::analysis::syntax::parser::parse_expression_statement() {
   auto expression = parse_expression();
   return std::make_unique<expression_statement_syntax>(std::move(expression));
+}
+std::unique_ptr<minsk::analysis::syntax::statement_syntax>
+minsk::analysis::syntax::parser::parse_variable_declaration() {
+  auto is_read_only = current().kind() == syntax_kind::let_keyword;
+  auto keyword_token = match_token(is_read_only ? syntax_kind::let_keyword
+                                                : syntax_kind::var_keyword);
+  auto identifier_token = match_token(syntax_kind::identifier_token);
+  auto equals_token = match_token(syntax_kind::equals_token);
+  auto initializer = parse_expression();
+  return std::make_unique<variable_declaration_syntax>(
+      std::move(keyword_token), std::move(identifier_token),
+      std::move(equals_token), std::move(initializer));
 }
 std::unique_ptr<minsk::analysis::syntax::expression_syntax>
 minsk::analysis::syntax::parser::parse_expression() {

@@ -40,6 +40,12 @@ minsk::analysis::syntax::facts::keyword_kind(std::string_view text) {
   if (text == "false") {
     return syntax_kind::false_keyword;
   }
+  if (text == "let") {
+    return syntax_kind::let_keyword;
+  }
+  if (text == "var") {
+    return syntax_kind::var_keyword;
+  }
   return syntax_kind::identifier_token;
 }
 
@@ -78,6 +84,10 @@ minsk::analysis::syntax::facts::get_text(syntax_kind kind) {
     return "true";
   case syntax_kind::false_keyword:
     return "false";
+  case syntax_kind::let_keyword:
+    return "let";
+  case syntax_kind::var_keyword:
+    return "var";
   default:
     return {};
   }

@@ -12,6 +12,7 @@
 #include "minsk/analysis/binding/nodes/statement.hpp"
 #include "minsk/analysis/binding/nodes/statements/block.hpp"
 #include "minsk/analysis/binding/nodes/statements/expression.hpp"
+#include "minsk/analysis/binding/nodes/statements/variable.hpp"
 #include "minsk/analysis/binding/scope.hpp"
 #include "minsk/analysis/binding/scope/global.hpp"
 #include "minsk/analysis/diagnostic.hpp"
@@ -23,6 +24,7 @@
 #include "minsk/analysis/syntax/nodes/expressions/parenthesized.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/unary.hpp"
 #include "minsk/analysis/syntax/nodes/statements/block.hpp"
+#include "minsk/analysis/syntax/nodes/statements/variable.hpp"
 #include "minsk/analysis/variable_symbol.hpp"
 #include "minsk/runtime/object.hpp"
 #include <algorithm>
@@ -40,8 +42,13 @@ minsk::analysis::binding::binder::bind_assignment_expression(
   auto name = syntax->identifier_token().text();
   auto variable = m_scope->try_lookup(name);
   if (!variable) {
-    variable = variable_symbol{std::string{name}, expression->type()};
-    m_scope->try_declare(variable_symbol{*variable});
+    m_diagnostics.report_undefined_name(syntax->identifier_token().span(),
+                                        name);
+    return expression;
+  }
+
+  if (variable->is_read_only()) {
+    m_diagnostics.report_cannot_assign(syntax->equals_token().span(), name);
   }
 
   if (expression->type() != variable->type()) {
@@ -179,6 +186,9 @@ minsk::analysis::binding::binder::bind_statement(
   case syntax::syntax_kind::expression_statement:
     return bind_expression_statement(
         dynamic_cast<const syntax::expression_statement_syntax *>(syntax));
+  case syntax::syntax_kind::variable_declaration:
+    return bind_variable_declaration(
+        dynamic_cast<const syntax::variable_declaration_syntax *>(syntax));
   default:
     throw std::runtime_error{fmt::format(
         "Unexpected syntax {}", magic_enum::enum_name(syntax->kind()))};
@@ -202,6 +212,23 @@ minsk::analysis::binding::binder::bind_expression_statement(
     const syntax::expression_statement_syntax *syntax) {
   auto expression = bind_expression(syntax->expression());
   return std::make_unique<bound_expression_statement>(std::move(expression));
+}
+
+std::unique_ptr<minsk::analysis::binding::bound_statement>
+minsk::analysis::binding::binder::bind_variable_declaration(
+    const syntax::variable_declaration_syntax *syntax) {
+  auto name = syntax->identifier_token().text();
+  auto is_read_only =
+      syntax->keyword_token().kind() == syntax::syntax_kind::let_keyword;
+  auto initializer = bind_expression(syntax->initializer());
+  auto variable =
+      variable_symbol{std::string{name}, is_read_only, initializer->type()};
+  if (!m_scope->try_declare(variable_symbol{variable})) {
+    m_diagnostics.report_variable_already_declared(
+        syntax->identifier_token().span(), name);
+  }
+  return std::make_unique<bound_variable_declaration>(std::move(variable),
+                                                      std::move(initializer));
 }
 
 std::unique_ptr<minsk::analysis::binding::bound_expression>

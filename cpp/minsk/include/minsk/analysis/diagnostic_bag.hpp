@@ -48,6 +48,7 @@ public:
   void report_cannot_convert(text::text_span span,
                              runtime::object_kind from_type,
                              runtime::object_kind to_type);
+  void report_cannot_assign(text::text_span span, std::string_view name);
 };
 
 } // namespace minsk::analysis

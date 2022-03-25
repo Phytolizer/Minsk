@@ -30,11 +30,14 @@ enum class syntax_kind {
 
   true_keyword,
   false_keyword,
+  let_keyword,
+  var_keyword,
 
   compilation_unit,
 
   block_statement,
   expression_statement,
+  variable_declaration,
 
   assignment_expression,
   binary_expression,

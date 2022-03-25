@@ -51,7 +51,8 @@ TEST_CASE("correct evaluation") {
       evaluator_test{"!false", std::make_unique<boolean>(true)},
       evaluator_test{"true || false", std::make_unique<boolean>(true)},
       evaluator_test{"false || false", std::make_unique<boolean>(false)},
-      evaluator_test{"(a = 10) * a", std::make_unique<integer>(100)},
+      evaluator_test{"{ var a = 0 (a = 10) * a }",
+                     std::make_unique<integer>(100)},
   };
 
   DOCTEST_VALUE_PARAMETERIZED_DATA(data, evaluator_tests);

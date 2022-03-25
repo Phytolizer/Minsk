@@ -26,6 +26,10 @@ void minsk::analysis::evaluator::evaluate_statement(
     evaluate_expression_statement(
         dynamic_cast<const binding::bound_expression_statement *>(root));
     break;
+  case binding::bound_node_kind::variable_declaration:
+    evaluate_variable_declaration(
+        dynamic_cast<const binding::bound_variable_declaration *>(root));
+    break;
   default:
     throw std::runtime_error{
         fmt::format("unexpected node {}", magic_enum::enum_name(root->kind()))};
@@ -42,6 +46,14 @@ void minsk::analysis::evaluator::evaluate_block_statement(
 void minsk::analysis::evaluator::evaluate_expression_statement(
     const binding::bound_expression_statement *root) {
   m_last_value = evaluate_expression(root->expression());
+}
+
+void minsk::analysis::evaluator::evaluate_variable_declaration(
+    const binding::bound_variable_declaration *root) {
+  auto initializer = evaluate_expression(root->initializer());
+  m_variables->emplace(root->variable(),
+                       runtime::copy_object_ptr(initializer.get()));
+  m_last_value = std::move(initializer);
 }
 
 minsk::runtime::object_ptr minsk::analysis::evaluator::evaluate_expression(

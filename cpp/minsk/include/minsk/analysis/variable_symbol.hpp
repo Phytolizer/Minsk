@@ -9,12 +9,15 @@ namespace minsk::analysis {
 
 class variable_symbol final {
   std::string m_name;
+  bool m_is_read_only;
   runtime::object_kind m_type;
 
 public:
-  variable_symbol(std::string &&name, runtime::object_kind type);
+  variable_symbol(std::string &&name, bool is_read_only,
+                  runtime::object_kind type);
 
   std::string_view name() const;
+  bool is_read_only() const;
   runtime::object_kind type() const;
 
   bool operator==(const variable_symbol &other) const;
