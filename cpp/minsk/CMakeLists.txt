@@ -22,6 +22,7 @@ add_library(
   "source/analysis/syntax/nodes/expressions/name.cpp"
   "source/analysis/syntax/nodes/expressions/parenthesized.cpp"
   "source/analysis/syntax/nodes/expressions/unary.cpp"
+  "source/analysis/syntax/nodes/unit.cpp"
   "source/analysis/syntax/parser.cpp"
   "source/analysis/syntax/token.cpp"
   "source/analysis/syntax/tree.cpp"

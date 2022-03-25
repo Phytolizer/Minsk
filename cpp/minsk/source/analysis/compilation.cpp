@@ -18,7 +18,7 @@ minsk::analysis::compilation::syntax() const {
 minsk::analysis::evaluation_result minsk::analysis::compilation::evaluate(
     minsk::analysis::variable_map *variables) const {
   binding::binder binder{variables};
-  auto expression = binder.bind_expression(m_syntax.root());
+  auto expression = binder.bind_expression(m_syntax.root()->expression());
   diagnostic_bag diagnostics;
   std::copy(m_syntax.diagnostics().begin(), m_syntax.diagnostics().end(),
             std::back_inserter(diagnostics));

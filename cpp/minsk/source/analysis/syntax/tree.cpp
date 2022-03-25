@@ -8,24 +8,22 @@
 #include <iterator>
 #include <utility>
 
-minsk::analysis::syntax::syntax_tree::syntax_tree(
-    text::source_text &&text, std::unique_ptr<expression_syntax> root,
-    minsk::analysis::syntax::syntax_token &&end_of_file_token,
-    minsk::analysis::diagnostic_bag &&diagnostics)
-    : m_text(std::move(text)), m_root(std::move(root)),
-      m_end_of_file_token(std::move(end_of_file_token)),
-      m_diagnostics(std::move(diagnostics)) {}
+minsk::analysis::syntax::syntax_tree::syntax_tree(text::source_text &&text)
+    : m_text(std::move(text)) {
+  auto parser = syntax::parser{&m_text};
+  auto root = parser.parse_compilation_unit();
+  auto diagnostics = parser.take_diagnostics();
+
+  m_root = std::move(root);
+  m_diagnostics = std::move(diagnostics);
+}
 const minsk::analysis::text::source_text &
 minsk::analysis::syntax::syntax_tree::text() const {
   return m_text;
 }
-const minsk::analysis::syntax::expression_syntax *
+const minsk::analysis::syntax::compilation_unit_syntax *
 minsk::analysis::syntax::syntax_tree::root() const {
   return m_root.get();
-}
-const minsk::analysis::syntax::syntax_token &
-minsk::analysis::syntax::syntax_tree::end_of_file_token() const {
-  return m_end_of_file_token;
 }
 const minsk::analysis::diagnostic_bag &
 minsk::analysis::syntax::syntax_tree::diagnostics() const {
@@ -39,8 +37,7 @@ minsk::analysis::syntax::syntax_tree::parse(std::string &&text) {
 
 minsk::analysis::syntax::syntax_tree
 minsk::analysis::syntax::syntax_tree::parse(text::source_text &&text) {
-  minsk::analysis::syntax::parser parser{std::move(text)};
-  return parser.parse();
+  return syntax_tree{std::move(text)};
 }
 
 std::vector<minsk::analysis::syntax::syntax_token>

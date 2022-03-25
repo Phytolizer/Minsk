@@ -29,6 +29,8 @@ enum class syntax_kind {
   true_keyword,
   false_keyword,
 
+  compilation_unit,
+
   assignment_expression,
   binary_expression,
   literal_expression,

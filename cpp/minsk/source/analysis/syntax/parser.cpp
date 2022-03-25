@@ -10,16 +10,16 @@
 #include "minsk/analysis/syntax/nodes/expressions/name.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/parenthesized.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/unary.hpp"
+#include "minsk/analysis/syntax/nodes/unit.hpp"
 #include "minsk/analysis/syntax/token.hpp"
 #include "minsk/analysis/text/source.hpp"
 #include "minsk/runtime/object.hpp"
 #include <algorithm>
 #include <memory>
 
-minsk::analysis::syntax::parser::parser(
-    minsk::analysis::text::source_text &&text)
-    : m_text(std::move(text)), m_position(0) {
-  auto lex = lexer{&m_text};
+minsk::analysis::syntax::parser::parser(const text::source_text *text)
+    : m_text(text), m_position(0) {
+  auto lex = lexer{m_text};
   std::copy_if(lex.begin(), lex.end(), std::back_inserter(m_tokens),
                [](const syntax_token &token) {
                  return token.kind() != syntax_kind::bad_token &&
@@ -27,6 +27,17 @@ minsk::analysis::syntax::parser::parser(
                });
   std::copy(lex.diagnostics().begin(), lex.diagnostics().end(),
             std::back_inserter(m_diagnostics));
+}
+std::unique_ptr<minsk::analysis::syntax::compilation_unit_syntax>
+minsk::analysis::syntax::parser::parse_compilation_unit() {
+  auto expression = parse_expression();
+  auto end_of_file_token = match_token(syntax_kind::end_of_file_token);
+  return std::make_unique<compilation_unit_syntax>(
+      std::move(expression), std::move(end_of_file_token));
+}
+minsk::analysis::diagnostic_bag
+minsk::analysis::syntax::parser::take_diagnostics() {
+  return std::move(m_diagnostics);
 }
 const minsk::analysis::syntax::syntax_token &
 minsk::analysis::syntax::parser::peek(int offset) const {
@@ -150,14 +161,4 @@ minsk::analysis::syntax::parser::parse_boolean_literal() {
       is_true ? syntax_kind::true_keyword : syntax_kind::false_keyword);
   return std::make_unique<literal_expression_syntax>(
       std::move(keyword_token), std::make_unique<runtime::boolean>(is_true));
-}
-minsk::analysis::syntax::syntax_tree minsk::analysis::syntax::parser::parse() {
-  std::unique_ptr<expression_syntax> expression = parse_expression();
-  syntax_token end_of_file_token = match_token(syntax_kind::end_of_file_token);
-  return syntax_tree{
-      std::move(m_text),
-      std::move(expression),
-      std::move(end_of_file_token),
-      std::move(m_diagnostics),
-  };
 }

@@ -3,15 +3,17 @@
 
 #include "minsk/analysis/diagnostic_bag.hpp"
 #include "minsk/analysis/syntax/nodes/expression.hpp"
+#include "minsk/analysis/syntax/nodes/unit.hpp"
 #include "minsk/analysis/text/source.hpp"
 #include "token.hpp"
 #include "tree.hpp"
+#include <memory>
 #include <vector>
 
 namespace minsk::analysis::syntax {
 
 class parser final {
-  text::source_text m_text;
+  const text::source_text *m_text;
   std::vector<syntax_token> m_tokens;
   int m_position;
   diagnostic_bag m_diagnostics;
@@ -33,8 +35,9 @@ class parser final {
   parse_parenthesized_expression();
 
 public:
-  explicit parser(text::source_text &&text);
-  syntax_tree parse();
+  explicit parser(const text::source_text *text);
+  std::unique_ptr<compilation_unit_syntax> parse_compilation_unit();
+  diagnostic_bag take_diagnostics();
 };
 
 } // namespace minsk::analysis::syntax
