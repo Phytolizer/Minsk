@@ -28,6 +28,13 @@ CPMAddPackage(
   GIT_TAG v3.2
 )
 
+CPMAddPackage(
+  NAME doctest
+  GITHUB_REPOSITORY doctest/doctest
+  GIT_TAG v2.4.8
+)
+
 add_subdirectory(util)
 add_subdirectory(minsk)
+add_subdirectory(minsk_test)
 add_subdirectory(mc)
