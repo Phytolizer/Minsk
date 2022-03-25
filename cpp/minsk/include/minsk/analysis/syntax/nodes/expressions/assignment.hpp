@@ -20,7 +20,7 @@ public:
                                std::unique_ptr<expression_syntax> expression);
 
   syntax_kind kind() const override;
-  std::vector<const node *> children() const override;
+  std::vector<const syntax_node *> children() const override;
   const syntax_token &identifier_token() const;
   const syntax_token &equals_token() const;
   const expression_syntax *expression() const;

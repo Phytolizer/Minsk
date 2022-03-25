@@ -11,7 +11,7 @@
 
 namespace minsk::analysis::syntax {
 
-class syntax_token final : public node {
+class syntax_token final : public syntax_node {
   syntax_kind m_kind;
   int m_position;
   std::string m_text;
@@ -24,7 +24,7 @@ public:
   syntax_token &operator=(const syntax_token &other);
 
   [[nodiscard]] syntax_kind kind() const override;
-  [[nodiscard]] std::vector<const node *> children() const override;
+  [[nodiscard]] std::vector<const syntax_node *> children() const override;
   [[nodiscard]] int position() const;
   [[nodiscard]] std::string_view text() const;
   [[nodiscard]] const runtime::object *value() const;

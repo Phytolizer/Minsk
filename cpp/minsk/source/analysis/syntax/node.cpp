@@ -4,11 +4,11 @@
 #include <iostream>
 #include <string>
 #include <string_view>
-void minsk::analysis::syntax::node::pretty_print() const {
+void minsk::analysis::syntax::syntax_node::pretty_print() const {
   pretty_print(this, std::cout, true, "", true);
 }
-void minsk::analysis::syntax::node::pretty_print(
-    const minsk::analysis::syntax::node *n, std::ostream &writer,
+void minsk::analysis::syntax::syntax_node::pretty_print(
+    const minsk::analysis::syntax::syntax_node *n, std::ostream &writer,
     bool is_to_console, std::string indent, bool is_last) {
   writer << indent;
   std::string marker = is_last ? "└── " : "├── ";
@@ -21,10 +21,10 @@ void minsk::analysis::syntax::node::pretty_print(
   }
   writer << '\n';
   indent += is_last ? "    " : "│   ";
-  std::vector<const node *> children = n->children();
+  std::vector<const syntax_node *> children = n->children();
   if (!children.empty()) {
-    const node *last_child = children[children.size() - 1];
-    for (const node *child : children) {
+    const syntax_node *last_child = children[children.size() - 1];
+    for (const syntax_node *child : children) {
       pretty_print(child, writer, is_to_console, indent, child == last_child);
     }
   }

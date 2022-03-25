@@ -9,7 +9,7 @@
 
 namespace minsk::analysis::syntax {
 
-class node;
+class syntax_node;
 
 class parenthesized_expression_syntax final : public expression_syntax {
   syntax_token m_open_parenthesis_token;
@@ -22,7 +22,7 @@ public:
                                   syntax_token &&close_parenthesis_token);
 
   [[nodiscard]] syntax_kind kind() const override;
-  [[nodiscard]] std::vector<const node *> children() const override;
+  [[nodiscard]] std::vector<const syntax_node *> children() const override;
 
   [[nodiscard]] const syntax_token &open_parenthesis_token() const;
   [[nodiscard]] const expression_syntax *expression() const;

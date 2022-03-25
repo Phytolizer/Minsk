@@ -9,7 +9,7 @@
 
 namespace minsk::analysis::syntax {
 
-class node;
+class syntax_node;
 
 class binary_expression_syntax final : public expression_syntax {
   std::unique_ptr<expression_syntax> m_left;
@@ -22,7 +22,7 @@ public:
                            std::unique_ptr<expression_syntax> right);
 
   [[nodiscard]] syntax_kind kind() const override;
-  [[nodiscard]] std::vector<const node *> children() const override;
+  [[nodiscard]] std::vector<const syntax_node *> children() const override;
 
   [[nodiscard]] const expression_syntax *left() const;
   [[nodiscard]] const syntax_token &operator_token() const;

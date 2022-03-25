@@ -16,7 +16,7 @@ public:
   explicit name_expression_syntax(syntax_token &&identifier_token);
 
   syntax_kind kind() const override;
-  std::vector<const node *> children() const override;
+  std::vector<const syntax_node *> children() const override;
   const syntax_token &identifier_token() const;
 };
 

@@ -20,16 +20,17 @@
 using minsk::analysis::syntax::syntax_kind;
 using minsk::analysis::syntax::syntax_token;
 using minsk::analysis::syntax::syntax_tree;
+using minsk::analysis::syntax::syntax_node;
 namespace facts = minsk::analysis::syntax::facts;
 
 class asserting_iterator final {
-  using container = std::vector<const minsk::analysis::syntax::node *>;
+  using container = std::vector<const syntax_node *>;
   container m_container;
   typename container::const_iterator m_iterator;
 
-  static container flatten(const minsk::analysis::syntax::node *node) {
+  static container flatten(const syntax_node *node) {
     container result;
-    auto stack = std::stack<typename container::value_type>{};
+    auto stack = std::stack<const syntax_node *>{};
     stack.push(node);
 
     while (!stack.empty()) {
@@ -46,7 +47,7 @@ class asserting_iterator final {
   }
 
 public:
-  explicit asserting_iterator(const minsk::analysis::syntax::node *node)
+  explicit asserting_iterator(const syntax_node *node)
       : m_container(flatten(node)), m_iterator(std::begin(m_container)) {}
 
   ~asserting_iterator() { CHECK(m_iterator == std::ranges::end(m_container)); }

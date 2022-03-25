@@ -44,7 +44,7 @@ minsk::analysis::syntax::syntax_token::operator=(
   }
   return *this;
 }
-std::vector<const minsk::analysis::syntax::node *>
+std::vector<const minsk::analysis::syntax::syntax_node *>
 minsk::analysis::syntax::syntax_token::children() const {
   return {};
 }

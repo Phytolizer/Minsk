@@ -18,7 +18,7 @@ minsk::analysis::syntax::assignment_expression_syntax::kind() const {
   return syntax_kind::assignment_expression;
 }
 
-std::vector<const minsk::analysis::syntax::node *>
+std::vector<const minsk::analysis::syntax::syntax_node *>
 minsk::analysis::syntax::assignment_expression_syntax::children() const {
   return {
       &m_identifier_token,

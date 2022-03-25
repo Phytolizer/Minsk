@@ -9,7 +9,7 @@
 
 namespace minsk::analysis::syntax {
 
-class node;
+class syntax_node;
 
 class literal_expression_syntax final : public expression_syntax {
   syntax_token m_literal_token;
@@ -21,7 +21,7 @@ public:
                             runtime::object_ptr value);
 
   [[nodiscard]] syntax_kind kind() const override;
-  [[nodiscard]] std::vector<const node *> children() const override;
+  [[nodiscard]] std::vector<const syntax_node *> children() const override;
 
   [[nodiscard]] const syntax_token &literal_token() const;
   [[nodiscard]] const runtime::object *value() const;

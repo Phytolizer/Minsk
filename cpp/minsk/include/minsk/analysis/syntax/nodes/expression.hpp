@@ -5,7 +5,7 @@
 
 namespace minsk::analysis::syntax {
 
-class expression_syntax : public node {
+class expression_syntax : public syntax_node {
 public:
   virtual ~expression_syntax() = default;
 };
