@@ -25,6 +25,13 @@
       }
     },
     {
+      "name": "dev-ninja",
+      "inherits": ["dev-base"],
+      "binaryDir": "build/dev-ninja",
+      "generator": "Ninja",
+      "displayName": "Development (Ninja)"
+    },
+    {
       "name": "dist",
       "binaryDir": "build/dist",
       "generator": "Unix Makefiles",
@@ -37,6 +44,10 @@
     {
       "name": "dev-make",
       "configurePreset": "dev-make"
+    },
+    {
+      "name": "dev-ninja",
+      "configurePreset": "dev-ninja"
     },
     {
       "name": "dev-make-clang",
