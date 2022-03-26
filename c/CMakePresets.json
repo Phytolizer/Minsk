@@ -23,7 +23,7 @@
       "inherits": ["dev-make"],
       "binaryDir": "build/dev-make-clang",
       "cacheVariables": {
-        "CMAKE_CXX_COMPILER": "clang++"
+        "CMAKE_C_COMPILER": "clang"
       }
     },
     {
