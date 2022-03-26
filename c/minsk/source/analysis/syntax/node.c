@@ -45,6 +45,7 @@ syntax_node_children_t syntax_node_children(const syntax_node_t *node) {
     return unary_expression_syntax_children((unary_expression_syntax_t *)node);
   default:
     assert(false && "corrupt syntax node");
+    return (syntax_node_children_t){0};
   }
 }
 static void pretty_print(const syntax_node_t *node, FILE *stream,
