@@ -1,0 +1,72 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "dev-base",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "dev-make",
+      "inherits": ["dev-base"],
+      "displayName": "Development (Make)",
+      "binaryDir": "build/dev-make",
+      "generator": "Unix Makefiles"
+    },
+    {
+      "name": "dev-make-clang",
+      "inherits": ["dev-make"],
+      "binaryDir": "build/dev-make-clang",
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "clang++"
+      }
+    },
+    {
+      "name": "dev-ninja",
+      "inherits": ["dev-base"],
+      "binaryDir": "build/dev-ninja",
+      "generator": "Ninja",
+      "displayName": "Development (Ninja)"
+    },
+    {
+      "name": "dev-vs",
+      "inherits": [ "dev-base" ],
+      "binaryDir": "build/dev-vs",
+      "generator": "Visual Studio 17 2022",
+      "displayName": "Development (Visual Studio)"
+    },
+    {
+      "name": "dist",
+      "binaryDir": "build/dist",
+      "generator": "Unix Makefiles",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "dev-make",
+      "configurePreset": "dev-make"
+    },
+    {
+      "name": "dev-ninja",
+      "configurePreset": "dev-ninja"
+    },
+    {
+      "name": "dev-make-clang",
+      "configurePreset": "dev-make-clang"
+    },
+    {
+      "name": "dev-vs",
+      "configurePreset": "dev-vs"
+    },
+    {
+      "name": "dist",
+      "configurePreset": "dist"
+    }
+  ]
+}
