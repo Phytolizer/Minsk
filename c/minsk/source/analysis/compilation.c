@@ -4,15 +4,17 @@
 #include "minsk/analysis/binding/node/expression.h"
 #include "minsk/analysis/diagnostic_bag.h"
 #include "minsk/analysis/evaluator.h"
+#include "minsk/analysis/variables.h"
 #include "minsk/runtime/object.h"
 
 void compilation_init(compilation_t *compilation, const syntax_tree_t *syntax) {
   compilation->syntax = syntax;
 }
 
-evaluation_result_t compilation_evaluate(compilation_t *compilation) {
+evaluation_result_t compilation_evaluate(compilation_t *compilation,
+                                         variable_map_t *variables) {
   binder_t binder;
-  binder_init(&binder);
+  binder_init(&binder, variables);
   bound_expression_t *bound_expression =
       binder_bind_expression(&binder, compilation->syntax->root);
   diagnostic_bag_t diagnostics;
@@ -30,7 +32,7 @@ evaluation_result_t compilation_evaluate(compilation_t *compilation) {
     return (evaluation_result_t){.diagnostics = diagnostics};
   }
   evaluator_t evaluator;
-  evaluator_init(&evaluator, bound_expression);
+  evaluator_init(&evaluator, bound_expression, variables);
   object_t *result = evaluator_evaluate(&evaluator);
   bound_node_free((bound_node_t *)bound_expression);
   return (evaluation_result_t){.value = result};

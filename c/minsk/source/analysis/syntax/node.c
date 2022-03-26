@@ -1,6 +1,9 @@
 #include "minsk/analysis/syntax/node.h"
+#include "minsk/analysis/syntax/kind.h"
+#include "minsk/analysis/syntax/node/expression/assignment.h"
 #include "minsk/analysis/syntax/node/expression/binary.h"
 #include "minsk/analysis/syntax/node/expression/literal.h"
+#include "minsk/analysis/syntax/node/expression/name.h"
 #include "minsk/analysis/syntax/node/expression/parenthesized.h"
 #include "minsk/analysis/syntax/node/expression/unary.h"
 #include "sds.h"
@@ -11,11 +14,17 @@
 
 void syntax_node_free(syntax_node_t *node) {
   switch (node->kind) {
+  case syntax_kind_assignment_expression:
+    assignment_expression_syntax_free((assignment_expression_syntax_t *)node);
+    break;
   case syntax_kind_binary_expression:
     binary_expression_syntax_free((binary_expression_syntax_t *)node);
     break;
   case syntax_kind_literal_expression:
     literal_expression_syntax_free((literal_expression_syntax_t *)node);
+    break;
+  case syntax_kind_name_expression:
+    name_expression_syntax_free((name_expression_syntax_t *)node);
     break;
   case syntax_kind_parenthesized_expression:
     parenthesized_expression_syntax_free(
@@ -33,12 +42,17 @@ syntax_node_children_t syntax_node_children(const syntax_node_t *node) {
     return (syntax_node_children_t){0};
   }
   switch (node->kind) {
+  case syntax_kind_assignment_expression:
+    return assignment_expression_syntax_children(
+        (const assignment_expression_syntax_t *)node);
   case syntax_kind_binary_expression:
     return binary_expression_syntax_children(
         (binary_expression_syntax_t *)node);
   case syntax_kind_literal_expression:
     return literal_expression_syntax_children(
         (literal_expression_syntax_t *)node);
+  case syntax_kind_name_expression:
+    return name_expression_syntax_children((name_expression_syntax_t *)node);
   case syntax_kind_parenthesized_expression:
     return parenthesized_expression_syntax_children(
         (parenthesized_expression_syntax_t *)node);

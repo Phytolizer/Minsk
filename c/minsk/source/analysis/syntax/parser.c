@@ -3,10 +3,13 @@
 #include "minsk/analysis/syntax/facts.h"
 #include "minsk/analysis/syntax/kind.h"
 #include "minsk/analysis/syntax/node/expression.h"
+#include "minsk/analysis/syntax/node/expression/assignment.h"
 #include "minsk/analysis/syntax/node/expression/binary.h"
 #include "minsk/analysis/syntax/node/expression/literal.h"
+#include "minsk/analysis/syntax/node/expression/name.h"
 #include "minsk/analysis/syntax/node/expression/parenthesized.h"
 #include "minsk/analysis/syntax/node/expression/unary.h"
+#include "minsk/analysis/syntax/peek_buffer.h"
 #include "minsk/analysis/syntax/token.h"
 #include "minsk/analysis/syntax/tree.h"
 #include "minsk/runtime/object.h"
@@ -56,6 +59,13 @@ static expression_syntax_t *parse_number_literal(parser_t *parser) {
   syntax_token_t number_token = match_token(parser, syntax_kind_number_token);
   return literal_expression_syntax_new(number_token, NULL);
 }
+
+static expression_syntax_t *parse_name_expression(parser_t *parser) {
+  syntax_token_t identifier_token =
+      match_token(parser, syntax_kind_identifier_token);
+  return name_expression_syntax_new(identifier_token);
+}
+
 static expression_syntax_t *parse_primary_expression(parser_t *parser) {
   switch (current(parser)->base.kind) {
   case syntax_kind_open_parenthesis_token:
@@ -63,8 +73,10 @@ static expression_syntax_t *parse_primary_expression(parser_t *parser) {
   case syntax_kind_true_keyword:
   case syntax_kind_false_keyword:
     return parse_boolean_literal(parser);
-  default:
+  case syntax_kind_number_token:
     return parse_number_literal(parser);
+  default:
+    return parse_name_expression(parser);
   }
 }
 
@@ -98,8 +110,23 @@ static expression_syntax_t *parse_binary_expression(parser_t *parser,
   return left;
 }
 
-static expression_syntax_t *parse_expression(parser_t *parser) {
+static expression_syntax_t *parse_assignment_expression(parser_t *parser) {
+  if (current(parser)->base.kind == syntax_kind_identifier_token &&
+      peek_buffer_peek(&parser->peek_buffer, 1)->base.kind ==
+          syntax_kind_equals_token) {
+    syntax_token_t identifier_token =
+        match_token(parser, syntax_kind_identifier_token);
+    syntax_token_t equals_token = match_token(parser, syntax_kind_equals_token);
+    expression_syntax_t *expression = parse_expression(parser);
+    return assignment_expression_syntax_new(identifier_token, equals_token,
+                                            expression);
+  }
+
   return parse_binary_expression(parser, 0);
+}
+
+static expression_syntax_t *parse_expression(parser_t *parser) {
+  return parse_assignment_expression(parser);
 }
 
 void parser_init(parser_t *parser, const char *text) {

@@ -47,7 +47,7 @@ void diagnostic_bag_copy_diagnostic(diagnostic_bag_t *bag,
 void diagnostic_bag_report_invalid_int(diagnostic_bag_t *bag, text_span_t span,
                                        sds text) {
   sds message =
-      sdscatfmt(sdsempty(), "Number '%S' doesn't fit in an int", text);
+      sdscatfmt(sdsempty(), "Number '%s' doesn't fit in an int", text);
   report(bag, span, message);
   sdsfree(text);
 }
@@ -88,5 +88,12 @@ void diagnostic_bag_report_undefined_unary_operator(
   sds message =
       sdscatfmt(sdsempty(), "Undefined unary operator '%s' for type <%s>",
                 operator_text, object_kind_to_string(operand_type));
+  report(bag, span, message);
+}
+
+void diagnostic_bag_report_undefined_variable(diagnostic_bag_t *bag,
+                                              text_span_t span,
+                                              const char *name) {
+  sds message = sdscatfmt(sdsempty(), "Undefined variable '%s'", name);
   report(bag, span, message);
 }

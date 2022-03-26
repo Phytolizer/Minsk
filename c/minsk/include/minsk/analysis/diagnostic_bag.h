@@ -33,3 +33,6 @@ void diagnostic_bag_report_undefined_unary_operator(diagnostic_bag_t *bag,
                                                     text_span_t span,
                                                     const char *operator_text,
                                                     object_kind_t operand_type);
+void diagnostic_bag_report_undefined_variable(diagnostic_bag_t *bag,
+                                              text_span_t span,
+                                              const char *name);

@@ -18,14 +18,17 @@
   X(pipe_pipe_token)                                                           \
   X(bang_equals_token)                                                         \
   X(equals_equals_token)                                                       \
+  X(equals_token)                                                              \
   X(open_parenthesis_token)                                                    \
   X(close_parenthesis_token)                                                   \
                                                                                \
   X(true_keyword)                                                              \
   X(false_keyword)                                                             \
                                                                                \
+  X(assignment_expression)                                                     \
   X(binary_expression)                                                         \
   X(literal_expression)                                                        \
+  X(name_expression)                                                           \
   X(parenthesized_expression)                                                  \
   X(unary_expression)
 

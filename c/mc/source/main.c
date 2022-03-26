@@ -6,6 +6,7 @@
 #include "minsk/analysis/evaluator.h"
 #include "minsk/analysis/syntax/tree.h"
 #include "minsk/analysis/text/span.h"
+#include "minsk/analysis/variables.h"
 #include "minsk/runtime/object.h"
 #include "styler/styler.h"
 #include "util/line.h"
@@ -19,6 +20,8 @@ int main(void) {
   char *line = NULL;
   size_t line_len = 0;
   bool show_tree = false;
+  variable_map_t variables;
+  variable_map_init(&variables);
   while (true) {
     printf("> ");
     if (!util_read_line(&line, &line_len, stdin)) {
@@ -41,7 +44,7 @@ int main(void) {
     }
     compilation_t compilation;
     compilation_init(&compilation, &syntax_tree);
-    evaluation_result_t result = compilation_evaluate(&compilation);
+    evaluation_result_t result = compilation_evaluate(&compilation, &variables);
     syntax_tree_free(&syntax_tree);
     diagnostic_bag_t diagnostics = result.diagnostics;
     if (diagnostics.length > 0) {
@@ -70,6 +73,7 @@ int main(void) {
       object_free(result.value);
     }
   }
+  variable_map_free(&variables);
   free(line);
   return 0;
 }

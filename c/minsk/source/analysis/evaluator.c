@@ -1,26 +1,41 @@
 #include "minsk/analysis/evaluator.h"
 #include "minsk/analysis/binding/kind.h"
 #include "minsk/analysis/binding/node/expression.h"
+#include "minsk/analysis/binding/node/expression/assignment.h"
 #include "minsk/analysis/binding/node/expression/binary.h"
 #include "minsk/analysis/binding/node/expression/binary/kind.h"
 #include "minsk/analysis/binding/node/expression/literal.h"
 #include "minsk/analysis/binding/node/expression/unary.h"
 #include "minsk/analysis/binding/node/expression/unary/kind.h"
+#include "minsk/analysis/binding/node/expression/variable.h"
 #include "minsk/analysis/syntax/kind.h"
 #include "minsk/analysis/syntax/node/expression.h"
 #include "minsk/analysis/syntax/node/expression/binary.h"
 #include "minsk/analysis/syntax/node/expression/literal.h"
 #include "minsk/analysis/syntax/node/expression/parenthesized.h"
 #include "minsk/analysis/syntax/node/expression/unary.h"
+#include "minsk/analysis/variables.h"
 #include "minsk/runtime/object.h"
 #include <assert.h>
 
-static object_t *evaluate_expression(const bound_expression_t *root);
+static object_t *evaluate_expression(evaluator_t *evaluator,
+                                     const bound_expression_t *root);
 
 static object_t *
-evaluate_binary_expression(const bound_binary_expression_t *root) {
-  object_t *left = evaluate_expression(root->left);
-  object_t *right = evaluate_expression(root->right);
+evaluate_assignment_expression(evaluator_t *evaluator,
+                               const bound_assignment_expression_t *root) {
+  object_t *value = evaluate_expression(evaluator, root->expression);
+  variable_map_insert(evaluator->variables,
+                      variable_symbol_copy(&root->variable),
+                      object_copy(value));
+  return value;
+}
+
+static object_t *
+evaluate_binary_expression(evaluator_t *evaluator,
+                           const bound_binary_expression_t *root) {
+  object_t *left = evaluate_expression(evaluator, root->left);
+  object_t *right = evaluate_expression(evaluator, root->right);
 
   switch (root->op->kind) {
   case bound_binary_operator_kind_addition: {
@@ -84,13 +99,16 @@ evaluate_binary_expression(const bound_binary_expression_t *root) {
 }
 
 static object_t *
-evaluate_literal_expression(const bound_literal_expression_t *root) {
+evaluate_literal_expression(evaluator_t *evaluator,
+                            const bound_literal_expression_t *root) {
+  (void)evaluator;
   return object_copy(root->value);
 }
 
 static object_t *
-evaluate_unary_expression(const bound_unary_expression_t *root) {
-  object_t *operand = evaluate_expression(root->operand);
+evaluate_unary_expression(evaluator_t *evaluator,
+                          const bound_unary_expression_t *root) {
+  object_t *operand = evaluate_expression(evaluator, root->operand);
 
   switch (root->op->kind) {
   case bound_unary_operator_kind_identity: {
@@ -114,24 +132,44 @@ evaluate_unary_expression(const bound_unary_expression_t *root) {
   }
 }
 
-static object_t *evaluate_expression(const bound_expression_t *root) {
-  switch (root->base.kind) {
-  case bound_node_kind_binary_expression:
-    return evaluate_binary_expression((bound_binary_expression_t *)root);
-  case bound_node_kind_literal_expression:
-    return evaluate_literal_expression((bound_literal_expression_t *)root);
-  case bound_node_kind_unary_expression:
-    return evaluate_unary_expression((bound_unary_expression_t *)root);
-  default:
-    assert(false && "unexpected expression syntax");
-    return NULL;
-  }
+static object_t *
+evaluate_variable_expression(evaluator_t *evaluator,
+                             const bound_variable_expression_t *root) {
+  variable_map_bucket_t *bucket =
+      variable_map_find(evaluator->variables, root->variable);
+  assert(bucket != NULL);
+  return object_copy(bucket->value);
 }
 
-void evaluator_init(evaluator_t *evaluator, const bound_expression_t *root) {
+static object_t *evaluate_expression(evaluator_t *evaluator,
+                                     const bound_expression_t *root) {
+  switch (root->base.kind) {
+  case bound_node_kind_assignment_expression:
+    return evaluate_assignment_expression(
+        evaluator, (const bound_assignment_expression_t *)root);
+  case bound_node_kind_binary_expression:
+    return evaluate_binary_expression(evaluator,
+                                      (bound_binary_expression_t *)root);
+  case bound_node_kind_literal_expression:
+    return evaluate_literal_expression(evaluator,
+                                       (bound_literal_expression_t *)root);
+  case bound_node_kind_unary_expression:
+    return evaluate_unary_expression(evaluator,
+                                     (bound_unary_expression_t *)root);
+  case bound_node_kind_variable_expression:
+    return evaluate_variable_expression(evaluator,
+                                        (bound_variable_expression_t *)root);
+  }
+  assert(false && "unexpected expression syntax");
+  return NULL;
+}
+
+void evaluator_init(evaluator_t *evaluator, const bound_expression_t *root,
+                    variable_map_t *variables) {
   evaluator->root = root;
+  evaluator->variables = variables;
 }
 
 object_t *evaluator_evaluate(evaluator_t *evaluator) {
-  return evaluate_expression(evaluator->root);
+  return evaluate_expression(evaluator, evaluator->root);
 }

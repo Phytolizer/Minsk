@@ -100,6 +100,9 @@ syntax_token_t lexer_next_token(lexer_t *lexer) {
       if (peek(lexer, 1) == '=') {
         kind = syntax_kind_equals_equals_token;
         lexer->position += 2;
+      } else {
+        kind = syntax_kind_equals_token;
+        lexer->position += 1;
       }
       break;
     case '&':
