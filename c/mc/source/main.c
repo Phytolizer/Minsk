@@ -5,6 +5,7 @@
 #include "minsk/analysis/diagnostic_bag.h"
 #include "minsk/analysis/evaluator.h"
 #include "minsk/analysis/syntax/tree.h"
+#include "minsk/analysis/text/span.h"
 #include "minsk/runtime/object.h"
 #include "styler/styler.h"
 #include "util/line.h"
@@ -44,11 +45,24 @@ int main(void) {
     syntax_tree_free(&syntax_tree);
     diagnostic_bag_t diagnostics = result.diagnostics;
     if (diagnostics.length > 0) {
-      styler_apply_fg(styler_fg_red, stdout);
       for (size_t i = 0; i < diagnostics.length; i++) {
+        styler_apply_fg(styler_fg_red, stdout);
         printf("%s\n", diagnostics.data[i].message);
+        styler_apply_fg(styler_fg_reset, stdout);
+        text_span_t prefix_span = {.start = 0,
+                                   .length = diagnostics.data[i].span.start};
+        text_span_t error_span = diagnostics.data[i].span;
+        text_span_t suffix_span = {
+            .start = text_span_end(diagnostics.data[i].span),
+            .length = strlen(line) - text_span_end(diagnostics.data[i].span)};
+        printf("   ");
+        printf("%.*s", (int)prefix_span.length, line + prefix_span.start);
+        styler_apply_fg(styler_fg_red, stdout);
+        printf("%.*s", (int)error_span.length, line + error_span.start);
+        styler_apply_fg(styler_fg_reset, stdout);
+        printf("%.*s", (int)suffix_span.length, line + suffix_span.start);
+        printf("\n");
       }
-      styler_apply_fg(styler_fg_reset, stdout);
       diagnostic_bag_free(&diagnostics);
     } else {
       object_print(result.value, stdout);
