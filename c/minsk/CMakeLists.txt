@@ -1,5 +1,6 @@
 add_library(
   minsk
+  "source/analysis/evaluator.c"
   "source/analysis/syntax/facts.c"
   "source/analysis/syntax/kind.c"
   "source/analysis/syntax/lexer.c"
