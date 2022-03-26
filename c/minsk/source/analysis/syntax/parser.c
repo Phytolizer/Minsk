@@ -12,6 +12,7 @@
 #include "minsk/analysis/syntax/peek_buffer.h"
 #include "minsk/analysis/syntax/token.h"
 #include "minsk/analysis/syntax/tree.h"
+#include "minsk/analysis/text/source.h"
 #include "minsk/runtime/object.h"
 #include <stdbool.h>
 #include <stddef.h>
@@ -154,7 +155,7 @@ syntax_tree_t parser_parse(parser_t *parser) {
 }
 void parser_free(parser_t *parser) {
   peek_buffer_free(&parser->peek_buffer);
-  parser->peek_buffer.lexer.text = NULL;
+  parser->peek_buffer.lexer.text = (source_text_t){0};
   parser->peek_buffer.lexer.position = 0;
   parser->peek_buffer.data = NULL;
   parser->peek_buffer.length = 0;

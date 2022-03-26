@@ -113,6 +113,8 @@ START_TEST(parser_binary_operator_precedence_test) {
       syntax_tree_free(&syntax_tree);
     }
   }
+
+  syntax_kind_vector_free(&binary_operators);
 }
 END_TEST
 

@@ -4,6 +4,7 @@
 #include "minsk/analysis/syntax/facts.h"
 #include "minsk/analysis/syntax/kind.h"
 #include "minsk/analysis/syntax/token.h"
+#include "minsk/analysis/text/source.h"
 #include "minsk/runtime/object.h"
 #include "sds.h"
 #include <ctype.h>
@@ -14,16 +15,16 @@
 
 static char peek(lexer_t *lexer, int offset) {
   size_t index = lexer->position + offset;
-  if (index >= sdslen(lexer->text)) {
+  if (index >= sdslen(lexer->text.text)) {
     return '\0';
   }
-  return lexer->text[index];
+  return lexer->text.text[index];
 }
 
 static char current(lexer_t *lexer) { return peek(lexer, 0); }
 
-void lexer_init(lexer_t *lexer, sds text) {
-  lexer->text = text;
+void lexer_init(lexer_t *lexer, const char *text) {
+  lexer->text = source_text_from(sdsnew(text));
   lexer->position = 0;
   diagnostic_bag_init(&lexer->diagnostics);
 }
@@ -45,7 +46,7 @@ syntax_token_t lexer_next_token(lexer_t *lexer) {
       lexer->position += 1;
     }
 
-    text = sdsnewlen(&lexer->text[start], lexer->position - start);
+    text = sdsnewlen(&lexer->text.text[start], lexer->position - start);
     errno = 0;
     char *endptr;
     long long_val = strtol(text, &endptr, 10);
@@ -64,7 +65,7 @@ syntax_token_t lexer_next_token(lexer_t *lexer) {
       lexer->position += 1;
     }
 
-    text = sdsnewlen(&lexer->text[start], lexer->position - start);
+    text = sdsnewlen(&lexer->text.text[start], lexer->position - start);
     kind = facts_keyword_kind(text);
   } else {
     switch (current(lexer)) {
@@ -137,7 +138,7 @@ syntax_token_t lexer_next_token(lexer_t *lexer) {
   }
 
   if (text == NULL) {
-    text = sdsnewlen(&lexer->text[start], lexer->position - start);
+    text = sdsnewlen(&lexer->text.text[start], lexer->position - start);
   }
 
   return (syntax_token_t){
@@ -149,6 +150,6 @@ syntax_token_t lexer_next_token(lexer_t *lexer) {
 }
 
 void lexer_free(lexer_t *lexer) {
-  sdsfree(lexer->text);
+  source_text_free(&lexer->text);
   diagnostic_bag_free(&lexer->diagnostics);
 }

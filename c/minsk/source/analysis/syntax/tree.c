@@ -24,7 +24,7 @@ syntax_tree_t syntax_tree_parse(const char *text) {
 
 syntax_token_vector_t syntax_tree_parse_tokens(const char *text) {
   lexer_t lexer;
-  lexer_init(&lexer, sdsnew(text));
+  lexer_init(&lexer, text);
   syntax_token_vector_t tokens;
   syntax_token_vector_init(&tokens);
   while (true) {

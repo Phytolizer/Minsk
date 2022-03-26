@@ -22,7 +22,7 @@ static void peek_buffer_push(peek_buffer_t *buffer) {
   buffer->length++;
 }
 void peek_buffer_init(peek_buffer_t *buffer, const char *text) {
-  lexer_init(&buffer->lexer, sdsnew(text));
+  lexer_init(&buffer->lexer, text);
   buffer->data = NULL;
   buffer->length = 0;
   buffer->capacity = 0;
