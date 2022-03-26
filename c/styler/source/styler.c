@@ -47,6 +47,7 @@ static bool is_support_color(void) {
 #endif
 }
 
+#ifdef STYLER_WINDOWS
 typedef BOOL (*get_file_information_by_handle_ex_func_t)(
     HANDLE hFile, FILE_INFO_BY_HANDLE_CLASS FileInformationClass,
     LPVOID lpFileInformation, DWORD dwBufferSize);
@@ -95,6 +96,7 @@ static bool is_msys_pty(int fd) {
   free(p_name_info);
   return true;
 }
+#endif
 
 static bool is_terminal(FILE *stream) {
 #ifdef STYLER_UNIX
