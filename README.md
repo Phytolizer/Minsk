@@ -1,5 +1,6 @@
 # Minsk
 
+[![C](https://github.com/Phytolizer/Minsk/actions/workflows/c.yml/badge.svg)](https://github.com/Phytolizer/Minsk/actions/workflows/c.yml)
 [![C++](https://github.com/Phytolizer/Minsk/actions/workflows/cpp.yml/badge.svg)](https://github.com/Phytolizer/Minsk/actions/workflows/cpp.yml)
 [![C#](https://github.com/Phytolizer/Minsk/actions/workflows/cs.yml/badge.svg)](https://github.com/Phytolizer/Minsk/actions/workflows/cs.yml)
 [![Kotlin](https://github.com/Phytolizer/Minsk/actions/workflows/kt.yml/badge.svg)](https://github.com/Phytolizer/Minsk/actions/workflows/kt.yml)
