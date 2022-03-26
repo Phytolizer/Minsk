@@ -50,7 +50,7 @@ syntax_node_children_t syntax_node_children(const syntax_node_t *node) {
 static void pretty_print(const syntax_node_t *node, FILE *stream,
                          bool is_to_console, sds indent, bool is_last) {
   fprintf(stream, "%s", indent);
-  fprintf(stream, "%s", "+-- ");
+  fprintf(stream, "%s", is_last ? "└── " : "├── ");
   syntax_kind_print(node->kind, stream);
   if (node->is_token) {
     syntax_token_t *tok = (syntax_token_t *)node;
@@ -61,7 +61,7 @@ static void pretty_print(const syntax_node_t *node, FILE *stream,
   }
   fprintf(stream, "\n");
   sds new_indent =
-      sdscatfmt(sdsempty(), "%S%s", indent, is_last ? "    " : "|   ");
+      sdscatfmt(sdsempty(), "%S%s", indent, is_last ? "    " : "│   ");
   sdsfree(indent);
   syntax_node_children_t children = syntax_node_children(node);
   if (children.length != 0) {
