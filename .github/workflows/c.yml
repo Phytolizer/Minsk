@@ -24,6 +24,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
+    - name: Get unit test library
+      run: |
+        sudo add-apt-repository ppa:snaipewastaken/ppa
+        sudo apt-get update
+        sudo apt-get install criterion-dev
+
     - name: get-cmake
       uses: lukka/get-cmake@v3.22.2
 
