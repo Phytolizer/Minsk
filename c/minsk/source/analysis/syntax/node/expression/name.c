@@ -8,6 +8,7 @@
 expression_syntax_t *
 name_expression_syntax_new(syntax_token_t identifier_token) {
   name_expression_syntax_t *syntax = malloc(sizeof(name_expression_syntax_t));
+  syntax->base.base.is_token = false;
   syntax->base.base.kind = syntax_kind_name_expression;
   syntax->identifier_token = identifier_token;
   return (expression_syntax_t *)syntax;
