@@ -19,4 +19,4 @@ add_library(
 )
 add_library(minsk::minsk ALIAS minsk)
 target_include_directories(minsk PUBLIC include)
-target_link_libraries(minsk PUBLIC util::util)
+target_link_libraries(minsk PUBLIC util::util styler::styler)

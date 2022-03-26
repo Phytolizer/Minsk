@@ -4,6 +4,7 @@
 #include "minsk/analysis/syntax/node/expression/parenthesized.h"
 #include "minsk/analysis/syntax/node/expression/unary.h"
 #include "sds.h"
+#include "styler/styler.h"
 #include <assert.h>
 #include <malloc.h>
 #include <stdbool.h>
@@ -52,7 +53,13 @@ static void pretty_print(const syntax_node_t *node, FILE *stream,
                          bool is_to_console, sds indent, bool is_last) {
   fprintf(stream, "%s", indent);
   fprintf(stream, "%s", is_last ? "└── " : "├── ");
+  if (is_to_console) {
+    styler_apply_fg(node->is_token ? styler_fg_blue : styler_fg_cyan, stream);
+  }
   syntax_kind_print(node->kind, stream);
+  if (is_to_console) {
+    styler_apply_fg(styler_fg_reset, stream);
+  }
   if (node->is_token) {
     syntax_token_t *tok = (syntax_token_t *)node;
     if (tok->value != NULL) {
