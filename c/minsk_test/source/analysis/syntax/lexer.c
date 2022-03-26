@@ -20,7 +20,7 @@ typedef struct {
   size_t capacity;
 } simple_token_vector_t;
 
-simple_token_vector_t get_tokens(void) {
+static simple_token_vector_t get_tokens(void) {
   static const simple_token_t dynamic_tokens[] = {
       {.kind = syntax_kind_number_token, .text = "1"},
       {.kind = syntax_kind_number_token, .text = "123"},
