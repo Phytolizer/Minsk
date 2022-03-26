@@ -16,6 +16,9 @@
   X(open_parenthesis_token)                                                    \
   X(close_parenthesis_token)                                                   \
                                                                                \
+  X(true_keyword)                                                              \
+  X(false_keyword)                                                             \
+                                                                               \
   X(binary_expression)                                                         \
   X(literal_expression)                                                        \
   X(parenthesized_expression)                                                  \

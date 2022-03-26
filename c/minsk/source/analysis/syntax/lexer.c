@@ -1,6 +1,7 @@
 #include "minsk/analysis/syntax/lexer.h"
 #include "minsk/analysis/diagnostic.h"
 #include "minsk/analysis/diagnostic_bag.h"
+#include "minsk/analysis/syntax/facts.h"
 #include "minsk/analysis/syntax/kind.h"
 #include "minsk/analysis/syntax/token.h"
 #include "minsk/runtime/object.h"
@@ -58,6 +59,13 @@ syntax_token_t lexer_next_token(lexer_t *lexer) {
 
     value = integer_new((int)long_val);
     kind = syntax_kind_number_token;
+  } else if (isalpha(current(lexer))) {
+    while (isalpha(current(lexer))) {
+      lexer->position += 1;
+    }
+
+    text = sdsnewlen(&lexer->text[start], lexer->position - start);
+    kind = facts_keyword_kind(text);
   } else {
     switch (current(lexer)) {
     case '\0':

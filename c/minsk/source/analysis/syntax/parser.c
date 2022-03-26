@@ -9,6 +9,8 @@
 #include "minsk/analysis/syntax/node/expression/unary.h"
 #include "minsk/analysis/syntax/token.h"
 #include "minsk/analysis/syntax/tree.h"
+#include "minsk/runtime/object.h"
+#include <stdbool.h>
 #include <stddef.h>
 
 static syntax_token_t *current(parser_t *parser) {
@@ -21,8 +23,8 @@ static syntax_token_t match_token(parser_t *parser, syntax_kind_t kind) {
   }
 
   diagnostic_bag_report_unexpected_token(&parser->diagnostics,
-                                         token_span(current(parser)), kind,
-                                         current(parser)->base.kind);
+                                         token_span(current(parser)),
+                                         current(parser)->base.kind, kind);
   return (syntax_token_t){
       .base = {.kind = kind, .is_token = true},
       .position = current(parser)->position,
@@ -43,6 +45,13 @@ static expression_syntax_t *parse_parenthesized_expression(parser_t *parser) {
                                              close_parenthesis_token);
 }
 
+static expression_syntax_t *parse_boolean_literal(parser_t *parser) {
+  bool is_true = current(parser)->base.kind == syntax_kind_true_keyword;
+  syntax_token_t token = match_token(
+      parser, is_true ? syntax_kind_true_keyword : syntax_kind_false_keyword);
+  return literal_expression_syntax_new(token, boolean_new(is_true));
+}
+
 static expression_syntax_t *parse_number_literal(parser_t *parser) {
   syntax_token_t number_token = match_token(parser, syntax_kind_number_token);
   return literal_expression_syntax_new(number_token, NULL);
@@ -51,6 +60,9 @@ static expression_syntax_t *parse_primary_expression(parser_t *parser) {
   switch (current(parser)->base.kind) {
   case syntax_kind_open_parenthesis_token:
     return parse_parenthesized_expression(parser);
+  case syntax_kind_true_keyword:
+  case syntax_kind_false_keyword:
+    return parse_boolean_literal(parser);
   default:
     return parse_number_literal(parser);
   }
