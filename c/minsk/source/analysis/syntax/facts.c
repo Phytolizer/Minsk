@@ -40,3 +40,34 @@ syntax_kind_t facts_keyword_kind(const char *text) {
   }
   return syntax_kind_identifier_token;
 }
+
+const char *facts_get_text(syntax_kind_t kind) {
+  switch (kind) {
+  case syntax_kind_plus_token:
+    return "+";
+  case syntax_kind_minus_token:
+    return "-";
+  case syntax_kind_star_token:
+    return "*";
+  case syntax_kind_slash_token:
+    return "/";
+  case syntax_kind_equals_token:
+    return "=";
+  case syntax_kind_equals_equals_token:
+    return "==";
+  case syntax_kind_bang_equals_token:
+    return "!=";
+  case syntax_kind_bang_token:
+    return "!";
+  case syntax_kind_open_parenthesis_token:
+    return "(";
+  case syntax_kind_close_parenthesis_token:
+    return ")";
+  case syntax_kind_false_keyword:
+    return "false";
+  case syntax_kind_true_keyword:
+    return "true";
+  default:
+    return NULL;
+  }
+}
