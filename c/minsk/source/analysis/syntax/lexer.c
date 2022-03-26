@@ -12,7 +12,7 @@
 #include <stdlib.h>
 
 static char peek(lexer_t *lexer, int offset) {
-  int index = lexer->position + offset;
+  size_t index = lexer->position + offset;
   if (index >= sdslen(lexer->text)) {
     return '\0';
   }
