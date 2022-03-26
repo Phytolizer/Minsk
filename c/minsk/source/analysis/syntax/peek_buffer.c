@@ -1,4 +1,5 @@
 #include "minsk/analysis/syntax/peek_buffer.h"
+#include "minsk/analysis/syntax/token.h"
 #include <assert.h>
 #include <stdlib.h>
 static void peek_buffer_push(peek_buffer_t *buffer) {
@@ -14,6 +15,7 @@ static void peek_buffer_push(peek_buffer_t *buffer) {
   syntax_token_t tok = lexer_next_token(&buffer->lexer);
   while (tok.base.kind == syntax_kind_whitespace_token ||
          tok.base.kind == syntax_kind_bad_token) {
+    token_free(&tok);
     tok = lexer_next_token(&buffer->lexer);
   }
   buffer->data[buffer->length] = tok;
@@ -48,4 +50,5 @@ void peek_buffer_free(peek_buffer_t *buffer) {
   }
   free(buffer->data);
   buffer->data = NULL;
+  lexer_free(&buffer->lexer);
 }

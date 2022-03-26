@@ -78,6 +78,7 @@ static void pretty_print(const syntax_node_t *node, FILE *stream,
                    i == children.length - 1);
     }
   }
+  syntax_node_children_free(&children);
   sdsfree(new_indent);
 }
 void syntax_node_pretty_print(const syntax_node_t *node, FILE *stream) {
