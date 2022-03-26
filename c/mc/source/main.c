@@ -1,6 +1,7 @@
 #include "minsk/analysis/binding/binder.h"
 #include "minsk/analysis/binding/node.h"
 #include "minsk/analysis/binding/node/expression.h"
+#include "minsk/analysis/compilation.h"
 #include "minsk/analysis/diagnostic_bag.h"
 #include "minsk/analysis/evaluator.h"
 #include "minsk/analysis/syntax/tree.h"
@@ -37,21 +38,11 @@ int main(void) {
     if (show_tree) {
       syntax_node_pretty_print((syntax_node_t *)syntax_tree.root, stdout);
     }
-    binder_t binder;
-    binder_init(&binder);
-    bound_expression_t *root =
-        binder_bind_expression(&binder, syntax_tree.root);
-    diagnostic_bag_t diagnostics;
-    diagnostic_bag_init(&diagnostics);
-    for (size_t i = 0; i < syntax_tree.diagnostics.length; i++) {
-      diagnostic_bag_copy_diagnostic(&diagnostics,
-                                     syntax_tree.diagnostics.data[i]);
-    }
-    for (size_t i = 0; i < binder.diagnostics.length; i++) {
-      diagnostic_bag_copy_diagnostic(&diagnostics, binder.diagnostics.data[i]);
-    }
+    compilation_t compilation;
+    compilation_init(&compilation, &syntax_tree);
+    evaluation_result_t result = compilation_evaluate(&compilation);
     syntax_tree_free(&syntax_tree);
-    binder_free(&binder);
+    diagnostic_bag_t diagnostics = result.diagnostics;
     if (diagnostics.length > 0) {
       styler_apply_fg(styler_fg_red, stdout);
       for (size_t i = 0; i < diagnostics.length; i++) {
@@ -60,14 +51,10 @@ int main(void) {
       styler_apply_fg(styler_fg_reset, stdout);
       diagnostic_bag_free(&diagnostics);
     } else {
-      evaluator_t evaluator;
-      evaluator_init(&evaluator, root);
-      object_t *result = evaluator_evaluate(&evaluator);
-      object_print(result, stdout);
+      object_print(result.value, stdout);
       printf("\n");
-      object_free(result);
+      object_free(result.value);
     }
-    bound_node_free((bound_node_t *)root);
   }
   free(line);
   return 0;

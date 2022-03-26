@@ -8,6 +8,7 @@ add_library(
   "source/analysis/binding/node/expression/literal.c"
   "source/analysis/binding/node/expression/unary.c"
   "source/analysis/binding/node/expression/unary/operator.c"
+  "source/analysis/compilation.c"
   "source/analysis/diagnostic.c"
   "source/analysis/diagnostic_bag.c"
   "source/analysis/evaluator.c"
