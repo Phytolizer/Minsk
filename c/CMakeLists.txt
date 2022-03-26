@@ -19,5 +19,6 @@ CPMAddPackage(
 enable_testing()
 
 add_subdirectory(util)
+add_subdirectory(styler)
 add_subdirectory(minsk)
 add_subdirectory(mc)
