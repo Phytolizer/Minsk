@@ -1,6 +1,7 @@
 #include "minsk/analysis/diagnostic_bag.h"
 #include "minsk/analysis/evaluator.h"
 #include "minsk/analysis/syntax/parser.h"
+#include "minsk/analysis/syntax/tree.h"
 #include "minsk/runtime/object.h"
 #include "styler/styler.h"
 #include "util/line.h"
@@ -18,11 +19,9 @@ int main(void) {
       break;
     }
 
-    parser_t parser;
-    parser_init(&parser, line);
-    expression_syntax_t *expression = parser_parse(&parser);
-    diagnostic_bag_t diagnostics = parser.diagnostics;
-    syntax_node_pretty_print((syntax_node_t *)expression, stdout);
+    syntax_tree_t syntax_tree = syntax_tree_parse(line);
+    diagnostic_bag_t diagnostics = syntax_tree.diagnostics;
+    syntax_node_pretty_print((syntax_node_t *)syntax_tree.root, stdout);
     if (diagnostics.length > 0) {
       styler_apply_fg(styler_fg_red, stdout);
       for (size_t i = 0; i < diagnostics.length; i++) {
@@ -31,14 +30,13 @@ int main(void) {
       styler_apply_fg(styler_fg_reset, stdout);
     } else {
       evaluator_t evaluator;
-      evaluator_init(&evaluator, expression);
+      evaluator_init(&evaluator, syntax_tree.root);
       object_t *result = evaluator_evaluate(&evaluator);
       object_print(result, stdout);
       printf("\n");
       object_free(result);
     }
-    parser_free(&parser);
-    syntax_node_free((syntax_node_t *)expression);
+    syntax_tree_free(&syntax_tree);
   }
   free(line);
   return 0;

@@ -1,11 +1,14 @@
 #include "minsk/analysis/syntax/parser.h"
 #include "minsk/analysis/diagnostic_bag.h"
 #include "minsk/analysis/syntax/facts.h"
+#include "minsk/analysis/syntax/kind.h"
 #include "minsk/analysis/syntax/node/expression.h"
 #include "minsk/analysis/syntax/node/expression/binary.h"
 #include "minsk/analysis/syntax/node/expression/literal.h"
 #include "minsk/analysis/syntax/node/expression/parenthesized.h"
 #include "minsk/analysis/syntax/node/expression/unary.h"
+#include "minsk/analysis/syntax/token.h"
+#include "minsk/analysis/syntax/tree.h"
 #include <stddef.h>
 
 static syntax_token_t *current(parser_t *parser) {
@@ -91,8 +94,10 @@ void parser_init(parser_t *parser, const char *text) {
   peek_buffer_init(&parser->peek_buffer, text);
   diagnostic_bag_init(&parser->diagnostics);
 }
-expression_syntax_t *parser_parse(parser_t *parser) {
+syntax_tree_t parser_parse(parser_t *parser) {
   expression_syntax_t *expression = parse_expression(parser);
+  syntax_token_t end_of_file_token =
+      match_token(parser, syntax_kind_end_of_file_token);
   diagnostic_bag_t bag;
   diagnostic_bag_init(&bag);
   for (size_t i = 0; i < parser->peek_buffer.lexer.diagnostics.length; i++) {
@@ -102,9 +107,11 @@ expression_syntax_t *parser_parse(parser_t *parser) {
   for (size_t i = 0; i < parser->diagnostics.length; i++) {
     diagnostic_bag_copy_diagnostic(&bag, parser->diagnostics.data[i]);
   }
-  diagnostic_bag_free(&parser->diagnostics);
-  parser->diagnostics = bag;
-  return expression;
+  return (syntax_tree_t){
+      .root = expression,
+      .end_of_file_token = end_of_file_token,
+      .diagnostics = bag,
+  };
 }
 void parser_free(parser_t *parser) {
   peek_buffer_free(&parser->peek_buffer);

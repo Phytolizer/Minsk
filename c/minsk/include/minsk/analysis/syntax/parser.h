@@ -2,6 +2,7 @@
 
 #include "minsk/analysis/diagnostic_bag.h"
 #include "minsk/analysis/syntax/node/expression.h"
+#include "minsk/analysis/syntax/tree.h"
 #include "peek_buffer.h"
 
 typedef struct {
@@ -10,5 +11,5 @@ typedef struct {
 } parser_t;
 
 void parser_init(parser_t *parser, const char *text);
-expression_syntax_t *parser_parse(parser_t *parser);
+syntax_tree_t parser_parse(parser_t *parser);
 void parser_free(parser_t *parser);

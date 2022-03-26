@@ -14,6 +14,7 @@ add_library(
   "source/analysis/syntax/parser.c"
   "source/analysis/syntax/peek_buffer.c"
   "source/analysis/syntax/token.c"
+  "source/analysis/syntax/tree.c"
   "source/analysis/text/span.c"
   "source/runtime/object.c"
 )
