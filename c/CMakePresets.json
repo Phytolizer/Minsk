@@ -6,7 +6,8 @@
       "hidden": true,
       "cacheVariables": {
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_FLAGS": "-Wall -Wextra -Wpedantic"
       }
     },
     {
@@ -33,7 +34,7 @@
     },
     {
       "name": "dev-vs",
-      "inherits": [ "dev-base" ],
+      "inherits": ["dev-base"],
       "binaryDir": "build/dev-vs",
       "generator": "Visual Studio 17 2022",
       "displayName": "Development (Visual Studio)"
