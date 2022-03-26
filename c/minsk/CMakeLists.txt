@@ -1,5 +1,13 @@
 add_library(
   minsk
+  "source/analysis/binding/binder.c"
+  "source/analysis/binding/node.c"
+  "source/analysis/binding/node/expression.c"
+  "source/analysis/binding/node/expression/binary.c"
+  "source/analysis/binding/node/expression/binary/operator.c"
+  "source/analysis/binding/node/expression/literal.c"
+  "source/analysis/binding/node/expression/unary.c"
+  "source/analysis/binding/node/expression/unary/operator.c"
   "source/analysis/diagnostic.c"
   "source/analysis/diagnostic_bag.c"
   "source/analysis/evaluator.c"

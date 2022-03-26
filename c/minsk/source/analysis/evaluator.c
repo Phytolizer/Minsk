@@ -1,4 +1,11 @@
 #include "minsk/analysis/evaluator.h"
+#include "minsk/analysis/binding/kind.h"
+#include "minsk/analysis/binding/node/expression.h"
+#include "minsk/analysis/binding/node/expression/binary.h"
+#include "minsk/analysis/binding/node/expression/binary/kind.h"
+#include "minsk/analysis/binding/node/expression/literal.h"
+#include "minsk/analysis/binding/node/expression/unary.h"
+#include "minsk/analysis/binding/node/expression/unary/kind.h"
 #include "minsk/analysis/syntax/kind.h"
 #include "minsk/analysis/syntax/node/expression.h"
 #include "minsk/analysis/syntax/node/expression/binary.h"
@@ -8,35 +15,36 @@
 #include "minsk/runtime/object.h"
 #include <assert.h>
 
-static object_t *evaluate_expression(expression_syntax_t *root);
+static object_t *evaluate_expression(const bound_expression_t *root);
 
-static object_t *evaluate_binary_expression(binary_expression_syntax_t *root) {
+static object_t *
+evaluate_binary_expression(const bound_binary_expression_t *root) {
   object_t *left = evaluate_expression(root->left);
   object_t *right = evaluate_expression(root->right);
 
-  switch (root->operator_token.base.kind) {
-  case syntax_kind_plus_token: {
+  switch (root->op->kind) {
+  case bound_binary_operator_kind_addition: {
     int left_value = ((integer_t *)left)->value;
     int right_value = ((integer_t *)right)->value;
     object_free(left);
     object_free(right);
     return integer_new(left_value + right_value);
   } break;
-  case syntax_kind_minus_token: {
+  case bound_binary_operator_kind_subtraction: {
     int left_value = ((integer_t *)left)->value;
     int right_value = ((integer_t *)right)->value;
     object_free(left);
     object_free(right);
     return integer_new(left_value - right_value);
   } break;
-  case syntax_kind_star_token: {
+  case bound_binary_operator_kind_multiplication: {
     int left_value = ((integer_t *)left)->value;
     int right_value = ((integer_t *)right)->value;
     object_free(left);
     object_free(right);
     return integer_new(left_value * right_value);
   } break;
-  case syntax_kind_slash_token: {
+  case bound_binary_operator_kind_division: {
     int left_value = ((integer_t *)left)->value;
     int right_value = ((integer_t *)right)->value;
     object_free(left);
@@ -44,59 +52,52 @@ static object_t *evaluate_binary_expression(binary_expression_syntax_t *root) {
     return integer_new(left_value / right_value);
   } break;
   default:
-    assert(false && "unexpected binary operator");
+    assert(false && "corrupt binary operator");
     return NULL;
   }
 }
 
 static object_t *
-evaluate_literal_expression(literal_expression_syntax_t *root) {
+evaluate_literal_expression(const bound_literal_expression_t *root) {
   return object_copy(root->value);
 }
 
 static object_t *
-evaluate_parenthesized_expression(parenthesized_expression_syntax_t *root) {
-  return evaluate_expression(root->expression);
-}
-
-static object_t *evaluate_unary_expression(unary_expression_syntax_t *root) {
+evaluate_unary_expression(const bound_unary_expression_t *root) {
   object_t *operand = evaluate_expression(root->operand);
 
-  switch (root->operator_token.base.kind) {
-  case syntax_kind_plus_token: {
+  switch (root->op->kind) {
+  case bound_unary_operator_kind_identity: {
     int operand_value = ((integer_t *)operand)->value;
     object_free(operand);
     return integer_new(operand_value);
   } break;
-  case syntax_kind_minus_token: {
+  case bound_unary_operator_kind_negation: {
     int operand_value = ((integer_t *)operand)->value;
     object_free(operand);
     return integer_new(-operand_value);
   } break;
   default:
-    assert(false && "unexpected unary operator");
+    assert(false && "corrupt unary operator");
     return NULL;
   }
 }
 
-static object_t *evaluate_expression(expression_syntax_t *root) {
+static object_t *evaluate_expression(const bound_expression_t *root) {
   switch (root->base.kind) {
-  case syntax_kind_binary_expression:
-    return evaluate_binary_expression((binary_expression_syntax_t *)root);
-  case syntax_kind_literal_expression:
-    return evaluate_literal_expression((literal_expression_syntax_t *)root);
-  case syntax_kind_parenthesized_expression:
-    return evaluate_parenthesized_expression(
-        (parenthesized_expression_syntax_t *)root);
-  case syntax_kind_unary_expression:
-    return evaluate_unary_expression((unary_expression_syntax_t *)root);
+  case bound_node_kind_binary_expression:
+    return evaluate_binary_expression((bound_binary_expression_t *)root);
+  case bound_node_kind_literal_expression:
+    return evaluate_literal_expression((bound_literal_expression_t *)root);
+  case bound_node_kind_unary_expression:
+    return evaluate_unary_expression((bound_unary_expression_t *)root);
   default:
     assert(false && "unexpected expression syntax");
     return NULL;
   }
 }
 
-void evaluator_init(evaluator_t *evaluator, expression_syntax_t *root) {
+void evaluator_init(evaluator_t *evaluator, const bound_expression_t *root) {
   evaluator->root = root;
 }
 

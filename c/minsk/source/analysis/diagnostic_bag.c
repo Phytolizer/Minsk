@@ -68,3 +68,25 @@ void diagnostic_bag_report_unexpected_token(diagnostic_bag_t *bag,
                           syntax_kind_to_string(actual_kind));
   report(bag, span, message);
 }
+
+void diagnostic_bag_report_undefined_binary_operator(diagnostic_bag_t *bag,
+                                                     text_span_t span,
+                                                     const char *operator_text,
+                                                     object_kind_t left_type,
+                                                     object_kind_t right_type) {
+  sds message = sdscatfmt(sdsempty(),
+                          "Undefined binary operator '%s' for types <%s> and "
+                          "<%s>",
+                          operator_text, object_kind_to_string(left_type),
+                          object_kind_to_string(right_type));
+  report(bag, span, message);
+}
+
+void diagnostic_bag_report_undefined_unary_operator(
+    diagnostic_bag_t *bag, text_span_t span, const char *operator_text,
+    object_kind_t operand_type) {
+  sds message =
+      sdscatfmt(sdsempty(), "Undefined unary operator '%s' for type <%s>",
+                operator_text, object_kind_to_string(operand_type));
+  report(bag, span, message);
+}

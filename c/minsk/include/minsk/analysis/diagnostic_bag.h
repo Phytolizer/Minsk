@@ -3,6 +3,7 @@
 #include "minsk/analysis/diagnostic.h"
 #include "minsk/analysis/syntax/kind.h"
 #include "minsk/analysis/text/span.h"
+#include "minsk/runtime/object.h"
 #include <stddef.h>
 
 typedef struct {
@@ -23,3 +24,12 @@ void diagnostic_bag_report_unexpected_token(diagnostic_bag_t *bag,
                                             text_span_t span,
                                             syntax_kind_t expected_kind,
                                             syntax_kind_t actual_kind);
+void diagnostic_bag_report_undefined_binary_operator(diagnostic_bag_t *bag,
+                                                     text_span_t span,
+                                                     const char *operator_text,
+                                                     object_kind_t left_type,
+                                                     object_kind_t right_type);
+void diagnostic_bag_report_undefined_unary_operator(diagnostic_bag_t *bag,
+                                                    text_span_t span,
+                                                    const char *operator_text,
+                                                    object_kind_t operand_type);

@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #define OBJECT_KINDS_X                                                         \
+  X(null)                                                                      \
   X(integer)                                                                   \
   X(boolean)
 
@@ -11,6 +12,8 @@ typedef enum {
   OBJECT_KINDS_X
 #undef X
 } object_kind_t;
+
+const char *object_kind_to_string(object_kind_t kind);
 
 typedef struct {
   object_kind_t kind;

@@ -4,6 +4,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+const char *object_kind_to_string(object_kind_t kind) {
+  switch (kind) {
+#define X(x)                                                                   \
+  case object_kind_##x:                                                        \
+    return #x;
+    OBJECT_KINDS_X
+#undef X
+  default:
+    assert(false && "corrupt object kind");
+  }
+}
+
 object_t *integer_new(int value) {
   integer_t *result = malloc(sizeof(integer_t));
   result->base.kind = object_kind_integer;
