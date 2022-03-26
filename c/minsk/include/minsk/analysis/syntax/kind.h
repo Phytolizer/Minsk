@@ -14,7 +14,12 @@
   X(star_token)                                                                \
   X(slash_token)                                                               \
   X(open_parenthesis_token)                                                    \
-  X(close_parenthesis_token)
+  X(close_parenthesis_token)                                                   \
+                                                                               \
+  X(binary_expression)                                                         \
+  X(literal_expression)                                                        \
+  X(parenthesized_expression)                                                  \
+  X(unary_expression)
 
 typedef enum {
 #define X(x) syntax_kind_##x,

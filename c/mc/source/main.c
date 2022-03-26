@@ -1,5 +1,6 @@
 #include "minsk/analysis/syntax/kind.h"
 #include "minsk/analysis/syntax/lexer.h"
+#include "minsk/analysis/syntax/parser.h"
 #include "minsk/analysis/syntax/token.h"
 #include "sds.h"
 #include "util/line.h"
@@ -18,20 +19,12 @@ int main(void) {
       break;
     }
 
-    lexer_t lexer;
-    lexer_init(&lexer, sdsnew(line));
-
-    syntax_token_t token;
-    while (true) {
-      token = lexer_next_token(&lexer);
-
-      token_print(&token, stdout);
-      printf("\n");
-
-      if (token.kind == syntax_kind_end_of_file_token) {
-        break;
-      }
-    }
+    parser_t parser;
+    parser_init(&parser, line);
+    expression_syntax_t *expression = parser_parse(&parser);
+    parser_free(&parser);
+    syntax_node_pretty_print((syntax_node_t *)expression, stdout);
+    syntax_node_free((syntax_node_t *)expression);
   }
   free(line);
   return 0;

@@ -23,3 +23,23 @@ void object_print(object_t *object, FILE *stream) {
     assert(false && "corrupt object");
   }
 }
+void object_free(object_t *object) { free(object); }
+object_t *object_copy(object_t *object) {
+  if (object == NULL) {
+    return NULL;
+  }
+  switch (object->kind) {
+  case object_kind_integer:
+    return integer_new(((integer_t *)object)->value);
+  case object_kind_boolean:
+    return boolean_new(((boolean_t *)object)->value);
+  default:
+    assert(false && "corrupt object");
+  }
+}
+object_t *boolean_new(bool value) {
+  boolean_t *result = malloc(sizeof(boolean_t));
+  result->base.kind = object_kind_boolean;
+  result->value = value;
+  return (object_t *)result;
+}

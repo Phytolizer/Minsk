@@ -91,7 +91,7 @@ syntax_token_t lexer_next_token(lexer_t *lexer) {
   }
 
   return (syntax_token_t){
-      .kind = kind,
+      .base = {.kind = kind, .is_token = true},
       .position = start,
       .text = text,
       .value = value,

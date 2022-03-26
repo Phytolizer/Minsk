@@ -27,4 +27,7 @@ typedef struct {
 } boolean_t;
 
 object_t *integer_new(int value);
+object_t *boolean_new(bool value);
 void object_print(object_t *object, FILE *stream);
+void object_free(object_t *object);
+object_t *object_copy(object_t *object);

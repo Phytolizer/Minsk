@@ -2,11 +2,12 @@
 
 #include "kind.h"
 #include "minsk/runtime/object.h"
+#include "node.h"
 #include "sds.h"
 #include <stdio.h>
 
 typedef struct {
-  syntax_kind_t kind;
+  syntax_node_t base;
   int position;
   sds text;
   object_t *value;

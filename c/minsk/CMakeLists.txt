@@ -1,6 +1,17 @@
 add_library(
-  minsk "source/analysis/syntax/kind.c" "source/analysis/syntax/lexer.c"
-        "source/analysis/syntax/token.c" "source/runtime/object.c"
+  minsk
+  "source/analysis/syntax/facts.c"
+  "source/analysis/syntax/kind.c"
+  "source/analysis/syntax/lexer.c"
+  "source/analysis/syntax/node.c"
+  "source/analysis/syntax/node/expression/binary.c"
+  "source/analysis/syntax/node/expression/literal.c"
+  "source/analysis/syntax/node/expression/parenthesized.c"
+  "source/analysis/syntax/node/expression/unary.c"
+  "source/analysis/syntax/parser.c"
+  "source/analysis/syntax/peek_buffer.c"
+  "source/analysis/syntax/token.c"
+  "source/runtime/object.c"
 )
 add_library(minsk::minsk ALIAS minsk)
 target_include_directories(minsk PUBLIC include)
