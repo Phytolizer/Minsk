@@ -1,6 +1,5 @@
 #include "minsk/analysis/diagnostic_bag.h"
 #include "minsk/analysis/evaluator.h"
-#include "minsk/analysis/syntax/parser.h"
 #include "minsk/analysis/syntax/tree.h"
 #include "minsk/runtime/object.h"
 #include "styler/styler.h"
