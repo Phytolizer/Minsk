@@ -13,10 +13,11 @@ include(cmake/CPM.cmake)
 CPMAddPackage(
   NAME sds
   GITHUB_REPOSITORY Phytolizer/sds
-  GIT_TAG v2.1.1
+  GIT_TAG v2.1.2
 )
 
 enable_testing()
 
 add_subdirectory(util)
+add_subdirectory(minsk)
 add_subdirectory(mc)

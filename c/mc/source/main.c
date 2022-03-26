@@ -1,3 +1,7 @@
+#include "minsk/analysis/syntax/kind.h"
+#include "minsk/analysis/syntax/lexer.h"
+#include "minsk/analysis/syntax/token.h"
+#include "sds.h"
 #include "util/line.h"
 #include <stdbool.h>
 #include <stddef.h>
@@ -14,10 +18,19 @@ int main(void) {
       break;
     }
 
-    if (strcmp(line, "1 + 2 * 3") == 0) {
-      printf("7\n");
-    } else {
-      printf("ERROR: Invalid expression!\n");
+    lexer_t lexer;
+    lexer_init(&lexer, sdsnew(line));
+
+    syntax_token_t token;
+    while (true) {
+      token = lexer_next_token(&lexer);
+
+      token_print(&token, stdout);
+      printf("\n");
+
+      if (token.kind == syntax_kind_end_of_file_token) {
+        break;
+      }
     }
   }
   free(line);
