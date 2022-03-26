@@ -14,3 +14,16 @@ void syntax_kind_print(syntax_kind_t kind, FILE *stream) {
     assert(false && "corrupt syntax kind");
   }
 }
+
+const char *syntax_kind_to_string(syntax_kind_t kind) {
+  switch (kind) {
+#define X(x)                                                                   \
+  case syntax_kind_##x:                                                        \
+    return #x;
+    SYNTAX_KINDS_X
+#undef X
+  default:
+    assert(false && "corrupt syntax kind");
+    return NULL;
+  }
+}

@@ -1,5 +1,7 @@
 add_library(
   minsk
+  "source/analysis/diagnostic.c"
+  "source/analysis/diagnostic_bag.c"
   "source/analysis/evaluator.c"
   "source/analysis/syntax/facts.c"
   "source/analysis/syntax/kind.c"
@@ -12,6 +14,7 @@ add_library(
   "source/analysis/syntax/parser.c"
   "source/analysis/syntax/peek_buffer.c"
   "source/analysis/syntax/token.c"
+  "source/analysis/text/span.c"
   "source/runtime/object.c"
 )
 add_library(minsk::minsk ALIAS minsk)

@@ -1,9 +1,12 @@
 #include "minsk/analysis/syntax/parser.h"
+#include "minsk/analysis/diagnostic_bag.h"
 #include "minsk/analysis/syntax/facts.h"
+#include "minsk/analysis/syntax/node/expression.h"
 #include "minsk/analysis/syntax/node/expression/binary.h"
 #include "minsk/analysis/syntax/node/expression/literal.h"
 #include "minsk/analysis/syntax/node/expression/parenthesized.h"
 #include "minsk/analysis/syntax/node/expression/unary.h"
+#include <stddef.h>
 
 static syntax_token_t *current(parser_t *parser) {
   return peek_buffer_peek(&parser->peek_buffer, 0);
@@ -14,6 +17,9 @@ static syntax_token_t match_token(parser_t *parser, syntax_kind_t kind) {
     return peek_buffer_pop(&parser->peek_buffer);
   }
 
+  diagnostic_bag_report_unexpected_token(&parser->diagnostics,
+                                         token_span(current(parser)), kind,
+                                         current(parser)->base.kind);
   return (syntax_token_t){
       .base = {.kind = kind, .is_token = true},
       .position = current(parser)->position,
@@ -83,9 +89,22 @@ static expression_syntax_t *parse_expression(parser_t *parser) {
 
 void parser_init(parser_t *parser, const char *text) {
   peek_buffer_init(&parser->peek_buffer, text);
+  diagnostic_bag_init(&parser->diagnostics);
 }
 expression_syntax_t *parser_parse(parser_t *parser) {
-  return parse_expression(parser);
+  expression_syntax_t *expression = parse_expression(parser);
+  diagnostic_bag_t bag;
+  diagnostic_bag_init(&bag);
+  for (size_t i = 0; i < parser->peek_buffer.lexer.diagnostics.length; i++) {
+    diagnostic_bag_copy_diagnostic(
+        &bag, parser->peek_buffer.lexer.diagnostics.data[i]);
+  }
+  for (size_t i = 0; i < parser->diagnostics.length; i++) {
+    diagnostic_bag_copy_diagnostic(&bag, parser->diagnostics.data[i]);
+  }
+  diagnostic_bag_free(&parser->diagnostics);
+  parser->diagnostics = bag;
+  return expression;
 }
 void parser_free(parser_t *parser) {
   peek_buffer_free(&parser->peek_buffer);
@@ -94,4 +113,5 @@ void parser_free(parser_t *parser) {
   parser->peek_buffer.data = NULL;
   parser->peek_buffer.length = 0;
   parser->peek_buffer.capacity = 0;
+  diagnostic_bag_free(&parser->diagnostics);
 }

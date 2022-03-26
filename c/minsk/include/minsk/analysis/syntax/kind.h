@@ -28,3 +28,4 @@ typedef enum {
 } syntax_kind_t;
 
 void syntax_kind_print(syntax_kind_t kind, FILE *stream);
+const char *syntax_kind_to_string(syntax_kind_t kind);

@@ -1,4 +1,6 @@
 #include "minsk/analysis/syntax/lexer.h"
+#include "minsk/analysis/diagnostic.h"
+#include "minsk/analysis/diagnostic_bag.h"
 #include "minsk/analysis/syntax/kind.h"
 #include "minsk/analysis/syntax/token.h"
 #include "minsk/runtime/object.h"
@@ -6,6 +8,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
+#include <stddef.h>
 #include <stdlib.h>
 
 static char peek(lexer_t *lexer, int offset) {
@@ -21,11 +24,12 @@ static char current(lexer_t *lexer) { return peek(lexer, 0); }
 void lexer_init(lexer_t *lexer, sds text) {
   lexer->text = text;
   lexer->position = 0;
+  diagnostic_bag_init(&lexer->diagnostics);
 }
 
 syntax_token_t lexer_next_token(lexer_t *lexer) {
   syntax_kind_t kind = syntax_kind_bad_token;
-  int start = lexer->position;
+  size_t start = lexer->position;
   sds text = NULL;
   object_t *value = NULL;
 
@@ -42,8 +46,14 @@ syntax_token_t lexer_next_token(lexer_t *lexer) {
 
     text = sdsnewlen(&lexer->text[start], lexer->position - start);
     errno = 0;
-    long long_val = strtol(text, NULL, 10);
-    if (errno != 0 || long_val < INT_MIN || long_val > INT_MAX) {
+    char *endptr;
+    long long_val = strtol(text, &endptr, 10);
+    if (errno != 0 || long_val < INT_MIN || long_val > INT_MAX ||
+        (endptr != NULL && *endptr != '\0')) {
+      diagnostic_bag_report_invalid_int(
+          &lexer->diagnostics,
+          (text_span_t){.start = start, .length = lexer->position - start},
+          sdsdup(text));
     }
 
     value = integer_new((int)long_val);
@@ -83,6 +93,8 @@ syntax_token_t lexer_next_token(lexer_t *lexer) {
   }
 
   if (kind == syntax_kind_bad_token) {
+    diagnostic_bag_report_bad_character(&lexer->diagnostics, lexer->position,
+                                        current(lexer));
     lexer->position += 1;
   }
 
@@ -96,4 +108,9 @@ syntax_token_t lexer_next_token(lexer_t *lexer) {
       .text = text,
       .value = value,
   };
+}
+
+void lexer_free(lexer_t *lexer) {
+  sdsfree(lexer->text);
+  diagnostic_bag_free(&lexer->diagnostics);
 }
