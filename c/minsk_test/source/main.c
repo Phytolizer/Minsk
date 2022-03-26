@@ -1,15 +1,12 @@
-#include <setjmp.h>
-#include <stdarg.h>
-#include <stddef.h>
-#include <stdint.h>
-
-#include <cmocka.h>
-
-static void null_test_success(void **state) { (void)state; }
+#include <check.h>
+#include <stdlib.h>
+#include "minsk_test/analysis/syntax/lexer.h"
 
 int main(void) {
-  const struct CMUnitTest tests[] = {
-      cmocka_unit_test(null_test_success),
-  };
-  return cmocka_run_group_tests(tests, NULL, NULL);
+  Suite *lexer_s = lexer_suite();
+  SRunner *sr = srunner_create(lexer_s);
+  srunner_run_all(sr, CK_NORMAL);
+  int number_failed = srunner_ntests_failed(sr);
+  srunner_free(sr);
+  return number_failed == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
 }

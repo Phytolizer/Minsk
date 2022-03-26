@@ -17,10 +17,9 @@ CPMAddPackage(
 )
 
 CPMAddPackage(
-  NAME cmocka
-  URL "https://cmocka.org/files/1.1/cmocka-1.1.5.tar.xz"
-  URL_MD5 "91f95cd5db88b9b120d191b18d367193"
-  VERSION 1.1.5
+  NAME check
+  GITHUB_REPOSITORY libcheck/check
+  GIT_TAG 0.15.2
 )
 
 enable_testing()
