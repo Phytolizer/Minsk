@@ -61,6 +61,27 @@ static simple_token_vector_t get_tokens(void) {
   return tokens;
 }
 
+static simple_token_vector_t get_separators(void) {
+  static const simple_token_t separators[] = {
+      {.kind = syntax_kind_whitespace_token, .text = " "},
+      {.kind = syntax_kind_whitespace_token, .text = "  "},
+      {.kind = syntax_kind_whitespace_token, .text = "\r"},
+      {.kind = syntax_kind_whitespace_token, .text = "\n"},
+      {.kind = syntax_kind_whitespace_token, .text = "\r\n"},
+  };
+  static const size_t num_separators =
+      sizeof(separators) / sizeof(simple_token_t);
+
+  simple_token_vector_t all_separators = {
+      .data = malloc(sizeof(simple_token_t) * num_separators),
+      .length = num_separators,
+      .capacity = num_separators,
+  };
+  memcpy(all_separators.data, separators,
+         sizeof(simple_token_t) * num_separators);
+  return all_separators;
+}
+
 START_TEST(lexes_token_test) {
   simple_token_vector_t tokens = get_tokens();
 
@@ -132,6 +153,40 @@ START_TEST(lexes_token_pairs_test) {
 }
 END_TEST
 
+START_TEST(lexes_token_pairs_with_separator_test) {
+  simple_token_vector_t tokens = get_tokens();
+  simple_token_vector_t separators = get_separators();
+
+  for (size_t i = 0; i < tokens.length; i++) {
+    for (size_t j = 0; j < tokens.length; j++) {
+      if (requires_separator(&tokens.data[i], &tokens.data[j])) {
+        for (size_t k = 0; k < separators.length; k++) {
+          sds text = sdscatfmt(sdsempty(), "%s%s%s", tokens.data[i].text,
+                               separators.data[k].text, tokens.data[j].text);
+          syntax_token_vector_t lexed_tokens = syntax_tree_parse_tokens(text);
+          sdsfree(text);
+          ck_assert_int_eq(lexed_tokens.length, 3);
+          ck_assert_int_eq(lexed_tokens.data[0].base.kind, tokens.data[i].kind);
+          ck_assert_str_eq(lexed_tokens.data[0].text, tokens.data[i].text);
+          ck_assert_int_eq(lexed_tokens.data[1].base.kind,
+                           separators.data[k].kind);
+          ck_assert_str_eq(lexed_tokens.data[1].text, separators.data[k].text);
+          ck_assert_int_eq(lexed_tokens.data[2].base.kind, tokens.data[j].kind);
+          ck_assert_str_eq(lexed_tokens.data[2].text, tokens.data[j].text);
+          token_free(&lexed_tokens.data[0]);
+          token_free(&lexed_tokens.data[1]);
+          token_free(&lexed_tokens.data[2]);
+          syntax_token_vector_free(&lexed_tokens);
+        }
+      }
+    }
+  }
+
+  free(tokens.data);
+  free(separators.data);
+}
+END_TEST
+
 Suite *lexer_suite(void) {
   Suite *s = suite_create("Lexer");
 
@@ -142,6 +197,12 @@ Suite *lexer_suite(void) {
   TCase *tc_lexes_token_pairs = tcase_create("lexes token pairs");
   tcase_add_test(tc_lexes_token_pairs, lexes_token_pairs_test);
   suite_add_tcase(s, tc_lexes_token_pairs);
+
+  TCase *tc_lexes_token_pairs_with_separator =
+      tcase_create("lexes token pairs with separator");
+  tcase_add_test(tc_lexes_token_pairs_with_separator,
+                 lexes_token_pairs_with_separator_test);
+  suite_add_tcase(s, tc_lexes_token_pairs_with_separator);
 
   return s;
 }
