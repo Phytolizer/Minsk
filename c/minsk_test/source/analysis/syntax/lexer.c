@@ -1,9 +1,11 @@
 #include "minsk_test/analysis/syntax/lexer.h"
 #include "check.h"
+#include "minsk/analysis/syntax/facts.h"
 #include "minsk/analysis/syntax/kind.h"
 #include "minsk/analysis/syntax/token.h"
 #include "minsk/analysis/syntax/tokens.h"
 #include "minsk/analysis/syntax/tree.h"
+#include <assert.h>
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -35,6 +37,25 @@ simple_token_vector_t get_tokens(void) {
   };
   memcpy(tokens.data, dynamic_tokens,
          sizeof(simple_token_t) * num_dynamic_tokens);
+
+  for (int i = 0; i < syntax_kind_count; i++) {
+    const char *text = facts_get_text(i);
+    if (text != NULL) {
+      simple_token_t token = {
+          .kind = i,
+          .text = text,
+      };
+      if (tokens.length == tokens.capacity) {
+        tokens.capacity *= 2;
+        simple_token_t *new_data =
+            realloc(tokens.data, sizeof(simple_token_t) * tokens.capacity);
+        assert(new_data != NULL);
+        tokens.data = new_data;
+      }
+      tokens.data[tokens.length] = token;
+      tokens.length += 1;
+    }
+  }
 
   return tokens;
 }

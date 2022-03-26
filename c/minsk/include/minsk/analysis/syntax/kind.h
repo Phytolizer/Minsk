@@ -36,6 +36,7 @@ typedef enum {
 #define X(x) syntax_kind_##x,
   SYNTAX_KINDS_X
 #undef X
+      syntax_kind_count
 } syntax_kind_t;
 
 void syntax_kind_print(syntax_kind_t kind, FILE *stream);

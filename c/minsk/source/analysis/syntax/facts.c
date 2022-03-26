@@ -59,6 +59,10 @@ const char *facts_get_text(syntax_kind_t kind) {
     return "!=";
   case syntax_kind_bang_token:
     return "!";
+  case syntax_kind_ampersand_ampersand_token:
+    return "&&";
+  case syntax_kind_pipe_pipe_token:
+    return "||";
   case syntax_kind_open_parenthesis_token:
     return "(";
   case syntax_kind_close_parenthesis_token:

@@ -7,8 +7,7 @@
       "cacheVariables": {
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_C_FLAGS": "-Wall -Wextra -Wpedantic -Werror=implicit-function-declaration -fsanitize=address,undefined",
-        "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address,undefined"
+        "CMAKE_C_FLAGS": "-Wall -Wextra -Wpedantic -Werror=implicit-function-declaration"
       }
     },
     {
