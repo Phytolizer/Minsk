@@ -1,10 +1,12 @@
 add_executable(
   minsk_test
+  "source/analysis/evaluator.c"
   "source/analysis/syntax/asserting_iterator.c"
   "source/analysis/syntax/kind_vector.c"
   "source/analysis/syntax/lexer.c"
   "source/analysis/syntax/node_vector.c"
   "source/analysis/syntax/parser.c"
+  "source/esc.c"
   "source/main.c"
 )
 target_include_directories(minsk_test PRIVATE include)

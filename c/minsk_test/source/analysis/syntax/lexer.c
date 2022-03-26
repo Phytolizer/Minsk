@@ -5,8 +5,11 @@
 #include "minsk/analysis/syntax/token.h"
 #include "minsk/analysis/syntax/tokens.h"
 #include "minsk/analysis/syntax/tree.h"
+#include "minsk_test/esc.h"
+#include "sds.h"
 #include <assert.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -86,6 +89,7 @@ START_TEST(lexes_token_test) {
   simple_token_vector_t tokens = get_tokens();
 
   for (size_t i = 0; i < tokens.length; i++) {
+    printf("Lexer: tokens[%zu]: '%s'\n", i, tokens.data[i].text);
     syntax_token_vector_t lexed_tokens =
         syntax_tree_parse_tokens(tokens.data[i].text);
     ck_assert_int_eq(lexed_tokens.length, 1);
@@ -136,6 +140,7 @@ START_TEST(lexes_token_pairs_test) {
 
       sds text = sdscatfmt(sdsempty(), "%s%s", tokens.data[i].text,
                            tokens.data[j].text);
+      printf("Lexer: token pairs[%zu, %zu]: '%s'\n", i, j, text);
       syntax_token_vector_t lexed_tokens = syntax_tree_parse_tokens(text);
       sdsfree(text);
       ck_assert_int_eq(lexed_tokens.length, 2);
@@ -163,6 +168,10 @@ START_TEST(lexes_token_pairs_with_separator_test) {
         for (size_t k = 0; k < separators.length; k++) {
           sds text = sdscatfmt(sdsempty(), "%s%s%s", tokens.data[i].text,
                                separators.data[k].text, tokens.data[j].text);
+          sds text_escaped = esc(text);
+          printf("Lexer: token pairs with separator[%zu, %zu, %zu]: '%s'\n", i,
+                 k, j, text_escaped);
+          sdsfree(text_escaped);
           syntax_token_vector_t lexed_tokens = syntax_tree_parse_tokens(text);
           sdsfree(text);
           ck_assert_int_eq(lexed_tokens.length, 3);

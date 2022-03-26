@@ -7,6 +7,7 @@
 #include "minsk_test/analysis/syntax/kind_vector.h"
 #include "sds.h"
 #include <stddef.h>
+#include <stdio.h>
 
 static syntax_kind_vector_t get_binary_operators(void) {
   // A binary operator is any for which facts_binary_operator_precedence(k)
@@ -46,6 +47,7 @@ START_TEST(parser_binary_operator_precedence_test) {
       // Parse the tree, and use the asserting_iterator_t to walk the tree.
       sds text = sdscatfmt(sdsempty(), "a %s b %s c", facts_get_text(left),
                            facts_get_text(right));
+      printf("Parser: binary pairs[%zu, %zu]: '%s'\n", i, j, text);
       syntax_tree_t syntax_tree = syntax_tree_parse(text);
       sdsfree(text);
 
@@ -126,6 +128,7 @@ START_TEST(parser_unary_operator_precedence_test) {
       // Parse the tree, and use the asserting_iterator_t to walk the tree.
       sds text = sdscatfmt(sdsempty(), "%s a %s b", facts_get_text(unary),
                            facts_get_text(binary));
+      printf("Parser: unary/binary pairs[%zu, %zu]: '%s'\n", i, j, text);
       syntax_tree_t syntax_tree = syntax_tree_parse(text);
       sdsfree(text);
 

@@ -1,3 +1,4 @@
+#include "minsk_test/analysis/evaluator.h"
 #include "minsk_test/analysis/syntax/lexer.h"
 #include "minsk_test/analysis/syntax/parser.h"
 #include <check.h>
@@ -13,6 +14,13 @@ int main(void) {
 
   Suite *parser_s = parser_suite();
   sr = srunner_create(parser_s);
+  srunner_set_fork_status(sr, CK_NOFORK);
+  srunner_run_all(sr, CK_NORMAL);
+  number_failed += srunner_ntests_failed(sr);
+  srunner_free(sr);
+
+  Suite *evaluator_s = evaluator_suite();
+  sr = srunner_create(evaluator_s);
   srunner_set_fork_status(sr, CK_NOFORK);
   srunner_run_all(sr, CK_NORMAL);
   number_failed += srunner_ntests_failed(sr);
