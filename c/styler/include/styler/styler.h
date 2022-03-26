@@ -6,10 +6,11 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#if defined(WIN32) || defined(_WIN32) || defined(_WIN64)
-#define STYLER_WINDOWS
-#else
+#if defined(__unix__) || defined(__unix) || defined(__linux__) ||              \
+    defined(__APPLE__) || defined(__MACH__)
 #define STYLER_UNIX
+#elif defined(WIN32) || defined(_WIN32) || defined(_WIN64)
+#define STYLER_WINDOWS
 #endif
 
 #define STYLER_STYLES_X                                                        \

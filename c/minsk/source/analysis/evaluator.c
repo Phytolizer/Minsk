@@ -75,6 +75,7 @@ static object_t *evaluate_unary_expression(unary_expression_syntax_t *root) {
   } break;
   default:
     assert(false && "unexpected unary operator");
+    return NULL;
   }
 }
 
