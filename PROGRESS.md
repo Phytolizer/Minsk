@@ -3,7 +3,7 @@
 Progress for each language implementation is detailed below.
 
 ## c (C)
-Episode 3.
+Episode 4.
 
 ## cpp (C++)
 Episode 6.
