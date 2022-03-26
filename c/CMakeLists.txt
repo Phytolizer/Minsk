@@ -16,9 +16,17 @@ CPMAddPackage(
   GIT_TAG v2.1.2
 )
 
+CPMAddPackage(
+  NAME cmocka
+  URL "https://cmocka.org/files/1.1/cmocka-1.1.5.tar.xz"
+  URL_MD5 "91f95cd5db88b9b120d191b18d367193"
+  VERSION 1.1.5
+)
+
 enable_testing()
 
 add_subdirectory(util)
 add_subdirectory(styler)
 add_subdirectory(minsk)
 add_subdirectory(mc)
+add_subdirectory(minsk_test)
