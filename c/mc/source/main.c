@@ -24,11 +24,11 @@ int main(void) {
     diagnostic_bag_t diagnostics = parser.diagnostics;
     syntax_node_pretty_print((syntax_node_t *)expression, stdout);
     if (diagnostics.length > 0) {
-      styler_apply_style(styler_fg_red, stdout);
+      styler_apply_fg(styler_fg_red, stdout);
       for (size_t i = 0; i < diagnostics.length; i++) {
         printf("%s\n", diagnostics.data[i].message);
       }
-      styler_apply_style(styler_fg_reset, stdout);
+      styler_apply_fg(styler_fg_reset, stdout);
     } else {
       evaluator_t evaluator;
       evaluator_init(&evaluator, expression);

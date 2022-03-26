@@ -118,6 +118,10 @@ typedef enum {
 #undef X
 } styler_winterm_t;
 
-void styler_apply_style(int style, FILE *stream);
+void styler_apply_fg(styler_fg_t fg, FILE *stream);
+void styler_apply_bg(styler_bg_t bg, FILE *stream);
+void styler_apply_fg_bright(styler_fg_bright_t fg, FILE *stream);
+void styler_apply_bg_bright(styler_bg_bright_t bg, FILE *stream);
+void styler_apply_style(styler_style_t style, FILE *stream);
 void styler_set_control_mode(styler_control_t mode);
 void styler_set_winterm_mode(styler_winterm_t mode);
