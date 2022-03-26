@@ -15,6 +15,12 @@ static const bound_unary_operator_t operators[] = {
         .operand_type = object_kind_integer,
         .result_type = object_kind_integer,
     },
+    {
+        .syntax_kind = syntax_kind_bang_token,
+        .kind = bound_unary_operator_kind_logical_negation,
+        .operand_type = object_kind_boolean,
+        .result_type = object_kind_boolean,
+    },
 };
 
 const bound_unary_operator_t *

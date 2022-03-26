@@ -87,6 +87,33 @@ syntax_token_t lexer_next_token(lexer_t *lexer) {
       kind = syntax_kind_slash_token;
       lexer->position += 1;
       break;
+    case '!':
+      if (peek(lexer, 1) == '=') {
+        kind = syntax_kind_bang_equals_token;
+        lexer->position += 2;
+      } else {
+        kind = syntax_kind_bang_token;
+        lexer->position += 1;
+      }
+      break;
+    case '=':
+      if (peek(lexer, 1) == '=') {
+        kind = syntax_kind_equals_equals_token;
+        lexer->position += 2;
+      }
+      break;
+    case '&':
+      if (peek(lexer, 1) == '&') {
+        kind = syntax_kind_ampersand_ampersand_token;
+        lexer->position += 2;
+      }
+      break;
+    case '|':
+      if (peek(lexer, 1) == '|') {
+        kind = syntax_kind_pipe_pipe_token;
+        lexer->position += 2;
+      }
+      break;
     case '(':
       kind = syntax_kind_open_parenthesis_token;
       lexer->position += 1;

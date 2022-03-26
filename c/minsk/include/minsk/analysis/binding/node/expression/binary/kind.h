@@ -4,7 +4,11 @@
   X(addition)                                                                  \
   X(subtraction)                                                               \
   X(multiplication)                                                            \
-  X(division)
+  X(division)                                                                  \
+  X(logical_and)                                                               \
+  X(logical_or)                                                                \
+  X(equality)                                                                  \
+  X(inequality)
 
 typedef enum {
 #define X(x) bound_binary_operator_kind_##x,

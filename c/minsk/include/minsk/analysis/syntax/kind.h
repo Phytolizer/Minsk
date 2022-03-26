@@ -13,6 +13,11 @@
   X(minus_token)                                                               \
   X(star_token)                                                                \
   X(slash_token)                                                               \
+  X(bang_token)                                                                \
+  X(ampersand_ampersand_token)                                                 \
+  X(pipe_pipe_token)                                                           \
+  X(bang_equals_token)                                                         \
+  X(equals_equals_token)                                                       \
   X(open_parenthesis_token)                                                    \
   X(close_parenthesis_token)                                                   \
                                                                                \

@@ -51,6 +51,32 @@ evaluate_binary_expression(const bound_binary_expression_t *root) {
     object_free(right);
     return integer_new(left_value / right_value);
   } break;
+  case bound_binary_operator_kind_logical_and: {
+    bool left_value = ((boolean_t *)left)->value;
+    bool right_value = ((boolean_t *)right)->value;
+    object_free(left);
+    object_free(right);
+    return boolean_new(left_value && right_value);
+  } break;
+  case bound_binary_operator_kind_logical_or: {
+    bool left_value = ((boolean_t *)left)->value;
+    bool right_value = ((boolean_t *)right)->value;
+    object_free(left);
+    object_free(right);
+    return boolean_new(left_value || right_value);
+  } break;
+  case bound_binary_operator_kind_equality: {
+    bool result = object_equals(left, right);
+    object_free(left);
+    object_free(right);
+    return boolean_new(result);
+  } break;
+  case bound_binary_operator_kind_inequality: {
+    bool result = !object_equals(left, right);
+    object_free(left);
+    object_free(right);
+    return boolean_new(result);
+  } break;
   default:
     assert(false && "corrupt binary operator");
     return NULL;
@@ -76,6 +102,11 @@ evaluate_unary_expression(const bound_unary_expression_t *root) {
     int operand_value = ((integer_t *)operand)->value;
     object_free(operand);
     return integer_new(-operand_value);
+  } break;
+  case bound_unary_operator_kind_logical_negation: {
+    bool operand_value = ((boolean_t *)operand)->value;
+    object_free(operand);
+    return boolean_new(!operand_value);
   } break;
   default:
     assert(false && "corrupt unary operator");

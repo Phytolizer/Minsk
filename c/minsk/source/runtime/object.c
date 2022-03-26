@@ -31,11 +31,26 @@ void object_print(object_t *object, FILE *stream) {
   case object_kind_boolean:
     fprintf(stream, "%s", ((boolean_t *)object)->value ? "true" : "false");
     break;
+  case object_kind_null:
   default:
     assert(false && "corrupt object");
   }
 }
 void object_free(object_t *object) { free(object); }
+bool object_equals(object_t *a, object_t *b) {
+  if (a->kind != b->kind) {
+    return false;
+  }
+  switch (a->kind) {
+  case object_kind_integer:
+    return ((integer_t *)a)->value == ((integer_t *)b)->value;
+  case object_kind_boolean:
+    return ((boolean_t *)a)->value == ((boolean_t *)b)->value;
+  case object_kind_null:
+  default:
+    assert(false && "corrupt object");
+  }
+}
 object_t *object_copy(object_t *object) {
   if (object == NULL) {
     return NULL;
@@ -45,6 +60,7 @@ object_t *object_copy(object_t *object) {
     return integer_new(((integer_t *)object)->value);
   case object_kind_boolean:
     return boolean_new(((boolean_t *)object)->value);
+  case object_kind_null:
   default:
     assert(false && "corrupt object");
   }
