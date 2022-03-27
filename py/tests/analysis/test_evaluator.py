@@ -5,6 +5,7 @@ import pytest
 from minsk.analysis.compilation import Compilation
 from minsk.analysis.syntax.parser import SyntaxTree
 from minsk.analysis.variable import VariableSymbol
+from tests.analysis.text.annotated import AnnotatedText
 
 
 @pytest.mark.parametrize(
@@ -41,3 +42,27 @@ def test_evaluates_correct_value(text, expected):
 
     assert len(diagnostics) == 0
     assert value == expected
+
+
+def assert_diagnostics(raw_text, raw_diagnostics):
+    annotated_text = AnnotatedText.parse(raw_text)
+    syntax_tree = SyntaxTree.parse(annotated_text.text)
+    compilation = Compilation(syntax_tree)
+    actual_diagnostics, _ = compilation.evaluate({})
+    diagnostics = AnnotatedText.unindent_lines(raw_diagnostics)
+    if len(diagnostics) != len(annotated_text.spans):
+        raise ValueError("diagnostics do not match annotated text")
+
+    assert len(actual_diagnostics) == len(diagnostics)
+
+    for i in range(len(diagnostics)):
+        assert actual_diagnostics[i].message == diagnostics[i]
+        assert actual_diagnostics[i].span == annotated_text.spans[i]
+
+
+def test_variable_expression_reports_undeclared():
+    text = "[a] + 3"
+    diagnostics = """
+        Undefined name 'a'
+    """
+    assert_diagnostics(text, diagnostics)
