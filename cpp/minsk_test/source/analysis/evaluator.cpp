@@ -63,7 +63,12 @@ TEST_CASE("correct evaluation") {
       evaluation_test{"!false", std::make_unique<boolean>(true)},
       evaluation_test{"true || false", std::make_unique<boolean>(true)},
       evaluation_test{"false || false", std::make_unique<boolean>(false)},
-      evaluation_test{"{ var a = 0 (a = 10) * a }",
+      evaluation_test{R"(
+        {
+          var a = 0
+          (a = 10) * a
+        }
+      )",
                       std::make_unique<integer>(100)},
   };
 
