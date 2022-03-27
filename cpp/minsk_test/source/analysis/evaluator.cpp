@@ -117,3 +117,73 @@ TEST_CASE("variable declaration reports redeclaration") {
 
   assert_has_diagnostics(text, diagnostics);
 }
+
+TEST_CASE("name expression reports undefined") {
+  constexpr std::string_view text = "[x] * 10";
+
+  constexpr std::string_view diagnostics = R"(
+    Name 'x' is undeclared
+  )";
+
+  assert_has_diagnostics(text, diagnostics);
+}
+
+TEST_CASE("assignment expression reports undeclared") {
+  constexpr std::string_view text = "[x] = 10";
+
+  constexpr std::string_view diagnostics = R"(
+    Name 'x' is undeclared
+  )";
+
+  assert_has_diagnostics(text, diagnostics);
+}
+
+TEST_CASE("assignment expression reports read-only") {
+  constexpr std::string_view text = R"(
+    {
+      let x = 10
+      x [=] 20
+    }
+  )";
+
+  constexpr std::string_view diagnostics = R"(
+    Variable 'x' is read-only
+  )";
+
+  assert_has_diagnostics(text, diagnostics);
+}
+
+TEST_CASE("assignment expression reports cannot convert") {
+  constexpr std::string_view text = R"(
+    {
+      var x = 10
+      x = [true]
+    }
+  )";
+
+  constexpr std::string_view diagnostics = R"(
+    Cannot convert type 'boolean' to 'integer'
+  )";
+
+  assert_has_diagnostics(text, diagnostics);
+}
+
+TEST_CASE("binary operator reports undefined") {
+  constexpr std::string_view text = "true [+] 4";
+
+  constexpr std::string_view diagnostics = R"(
+    Binary operator '+' isn't defined for types 'boolean' and 'integer'
+  )";
+
+  assert_has_diagnostics(text, diagnostics);
+}
+
+TEST_CASE("unary operator reports undefined") {
+  constexpr std::string_view text = "[+]true";
+
+  constexpr std::string_view diagnostics = R"(
+    Unary operator '+' isn't defined for type 'boolean'
+  )";
+
+  assert_has_diagnostics(text, diagnostics);
+}
