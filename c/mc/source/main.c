@@ -26,7 +26,9 @@ int main(void) {
   variable_map_init(&variables);
   sds text_builder = sdsempty();
   while (true) {
-    printf("%s", sdslen(text_builder) == 0 ? "> " : "| ");
+    styler_apply_fg(styler_fg_green, stdout);
+    printf("%s", sdslen(text_builder) == 0 ? "» " : "· ");
+    styler_apply_fg(styler_fg_reset, stdout);
     if (!util_read_line(&input_line, &line_len, stdin)) {
       break;
     }
@@ -72,16 +74,20 @@ int main(void) {
         text_span_t suffix_span = text_span_from_bounds(
             text_span_end(diagnostics.data[i].span), text_line_end(line));
         printf("   ");
-        printf("%.*s", (int)prefix_span.length, text_builder + prefix_span.start);
+        printf("%.*s", (int)prefix_span.length,
+               text_builder + prefix_span.start);
         styler_apply_fg(styler_fg_red, stdout);
         printf("%.*s", (int)error_span.length, text_builder + error_span.start);
         styler_apply_fg(styler_fg_reset, stdout);
-        printf("%.*s", (int)suffix_span.length, text_builder + suffix_span.start);
+        printf("%.*s", (int)suffix_span.length,
+               text_builder + suffix_span.start);
         printf("\n");
       }
       diagnostic_bag_free(&diagnostics);
     } else {
+      styler_apply_fg(styler_fg_magenta, stdout);
       object_print(result.value, stdout);
+      styler_apply_fg(styler_fg_reset, stdout);
       printf("\n");
       object_free(result.value);
     }
