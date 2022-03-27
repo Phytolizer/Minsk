@@ -11,6 +11,9 @@ int main(void) {
   srunner_run_all(sr, CK_NORMAL);
   int number_failed = srunner_ntests_failed(sr);
   srunner_free(sr);
+  if (number_failed > 0) {
+    return EXIT_FAILURE;
+  }
 
   Suite *parser_s = parser_suite();
   sr = srunner_create(parser_s);
@@ -18,6 +21,9 @@ int main(void) {
   srunner_run_all(sr, CK_NORMAL);
   number_failed += srunner_ntests_failed(sr);
   srunner_free(sr);
+  if (number_failed > 0) {
+    return EXIT_FAILURE;
+  }
 
   Suite *evaluator_s = evaluator_suite();
   sr = srunner_create(evaluator_s);
@@ -25,6 +31,9 @@ int main(void) {
   srunner_run_all(sr, CK_NORMAL);
   number_failed += srunner_ntests_failed(sr);
   srunner_free(sr);
+  if (number_failed > 0) {
+    return EXIT_FAILURE;
+  }
 
-  return number_failed == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
+  return EXIT_SUCCESS;
 }
