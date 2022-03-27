@@ -13,3 +13,9 @@ int minsk::analysis::text::text_span::start() const { return m_start; }
 int minsk::analysis::text::text_span::length() const { return m_length; }
 
 int minsk::analysis::text::text_span::end() const { return m_start + m_length; }
+
+std::ostream &minsk::analysis::text::operator<<(
+    std::ostream &os, const minsk::analysis::text::text_span &span) {
+  return os << "text_span{start: " << span.start()
+            << ", length: " << span.length() << "}";
+}

@@ -1,6 +1,7 @@
 #ifndef MINSK_ANALYSIS_TEXT_SPAN_HPP
 #define MINSK_ANALYSIS_TEXT_SPAN_HPP
 
+#include <ostream>
 namespace minsk::analysis::text {
 
 class text_span final {
@@ -18,6 +19,9 @@ public:
     return m_start == other.m_start && m_length == other.m_length;
   }
 };
+
+std::ostream &operator<<(std::ostream &os,
+                         const minsk::analysis::text::text_span &span);
 
 } // namespace minsk::analysis::text
 
