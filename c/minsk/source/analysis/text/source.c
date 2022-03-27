@@ -64,6 +64,14 @@ static size_t get_line_break_width(sds text, size_t position) {
   return 0;
 }
 
+static void add_line(text_line_vector_t *vector, size_t start, size_t end,
+                     size_t line_break_width) {
+  size_t length = end - start;
+  size_t length_including_line_break = length + line_break_width;
+  text_line_t line = text_line_new(start, length, length_including_line_break);
+  text_line_vector_push(vector, line);
+}
+
 static void source_text_parse_lines(source_text_t *source_text) {
   size_t position = 0;
   size_t line_start = 0;
@@ -74,18 +82,13 @@ static void source_text_parse_lines(source_text_t *source_text) {
     if (line_break_width == 0) {
       position += 1;
     } else {
-      text_line_vector_push(
-          &source_text->lines,
-          text_line_new(line_start, position - line_start,
-                        position - line_start + line_break_width));
+      add_line(&source_text->lines, line_start, position, line_break_width);
       line_start = position + line_break_width;
       position = line_start;
     }
   }
 
-  text_line_vector_push(
-      &source_text->lines,
-      text_line_new(line_start, position - line_start, position - line_start));
+  add_line(&source_text->lines, line_start, position, 0);
 }
 
 source_text_t source_text_from(sds text) {
@@ -111,7 +114,7 @@ size_t source_text_get_line_index(source_text_t *text, size_t offset) {
       return mid;
     }
   }
-  return start;
+  return start - 1;
 }
 
 void source_text_free(source_text_t *text) {
