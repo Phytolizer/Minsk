@@ -1,3 +1,4 @@
+#include "minsk_test/analysis/syntax/parser.h"
 #include "check.h"
 #include "minsk/analysis/syntax/facts.h"
 #include "minsk/analysis/syntax/kind.h"

@@ -9,7 +9,7 @@
 
 #define MAX_LOAD_FACTOR 0.75
 
-uint64_t syntax_kind_hash_fnv1a(const void *raw_key) {
+static uint64_t syntax_kind_hash_fnv1a(const void *raw_key) {
   uint64_t h = 0xcbf29ce484222325ULL;
   const char *key = raw_key;
   for (size_t i = 0; i < sizeof(syntax_kind_t); i++) {

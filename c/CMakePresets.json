@@ -7,7 +7,7 @@
       "cacheVariables": {
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_C_FLAGS": "-Wall -Wextra -Wpedantic -Werror=implicit-function-declaration"
+        "CMAKE_C_FLAGS": "-Wall -Wextra -Wpedantic -Werror=implicit-function-declaration -Wmissing-prototypes"
       }
     },
     {
