@@ -53,7 +53,8 @@ void text_line_vector_free(text_line_vector_t *vector) { free(vector->data); }
 
 static size_t get_line_break_width(sds text, size_t position) {
   char character = text[position];
-  char lookahead = position + 1 == sdslen(text) ? '\0' : text[position + 1];
+  char lookahead =
+      (char)(position + 1 == sdslen(text) ? '\0' : text[position + 1]);
   if (character == '\r' && lookahead == '\n') {
     return 2;
   }
