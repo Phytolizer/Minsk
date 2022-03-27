@@ -130,7 +130,7 @@ static expression_syntax_t *parse_expression(parser_t *parser) {
   return parse_assignment_expression(parser);
 }
 
-void parser_init(parser_t *parser, const char *text) {
+void parser_init(parser_t *parser, source_text_t text) {
   peek_buffer_init(&parser->peek_buffer, text);
   diagnostic_bag_init(&parser->diagnostics);
 }
@@ -151,6 +151,7 @@ syntax_tree_t parser_parse(parser_t *parser) {
       .root = expression,
       .end_of_file_token = end_of_file_token,
       .diagnostics = bag,
+      .source_text = parser->peek_buffer.lexer.text,
   };
 }
 void parser_free(parser_t *parser) {

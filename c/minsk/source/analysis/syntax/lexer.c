@@ -23,8 +23,8 @@ static char peek(lexer_t *lexer, int offset) {
 
 static char current(lexer_t *lexer) { return peek(lexer, 0); }
 
-void lexer_init(lexer_t *lexer, const char *text) {
-  lexer->text = source_text_from(sdsnew(text));
+void lexer_init(lexer_t *lexer, source_text_t text) {
+  lexer->text = text;
   lexer->position = 0;
   diagnostic_bag_init(&lexer->diagnostics);
 }
@@ -150,6 +150,5 @@ syntax_token_t lexer_next_token(lexer_t *lexer) {
 }
 
 void lexer_free(lexer_t *lexer) {
-  source_text_free(&lexer->text);
   diagnostic_bag_free(&lexer->diagnostics);
 }

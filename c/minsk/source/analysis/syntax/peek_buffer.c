@@ -1,5 +1,6 @@
 #include "minsk/analysis/syntax/peek_buffer.h"
 #include "minsk/analysis/syntax/token.h"
+#include "minsk/analysis/text/source.h"
 #include <assert.h>
 #include <stdlib.h>
 static void peek_buffer_push(peek_buffer_t *buffer) {
@@ -21,7 +22,7 @@ static void peek_buffer_push(peek_buffer_t *buffer) {
   buffer->data[buffer->length] = tok;
   buffer->length++;
 }
-void peek_buffer_init(peek_buffer_t *buffer, const char *text) {
+void peek_buffer_init(peek_buffer_t *buffer, source_text_t text) {
   lexer_init(&buffer->lexer, text);
   buffer->data = NULL;
   buffer->length = 0;

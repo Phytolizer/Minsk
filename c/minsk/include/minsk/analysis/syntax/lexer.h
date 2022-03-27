@@ -12,6 +12,6 @@ typedef struct {
   diagnostic_bag_t diagnostics;
 } lexer_t;
 
-void lexer_init(lexer_t *lexer, const char *text);
+void lexer_init(lexer_t *lexer, source_text_t text);
 syntax_token_t lexer_next_token(lexer_t *lexer);
 void lexer_free(lexer_t *lexer);
