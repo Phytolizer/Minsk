@@ -70,6 +70,42 @@ TEST_CASE("correct evaluation") {
         }
       )",
                       std::make_unique<integer>(100)},
+      evaluation_test{R"(
+        {
+          var a = 10
+          if false
+            a = 20
+          a
+        }
+      )", std::make_unique<integer>(10)},
+      evaluation_test{R"(
+        {
+          var a = 10
+          if true
+            a = 20
+          a
+        }
+      )", std::make_unique<integer>(20)},
+      evaluation_test{R"(
+        {
+          var a = 0
+          if true
+            a = 20
+          else
+            a = 10
+          a
+        }
+      )", std::make_unique<integer>(20)},
+      evaluation_test{R"(
+        {
+          var a = 0
+          if false
+            a = 20
+          else
+            a = 10
+          a
+        }
+      )", std::make_unique<integer>(10)},
   };
 
   DOCTEST_VALUE_PARAMETERIZED_DATA(data, evaluator_tests);
@@ -196,6 +232,19 @@ TEST_CASE("unary operator reports undefined") {
 
   constexpr std::string_view diagnostics = R"(
     Unary operator '+' isn't defined for type 'boolean'
+  )";
+
+  assert_has_diagnostics(text, diagnostics);
+}
+
+TEST_CASE("if statement requires boolean condition") {
+  constexpr std::string_view text = R"(
+    if [1]
+      1
+  )";
+
+  constexpr std::string_view diagnostics = R"(
+    Cannot convert type 'integer' to 'boolean'
   )";
 
   assert_has_diagnostics(text, diagnostics);

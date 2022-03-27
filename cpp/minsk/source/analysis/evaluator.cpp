@@ -11,6 +11,7 @@
 #include "minsk/analysis/binding/nodes/expressions/variable.hpp"
 #include "minsk/analysis/binding/nodes/statements/block.hpp"
 #include "minsk/analysis/binding/nodes/statements/expression.hpp"
+#include "minsk/analysis/binding/nodes/statements/if.hpp"
 #include "minsk/runtime/object.hpp"
 #include <memory>
 #include <stdexcept>
@@ -25,6 +26,10 @@ void minsk::analysis::evaluator::evaluate_statement(
   case binding::bound_node_kind::expression_statement:
     evaluate_expression_statement(
         dynamic_cast<const binding::bound_expression_statement *>(root));
+    break;
+  case binding::bound_node_kind::if_statement:
+    evaluate_if_statement(
+        dynamic_cast<const binding::bound_if_statement *>(root));
     break;
   case binding::bound_node_kind::variable_declaration:
     evaluate_variable_declaration(
@@ -46,6 +51,16 @@ void minsk::analysis::evaluator::evaluate_block_statement(
 void minsk::analysis::evaluator::evaluate_expression_statement(
     const binding::bound_expression_statement *root) {
   m_last_value = evaluate_expression(root->expression());
+}
+
+void minsk::analysis::evaluator::evaluate_if_statement(
+    const binding::bound_if_statement *root) {
+  const auto condition = evaluate_expression(root->condition());
+  if (condition->as_boolean()->value()) {
+    evaluate_statement(root->then_statement());
+  } else if (root->else_statement() != nullptr) {
+    evaluate_statement(root->else_statement());
+  }
 }
 
 void minsk::analysis::evaluator::evaluate_variable_declaration(

@@ -3,6 +3,7 @@
 #include "minsk/analysis/syntax/facts.hpp"
 #include "minsk/analysis/syntax/kind.hpp"
 #include "minsk/analysis/syntax/lexer.hpp"
+#include "minsk/analysis/syntax/nodes/else.hpp"
 #include "minsk/analysis/syntax/nodes/expression.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/assignment.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/binary.hpp"
@@ -13,6 +14,7 @@
 #include "minsk/analysis/syntax/nodes/statement.hpp"
 #include "minsk/analysis/syntax/nodes/statements/block.hpp"
 #include "minsk/analysis/syntax/nodes/statements/expression.hpp"
+#include "minsk/analysis/syntax/nodes/statements/if.hpp"
 #include "minsk/analysis/syntax/nodes/statements/variable.hpp"
 #include "minsk/analysis/syntax/nodes/unit.hpp"
 #include "minsk/analysis/syntax/token.hpp"
@@ -71,6 +73,8 @@ minsk::analysis::syntax::parser::parse_statement() {
   case syntax_kind::let_keyword:
   case syntax_kind::var_keyword:
     return parse_variable_declaration();
+  case syntax_kind::if_keyword:
+    return parse_if_statement();
   default:
     return parse_expression_statement();
   }
@@ -93,6 +97,22 @@ std::unique_ptr<minsk::analysis::syntax::statement_syntax>
 minsk::analysis::syntax::parser::parse_expression_statement() {
   auto expression = parse_expression();
   return std::make_unique<expression_statement_syntax>(std::move(expression));
+}
+std::unique_ptr<minsk::analysis::syntax::statement_syntax>
+minsk::analysis::syntax::parser::parse_if_statement() {
+  auto if_keyword = match_token(syntax_kind::if_keyword);
+  auto condition = parse_expression();
+  auto then_statement = parse_statement();
+  auto else_clause = std::unique_ptr<else_clause_syntax>{nullptr};
+  if (current().kind() == syntax_kind::else_keyword) {
+    auto else_keyword = match_token(syntax_kind::else_keyword);
+    auto else_statement = parse_statement();
+    else_clause = std::make_unique<else_clause_syntax>(
+        std::move(else_keyword), std::move(else_statement));
+  }
+  return std::make_unique<if_statement_syntax>(
+      std::move(if_keyword), std::move(condition), std::move(then_statement),
+      std::move(else_clause));
 }
 std::unique_ptr<minsk::analysis::syntax::statement_syntax>
 minsk::analysis::syntax::parser::parse_variable_declaration() {

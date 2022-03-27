@@ -17,6 +17,7 @@
 #include "minsk/analysis/syntax/nodes/statement.hpp"
 #include "minsk/analysis/syntax/nodes/statements/block.hpp"
 #include "minsk/analysis/syntax/nodes/statements/expression.hpp"
+#include "minsk/analysis/syntax/nodes/statements/if.hpp"
 #include "minsk/analysis/syntax/nodes/statements/variable.hpp"
 #include "minsk/analysis/syntax/nodes/unit.hpp"
 #include "minsk/analysis/variable_map.hpp"
@@ -32,9 +33,12 @@ class binder final {
   std::unique_ptr<bound_statement>
   bind_expression_statement(const syntax::expression_statement_syntax *syntax);
   std::unique_ptr<bound_statement>
+  bind_if_statement(const syntax::if_statement_syntax *syntax);
+  std::unique_ptr<bound_statement>
   bind_variable_declaration(const syntax::variable_declaration_syntax *syntax);
-  std::unique_ptr<bound_expression>
-  bind_expression(const syntax::expression_syntax *syntax);
+  std::unique_ptr<bound_expression> bind_expression(
+      const syntax::expression_syntax *syntax,
+      runtime::object_kind required_type = runtime::object_kind::null);
   std::unique_ptr<bound_expression> bind_assignment_expression(
       const syntax::assignment_expression_syntax *syntax);
   std::unique_ptr<bound_expression>

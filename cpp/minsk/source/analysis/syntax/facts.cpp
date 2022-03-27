@@ -1,5 +1,6 @@
 #include "minsk/analysis/syntax/facts.hpp"
 #include "minsk/analysis/syntax/kind.hpp"
+#include "minsk/analysis/syntax/nodes/else.hpp"
 int minsk::analysis::syntax::facts::binary_operator_precedence(
     minsk::analysis::syntax::syntax_kind kind) {
   switch (kind) {
@@ -49,6 +50,12 @@ minsk::analysis::syntax::facts::keyword_kind(std::string_view text) {
   }
   if (text == "var") {
     return syntax_kind::var_keyword;
+  }
+  if (text == "if") {
+    return syntax_kind::if_keyword;
+  }
+  if (text == "else") {
+    return syntax_kind::else_keyword;
   }
   return syntax_kind::identifier_token;
 }
@@ -100,6 +107,10 @@ minsk::analysis::syntax::facts::get_text(syntax_kind kind) {
     return "let";
   case syntax_kind::var_keyword:
     return "var";
+  case syntax_kind::if_keyword:
+    return "if";
+  case syntax_kind::else_keyword:
+    return "else";
   default:
     return {};
   }

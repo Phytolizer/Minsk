@@ -36,12 +36,16 @@ enum class syntax_kind {
   false_keyword,
   let_keyword,
   var_keyword,
+  if_keyword,
+  else_keyword,
 
   compilation_unit,
+  else_clause,
 
   block_statement,
   expression_statement,
   variable_declaration,
+  if_statement,
 
   assignment_expression,
   binary_expression,

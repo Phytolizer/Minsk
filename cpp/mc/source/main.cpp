@@ -81,9 +81,11 @@ int main() {
       }
     } else {
       previous = std::move(compilation);
-      std::cout << rang::fg::magenta;
-      result.value()->print(std::cout);
-      std::cout << rang::fg::reset << '\n';
+      if (result.value() != nullptr) {
+        std::cout << rang::fg::magenta;
+        result.value()->print(std::cout);
+        std::cout << rang::fg::reset << '\n';
+      }
     }
     text_builder.str("");
   }

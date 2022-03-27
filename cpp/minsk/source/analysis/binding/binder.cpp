@@ -12,6 +12,7 @@
 #include "minsk/analysis/binding/nodes/statement.hpp"
 #include "minsk/analysis/binding/nodes/statements/block.hpp"
 #include "minsk/analysis/binding/nodes/statements/expression.hpp"
+#include "minsk/analysis/binding/nodes/statements/if.hpp"
 #include "minsk/analysis/binding/nodes/statements/variable.hpp"
 #include "minsk/analysis/binding/scope.hpp"
 #include "minsk/analysis/binding/scope/global.hpp"
@@ -24,6 +25,7 @@
 #include "minsk/analysis/syntax/nodes/expressions/parenthesized.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/unary.hpp"
 #include "minsk/analysis/syntax/nodes/statements/block.hpp"
+#include "minsk/analysis/syntax/nodes/statements/if.hpp"
 #include "minsk/analysis/syntax/nodes/statements/variable.hpp"
 #include "minsk/analysis/variable_symbol.hpp"
 #include "minsk/runtime/object.hpp"
@@ -188,6 +190,9 @@ minsk::analysis::binding::binder::bind_statement(
   case syntax::syntax_kind::variable_declaration:
     return bind_variable_declaration(
         dynamic_cast<const syntax::variable_declaration_syntax *>(syntax));
+  case syntax::syntax_kind::if_statement:
+    return bind_if_statement(
+        dynamic_cast<const syntax::if_statement_syntax *>(syntax));
   default:
     throw std::runtime_error{fmt::format(
         "Unexpected syntax {}", magic_enum::enum_name(syntax->kind()))};
@@ -214,6 +219,22 @@ minsk::analysis::binding::binder::bind_expression_statement(
 }
 
 std::unique_ptr<minsk::analysis::binding::bound_statement>
+minsk::analysis::binding::binder::bind_if_statement(
+    const syntax::if_statement_syntax *syntax) {
+  auto condition =
+      bind_expression(syntax->condition(), runtime::object_kind::boolean);
+  auto then_statement = bind_statement(syntax->then_statement());
+  auto else_statement =
+      syntax->else_clause()
+          ? bind_statement(syntax->else_clause()->else_statement())
+          : std::unique_ptr<bound_statement>{nullptr};
+
+  return std::make_unique<bound_if_statement>(std::move(condition),
+                                              std::move(then_statement),
+                                              std::move(else_statement));
+}
+
+std::unique_ptr<minsk::analysis::binding::bound_statement>
 minsk::analysis::binding::binder::bind_variable_declaration(
     const syntax::variable_declaration_syntax *syntax) {
   auto name = syntax->identifier_token().text();
@@ -232,30 +253,46 @@ minsk::analysis::binding::binder::bind_variable_declaration(
 
 std::unique_ptr<minsk::analysis::binding::bound_expression>
 minsk::analysis::binding::binder::bind_expression(
-    const syntax::expression_syntax *syntax) {
+    const syntax::expression_syntax *syntax,
+    runtime::object_kind required_type) {
+  auto result = std::unique_ptr<bound_expression>{nullptr};
   switch (syntax->kind()) {
   case syntax::syntax_kind::assignment_expression:
-    return bind_assignment_expression(
+    result = bind_assignment_expression(
         dynamic_cast<const syntax::assignment_expression_syntax *>(syntax));
+    break;
   case syntax::syntax_kind::binary_expression:
-    return bind_binary_expression(
+    result = bind_binary_expression(
         dynamic_cast<const syntax::binary_expression_syntax *>(syntax));
+    break;
   case syntax::syntax_kind::literal_expression:
-    return bind_literal_expression(
+    result = bind_literal_expression(
         dynamic_cast<const syntax::literal_expression_syntax *>(syntax));
+    break;
   case syntax::syntax_kind::name_expression:
-    return bind_name_expression(
+    result = bind_name_expression(
         dynamic_cast<const syntax::name_expression_syntax *>(syntax));
+    break;
   case syntax::syntax_kind::parenthesized_expression:
-    return bind_parenthesized_expression(
+    result = bind_parenthesized_expression(
         dynamic_cast<const syntax::parenthesized_expression_syntax *>(syntax));
+    break;
   case syntax::syntax_kind::unary_expression:
-    return bind_unary_expression(
+    result = bind_unary_expression(
         dynamic_cast<const syntax::unary_expression_syntax *>(syntax));
+    break;
   default:
     throw std::runtime_error{fmt::format(
         "Unexpected syntax {}", magic_enum::enum_name(syntax->kind()))};
   }
+
+  if (required_type != runtime::object_kind::null &&
+      result->type() != required_type) {
+    m_diagnostics.report_cannot_convert(syntax->span(), result->type(),
+                                        required_type);
+  }
+
+  return result;
 }
 
 const minsk::analysis::diagnostic_bag &
