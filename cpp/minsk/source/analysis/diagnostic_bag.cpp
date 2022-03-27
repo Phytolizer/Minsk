@@ -22,6 +22,11 @@ void minsk::analysis::diagnostic_bag::push_back(const value_type &v) {
   m_diagnostics.push_back(v);
 }
 
+const minsk::analysis::diagnostic &
+minsk::analysis::diagnostic_bag::operator[](size_type i) const {
+  return m_diagnostics[i];
+}
+
 bool minsk::analysis::diagnostic_bag::empty() const {
   return m_diagnostics.empty();
 }

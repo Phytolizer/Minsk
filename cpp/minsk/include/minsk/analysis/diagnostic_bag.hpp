@@ -27,6 +27,8 @@ public:
 
   void push_back(const value_type &v);
 
+  const diagnostic &operator[](size_type i) const;
+
   bool empty() const;
   size_type size() const;
 

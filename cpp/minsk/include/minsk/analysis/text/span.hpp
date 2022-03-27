@@ -13,6 +13,10 @@ public:
   int start() const;
   int length() const;
   int end() const;
+
+  constexpr bool operator==(const text_span &other) const {
+    return m_start == other.m_start && m_length == other.m_length;
+  }
 };
 
 } // namespace minsk::analysis::text
