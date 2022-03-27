@@ -11,6 +11,10 @@ int minsk::analysis::syntax::facts::binary_operator_precedence(
     return 4;
   case syntax_kind::equals_equals_token:
   case syntax_kind::bang_equals_token:
+  case syntax_kind::less_token:
+  case syntax_kind::less_equals_token:
+  case syntax_kind::greater_token:
+  case syntax_kind::greater_equals_token:
     return 3;
   case syntax_kind::ampersand_ampersand_token:
     return 2;
@@ -70,6 +74,14 @@ minsk::analysis::syntax::facts::get_text(syntax_kind kind) {
     return "==";
   case syntax_kind::bang_equals_token:
     return "!=";
+  case syntax_kind::less_token:
+    return "<";
+  case syntax_kind::less_equals_token:
+    return "<=";
+  case syntax_kind::greater_token:
+    return ">";
+  case syntax_kind::greater_equals_token:
+    return ">=";
   case syntax_kind::equals_token:
     return "=";
   case syntax_kind::open_parenthesis_token:

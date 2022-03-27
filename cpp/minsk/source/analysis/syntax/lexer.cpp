@@ -101,6 +101,24 @@ minsk::analysis::syntax::lexer::iterator::scan() {
         m_position += 1;
       }
       break;
+    case '<':
+      if (peek(1) == '=') {
+        kind = syntax_kind::less_equals_token;
+        m_position += 2;
+      } else {
+        kind = syntax_kind::less_token;
+        m_position += 1;
+      }
+      break;
+    case '>':
+      if (peek(1) == '=') {
+        kind = syntax_kind::greater_equals_token;
+        m_position += 2;
+      } else {
+        kind = syntax_kind::greater_token;
+        m_position += 1;
+      }
+      break;
     case '&':
       if (peek(1) == '&') {
         kind = syntax_kind::ampersand_ampersand_token;

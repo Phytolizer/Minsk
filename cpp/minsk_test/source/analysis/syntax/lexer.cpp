@@ -72,7 +72,9 @@ bool requires_separator(const simple_token &t1, const simple_token &t2) {
   }
 
   if ((t1.kind == syntax_kind::bang_token ||
-       t1.kind == syntax_kind::equals_token) &&
+       t1.kind == syntax_kind::equals_token ||
+       t1.kind == syntax_kind::less_token ||
+       t1.kind == syntax_kind::greater_token) &&
       (t2.kind == syntax_kind::equals_equals_token ||
        t2.kind == syntax_kind::equals_token)) {
     return true;

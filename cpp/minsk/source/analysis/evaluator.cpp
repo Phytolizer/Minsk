@@ -122,6 +122,18 @@ minsk::analysis::evaluator::evaluate_binary_expression(
     return std::make_unique<runtime::boolean>(*left == *right);
   case binding::bound_binary_operator_kind::inequality:
     return std::make_unique<runtime::boolean>(*left != *right);
+  case binding::bound_binary_operator_kind::less_than:
+    return std::make_unique<runtime::boolean>(left->as_integer()->value() <
+                                              right->as_integer()->value());
+  case binding::bound_binary_operator_kind::less_than_or_equal:
+    return std::make_unique<runtime::boolean>(left->as_integer()->value() <=
+                                              right->as_integer()->value());
+  case binding::bound_binary_operator_kind::greater_than:
+    return std::make_unique<runtime::boolean>(left->as_integer()->value() >
+                                              right->as_integer()->value());
+  case binding::bound_binary_operator_kind::greater_than_or_equal:
+    return std::make_unique<runtime::boolean>(left->as_integer()->value() >=
+                                              right->as_integer()->value());
   }
   throw std::runtime_error{"corrupt operator kind"};
 }
