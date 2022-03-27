@@ -5,6 +5,8 @@
 #include "minsk/analysis/syntax/token.h"
 #include "minsk/analysis/syntax/tokens.h"
 #include "minsk/analysis/syntax/tree.h"
+#include "minsk_test/analysis/syntax/kind_set.h"
+#include "minsk_test/analysis/syntax/kind_vector.h"
 #include "minsk_test/esc.h"
 #include "sds.h"
 #include <assert.h>
@@ -84,6 +86,34 @@ static simple_token_vector_t get_separators(void) {
          sizeof(simple_token_t) * num_separators);
   return all_separators;
 }
+
+START_TEST(tests_all_tokens_test) {
+  syntax_kind_set_t tested_kinds;
+  syntax_kind_set_init(&tested_kinds);
+  simple_token_vector_t tokens = get_tokens();
+  simple_token_vector_t separators = get_separators();
+  for (size_t i = 0; i < tokens.length; i++) {
+    syntax_kind_set_insert(&tested_kinds, tokens.data[i].kind);
+  }
+  for (size_t i = 0; i < separators.length; i++) {
+    syntax_kind_set_insert(&tested_kinds, separators.data[i].kind);
+  }
+
+  for (int i = 0; i < syntax_kind_count; i++) {
+    const char *str = syntax_kind_to_string(i);
+    if (strstr(str, "token") == NULL && strstr(str, "keyword") == NULL) {
+      continue;
+    }
+    if (i != syntax_kind_bad_token && i != syntax_kind_end_of_file_token &&
+        !syntax_kind_set_contains(&tested_kinds, i)) {
+      ck_abort_msg("%s is not tested", syntax_kind_to_string(i));
+      break;
+    }
+  }
+
+  syntax_kind_set_free(&tested_kinds);
+}
+END_TEST
 
 START_TEST(lexes_token_test) {
   simple_token_vector_t tokens = get_tokens();
@@ -198,6 +228,10 @@ END_TEST
 
 Suite *lexer_suite(void) {
   Suite *s = suite_create("Lexer");
+
+  TCase *tc_tests_all_tokens = tcase_create("tests all tokens");
+  tcase_add_test(tc_tests_all_tokens, tests_all_tokens_test);
+  suite_add_tcase(s, tc_tests_all_tokens);
 
   TCase *tc_lexes_token = tcase_create("lexes token");
   tcase_add_test(tc_lexes_token, lexes_token_test);

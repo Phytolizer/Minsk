@@ -2,6 +2,7 @@ add_executable(
   minsk_test
   "source/analysis/evaluator.c"
   "source/analysis/syntax/asserting_iterator.c"
+  "source/analysis/syntax/kind_set.c"
   "source/analysis/syntax/kind_vector.c"
   "source/analysis/syntax/lexer.c"
   "source/analysis/syntax/node_vector.c"
