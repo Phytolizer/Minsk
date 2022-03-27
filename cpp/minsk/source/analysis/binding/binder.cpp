@@ -14,6 +14,7 @@
 #include "minsk/analysis/binding/nodes/statements/expression.hpp"
 #include "minsk/analysis/binding/nodes/statements/if.hpp"
 #include "minsk/analysis/binding/nodes/statements/variable.hpp"
+#include "minsk/analysis/binding/nodes/statements/while.hpp"
 #include "minsk/analysis/binding/scope.hpp"
 #include "minsk/analysis/binding/scope/global.hpp"
 #include "minsk/analysis/diagnostic.hpp"
@@ -27,6 +28,7 @@
 #include "minsk/analysis/syntax/nodes/statements/block.hpp"
 #include "minsk/analysis/syntax/nodes/statements/if.hpp"
 #include "minsk/analysis/syntax/nodes/statements/variable.hpp"
+#include "minsk/analysis/syntax/nodes/statements/while.hpp"
 #include "minsk/analysis/variable_symbol.hpp"
 #include "minsk/runtime/object.hpp"
 #include <algorithm>
@@ -193,6 +195,9 @@ minsk::analysis::binding::binder::bind_statement(
   case syntax::syntax_kind::if_statement:
     return bind_if_statement(
         dynamic_cast<const syntax::if_statement_syntax *>(syntax));
+  case syntax::syntax_kind::while_statement:
+    return bind_while_statement(
+        dynamic_cast<const syntax::while_statement_syntax *>(syntax));
   default:
     throw std::runtime_error{fmt::format(
         "Unexpected syntax {}", magic_enum::enum_name(syntax->kind()))};
@@ -249,6 +254,16 @@ minsk::analysis::binding::binder::bind_variable_declaration(
   }
   return std::make_unique<bound_variable_declaration>(std::move(variable),
                                                       std::move(initializer));
+}
+
+std::unique_ptr<minsk::analysis::binding::bound_statement>
+minsk::analysis::binding::binder::bind_while_statement(
+    const syntax::while_statement_syntax *syntax) {
+  auto condition =
+      bind_expression(syntax->condition(), runtime::object_kind::boolean);
+  auto body = bind_statement(syntax->body());
+  return std::make_unique<bound_while_statement>(std::move(condition),
+                                                 std::move(body));
 }
 
 std::unique_ptr<minsk::analysis::binding::bound_expression>

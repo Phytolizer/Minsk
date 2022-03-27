@@ -35,6 +35,10 @@ void minsk::analysis::evaluator::evaluate_statement(
     evaluate_variable_declaration(
         dynamic_cast<const binding::bound_variable_declaration *>(root));
     break;
+  case binding::bound_node_kind::while_statement:
+    evaluate_while_statement(
+        dynamic_cast<const binding::bound_while_statement *>(root));
+    break;
   default:
     throw std::runtime_error{
         fmt::format("unexpected node {}", magic_enum::enum_name(root->kind()))};
@@ -55,7 +59,7 @@ void minsk::analysis::evaluator::evaluate_expression_statement(
 
 void minsk::analysis::evaluator::evaluate_if_statement(
     const binding::bound_if_statement *root) {
-  const auto condition = evaluate_expression(root->condition());
+  auto condition = evaluate_expression(root->condition());
   if (condition->as_boolean()->value()) {
     evaluate_statement(root->then_statement());
   } else if (root->else_statement() != nullptr) {
@@ -69,6 +73,17 @@ void minsk::analysis::evaluator::evaluate_variable_declaration(
   m_variables->emplace(root->variable(),
                        runtime::copy_object_ptr(initializer.get()));
   m_last_value = std::move(initializer);
+}
+
+void minsk::analysis::evaluator::evaluate_while_statement(
+    const binding::bound_while_statement *root) {
+  while (true) {
+    auto condition = evaluate_expression(root->condition());
+    if (!condition->as_boolean()->value()) {
+      break;
+    }
+    evaluate_statement(root->body());
+  }
 }
 
 minsk::runtime::object_ptr minsk::analysis::evaluator::evaluate_expression(

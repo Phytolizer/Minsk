@@ -16,6 +16,7 @@
 #include "minsk/analysis/syntax/nodes/statements/expression.hpp"
 #include "minsk/analysis/syntax/nodes/statements/if.hpp"
 #include "minsk/analysis/syntax/nodes/statements/variable.hpp"
+#include "minsk/analysis/syntax/nodes/statements/while.hpp"
 #include "minsk/analysis/syntax/nodes/unit.hpp"
 #include "minsk/analysis/syntax/token.hpp"
 #include "minsk/analysis/text/source.hpp"
@@ -75,6 +76,8 @@ minsk::analysis::syntax::parser::parse_statement() {
     return parse_variable_declaration();
   case syntax_kind::if_keyword:
     return parse_if_statement();
+  case syntax_kind::while_keyword:
+    return parse_while_statement();
   default:
     return parse_expression_statement();
   }
@@ -113,6 +116,14 @@ minsk::analysis::syntax::parser::parse_if_statement() {
   return std::make_unique<if_statement_syntax>(
       std::move(if_keyword), std::move(condition), std::move(then_statement),
       std::move(else_clause));
+}
+std::unique_ptr<minsk::analysis::syntax::statement_syntax>
+minsk::analysis::syntax::parser::parse_while_statement() {
+  auto while_keyword = match_token(syntax_kind::while_keyword);
+  auto condition = parse_expression();
+  auto body = parse_statement();
+  return std::make_unique<while_statement_syntax>(
+      std::move(while_keyword), std::move(condition), std::move(body));
 }
 std::unique_ptr<minsk::analysis::syntax::statement_syntax>
 minsk::analysis::syntax::parser::parse_variable_declaration() {

@@ -77,7 +77,8 @@ TEST_CASE("correct evaluation") {
             a = 20
           a
         }
-      )", std::make_unique<integer>(10)},
+      )",
+                      std::make_unique<integer>(10)},
       evaluation_test{R"(
         {
           var a = 10
@@ -85,7 +86,8 @@ TEST_CASE("correct evaluation") {
             a = 20
           a
         }
-      )", std::make_unique<integer>(20)},
+      )",
+                      std::make_unique<integer>(20)},
       evaluation_test{R"(
         {
           var a = 0
@@ -95,7 +97,8 @@ TEST_CASE("correct evaluation") {
             a = 10
           a
         }
-      )", std::make_unique<integer>(20)},
+      )",
+                      std::make_unique<integer>(20)},
       evaluation_test{R"(
         {
           var a = 0
@@ -105,7 +108,17 @@ TEST_CASE("correct evaluation") {
             a = 10
           a
         }
-      )", std::make_unique<integer>(10)},
+      )",
+                      std::make_unique<integer>(10)},
+      evaluation_test{R"(
+        {
+          var a = 0
+          while a < 10
+            a = a + 1
+          a
+        }
+      )",
+                      std::make_unique<integer>(10)},
   };
 
   DOCTEST_VALUE_PARAMETERIZED_DATA(data, evaluator_tests);
@@ -240,6 +253,19 @@ TEST_CASE("unary operator reports undefined") {
 TEST_CASE("if statement requires boolean condition") {
   constexpr std::string_view text = R"(
     if [1]
+      1
+  )";
+
+  constexpr std::string_view diagnostics = R"(
+    Cannot convert type 'integer' to 'boolean'
+  )";
+
+  assert_has_diagnostics(text, diagnostics);
+}
+
+TEST_CASE("while statement requires boolean condition") {
+  constexpr std::string_view text = R"(
+    while [1]
       1
   )";
 

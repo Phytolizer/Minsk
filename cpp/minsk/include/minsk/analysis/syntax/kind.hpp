@@ -38,6 +38,7 @@ enum class syntax_kind {
   var_keyword,
   if_keyword,
   else_keyword,
+  while_keyword,
 
   compilation_unit,
   else_clause,
@@ -46,6 +47,7 @@ enum class syntax_kind {
   expression_statement,
   variable_declaration,
   if_statement,
+  while_statement,
 
   assignment_expression,
   binary_expression,
