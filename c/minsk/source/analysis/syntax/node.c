@@ -6,6 +6,7 @@
 #include "minsk/analysis/syntax/node/expression/name.h"
 #include "minsk/analysis/syntax/node/expression/parenthesized.h"
 #include "minsk/analysis/syntax/node/expression/unary.h"
+#include "minsk/analysis/syntax/token.h"
 #include "sds.h"
 #include "styler/styler.h"
 #include <assert.h>
@@ -102,4 +103,18 @@ void syntax_node_children_free(syntax_node_children_t *children) {
   free(children->data);
   children->data = NULL;
   children->length = 0;
+}
+
+text_span_t syntax_node_span(const syntax_node_t *node) {
+  if (node->is_token) {
+    return token_span((syntax_token_t *)node);
+  }
+  syntax_node_children_t children = syntax_node_children(node);
+  const syntax_node_t *first = children.data[0];
+  const syntax_node_t *last = children.data[children.length - 1];
+
+  text_span_t span = text_span_from_bounds(
+      syntax_node_span(first).start, text_span_end(syntax_node_span(last)));
+  syntax_node_children_free(&children);
+  return span;
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "kind.h"
+#include "minsk/analysis/text/span.h"
 #include <stdbool.h>
 
 typedef struct {
@@ -17,3 +18,4 @@ void syntax_node_pretty_print(const syntax_node_t *node, FILE *stream);
 syntax_node_children_t syntax_node_children(const syntax_node_t *node);
 void syntax_node_free(syntax_node_t *node);
 void syntax_node_children_free(syntax_node_children_t *children);
+text_span_t syntax_node_span(const syntax_node_t *node);
