@@ -9,6 +9,7 @@
 #include "minsk/analysis/text/span.h"
 #include "minsk/analysis/variables.h"
 #include "minsk/runtime/object.h"
+#include "sds.h"
 #include "styler/styler.h"
 #include "util/line.h"
 #include <stdbool.h>
@@ -23,8 +24,9 @@ int main(void) {
   bool show_tree = false;
   variable_map_t variables;
   variable_map_init(&variables);
+  sds text_builder = sdsempty();
   while (true) {
-    printf("> ");
+    printf("%s", sdslen(text_builder) == 0 ? "> " : "| ");
     if (!util_read_line(&input_line, &line_len, stdin)) {
       break;
     }
@@ -39,7 +41,13 @@ int main(void) {
       continue;
     }
 
-    syntax_tree_t syntax_tree = syntax_tree_parse(input_line);
+    bool is_empty = input_line[0] == '\0';
+    text_builder = sdscatfmt(text_builder, "%s\n", input_line);
+    syntax_tree_t syntax_tree = syntax_tree_parse(text_builder);
+    if (syntax_tree.diagnostics.length > 0 && !is_empty) {
+      syntax_tree_free(&syntax_tree);
+      continue;
+    }
     if (show_tree) {
       syntax_node_pretty_print((syntax_node_t *)syntax_tree.root, stdout);
     }
@@ -78,6 +86,8 @@ int main(void) {
       object_free(result.value);
     }
     syntax_tree_free(&syntax_tree);
+    sdsfree(text_builder);
+    text_builder = sdsempty();
   }
   variable_map_free(&variables);
   free(input_line);
