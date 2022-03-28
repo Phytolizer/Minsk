@@ -66,3 +66,28 @@ def test_variable_expression_reports_undeclared():
         Undefined name 'a'
     """
     assert_diagnostics(text, diagnostics)
+
+
+def test_variable_declaration_reports_redeclaration():
+    text = """
+        {
+            var x = 10
+            var y = 20
+            {
+                var x = 30
+            }
+            var [x] = 40
+        }
+    """
+    diagnostics = """
+        Name 'x' is already declared in this scope
+    """
+    assert_diagnostics(text, diagnostics)
+
+
+def test_binary_operator_reports_undefined():
+    text = "3 [&&] 4"
+    diagnostics = """
+        The binary operator '&&' isn't defined for types 'integer' and 'integer'
+    """
+    assert_diagnostics(text, diagnostics)

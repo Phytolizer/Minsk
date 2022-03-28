@@ -37,7 +37,7 @@ class DiagnosticBag:
     ):
         message = (
             f"The binary operator '{operator}' isn't defined for "
-            + f"types {left_type} and {right_type}"
+            + f"types '{left_type}' and '{right_type}'"
         )
         self._report(span, message)
 
