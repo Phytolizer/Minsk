@@ -53,9 +53,11 @@ void syntax_kind_set_insert(syntax_kind_set_t *set, syntax_kind_t kind) {
       new_data[i].present = false;
     }
     for (size_t i = 0; i < set->capacity; i++) {
-      syntax_kind_set_bucket_t *bucket =
-          find_bucket(new_data, new_capacity, set->data[i].kind);
-      *bucket = set->data[i];
+      if (set->data[i].present) {
+        syntax_kind_set_bucket_t *bucket =
+            find_bucket(new_data, new_capacity, set->data[i].kind);
+        *bucket = set->data[i];
+      }
     }
     free(set->data);
     set->data = new_data;
