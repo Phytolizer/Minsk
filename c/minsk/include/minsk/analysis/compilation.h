@@ -1,5 +1,6 @@
 #pragma once
 
+#include "minsk/analysis/binding/scope/global.h"
 #include "minsk/analysis/diagnostic_bag.h"
 #include "minsk/analysis/syntax/tree.h"
 #include "minsk/analysis/variables.h"
@@ -7,6 +8,7 @@
 
 typedef struct {
   const syntax_tree_t *syntax;
+  bound_global_scope_t global_scope;
 } compilation_t;
 
 typedef struct {
