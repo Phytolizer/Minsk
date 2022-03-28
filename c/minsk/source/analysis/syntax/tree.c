@@ -3,15 +3,14 @@
 #include "minsk/analysis/syntax/lexer.h"
 #include "minsk/analysis/syntax/node.h"
 #include "minsk/analysis/syntax/node/expression.h"
+#include "minsk/analysis/syntax/node/unit.h"
 #include "minsk/analysis/syntax/parser.h"
 #include "minsk/analysis/syntax/token.h"
 #include "minsk/analysis/syntax/tokens.h"
 #include "minsk/analysis/text/source.h"
 
 void syntax_tree_free(syntax_tree_t *tree) {
-  syntax_node_free((syntax_node_t *)tree->root);
-  tree->root = NULL;
-  token_free(&tree->end_of_file_token);
+  compilation_unit_syntax_free(&tree->root);
   diagnostic_bag_free(&tree->diagnostics);
   source_text_free(&tree->source_text);
 }
@@ -19,9 +18,16 @@ void syntax_tree_free(syntax_tree_t *tree) {
 syntax_tree_t syntax_tree_parse(const char *text) {
   parser_t parser;
   parser_init(&parser, source_text_from(sdsnew(text)));
-  syntax_tree_t tree = parser_parse(&parser);
+  compilation_unit_syntax_t root = parser_parse_compilation_unit(&parser);
+  diagnostic_bag_t diagnostics = parser.diagnostics;
+  parser.diagnostics.length = 0;
+  parser.diagnostics.data = NULL;
   parser_free(&parser);
-  return tree;
+  return (syntax_tree_t){
+      .diagnostics = diagnostics,
+      .root = root,
+      .source_text = parser.source_text,
+  };
 }
 
 syntax_token_vector_t syntax_tree_parse_tokens(const char *text) {

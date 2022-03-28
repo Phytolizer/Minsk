@@ -51,7 +51,7 @@ int main(void) {
       continue;
     }
     if (show_tree) {
-      syntax_node_pretty_print((syntax_node_t *)syntax_tree.root, stdout);
+      syntax_node_pretty_print((syntax_node_t *)syntax_tree.root.root, stdout);
     }
     compilation_t compilation;
     compilation_init(&compilation, &syntax_tree);

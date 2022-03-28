@@ -8,15 +8,18 @@
 #include "minsk/analysis/binding/node/expression/unary/operator.h"
 #include "minsk/analysis/binding/node/expression/variable.h"
 #include "minsk/analysis/binding/scope.h"
+#include "minsk/analysis/binding/scope/global.h"
 #include "minsk/analysis/diagnostic_bag.h"
 #include "minsk/analysis/symbol.h"
 #include "minsk/analysis/syntax/kind.h"
+#include "minsk/analysis/syntax/node/expression.h"
 #include "minsk/analysis/syntax/node/expression/assignment.h"
 #include "minsk/analysis/syntax/node/expression/binary.h"
 #include "minsk/analysis/syntax/node/expression/literal.h"
 #include "minsk/analysis/syntax/node/expression/name.h"
 #include "minsk/analysis/syntax/node/expression/parenthesized.h"
 #include "minsk/analysis/syntax/node/expression/unary.h"
+#include "minsk/analysis/syntax/node/unit.h"
 #include "minsk/analysis/syntax/token.h"
 #include "minsk/analysis/variables.h"
 #include "minsk/runtime/object.h"
@@ -25,6 +28,21 @@
 void binder_init(binder_t *binder, bound_scope_t *parent) {
   diagnostic_bag_init(&binder->diagnostics);
   bound_scope_init(&binder->scope, parent);
+}
+
+bound_global_scope_t
+binder_bind_global_scope(const compilation_unit_syntax_t *syntax) {
+  binder_t binder;
+  binder_init(&binder, NULL);
+  bound_expression_t *expression =
+      binder_bind_expression(&binder, syntax->root);
+  variable_symbol_vector_t variables =
+      bound_scope_get_declared_variables(&binder.scope);
+  diagnostic_bag_t diagnostics = binder.diagnostics;
+  bound_global_scope_t global_scope;
+  bound_global_scope_init(&global_scope, NULL, diagnostics, variables,
+                          expression);
+  return global_scope;
 }
 
 static bound_expression_t *

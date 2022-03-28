@@ -55,7 +55,7 @@ START_TEST(parser_binary_operator_precedence_test) {
       // Walk the tree, and check that the precedence of each node is correct.
       asserting_iterator_t iterator;
       asserting_iterator_init(&iterator,
-                              (const syntax_node_t *)syntax_tree.root);
+                              (const syntax_node_t *)syntax_tree.root.root);
       if (facts_binary_operator_precedence(left) >=
           facts_binary_operator_precedence(right)) {
         // The expression is binary.
@@ -138,7 +138,7 @@ START_TEST(parser_unary_operator_precedence_test) {
       // Walk the tree, and check that the precedence of each node is correct.
       asserting_iterator_t iterator;
       asserting_iterator_init(&iterator,
-                              (const syntax_node_t *)syntax_tree.root);
+                              (const syntax_node_t *)syntax_tree.root.root);
       if (facts_unary_operator_precedence(unary) >=
           facts_binary_operator_precedence(binary)) {
         // The outermost expression is binary.

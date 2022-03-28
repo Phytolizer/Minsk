@@ -25,6 +25,8 @@
   X(true_keyword)                                                              \
   X(false_keyword)                                                             \
                                                                                \
+  X(compilation_unit)                                                          \
+                                                                               \
   X(assignment_expression)                                                     \
   X(binary_expression)                                                         \
   X(literal_expression)                                                        \

@@ -47,6 +47,10 @@ START_TEST(evaluator_correct_evaluation_test) {
     variable_map_t variables;
     variable_map_init(&variables);
     evaluation_result_t result = compilation_evaluate(&compilation, &variables);
+    for (size_t i = 0; i < result.diagnostics.length; i++) {
+      diagnostic_t diagnostic = result.diagnostics.data[i];
+      printf("%s\n", diagnostic.message);
+    }
     ck_assert_int_eq(result.diagnostics.length, 0);
     ck_assert(object_equals(result.value, tests[i].expected));
     object_free(result.value);
