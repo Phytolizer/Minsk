@@ -26,12 +26,14 @@ evaluation_result_t compilation_evaluate(compilation_t *compilation,
         &diagnostics, compilation->global_scope.diagnostics.data[i]);
   }
   if (diagnostics.length > 0) {
-    bound_global_scope_free(&compilation->global_scope);
     return (evaluation_result_t){.diagnostics = diagnostics};
   }
   evaluator_t evaluator;
   evaluator_init(&evaluator, compilation->global_scope.expression, variables);
   object_t *result = evaluator_evaluate(&evaluator);
-  bound_global_scope_free(&compilation->global_scope);
   return (evaluation_result_t){.value = result};
+}
+
+void compilation_free(compilation_t *compilation) {
+  bound_global_scope_free(&compilation->global_scope);
 }

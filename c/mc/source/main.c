@@ -56,6 +56,7 @@ int main(void) {
     compilation_t compilation;
     compilation_init(&compilation, &syntax_tree);
     evaluation_result_t result = compilation_evaluate(&compilation, &variables);
+    compilation_free(&compilation);
     diagnostic_bag_t diagnostics = result.diagnostics;
     if (diagnostics.length > 0) {
       for (size_t i = 0; i < diagnostics.length; i++) {

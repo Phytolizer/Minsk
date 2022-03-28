@@ -47,6 +47,7 @@ START_TEST(evaluator_correct_evaluation_test) {
     variable_map_t variables;
     variable_map_init(&variables);
     evaluation_result_t result = compilation_evaluate(&compilation, &variables);
+    compilation_free(&compilation);
     for (size_t i = 0; i < result.diagnostics.length; i++) {
       diagnostic_t diagnostic = result.diagnostics.data[i];
       printf("%s\n", diagnostic.message);
