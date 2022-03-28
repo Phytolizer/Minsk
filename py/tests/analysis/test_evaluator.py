@@ -91,3 +91,24 @@ def test_binary_operator_reports_undefined():
         The binary operator '&&' isn't defined for types 'integer' and 'integer'
     """
     assert_diagnostics(text, diagnostics)
+
+
+def test_assignment_expression_reports_undefined():
+    text = "[x] = 3"
+    diagnostics = """
+        Undefined name 'x'
+    """
+    assert_diagnostics(text, diagnostics)
+
+
+def test_assignment_expression_reports_read_only():
+    text = """
+        {
+            let x = 10
+            x [=] 20
+        }
+    """
+    diagnostics = """
+        Cannot assign to read-only variable 'x'
+    """
+    assert_diagnostics(text, diagnostics)
