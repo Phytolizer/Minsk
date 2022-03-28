@@ -7,6 +7,7 @@
 #include "minsk/analysis/binding/node/expression/unary.h"
 #include "minsk/analysis/binding/node/expression/unary/operator.h"
 #include "minsk/analysis/binding/node/expression/variable.h"
+#include "minsk/analysis/binding/scope.h"
 #include "minsk/analysis/diagnostic_bag.h"
 #include "minsk/analysis/symbol.h"
 #include "minsk/analysis/syntax/kind.h"
@@ -21,9 +22,9 @@
 #include "minsk/runtime/object.h"
 #include <assert.h>
 
-void binder_init(binder_t *binder, variable_map_t *variables) {
+void binder_init(binder_t *binder, bound_scope_t *parent) {
   diagnostic_bag_init(&binder->diagnostics);
-  binder->variables = variables;
+  bound_scope_init(&binder->scope, parent);
 }
 
 static bound_expression_t *
@@ -58,27 +59,30 @@ bind_assignment_expression(binder_t *binder,
                            const assignment_expression_syntax_t *syntax) {
   bound_expression_t *expression =
       binder_bind_expression(binder, syntax->expression);
-  variable_symbol_t variable;
-  variable_symbol_init(&variable, sdsdup(syntax->identifier_token.text),
-                       bound_expression_type(expression));
-  variable_map_insert(binder->variables, variable, NULL);
+  const sds name = syntax->identifier_token.text;
+  variable_symbol_t *variable = bound_scope_try_lookup(&binder->scope, name);
+  if (variable == NULL) {
+    diagnostic_bag_report_undefined_variable(
+        &binder->diagnostics, token_span(&syntax->identifier_token), name);
+    return expression;
+  }
   bound_expression_t *result = bound_assignment_expression_new(
-      variable_symbol_copy(&variable), expression);
+      variable_symbol_copy(variable), expression);
   return result;
 }
 
 static bound_expression_t *
 bind_name_expression(binder_t *binder, const name_expression_syntax_t *syntax) {
   (void)binder;
-  variable_map_bucket_t *bucket = variable_map_find_by_name(
-      binder->variables, syntax->identifier_token.text);
-  if (bucket == NULL) {
+  variable_symbol_t *variable =
+      bound_scope_try_lookup(&binder->scope, syntax->identifier_token.text);
+  if (variable == NULL) {
     diagnostic_bag_report_undefined_variable(
         &binder->diagnostics, token_span(&syntax->identifier_token),
         syntax->identifier_token.text);
     return bound_literal_expression_new(integer_new(0));
   }
-  return bound_variable_expression_new(variable_symbol_copy(&bucket->variable));
+  return bound_variable_expression_new(variable_symbol_copy(variable));
 }
 
 static bound_expression_t *
