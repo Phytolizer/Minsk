@@ -25,6 +25,7 @@ int main(void) {
   variable_map_t variables;
   variable_map_init(&variables);
   sds text_builder = sdsempty();
+  compilation_t *previous = NULL;
   while (true) {
     styler_apply_fg(styler_fg_green, stdout);
     printf("%s", sdslen(text_builder) == 0 ? "» " : "· ");
@@ -51,13 +52,19 @@ int main(void) {
       continue;
     }
     if (show_tree) {
-      syntax_node_pretty_print((syntax_node_t *)syntax_tree.root, stdout);
+      syntax_node_pretty_print((syntax_node_t *)syntax_tree.root.root, stdout);
     }
-    compilation_t compilation;
-    compilation_init(&compilation, &syntax_tree);
-    evaluation_result_t result = compilation_evaluate(&compilation, &variables);
+    compilation_t *compilation = malloc(sizeof(compilation_t));
+    if (previous == NULL) {
+      compilation_init(compilation, NULL, &syntax_tree);
+    } else {
+      *compilation = compilation_continue_with(previous, &syntax_tree);
+    }
+    evaluation_result_t result = compilation_evaluate(compilation, &variables);
     diagnostic_bag_t diagnostics = result.diagnostics;
     if (diagnostics.length > 0) {
+      compilation_free(compilation);
+      free(compilation);
       for (size_t i = 0; i < diagnostics.length; i++) {
         size_t line_index = source_text_get_line_index(
             &syntax_tree.source_text, diagnostics.data[i].span.start);
@@ -85,6 +92,7 @@ int main(void) {
       }
       diagnostic_bag_free(&diagnostics);
     } else {
+      previous = compilation;
       styler_apply_fg(styler_fg_magenta, stdout);
       object_print(result.value, stdout);
       styler_apply_fg(styler_fg_reset, stdout);
@@ -97,5 +105,10 @@ int main(void) {
   }
   variable_map_free(&variables);
   free(input_line);
+  sdsfree(text_builder);
+  if (previous != NULL) {
+    compilation_free(previous);
+    free(previous);
+  }
   return 0;
 }

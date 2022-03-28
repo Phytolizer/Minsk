@@ -7,23 +7,114 @@
 #include "minsk/analysis/binding/node/expression/unary.h"
 #include "minsk/analysis/binding/node/expression/unary/operator.h"
 #include "minsk/analysis/binding/node/expression/variable.h"
+#include "minsk/analysis/binding/scope.h"
+#include "minsk/analysis/binding/scope/global.h"
 #include "minsk/analysis/diagnostic_bag.h"
 #include "minsk/analysis/symbol.h"
 #include "minsk/analysis/syntax/kind.h"
+#include "minsk/analysis/syntax/node/expression.h"
 #include "minsk/analysis/syntax/node/expression/assignment.h"
 #include "minsk/analysis/syntax/node/expression/binary.h"
 #include "minsk/analysis/syntax/node/expression/literal.h"
 #include "minsk/analysis/syntax/node/expression/name.h"
 #include "minsk/analysis/syntax/node/expression/parenthesized.h"
 #include "minsk/analysis/syntax/node/expression/unary.h"
+#include "minsk/analysis/syntax/node/unit.h"
 #include "minsk/analysis/syntax/token.h"
 #include "minsk/analysis/variables.h"
 #include "minsk/runtime/object.h"
 #include <assert.h>
+#include <stddef.h>
+#include <stdlib.h>
 
-void binder_init(binder_t *binder, variable_map_t *variables) {
+void binder_init(binder_t *binder, bound_scope_t *parent) {
   diagnostic_bag_init(&binder->diagnostics);
-  binder->variables = variables;
+  binder->scope = malloc(sizeof(bound_scope_t));
+  bound_scope_init(binder->scope, parent);
+}
+
+typedef struct {
+  bound_global_scope_t *data;
+  size_t length;
+  size_t capacity;
+} bound_global_scope_vector_t;
+
+static void
+bound_global_scope_vector_init(bound_global_scope_vector_t *vector) {
+  vector->data = NULL;
+  vector->length = 0;
+  vector->capacity = 0;
+}
+
+static void bound_global_scope_vector_push(bound_global_scope_vector_t *vector,
+                                           bound_global_scope_t value) {
+  if (vector->length == vector->capacity) {
+    vector->capacity = vector->capacity == 0 ? 1 : vector->capacity * 2;
+    bound_global_scope_t *new_data =
+        realloc(vector->data, sizeof(bound_global_scope_t) * vector->capacity);
+    assert(new_data != NULL);
+    vector->data = new_data;
+  }
+  vector->data[vector->length] = value;
+  vector->length += 1;
+}
+
+static bound_global_scope_t
+bound_global_scope_vector_pop(bound_global_scope_vector_t *vector) {
+  assert(vector->length > 0);
+  vector->length -= 1;
+  bound_global_scope_t result = vector->data[vector->length];
+  return result;
+}
+
+static void
+bound_global_scope_vector_free(bound_global_scope_vector_t *vector) {
+  free(vector->data);
+  bound_global_scope_vector_init(vector);
+}
+
+static bound_scope_t *create_parent_scope(bound_global_scope_t *previous) {
+  bound_global_scope_vector_t stack;
+  bound_global_scope_vector_init(&stack);
+
+  while (previous != NULL) {
+    bound_global_scope_vector_push(&stack, *previous);
+    previous = previous->previous;
+  }
+
+  bound_scope_t *current = NULL;
+
+  while (stack.length > 0) {
+    bound_global_scope_t scope = bound_global_scope_vector_pop(&stack);
+    bound_scope_t *new_scope = malloc(sizeof(bound_scope_t));
+    bound_scope_init(new_scope, current);
+    for (size_t i = 0; i < scope.variables.length; i++) {
+      bound_scope_try_declare(new_scope, sdsdup(scope.variables.data[i].name),
+                              scope.variables.data[i]);
+    }
+    current = new_scope;
+  }
+
+  bound_global_scope_vector_free(&stack);
+  return current;
+}
+
+bound_global_scope_t
+binder_bind_global_scope(bound_global_scope_t *previous,
+                         const compilation_unit_syntax_t *syntax) {
+  bound_scope_t *parent_scope = create_parent_scope(previous);
+  binder_t binder;
+  binder_init(&binder, parent_scope);
+  bound_expression_t *expression =
+      binder_bind_expression(&binder, syntax->root);
+  variable_symbol_vector_t variables =
+      bound_scope_get_declared_variables(binder.scope);
+  diagnostic_bag_t diagnostics = binder.diagnostics;
+  bound_global_scope_t global_scope;
+  bound_global_scope_init(&global_scope, NULL, diagnostics, variables,
+                          expression);
+  binder_free(&binder);
+  return global_scope;
 }
 
 static bound_expression_t *
@@ -58,27 +149,30 @@ bind_assignment_expression(binder_t *binder,
                            const assignment_expression_syntax_t *syntax) {
   bound_expression_t *expression =
       binder_bind_expression(binder, syntax->expression);
-  variable_symbol_t variable;
-  variable_symbol_init(&variable, sdsdup(syntax->identifier_token.text),
-                       bound_expression_type(expression));
-  variable_map_insert(binder->variables, variable, NULL);
+  const sds name = syntax->identifier_token.text;
+  variable_symbol_t *variable = bound_scope_try_lookup(binder->scope, name);
+  if (variable == NULL) {
+    diagnostic_bag_report_undefined_variable(
+        &binder->diagnostics, token_span(&syntax->identifier_token), name);
+    return expression;
+  }
   bound_expression_t *result = bound_assignment_expression_new(
-      variable_symbol_copy(&variable), expression);
+      variable_symbol_copy(variable), expression);
   return result;
 }
 
 static bound_expression_t *
 bind_name_expression(binder_t *binder, const name_expression_syntax_t *syntax) {
   (void)binder;
-  variable_map_bucket_t *bucket = variable_map_find_by_name(
-      binder->variables, syntax->identifier_token.text);
-  if (bucket == NULL) {
+  variable_symbol_t *variable =
+      bound_scope_try_lookup(binder->scope, syntax->identifier_token.text);
+  if (variable == NULL) {
     diagnostic_bag_report_undefined_variable(
         &binder->diagnostics, token_span(&syntax->identifier_token),
         syntax->identifier_token.text);
     return bound_literal_expression_new(integer_new(0));
   }
-  return bound_variable_expression_new(variable_symbol_copy(&bucket->variable));
+  return bound_variable_expression_new(variable_symbol_copy(variable));
 }
 
 static bound_expression_t *
@@ -132,5 +226,6 @@ binder_bind_expression(binder_t *binder,
 }
 
 void binder_free(binder_t *binder) {
-  diagnostic_bag_free(&binder->diagnostics);
+  // diagnostic_bag_free(&binder->diagnostics);
+  bound_scope_free(binder->scope);
 }

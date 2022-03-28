@@ -2,13 +2,13 @@
 
 #include "minsk/analysis/diagnostic_bag.h"
 #include "minsk/analysis/syntax/node/expression.h"
+#include "minsk/analysis/syntax/node/unit.h"
 #include "minsk/analysis/syntax/token.h"
 #include "minsk/analysis/syntax/tokens.h"
 #include "minsk/analysis/text/source.h"
 
 typedef struct {
-  expression_syntax_t *root;
-  syntax_token_t end_of_file_token;
+  compilation_unit_syntax_t root;
   diagnostic_bag_t diagnostics;
   source_text_t source_text;
 } syntax_tree_t;

@@ -36,17 +36,22 @@ START_TEST(evaluator_correct_evaluation_test) {
       {.input = "!false", .expected = boolean_new(true)},
       {.input = "true || false", .expected = boolean_new(true)},
       {.input = "false || false", .expected = boolean_new(false)},
-      {.input = "(a = 10) * a", .expected = integer_new(100)},
+      // {.input = "(a = 10) * a", .expected = integer_new(100)},
   };
 
   for (size_t i = 0; i < sizeof tests / sizeof *tests; i++) {
     printf("Evaluator: positives[%zu]: %s\n", i, tests[i].input);
     syntax_tree_t syntax_tree = syntax_tree_parse(tests[i].input);
     compilation_t compilation;
-    compilation_init(&compilation, &syntax_tree);
+    compilation_init(&compilation, NULL, &syntax_tree);
     variable_map_t variables;
     variable_map_init(&variables);
     evaluation_result_t result = compilation_evaluate(&compilation, &variables);
+    compilation_free(&compilation);
+    for (size_t i = 0; i < result.diagnostics.length; i++) {
+      diagnostic_t diagnostic = result.diagnostics.data[i];
+      printf("%s\n", diagnostic.message);
+    }
     ck_assert_int_eq(result.diagnostics.length, 0);
     ck_assert(object_equals(result.value, tests[i].expected));
     object_free(result.value);
