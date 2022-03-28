@@ -8,9 +8,23 @@
 #include "minsk/analysis/variables.h"
 #include "minsk/runtime/object.h"
 
-void compilation_init(compilation_t *compilation, const syntax_tree_t *syntax) {
+void compilation_init(compilation_t *compilation, compilation_t *previous,
+                      const syntax_tree_t *syntax) {
+  compilation->previous = previous;
   compilation->syntax = syntax;
-  compilation->global_scope = binder_bind_global_scope(&syntax->root);
+  bound_global_scope_t *previous_global_scope = NULL;
+  if (previous != NULL) {
+    previous_global_scope = &previous->global_scope;
+  }
+  compilation->global_scope =
+      binder_bind_global_scope(previous_global_scope, &syntax->root);
+}
+
+compilation_t compilation_continue_with(compilation_t *compilation,
+                                        const syntax_tree_t *syntax) {
+  compilation_t result;
+  compilation_init(&result, compilation, syntax);
+  return result;
 }
 
 evaluation_result_t compilation_evaluate(compilation_t *compilation,

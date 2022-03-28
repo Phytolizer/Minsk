@@ -1,4 +1,5 @@
 #include "minsk/analysis/binding/scope.h"
+#include <stdlib.h>
 
 void bound_scope_init(bound_scope_t *scope, bound_scope_t *parent) {
   bound_scope_map_init(&scope->variables);
@@ -49,4 +50,5 @@ void bound_scope_free(bound_scope_t *scope) {
     bound_scope_free(scope->parent);
   }
   bound_scope_map_free(&scope->variables);
+  free(scope);
 }

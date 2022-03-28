@@ -24,24 +24,96 @@
 #include "minsk/analysis/variables.h"
 #include "minsk/runtime/object.h"
 #include <assert.h>
+#include <stddef.h>
+#include <stdlib.h>
 
 void binder_init(binder_t *binder, bound_scope_t *parent) {
   diagnostic_bag_init(&binder->diagnostics);
-  bound_scope_init(&binder->scope, parent);
+  binder->scope = malloc(sizeof(bound_scope_t));
+  bound_scope_init(binder->scope, parent);
+}
+
+typedef struct {
+  bound_global_scope_t *data;
+  size_t length;
+  size_t capacity;
+} bound_global_scope_vector_t;
+
+static void
+bound_global_scope_vector_init(bound_global_scope_vector_t *vector) {
+  vector->data = NULL;
+  vector->length = 0;
+  vector->capacity = 0;
+}
+
+static void bound_global_scope_vector_push(bound_global_scope_vector_t *vector,
+                                           bound_global_scope_t value) {
+  if (vector->length == vector->capacity) {
+    vector->capacity = vector->capacity == 0 ? 1 : vector->capacity * 2;
+    bound_global_scope_t *new_data =
+        realloc(vector->data, sizeof(bound_global_scope_t) * vector->capacity);
+    assert(new_data != NULL);
+    vector->data = new_data;
+  }
+  vector->data[vector->length] = value;
+  vector->length += 1;
+}
+
+static bound_global_scope_t
+bound_global_scope_vector_pop(bound_global_scope_vector_t *vector) {
+  assert(vector->length > 0);
+  vector->length -= 1;
+  bound_global_scope_t result = vector->data[vector->length];
+  return result;
+}
+
+static void
+bound_global_scope_vector_free(bound_global_scope_vector_t *vector) {
+  free(vector->data);
+  bound_global_scope_vector_init(vector);
+}
+
+static bound_scope_t *create_parent_scope(bound_global_scope_t *previous) {
+  bound_global_scope_vector_t stack;
+  bound_global_scope_vector_init(&stack);
+
+  while (previous != NULL) {
+    bound_global_scope_vector_push(&stack, *previous);
+    previous = previous->previous;
+  }
+
+  bound_scope_t *current = NULL;
+
+  while (stack.length > 0) {
+    bound_global_scope_t scope = bound_global_scope_vector_pop(&stack);
+    bound_scope_t *new_scope = malloc(sizeof(bound_scope_t));
+    bound_scope_init(new_scope, current);
+    for (size_t i = 0; i < scope.variables.length; i++) {
+      bound_scope_try_declare(new_scope, sdsdup(scope.variables.data[i].name),
+                              scope.variables.data[i]);
+    }
+    current = new_scope;
+  }
+
+  bound_global_scope_vector_free(&stack);
+  return current;
 }
 
 bound_global_scope_t
-binder_bind_global_scope(const compilation_unit_syntax_t *syntax) {
+binder_bind_global_scope(bound_global_scope_t *previous,
+                         const compilation_unit_syntax_t *syntax) {
+  bound_scope_t *parent_scope = create_parent_scope(previous);
   binder_t binder;
-  binder_init(&binder, NULL);
+  binder_init(&binder, parent_scope);
   bound_expression_t *expression =
       binder_bind_expression(&binder, syntax->root);
   variable_symbol_vector_t variables =
-      bound_scope_get_declared_variables(&binder.scope);
+      bound_scope_get_declared_variables(binder.scope);
   diagnostic_bag_t diagnostics = binder.diagnostics;
   bound_global_scope_t global_scope;
   bound_global_scope_init(&global_scope, NULL, diagnostics, variables,
                           expression);
+  binder_free(&binder);
   return global_scope;
 }
 
@@ -78,7 +150,7 @@ bind_assignment_expression(binder_t *binder,
   bound_expression_t *expression =
       binder_bind_expression(binder, syntax->expression);
   const sds name = syntax->identifier_token.text;
-  variable_symbol_t *variable = bound_scope_try_lookup(&binder->scope, name);
+  variable_symbol_t *variable = bound_scope_try_lookup(binder->scope, name);
   if (variable == NULL) {
     diagnostic_bag_report_undefined_variable(
         &binder->diagnostics, token_span(&syntax->identifier_token), name);
@@ -93,7 +165,7 @@ static bound_expression_t *
 bind_name_expression(binder_t *binder, const name_expression_syntax_t *syntax) {
   (void)binder;
   variable_symbol_t *variable =
-      bound_scope_try_lookup(&binder->scope, syntax->identifier_token.text);
+      bound_scope_try_lookup(binder->scope, syntax->identifier_token.text);
   if (variable == NULL) {
     diagnostic_bag_report_undefined_variable(
         &binder->diagnostics, token_span(&syntax->identifier_token),
@@ -155,4 +227,5 @@ binder_bind_expression(binder_t *binder,
 
 void binder_free(binder_t *binder) {
   diagnostic_bag_free(&binder->diagnostics);
+  bound_scope_free(binder->scope);
 }

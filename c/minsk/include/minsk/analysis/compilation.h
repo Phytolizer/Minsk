@@ -6,7 +6,8 @@
 #include "minsk/analysis/variables.h"
 #include "minsk/runtime/object.h"
 
-typedef struct {
+typedef struct minsk_compilation {
+  struct minsk_compilation *previous;
   const syntax_tree_t *syntax;
   bound_global_scope_t global_scope;
 } compilation_t;
@@ -16,7 +17,10 @@ typedef struct {
   object_t *value;
 } evaluation_result_t;
 
-void compilation_init(compilation_t *compilation, const syntax_tree_t *syntax);
+void compilation_init(compilation_t *compilation, compilation_t *previous,
+                      const syntax_tree_t *syntax);
+compilation_t compilation_continue_with(compilation_t *compilation,
+                                        const syntax_tree_t *syntax);
 evaluation_result_t compilation_evaluate(compilation_t *compilation,
                                          variable_map_t *variables);
 void compilation_free(compilation_t *compilation);
