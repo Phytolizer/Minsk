@@ -61,9 +61,10 @@ int main(void) {
       *compilation = compilation_continue_with(previous, &syntax_tree);
     }
     evaluation_result_t result = compilation_evaluate(compilation, &variables);
-    compilation_free(compilation);
     diagnostic_bag_t diagnostics = result.diagnostics;
     if (diagnostics.length > 0) {
+      compilation_free(compilation);
+      free(compilation);
       for (size_t i = 0; i < diagnostics.length; i++) {
         size_t line_index = source_text_get_line_index(
             &syntax_tree.source_text, diagnostics.data[i].span.start);
@@ -104,6 +105,10 @@ int main(void) {
   }
   variable_map_free(&variables);
   free(input_line);
-  free(previous);
+  sdsfree(text_builder);
+  if (previous != NULL) {
+    compilation_free(previous);
+    free(previous);
+  }
   return 0;
 }

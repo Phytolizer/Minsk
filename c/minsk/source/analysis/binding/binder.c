@@ -226,6 +226,6 @@ binder_bind_expression(binder_t *binder,
 }
 
 void binder_free(binder_t *binder) {
-  diagnostic_bag_free(&binder->diagnostics);
+  // diagnostic_bag_free(&binder->diagnostics);
   bound_scope_free(binder->scope);
 }

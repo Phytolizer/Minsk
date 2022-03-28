@@ -49,5 +49,8 @@ evaluation_result_t compilation_evaluate(compilation_t *compilation,
 }
 
 void compilation_free(compilation_t *compilation) {
+  if (compilation->previous != NULL) {
+    compilation_free(compilation->previous);
+  }
   bound_global_scope_free(&compilation->global_scope);
 }
