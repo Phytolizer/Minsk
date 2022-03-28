@@ -37,6 +37,7 @@ syntax_token_vector_t syntax_tree_parse_tokens(const char *text) {
     }
     syntax_token_vector_push(&tokens, token);
   }
+  source_text_free(&lexer.text);
   lexer_free(&lexer);
 
   return tokens;

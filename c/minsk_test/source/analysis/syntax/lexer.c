@@ -112,6 +112,8 @@ START_TEST(tests_all_tokens_test) {
   }
 
   syntax_kind_set_free(&tested_kinds);
+  free(tokens.data);
+  free(separators.data);
 }
 END_TEST
 
