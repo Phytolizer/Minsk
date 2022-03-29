@@ -60,6 +60,12 @@ minsk::analysis::syntax::facts::keyword_kind(std::string_view text) {
   if (text == "while") {
     return syntax_kind::while_keyword;
   }
+  if (text == "for") {
+    return syntax_kind::for_keyword;
+  }
+  if (text == "to") {
+    return syntax_kind::to_keyword;
+  }
   return syntax_kind::identifier_token;
 }
 
@@ -116,6 +122,10 @@ minsk::analysis::syntax::facts::get_text(syntax_kind kind) {
     return "else";
   case syntax_kind::while_keyword:
     return "while";
+  case syntax_kind::for_keyword:
+    return "for";
+  case syntax_kind::to_keyword:
+    return "to";
   default:
     return {};
   }

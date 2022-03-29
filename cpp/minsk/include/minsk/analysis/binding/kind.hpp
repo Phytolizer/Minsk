@@ -9,6 +9,7 @@ enum class bound_node_kind {
   variable_declaration,
   if_statement,
   while_statement,
+  for_statement,
 
   assignment_expression,
   binary_expression,

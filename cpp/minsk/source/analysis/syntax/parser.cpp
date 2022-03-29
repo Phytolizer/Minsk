@@ -14,6 +14,7 @@
 #include "minsk/analysis/syntax/nodes/statement.hpp"
 #include "minsk/analysis/syntax/nodes/statements/block.hpp"
 #include "minsk/analysis/syntax/nodes/statements/expression.hpp"
+#include "minsk/analysis/syntax/nodes/statements/for.hpp"
 #include "minsk/analysis/syntax/nodes/statements/if.hpp"
 #include "minsk/analysis/syntax/nodes/statements/variable.hpp"
 #include "minsk/analysis/syntax/nodes/statements/while.hpp"
@@ -78,6 +79,8 @@ minsk::analysis::syntax::parser::parse_statement() {
     return parse_if_statement();
   case syntax_kind::while_keyword:
     return parse_while_statement();
+  case syntax_kind::for_keyword:
+    return parse_for_statement();
   default:
     return parse_expression_statement();
   }
@@ -100,6 +103,21 @@ std::unique_ptr<minsk::analysis::syntax::statement_syntax>
 minsk::analysis::syntax::parser::parse_expression_statement() {
   auto expression = parse_expression();
   return std::make_unique<expression_statement_syntax>(std::move(expression));
+}
+std::unique_ptr<minsk::analysis::syntax::statement_syntax>
+minsk::analysis::syntax::parser::parse_for_statement() {
+  auto for_keyword = match_token(syntax_kind::for_keyword);
+  auto identifier_token = match_token(syntax_kind::identifier_token);
+  auto equals_token = match_token(syntax_kind::equals_token);
+  auto initial_value = parse_expression();
+  auto to_keyword = match_token(syntax_kind::to_keyword);
+  auto final_value = parse_expression();
+  auto body = parse_statement();
+
+  return std::make_unique<for_statement_syntax>(
+      std::move(for_keyword), std::move(identifier_token),
+      std::move(equals_token), std::move(initial_value), std::move(to_keyword),
+      std::move(final_value), std::move(body));
 }
 std::unique_ptr<minsk::analysis::syntax::statement_syntax>
 minsk::analysis::syntax::parser::parse_if_statement() {

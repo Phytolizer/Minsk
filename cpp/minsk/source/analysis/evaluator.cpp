@@ -27,6 +27,10 @@ void minsk::analysis::evaluator::evaluate_statement(
     evaluate_expression_statement(
         dynamic_cast<const binding::bound_expression_statement *>(root));
     break;
+  case binding::bound_node_kind::for_statement:
+    evaluate_for_statement(
+        dynamic_cast<const binding::bound_for_statement *>(root));
+    break;
   case binding::bound_node_kind::if_statement:
     evaluate_if_statement(
         dynamic_cast<const binding::bound_if_statement *>(root));
@@ -64,6 +68,32 @@ void minsk::analysis::evaluator::evaluate_if_statement(
     evaluate_statement(root->then_statement());
   } else if (root->else_statement() != nullptr) {
     evaluate_statement(root->else_statement());
+  }
+}
+
+void minsk::analysis::evaluator::evaluate_for_statement(
+    const binding::bound_for_statement *root) {
+  auto initial_value = evaluate_expression(root->initial_value());
+  auto final_value = evaluate_expression(root->final_value());
+  m_variables->emplace(root->variable(),
+                       runtime::copy_object_ptr(initial_value.get()));
+
+  while (true) {
+    evaluate_statement(root->body());
+
+    initial_value = std::make_unique<runtime::integer>(
+        initial_value->as_integer()->value() + 1);
+    auto it = m_variables->find(root->variable());
+    if (it != m_variables->end()) {
+      it->second = runtime::copy_object_ptr(initial_value.get());
+    } else {
+      m_variables->emplace(root->variable(),
+                           runtime::copy_object_ptr(initial_value.get()));
+    }
+    if (initial_value->as_integer()->value() ==
+        final_value->as_integer()->value()) {
+      break;
+    }
   }
 }
 

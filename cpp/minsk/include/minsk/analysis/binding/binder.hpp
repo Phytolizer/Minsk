@@ -17,6 +17,7 @@
 #include "minsk/analysis/syntax/nodes/statement.hpp"
 #include "minsk/analysis/syntax/nodes/statements/block.hpp"
 #include "minsk/analysis/syntax/nodes/statements/expression.hpp"
+#include "minsk/analysis/syntax/nodes/statements/for.hpp"
 #include "minsk/analysis/syntax/nodes/statements/if.hpp"
 #include "minsk/analysis/syntax/nodes/statements/variable.hpp"
 #include "minsk/analysis/syntax/nodes/statements/while.hpp"
@@ -33,6 +34,8 @@ class binder final {
   bind_block_statement(const syntax::block_statement_syntax *syntax);
   std::unique_ptr<bound_statement>
   bind_expression_statement(const syntax::expression_statement_syntax *syntax);
+  std::unique_ptr<bound_statement>
+  bind_for_statement(const syntax::for_statement_syntax *syntax);
   std::unique_ptr<bound_statement>
   bind_if_statement(const syntax::if_statement_syntax *syntax);
   std::unique_ptr<bound_statement>

@@ -12,6 +12,7 @@
 #include "minsk/analysis/binding/nodes/statement.hpp"
 #include "minsk/analysis/binding/nodes/statements/block.hpp"
 #include "minsk/analysis/binding/nodes/statements/expression.hpp"
+#include "minsk/analysis/binding/nodes/statements/for.hpp"
 #include "minsk/analysis/binding/nodes/statements/if.hpp"
 #include "minsk/analysis/binding/nodes/statements/variable.hpp"
 #include "minsk/analysis/binding/nodes/statements/while.hpp"
@@ -192,6 +193,9 @@ minsk::analysis::binding::binder::bind_statement(
   case syntax::syntax_kind::variable_declaration:
     return bind_variable_declaration(
         dynamic_cast<const syntax::variable_declaration_syntax *>(syntax));
+  case syntax::syntax_kind::for_statement:
+    return bind_for_statement(
+        dynamic_cast<const syntax::for_statement_syntax *>(syntax));
   case syntax::syntax_kind::if_statement:
     return bind_if_statement(
         dynamic_cast<const syntax::if_statement_syntax *>(syntax));
@@ -221,6 +225,32 @@ minsk::analysis::binding::binder::bind_expression_statement(
     const syntax::expression_statement_syntax *syntax) {
   auto expression = bind_expression(syntax->expression());
   return std::make_unique<bound_expression_statement>(std::move(expression));
+}
+
+std::unique_ptr<minsk::analysis::binding::bound_statement>
+minsk::analysis::binding::binder::bind_for_statement(
+    const syntax::for_statement_syntax *syntax) {
+  m_scope = std::make_unique<bound_scope>(std::move(m_scope));
+
+  auto variable = variable_symbol{
+      std::string{syntax->identifier_token().text()},
+      false,
+      runtime::object_kind::integer,
+  };
+  m_scope->try_declare(variable_symbol{variable});
+
+  auto initial_value =
+      bind_expression(syntax->initial_value(), runtime::object_kind::integer);
+  auto final_value =
+      bind_expression(syntax->final_value(), runtime::object_kind::integer);
+
+  auto body = bind_statement(syntax->body());
+
+  m_scope = m_scope->take_parent();
+
+  return std::make_unique<bound_for_statement>(
+      std::move(variable), std::move(initial_value), std::move(final_value),
+      std::move(body));
 }
 
 std::unique_ptr<minsk::analysis::binding::bound_statement>

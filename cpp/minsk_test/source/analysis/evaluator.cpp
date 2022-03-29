@@ -119,6 +119,14 @@ TEST_CASE("correct evaluation") {
         }
       )",
                       std::make_unique<integer>(10)},
+      evaluation_test{
+          R"(
+        {
+          for i = 1 to 10
+            i
+        }
+      )",
+          std::make_unique<integer>(9)},
   };
 
   DOCTEST_VALUE_PARAMETERIZED_DATA(data, evaluator_tests);
@@ -271,6 +279,19 @@ TEST_CASE("while statement requires boolean condition") {
 
   constexpr std::string_view diagnostics = R"(
     Cannot convert type 'integer' to 'boolean'
+  )";
+
+  assert_has_diagnostics(text, diagnostics);
+}
+
+TEST_CASE("for statement requires integer range") {
+  constexpr std::string_view text = R"(
+    for i = [true] to 10
+      i
+  )";
+
+  constexpr std::string_view diagnostics = R"(
+    Cannot convert type 'boolean' to 'integer'
   )";
 
   assert_has_diagnostics(text, diagnostics);

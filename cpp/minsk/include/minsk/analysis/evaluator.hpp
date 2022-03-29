@@ -10,6 +10,7 @@
 #include "minsk/analysis/binding/nodes/statement.hpp"
 #include "minsk/analysis/binding/nodes/statements/block.hpp"
 #include "minsk/analysis/binding/nodes/statements/expression.hpp"
+#include "minsk/analysis/binding/nodes/statements/for.hpp"
 #include "minsk/analysis/binding/nodes/statements/if.hpp"
 #include "minsk/analysis/binding/nodes/statements/variable.hpp"
 #include "minsk/analysis/binding/nodes/statements/while.hpp"
@@ -29,6 +30,7 @@ class evaluator final {
   void evaluate_expression_statement(
       const binding::bound_expression_statement *root);
   void evaluate_if_statement(const binding::bound_if_statement *root);
+  void evaluate_for_statement(const binding::bound_for_statement *root);
   void evaluate_variable_declaration(
       const binding::bound_variable_declaration *root);
   void evaluate_while_statement(const binding::bound_while_statement *root);
