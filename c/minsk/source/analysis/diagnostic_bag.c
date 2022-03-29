@@ -44,6 +44,14 @@ void diagnostic_bag_copy_diagnostic(diagnostic_bag_t *bag,
   report(bag, diagnostic.span, sdsdup(diagnostic.message));
 }
 
+void diagnostic_bag_append_range(diagnostic_bag_t *bag,
+                                 diagnostic_bag_t other) {
+  // Concatenate the two bags and store in `bag`.
+  for (size_t i = 0; i < other.length; i++) {
+    report(bag, other.data[i].span, sdsdup(other.data[i].message));
+  }
+}
+
 void diagnostic_bag_report_invalid_int(diagnostic_bag_t *bag, text_span_t span,
                                        sds text) {
   sds message =

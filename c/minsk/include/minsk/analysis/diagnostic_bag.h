@@ -16,6 +16,7 @@ void diagnostic_bag_init(diagnostic_bag_t *bag);
 void diagnostic_bag_free(diagnostic_bag_t *bag);
 void diagnostic_bag_copy_diagnostic(diagnostic_bag_t *bag,
                                     diagnostic_t diagnostic);
+void diagnostic_bag_append_range(diagnostic_bag_t *bag, diagnostic_bag_t other);
 void diagnostic_bag_report_invalid_int(diagnostic_bag_t *bag, text_span_t span,
                                        sds text);
 void diagnostic_bag_report_bad_character(diagnostic_bag_t *bag, size_t position,

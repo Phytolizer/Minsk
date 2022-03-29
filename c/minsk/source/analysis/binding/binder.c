@@ -110,6 +110,16 @@ binder_bind_global_scope(bound_global_scope_t *previous,
   variable_symbol_vector_t variables =
       bound_scope_get_declared_variables(binder.scope);
   diagnostic_bag_t diagnostics = binder.diagnostics;
+
+  if (previous != NULL) {
+    diagnostic_bag_t combined_diagnostics;
+    diagnostic_bag_init(&combined_diagnostics);
+    diagnostic_bag_append_range(&combined_diagnostics, previous->diagnostics);
+    diagnostic_bag_append_range(&combined_diagnostics, diagnostics);
+    diagnostic_bag_free(&diagnostics);
+    diagnostics = combined_diagnostics;
+  }
+
   bound_global_scope_t global_scope;
   bound_global_scope_init(&global_scope, NULL, diagnostics, variables,
                           expression);
