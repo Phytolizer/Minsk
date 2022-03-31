@@ -9,7 +9,7 @@ Episode 5.
 Episode 7.
 
 ## cs (C#)
-Episode 6.
+Episode 7.
 
 ## kt (Kotlin)
 Episode 6.5.
