@@ -37,10 +37,29 @@ internal sealed class Binder
             SyntaxKind.BlockStatement => BindBlockStatement((BlockStatementSyntax)syntax),
             SyntaxKind.ExpressionStatement => BindExpressionStatement((ExpressionStatementSyntax)syntax),
             SyntaxKind.IfStatement => BindIfStatement((IfStatementSyntax)syntax),
+            SyntaxKind.ForStatement => BindForStatement((ForStatementSyntax)syntax),
             SyntaxKind.VariableDeclaration => BindVariableDeclaration((VariableDeclarationSyntax)syntax),
             SyntaxKind.WhileStatement => BindWhileStatement((WhileStatementSyntax)syntax),
             _ => throw new InvalidOperationException(),
         };
+    }
+
+    private BoundStatement BindForStatement(ForStatementSyntax syntax)
+    {
+        var lowerBound = BindExpression(syntax.LowerBound);
+        var upperBound = BindExpression(syntax.UpperBound);
+
+        _scope = new BoundScope(_scope);
+
+        var name = syntax.IdentifierToken.Text;
+        var variable = new VariableSymbol(name, false, typeof(int));
+        _scope.TryDeclare(variable);
+
+        var body = BindStatement(syntax.Body);
+
+        _scope = _scope.Parent!;
+
+        return new BoundForStatement(variable, lowerBound, upperBound, body);
     }
 
     private BoundStatement BindWhileStatement(WhileStatementSyntax syntax)

@@ -34,6 +34,9 @@ internal sealed class Evaluator
             case BoundNodeKind.IfStatement:
                 EvaluateIfStatement((BoundIfStatement)root);
                 break;
+            case BoundNodeKind.ForStatement:
+                EvaluateForStatement((BoundForStatement)root);
+                break;
             case BoundNodeKind.VariableDeclaration:
                 EvaluateVariableDeclaration((BoundVariableDeclaration)root);
                 break;
@@ -42,6 +45,18 @@ internal sealed class Evaluator
                 break;
             default:
                 throw new InvalidOperationException();
+        }
+    }
+
+    private void EvaluateForStatement(BoundForStatement root)
+    {
+        var lowerBound = (int)EvaluateExpression(root.LowerBound);
+        var upperBound = (int)EvaluateExpression(root.UpperBound);
+
+        for (var i = lowerBound; i <= upperBound; i++)
+        {
+            _variables[root.Variable] = i;
+            EvaluateStatement(root.Body);
         }
     }
 

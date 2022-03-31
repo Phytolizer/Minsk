@@ -70,9 +70,30 @@ internal sealed class Parser
             SyntaxKind.OpenBraceToken => ParseBlockStatement(),
             SyntaxKind.LetKeyword or SyntaxKind.VarKeyword => ParseVariableDeclaration(),
             SyntaxKind.IfKeyword => ParseIfStatement(),
+            SyntaxKind.ForKeyword => ParseForStatement(),
             SyntaxKind.WhileKeyword => ParseWhileStatement(),
             _ => ParseExpressionStatement(),
         };
+    }
+
+    private StatementSyntax ParseForStatement()
+    {
+        var forKeyword = MatchToken(SyntaxKind.ForKeyword);
+        var identifierToken = MatchToken(SyntaxKind.IdentifierToken);
+        var equalsToken = MatchToken(SyntaxKind.EqualsToken);
+        var lowerBound = ParseExpression();
+        var toKeyword = MatchToken(SyntaxKind.ToKeyword);
+        var upperBound = ParseExpression();
+        var body = ParseStatement();
+
+        return new ForStatementSyntax(
+            forKeyword,
+            identifierToken,
+            equalsToken,
+            lowerBound,
+            toKeyword,
+            upperBound,
+            body);
     }
 
     private StatementSyntax ParseWhileStatement()

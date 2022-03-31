@@ -44,6 +44,7 @@ public sealed class EvaluatorTests
     [InlineData("{ var a = 0 if a == 0 a = 10 else a = 20 a }", 10)]
     [InlineData("{ var a = 0 if a == 5 a = 10 else a = 20 a }", 20)]
     [InlineData("{ var i = 10 var result = 0 while i > 0 { result = result + i i = i - 1 } result }", 55)]
+    [InlineData("{ var result = 0 for i = 1 to 10 { result = result + i } result }", 55)]
     public void EvaluatesCorrectValue(string text, object expected)
     {
         AssertValue(text, expected);
