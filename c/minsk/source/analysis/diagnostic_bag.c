@@ -98,3 +98,11 @@ void diagnostic_bag_report_undefined_variable(
   sds message = sdscatfmt(sdsempty(), "Undefined variable '%s'", name);
   report(bag, span, message);
 }
+
+void diagnostic_bag_report_cannot_convert(diagnostic_bag_t* bag,
+    text_span_t span, object_kind_t from_type, object_kind_t to_type) {
+  sds message =
+      sdscatfmt(sdsempty(), "Cannot convert from type <%s> to type <%s>",
+          object_kind_to_string(from_type), object_kind_to_string(to_type));
+  report(bag, span, message);
+}

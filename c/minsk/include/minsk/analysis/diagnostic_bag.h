@@ -30,3 +30,5 @@ void diagnostic_bag_report_undefined_unary_operator(diagnostic_bag_t* bag,
     text_span_t span, const char* operator_text, object_kind_t operand_type);
 void diagnostic_bag_report_undefined_variable(
     diagnostic_bag_t* bag, text_span_t span, const char* name);
+void diagnostic_bag_report_cannot_convert(diagnostic_bag_t* bag,
+    text_span_t span, object_kind_t from_type, object_kind_t to_type);

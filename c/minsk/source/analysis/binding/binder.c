@@ -12,6 +12,7 @@
 #include "minsk/analysis/diagnostic_bag.h"
 #include "minsk/analysis/symbol.h"
 #include "minsk/analysis/syntax/kind.h"
+#include "minsk/analysis/syntax/node.h"
 #include "minsk/analysis/syntax/node/expression.h"
 #include "minsk/analysis/syntax/node/expression/assignment.h"
 #include "minsk/analysis/syntax/node/expression/binary.h"
@@ -159,6 +160,12 @@ static bound_expression_t* bind_assignment_expression(
   if (variable == NULL) {
     diagnostic_bag_report_undefined_variable(
         &binder->diagnostics, token_span(&syntax->identifier_token), name);
+    return expression;
+  }
+  if (bound_expression_type(expression) != variable->type) {
+    diagnostic_bag_report_cannot_convert(&binder->diagnostics,
+        syntax_node_span((syntax_node_t*)syntax->expression),
+        bound_expression_type(expression), variable->type);
     return expression;
   }
   bound_expression_t* result = bound_assignment_expression_new(
