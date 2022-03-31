@@ -14,7 +14,9 @@ text_line_t text_line_new(
   return line;
 }
 
-size_t text_line_end(text_line_t line) { return line.start + line.length; }
+size_t text_line_end(text_line_t line) {
+  return line.start + line.length;
+}
 
 size_t text_line_end_including_line_break(text_line_t line) {
   return line.start + line.length_including_line_break;
@@ -49,7 +51,9 @@ void text_line_vector_push(text_line_vector_t* vector, text_line_t line) {
   vector->length += 1;
 }
 
-void text_line_vector_free(text_line_vector_t* vector) { free(vector->data); }
+void text_line_vector_free(text_line_vector_t* vector) {
+  free(vector->data);
+}
 
 static size_t get_line_break_width(sds text, size_t position) {
   char character = text[position];

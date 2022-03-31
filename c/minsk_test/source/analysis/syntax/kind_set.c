@@ -88,4 +88,6 @@ bool syntax_kind_set_contains(
   return false;
 }
 
-void syntax_kind_set_free(syntax_kind_set_t* set) { free(set->data); }
+void syntax_kind_set_free(syntax_kind_set_t* set) {
+  free(set->data);
+}

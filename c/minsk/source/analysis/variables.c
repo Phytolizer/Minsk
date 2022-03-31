@@ -11,7 +11,9 @@
 
 #define MAX_LOAD_FACTOR 0.75
 
-static uint64_t hash_fnv1a_init(void) { return 0xcbf29ce484222325ULL; }
+static uint64_t hash_fnv1a_init(void) {
+  return 0xcbf29ce484222325ULL;
+}
 
 static void hash_fnv1a_continue(
     uint64_t* hash, const void* data, size_t length) {

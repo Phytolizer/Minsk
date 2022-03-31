@@ -472,9 +472,13 @@ static void set_color(FILE* stream, int value) {
   fprintf(stream, "\x1b[%dm", value);
 }
 
-static void set_color_fg(FILE* stream, int value) { set_color(stream, value); }
+static void set_color_fg(FILE* stream, int value) {
+  set_color(stream, value);
+}
 
-static void set_color_bg(FILE* stream, int value) { set_color(stream, value); }
+static void set_color_bg(FILE* stream, int value) {
+  set_color(stream, value);
+}
 
 static void set_color_fg_bright(FILE* stream, int value) {
   set_color(stream, value);

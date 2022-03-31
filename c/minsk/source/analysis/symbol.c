@@ -6,7 +6,9 @@ void variable_symbol_init(
   symbol->type = type;
 }
 
-void variable_symbol_free(variable_symbol_t* symbol) { sdsfree(symbol->name); }
+void variable_symbol_free(variable_symbol_t* symbol) {
+  sdsfree(symbol->name);
+}
 
 variable_symbol_t variable_symbol_copy(const variable_symbol_t* symbol) {
   return (variable_symbol_t){

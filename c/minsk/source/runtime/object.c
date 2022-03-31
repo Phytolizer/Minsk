@@ -36,7 +36,9 @@ void object_print(object_t* object, FILE* stream) {
     assert(false && "corrupt object");
   }
 }
-void object_free(object_t* object) { free(object); }
+void object_free(object_t* object) {
+  free(object);
+}
 bool object_equals(object_t* a, object_t* b) {
   if (a->kind != b->kind) {
     return false;
