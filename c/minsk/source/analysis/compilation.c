@@ -9,8 +9,9 @@
 #include "minsk/runtime/object.h"
 #include <stdlib.h>
 
-void compilation_init(compilation_t* compilation, compilation_t* previous,
-    const syntax_tree_t* syntax) {
+compilation_t* compilation_new(
+    compilation_t* previous, const syntax_tree_t* syntax) {
+  compilation_t* compilation = malloc(sizeof(compilation_t));
   compilation->previous = previous;
   compilation->syntax = syntax;
   bound_global_scope_t* previous_global_scope = NULL;
@@ -19,13 +20,12 @@ void compilation_init(compilation_t* compilation, compilation_t* previous,
   }
   compilation->global_scope =
       binder_bind_global_scope(previous_global_scope, &syntax->root);
+  return compilation;
 }
 
-compilation_t compilation_continue_with(
+compilation_t* compilation_continue_with(
     compilation_t* compilation, const syntax_tree_t* syntax) {
-  compilation_t result;
-  compilation_init(&result, compilation, syntax);
-  return result;
+  return compilation_new(compilation, syntax);
 }
 
 evaluation_result_t compilation_evaluate(
@@ -52,7 +52,7 @@ evaluation_result_t compilation_evaluate(
 void compilation_free(compilation_t* compilation) {
   if (compilation->previous != NULL) {
     compilation_free(compilation->previous);
-    free(compilation->previous);
   }
   bound_global_scope_free(&compilation->global_scope);
+  free(compilation);
 }

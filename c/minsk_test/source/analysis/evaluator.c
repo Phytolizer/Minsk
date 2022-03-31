@@ -42,12 +42,11 @@ START_TEST(evaluator_correct_evaluation_test) {
   for (size_t i = 0; i < sizeof tests / sizeof *tests; i++) {
     printf("Evaluator: positives[%zu]: %s\n", i, tests[i].input);
     syntax_tree_t syntax_tree = syntax_tree_parse(tests[i].input);
-    compilation_t compilation;
-    compilation_init(&compilation, NULL, &syntax_tree);
+    compilation_t* compilation = compilation_new(NULL, &syntax_tree);
     variable_map_t variables;
     variable_map_init(&variables);
-    evaluation_result_t result = compilation_evaluate(&compilation, &variables);
-    compilation_free(&compilation);
+    evaluation_result_t result = compilation_evaluate(compilation, &variables);
+    compilation_free(compilation);
     for (size_t i = 0; i < result.diagnostics.length; i++) {
       diagnostic_t diagnostic = result.diagnostics.data[i];
       printf("%s\n", diagnostic.message);

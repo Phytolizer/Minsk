@@ -54,17 +54,16 @@ int main(void) {
     if (show_tree) {
       syntax_node_pretty_print((syntax_node_t*)syntax_tree.root.root, stdout);
     }
-    compilation_t* compilation = malloc(sizeof(compilation_t));
+    compilation_t* compilation;
     if (previous == NULL) {
-      compilation_init(compilation, NULL, &syntax_tree);
+      compilation = compilation_new(NULL, &syntax_tree);
     } else {
-      *compilation = compilation_continue_with(previous, &syntax_tree);
+      compilation = compilation_continue_with(previous, &syntax_tree);
     }
     evaluation_result_t result = compilation_evaluate(compilation, &variables);
     diagnostic_bag_t diagnostics = result.diagnostics;
     if (diagnostics.length > 0) {
       compilation_free(compilation);
-      free(compilation);
       for (size_t i = 0; i < diagnostics.length; i++) {
         size_t line_index = source_text_get_line_index(
             &syntax_tree.source_text, diagnostics.data[i].span.start);
@@ -108,7 +107,6 @@ int main(void) {
   sdsfree(text_builder);
   if (previous != NULL) {
     compilation_free(previous);
-    free(previous);
   }
   return 0;
 }

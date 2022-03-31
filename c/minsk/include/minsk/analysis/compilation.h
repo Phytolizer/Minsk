@@ -17,9 +17,9 @@ typedef struct {
   object_t* value;
 } evaluation_result_t;
 
-void compilation_init(compilation_t* compilation, compilation_t* previous,
-    const syntax_tree_t* syntax);
-compilation_t compilation_continue_with(
+compilation_t* compilation_new(
+    compilation_t* previous, const syntax_tree_t* syntax);
+compilation_t* compilation_continue_with(
     compilation_t* compilation, const syntax_tree_t* syntax);
 evaluation_result_t compilation_evaluate(
     compilation_t* compilation, variable_map_t* variables);
