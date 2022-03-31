@@ -31,13 +31,7 @@ public sealed class EvaluatorTests
     [InlineData("{ var a = 0 (a = 10) * a }", 100)]
     public void EvaluatesCorrectValue(string text, object expected)
     {
-        var syntaxTree = SyntaxTree.Parse(text);
-        var compilation = new Compilation(syntaxTree);
-        var variables = new Dictionary<VariableSymbol, object>();
-        var result = compilation.Evaluate(variables);
-
-        Assert.Empty(result.Diagnostics);
-        Assert.Equal(expected, result.Value);
+        AssertValue(text, expected);
     }
 
     [Fact]
@@ -56,7 +50,7 @@ public sealed class EvaluatorTests
         const string diagnostics = @"
             Name 'x' is already declared in this scope
         ";
-        AssertHasDiagnostics(text, diagnostics);
+        AssertDiagnostics(text, diagnostics);
     }
 
     [Fact]
@@ -68,10 +62,21 @@ public sealed class EvaluatorTests
         const string diagnostics = @"
             Undefined name 'x'
         ";
-        AssertHasDiagnostics(text, diagnostics);
+        AssertDiagnostics(text, diagnostics);
     }
 
-    private static void AssertHasDiagnostics(string text, string diagnosticText)
+    private void AssertValue(string text, object expected)
+    {
+        var syntaxTree = SyntaxTree.Parse(text);
+        var compilation = new Compilation(syntaxTree);
+        var variables = new Dictionary<VariableSymbol, object>();
+        var result = compilation.Evaluate(variables);
+
+        Assert.Empty(result.Diagnostics);
+        Assert.Equal(expected, result.Value);
+    }
+
+    private static void AssertDiagnostics(string text, string diagnosticText)
     {
         var annotatedText = AnnotatedText.Parse(text);
         var syntaxTree = SyntaxTree.Parse(annotatedText.Text);
