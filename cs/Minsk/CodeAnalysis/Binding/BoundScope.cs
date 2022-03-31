@@ -5,7 +5,7 @@ namespace Minsk.CodeAnalysis.Binding;
 internal sealed class BoundScope
 {
     public BoundScope? Parent { get; }
-    private Dictionary<string, VariableSymbol> _variables = new();
+    private readonly Dictionary<string, VariableSymbol> _variables = new();
 
     public BoundScope(BoundScope? parent)
     {

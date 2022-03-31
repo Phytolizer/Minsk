@@ -50,13 +50,13 @@ internal sealed class DiagnosticBag : IEnumerable<Diagnostic>
 
     public void ReportUndefinedBinaryOperator(TextSpan span, SyntaxToken op, Type leftType, Type rightType)
     {
-        var message = $"Binary operator '{op.Text}' is not defined for types {leftType} and {rightType}";
+        var message = $"Binary operator '{op.Text}' is not defined for types '{leftType}' and '{rightType}'";
         Report(span, message);
     }
 
     public void ReportUndefinedUnaryOperator(TextSpan span, SyntaxToken op, Type operandType)
     {
-        var message = $"Unary operator '{op.Text}' is not defined for type {operandType}";
+        var message = $"Unary operator '{op.Text}' is not defined for type '{operandType}'";
         Report(span, message);
     }
 
@@ -74,7 +74,7 @@ internal sealed class DiagnosticBag : IEnumerable<Diagnostic>
 
     public void ReportCannotConvert(TextSpan span, Type fromType, Type toType)
     {
-        var message = $"Cannot convert '{fromType}' to '{toType}'";
+        var message = $"Cannot convert type '{fromType}' to '{toType}'";
         Report(span, message);
     }
 

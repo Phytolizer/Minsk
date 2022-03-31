@@ -65,7 +65,73 @@ public sealed class EvaluatorTests
         AssertDiagnostics(text, diagnostics);
     }
 
-    private void AssertValue(string text, object expected)
+    [Fact]
+    public void AssignmentExpressionReportsUndefined()
+    {
+        const string text = @"
+            [x] = 10
+        ";
+        const string diagnostics = @"
+            Undefined name 'x'
+        ";
+        AssertDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
+    public void AssignmentExpressionReportsReadOnly()
+    {
+        const string text = @"
+            {
+                let x = 10
+                x [=] 20
+            }
+        ";
+        const string diagnostics = @"
+            Cannot assign to read-only variable 'x'
+        ";
+        AssertDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
+    public void AssignmentExpressionReportsCannotConvert()
+    {
+        const string text = @"
+            {
+                var x = 10
+                x [=] true
+            }
+        ";
+        const string diagnostics = @"
+            Cannot convert type 'System.Boolean' to 'System.Int32'
+        ";
+        AssertDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
+    public void UnaryOperatorReportsUndefined()
+    {
+        const string text = @"
+            [+]true
+        ";
+        const string diagnostics = @"
+            Unary operator '+' is not defined for type 'System.Boolean'
+        ";
+        AssertDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
+    public void BinaryOperatorReportsUndefined()
+    {
+        const string text = @"
+            true [+] true
+        ";
+        const string diagnostics = @"
+            Binary operator '+' is not defined for types 'System.Boolean' and 'System.Boolean'
+        ";
+        AssertDiagnostics(text, diagnostics);
+    }
+
+    private static void AssertValue(string text, object expected)
     {
         var syntaxTree = SyntaxTree.Parse(text);
         var compilation = new Compilation(syntaxTree);

@@ -152,7 +152,7 @@ internal sealed class Binder
             return new BoundAssignmentExpression(variable, boundExpression);
         }
 
-        _diagnostics.ReportCannotConvert(syntax.EqualsToken.Span, variable.Type, boundExpression.Type);
+        _diagnostics.ReportCannotConvert(syntax.EqualsToken.Span, boundExpression.Type, variable.Type);
         return boundExpression;
     }
 

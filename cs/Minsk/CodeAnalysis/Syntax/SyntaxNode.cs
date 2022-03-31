@@ -19,31 +19,31 @@ public abstract class SyntaxNode
 
     public void PrettyPrint()
     {
-        PrettyPrintInternal(this, true, "", true);
+        PrettyPrintInternal(this, Console.Out, true, "", true);
     }
 
     public void WriteTo(TextWriter writer)
     {
-        PrettyPrintInternal(this, false, "", true);
+        PrettyPrintInternal(this, writer, false, "", true);
     }
 
-    private static void PrettyPrintInternal(SyntaxNode node, bool isToConsole, string indent, bool isLast)
+    private static void PrettyPrintInternal(SyntaxNode node, TextWriter writer, bool isToConsole, string indent, bool isLast)
     {
         if (isToConsole)
         {
             Console.ForegroundColor = ConsoleColor.DarkGray;
         }
 
-        Console.Write(indent);
+        writer.Write(indent);
         var marker = isLast ? "└───" : "├───";
-        Console.Write(marker);
+        writer.Write(marker);
 
         if (isToConsole)
         {
             Console.ForegroundColor = node is SyntaxToken ? ConsoleColor.Blue : ConsoleColor.Cyan;
         }
 
-        Console.Write(node.Kind);
+        writer.Write(node.Kind);
         if (isToConsole)
         {
             Console.ResetColor();
@@ -51,17 +51,17 @@ public abstract class SyntaxNode
 
         if (node is SyntaxToken { Value: { } } t)
         {
-            Console.Write($" {t.Value}");
+            writer.Write($" {t.Value}");
         }
 
-        Console.WriteLine();
+        writer.WriteLine();
 
         indent += isLast ? "    " : "│   ";
         var children = node.Children.ToArray();
         var lastChild = children.LastOrDefault();
         foreach (var child in children)
         {
-            PrettyPrintInternal(child, isToConsole, indent, child == lastChild);
+            PrettyPrintInternal(child, writer, isToConsole, indent, child == lastChild);
         }
     }
 }

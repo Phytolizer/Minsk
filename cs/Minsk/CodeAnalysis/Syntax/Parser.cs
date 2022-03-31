@@ -6,14 +6,12 @@ namespace Minsk.CodeAnalysis.Syntax;
 internal sealed class Parser
 {
     private readonly DiagnosticBag _diagnostics = new();
-    private readonly SourceText _text;
     private readonly ImmutableArray<SyntaxToken> _tokens;
     private int _position;
 
     internal Parser(SourceText text)
     {
         var lexer = new Lexer(text);
-        _text = text;
         _tokens = lexer
             .Where(tok => tok.Kind != SyntaxKind.BadToken && tok.Kind != SyntaxKind.WhitespaceToken)
             .ToImmutableArray();
@@ -158,18 +156,13 @@ internal sealed class Parser
     private ExpressionSyntax ParsePrimaryExpression()
     {
         // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
-        switch (Current.Kind)
+        return Current.Kind switch
         {
-            case SyntaxKind.OpenParenthesisToken:
-                return ParseParenthesizedExpression();
-            case SyntaxKind.TrueKeyword:
-            case SyntaxKind.FalseKeyword:
-                return ParseBooleanLiteral();
-            case SyntaxKind.NumberToken:
-                return ParseNumberLiteral();
-            default:
-                return ParseNameExpression();
-        }
+            SyntaxKind.OpenParenthesisToken => ParseParenthesizedExpression(),
+            SyntaxKind.TrueKeyword or SyntaxKind.FalseKeyword => ParseBooleanLiteral(),
+            SyntaxKind.NumberToken => ParseNumberLiteral(),
+            _ => ParseNameExpression(),
+        };
     }
 
     private ExpressionSyntax ParseNumberLiteral()
