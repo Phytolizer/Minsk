@@ -31,7 +31,7 @@ int facts_unary_operator_precedence(syntax_kind_t kind) {
   }
 }
 
-syntax_kind_t facts_keyword_kind(const char *text) {
+syntax_kind_t facts_keyword_kind(const char* text) {
   if (strcmp(text, "true") == 0) {
     return syntax_kind_true_keyword;
   }
@@ -41,7 +41,7 @@ syntax_kind_t facts_keyword_kind(const char *text) {
   return syntax_kind_identifier_token;
 }
 
-const char *facts_get_text(syntax_kind_t kind) {
+const char* facts_get_text(syntax_kind_t kind) {
   switch (kind) {
   case syntax_kind_plus_token:
     return "+";

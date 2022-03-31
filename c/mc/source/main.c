@@ -19,13 +19,13 @@
 #include <string.h>
 
 int main(void) {
-  char *input_line = NULL;
+  char* input_line = NULL;
   size_t line_len = 0;
   bool show_tree = false;
   variable_map_t variables;
   variable_map_init(&variables);
   sds text_builder = sdsempty();
-  compilation_t *previous = NULL;
+  compilation_t* previous = NULL;
   while (true) {
     styler_apply_fg(styler_fg_green, stdout);
     printf("%s", sdslen(text_builder) == 0 ? "» " : "· ");
@@ -37,7 +37,7 @@ int main(void) {
     if (strcmp(input_line, "#showTree") == 0) {
       show_tree = !show_tree;
       printf("%s\n",
-             show_tree ? "Showing parse trees." : "Not showing parse trees.");
+          show_tree ? "Showing parse trees." : "Not showing parse trees.");
       continue;
     } else if (strcmp(input_line, "#cls") == 0) {
       printf("\x1b[2J\x1b[0;0H");
@@ -52,9 +52,9 @@ int main(void) {
       continue;
     }
     if (show_tree) {
-      syntax_node_pretty_print((syntax_node_t *)syntax_tree.root.root, stdout);
+      syntax_node_pretty_print((syntax_node_t*)syntax_tree.root.root, stdout);
     }
-    compilation_t *compilation = malloc(sizeof(compilation_t));
+    compilation_t* compilation = malloc(sizeof(compilation_t));
     if (previous == NULL) {
       compilation_init(compilation, NULL, &syntax_tree);
     } else {
@@ -73,7 +73,7 @@ int main(void) {
         size_t character = diagnostics.data[i].span.start - line.start + 1;
         styler_apply_fg(styler_fg_red, stdout);
         printf("(%zu, %zu): %s\n", line_number, character,
-               diagnostics.data[i].message);
+            diagnostics.data[i].message);
         styler_apply_fg(styler_fg_reset, stdout);
         text_span_t prefix_span =
             text_span_from_bounds(line.start, diagnostics.data[i].span.start);
@@ -81,13 +81,13 @@ int main(void) {
         text_span_t suffix_span = text_span_from_bounds(
             text_span_end(diagnostics.data[i].span), text_line_end(line));
         printf("   ");
-        printf("%.*s", (int)prefix_span.length,
-               text_builder + prefix_span.start);
+        printf(
+            "%.*s", (int)prefix_span.length, text_builder + prefix_span.start);
         styler_apply_fg(styler_fg_red, stdout);
         printf("%.*s", (int)error_span.length, text_builder + error_span.start);
         styler_apply_fg(styler_fg_reset, stdout);
-        printf("%.*s", (int)suffix_span.length,
-               text_builder + suffix_span.start);
+        printf(
+            "%.*s", (int)suffix_span.length, text_builder + suffix_span.start);
         printf("\n");
       }
       diagnostic_bag_free(&diagnostics);

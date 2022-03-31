@@ -2,4 +2,4 @@
 
 #include <check.h>
 
-Suite *lexer_suite(void);
+Suite* lexer_suite(void);

@@ -14,9 +14,8 @@ static uint64_t bound_scope_map_hash_fnv1a(const sds name) {
   return h;
 }
 
-static bound_scope_map_bucket_t *
-bound_scope_map_find_bucket(bound_scope_map_bucket_t *buckets, size_t capacity,
-                            const sds name) {
+static bound_scope_map_bucket_t* bound_scope_map_find_bucket(
+    bound_scope_map_bucket_t* buckets, size_t capacity, const sds name) {
   // find matching or empty bucket
   if (capacity == 0) {
     return NULL;
@@ -31,17 +30,17 @@ bound_scope_map_find_bucket(bound_scope_map_bucket_t *buckets, size_t capacity,
   return &buckets[index];
 }
 
-void bound_scope_map_init(bound_scope_map_t *map) {
+void bound_scope_map_init(bound_scope_map_t* map) {
   map->data = NULL;
   map->length = 0;
   map->capacity = 0;
 }
 
-void bound_scope_map_insert(bound_scope_map_t *map, sds name,
-                            variable_symbol_t value) {
+void bound_scope_map_insert(
+    bound_scope_map_t* map, sds name, variable_symbol_t value) {
   if (map->length >= map->capacity) {
     size_t new_capacity = map->capacity * 2;
-    bound_scope_map_bucket_t *new_data =
+    bound_scope_map_bucket_t* new_data =
         malloc(sizeof(bound_scope_map_bucket_t) * new_capacity);
     assert(new_data != NULL);
     // rehash
@@ -50,7 +49,7 @@ void bound_scope_map_insert(bound_scope_map_t *map, sds name,
     }
     for (size_t i = 0; i < map->capacity; i++) {
       if (map->data[i].name != NULL) {
-        bound_scope_map_bucket_t *bucket = bound_scope_map_find_bucket(
+        bound_scope_map_bucket_t* bucket = bound_scope_map_find_bucket(
             new_data, new_capacity, map->data[i].name);
         *bucket = map->data[i];
       }
@@ -59,16 +58,16 @@ void bound_scope_map_insert(bound_scope_map_t *map, sds name,
     map->data = new_data;
     map->capacity = new_capacity;
   }
-  bound_scope_map_bucket_t *bucket =
+  bound_scope_map_bucket_t* bucket =
       bound_scope_map_find_bucket(map->data, map->capacity, name);
   bucket->name = name;
   bucket->value = value;
   map->length++;
 }
 
-variable_symbol_t *bound_scope_map_lookup(const bound_scope_map_t *map,
-                                          const sds name) {
-  bound_scope_map_bucket_t *bucket =
+variable_symbol_t* bound_scope_map_lookup(
+    const bound_scope_map_t* map, const sds name) {
+  bound_scope_map_bucket_t* bucket =
       bound_scope_map_find_bucket(map->data, map->capacity, name);
 
   if (bucket == NULL || bucket->name == NULL) {
@@ -77,7 +76,7 @@ variable_symbol_t *bound_scope_map_lookup(const bound_scope_map_t *map,
   return &bucket->value;
 }
 
-void bound_scope_map_free(bound_scope_map_t *map) {
+void bound_scope_map_free(bound_scope_map_t* map) {
   for (size_t i = 0; i < map->capacity; i++) {
     if (map->data[i].name != NULL) {
       sdsfree(map->data[i].name);

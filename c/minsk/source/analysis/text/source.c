@@ -4,8 +4,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-text_line_t text_line_new(size_t start, size_t length,
-                          size_t length_including_line_break) {
+text_line_t text_line_new(
+    size_t start, size_t length, size_t length_including_line_break) {
   text_line_t line = {
       .start = start,
       .length = length,
@@ -31,16 +31,16 @@ text_span_t text_line_span_including_line_break(text_line_t line) {
   };
 }
 
-void text_line_vector_init(text_line_vector_t *vector) {
+void text_line_vector_init(text_line_vector_t* vector) {
   vector->data = malloc(sizeof(text_line_t) * 8);
   vector->length = 0;
   vector->capacity = 8;
 }
 
-void text_line_vector_push(text_line_vector_t *vector, text_line_t line) {
+void text_line_vector_push(text_line_vector_t* vector, text_line_t line) {
   if (vector->length == vector->capacity) {
     vector->capacity *= 2;
-    text_line_t *new_data =
+    text_line_t* new_data =
         realloc(vector->data, sizeof(text_line_t) * vector->capacity);
     assert(new_data != NULL);
     vector->data = new_data;
@@ -49,7 +49,7 @@ void text_line_vector_push(text_line_vector_t *vector, text_line_t line) {
   vector->length += 1;
 }
 
-void text_line_vector_free(text_line_vector_t *vector) { free(vector->data); }
+void text_line_vector_free(text_line_vector_t* vector) { free(vector->data); }
 
 static size_t get_line_break_width(sds text, size_t position) {
   char character = text[position];
@@ -64,15 +64,15 @@ static size_t get_line_break_width(sds text, size_t position) {
   return 0;
 }
 
-static void add_line(text_line_vector_t *vector, size_t start, size_t end,
-                     size_t line_break_width) {
+static void add_line(text_line_vector_t* vector, size_t start, size_t end,
+    size_t line_break_width) {
   size_t length = end - start;
   size_t length_including_line_break = length + line_break_width;
   text_line_t line = text_line_new(start, length, length_including_line_break);
   text_line_vector_push(vector, line);
 }
 
-static void source_text_parse_lines(source_text_t *source_text) {
+static void source_text_parse_lines(source_text_t* source_text) {
   size_t position = 0;
   size_t line_start = 0;
 
@@ -98,7 +98,7 @@ source_text_t source_text_from(sds text) {
   return source_text;
 }
 
-size_t source_text_get_line_index(source_text_t *text, size_t offset) {
+size_t source_text_get_line_index(source_text_t* text, size_t offset) {
   // binary search the lines
   size_t start = 0;
   size_t end = text->lines.length;
@@ -117,7 +117,7 @@ size_t source_text_get_line_index(source_text_t *text, size_t offset) {
   return start - 1;
 }
 
-void source_text_free(source_text_t *text) {
+void source_text_free(source_text_t* text) {
   sdsfree(text->text);
   text_line_vector_free(&text->lines);
 }

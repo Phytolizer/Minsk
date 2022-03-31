@@ -9,4 +9,4 @@ typedef struct {
 } diagnostic_t;
 
 diagnostic_t diagnostic_new(text_span_t span, sds message);
-void diagnostic_free(diagnostic_t *diagnostic);
+void diagnostic_free(diagnostic_t* diagnostic);

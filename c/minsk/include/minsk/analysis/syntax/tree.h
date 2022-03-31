@@ -13,6 +13,6 @@ typedef struct {
   source_text_t source_text;
 } syntax_tree_t;
 
-void syntax_tree_free(syntax_tree_t *tree);
-syntax_tree_t syntax_tree_parse(const char *text);
-syntax_token_vector_t syntax_tree_parse_tokens(const char *text);
+void syntax_tree_free(syntax_tree_t* tree);
+syntax_tree_t syntax_tree_parse(const char* text);
+syntax_token_vector_t syntax_tree_parse_tokens(const char* text);

@@ -13,7 +13,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-static char peek(lexer_t *lexer, int offset) {
+static char peek(lexer_t* lexer, int offset) {
   size_t index = lexer->position + offset;
   if (index >= sdslen(lexer->text.text)) {
     return '\0';
@@ -21,19 +21,19 @@ static char peek(lexer_t *lexer, int offset) {
   return lexer->text.text[index];
 }
 
-static char current(lexer_t *lexer) { return peek(lexer, 0); }
+static char current(lexer_t* lexer) { return peek(lexer, 0); }
 
-void lexer_init(lexer_t *lexer, source_text_t text) {
+void lexer_init(lexer_t* lexer, source_text_t text) {
   lexer->text = text;
   lexer->position = 0;
   diagnostic_bag_init(&lexer->diagnostics);
 }
 
-syntax_token_t lexer_next_token(lexer_t *lexer) {
+syntax_token_t lexer_next_token(lexer_t* lexer) {
   syntax_kind_t kind = syntax_kind_bad_token;
   size_t start = lexer->position;
   sds text = NULL;
-  object_t *value = NULL;
+  object_t* value = NULL;
 
   if (isspace(current(lexer))) {
     while (isspace(current(lexer))) {
@@ -48,12 +48,11 @@ syntax_token_t lexer_next_token(lexer_t *lexer) {
 
     text = sdsnewlen(&lexer->text.text[start], lexer->position - start);
     errno = 0;
-    char *endptr;
+    char* endptr;
     long long_val = strtol(text, &endptr, 10);
     if (errno != 0 || long_val < INT_MIN || long_val > INT_MAX ||
         (endptr != NULL && *endptr != '\0')) {
-      diagnostic_bag_report_invalid_int(
-          &lexer->diagnostics,
+      diagnostic_bag_report_invalid_int(&lexer->diagnostics,
           (text_span_t){.start = start, .length = lexer->position - start},
           sdsdup(text));
     }
@@ -132,8 +131,8 @@ syntax_token_t lexer_next_token(lexer_t *lexer) {
   }
 
   if (kind == syntax_kind_bad_token) {
-    diagnostic_bag_report_bad_character(&lexer->diagnostics, lexer->position,
-                                        current(lexer));
+    diagnostic_bag_report_bad_character(
+        &lexer->diagnostics, lexer->position, current(lexer));
     lexer->position += 1;
   }
 
@@ -149,6 +148,4 @@ syntax_token_t lexer_next_token(lexer_t *lexer) {
   };
 }
 
-void lexer_free(lexer_t *lexer) {
-  diagnostic_bag_free(&lexer->diagnostics);
-}
+void lexer_free(lexer_t* lexer) { diagnostic_bag_free(&lexer->diagnostics); }

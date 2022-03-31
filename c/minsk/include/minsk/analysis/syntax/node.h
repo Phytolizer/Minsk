@@ -10,12 +10,12 @@ typedef struct {
 } syntax_node_t;
 
 typedef struct {
-  const syntax_node_t **data;
+  const syntax_node_t** data;
   size_t length;
 } syntax_node_children_t;
 
-void syntax_node_pretty_print(const syntax_node_t *node, FILE *stream);
-syntax_node_children_t syntax_node_children(const syntax_node_t *node);
-void syntax_node_free(syntax_node_t *node);
-void syntax_node_children_free(syntax_node_children_t *children);
-text_span_t syntax_node_span(const syntax_node_t *node);
+void syntax_node_pretty_print(const syntax_node_t* node, FILE* stream);
+syntax_node_children_t syntax_node_children(const syntax_node_t* node);
+void syntax_node_free(syntax_node_t* node);
+void syntax_node_children_free(syntax_node_children_t* children);
+text_span_t syntax_node_span(const syntax_node_t* node);

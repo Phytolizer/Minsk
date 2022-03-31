@@ -3,21 +3,21 @@
 #include <assert.h>
 #include <stdlib.h>
 
-void syntax_token_vector_init(syntax_token_vector_t *vector) {
+void syntax_token_vector_init(syntax_token_vector_t* vector) {
   vector->data = malloc(sizeof(syntax_token_t) * 8);
   vector->length = 0;
   vector->capacity = 8;
 }
 
-void syntax_token_vector_free(syntax_token_vector_t *vector) {
+void syntax_token_vector_free(syntax_token_vector_t* vector) {
   free(vector->data);
 }
 
-void syntax_token_vector_push(syntax_token_vector_t *vector,
-                              syntax_token_t token) {
+void syntax_token_vector_push(
+    syntax_token_vector_t* vector, syntax_token_t token) {
   if (vector->length == vector->capacity) {
     vector->capacity *= 2;
-    syntax_token_t *new_data =
+    syntax_token_t* new_data =
         realloc(vector->data, sizeof(syntax_token_t) * vector->capacity);
     assert(new_data != NULL);
     vector->data = new_data;

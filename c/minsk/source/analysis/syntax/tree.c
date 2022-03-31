@@ -9,13 +9,13 @@
 #include "minsk/analysis/syntax/tokens.h"
 #include "minsk/analysis/text/source.h"
 
-void syntax_tree_free(syntax_tree_t *tree) {
+void syntax_tree_free(syntax_tree_t* tree) {
   compilation_unit_syntax_free(&tree->root);
   diagnostic_bag_free(&tree->diagnostics);
   source_text_free(&tree->source_text);
 }
 
-syntax_tree_t syntax_tree_parse(const char *text) {
+syntax_tree_t syntax_tree_parse(const char* text) {
   parser_t parser;
   parser_init(&parser, source_text_from(sdsnew(text)));
   compilation_unit_syntax_t root = parser_parse_compilation_unit(&parser);
@@ -30,7 +30,7 @@ syntax_tree_t syntax_tree_parse(const char *text) {
   };
 }
 
-syntax_token_vector_t syntax_tree_parse_tokens(const char *text) {
+syntax_token_vector_t syntax_tree_parse_tokens(const char* text) {
   lexer_t lexer;
   lexer_init(&lexer, source_text_from(sdsnew(text)));
   syntax_token_vector_t tokens;

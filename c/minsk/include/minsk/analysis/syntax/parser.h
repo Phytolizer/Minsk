@@ -13,6 +13,6 @@ typedef struct {
   source_text_t source_text;
 } parser_t;
 
-void parser_init(parser_t *parser, source_text_t text);
-compilation_unit_syntax_t parser_parse_compilation_unit(parser_t *parser);
-void parser_free(parser_t *parser);
+void parser_init(parser_t* parser, source_text_t text);
+compilation_unit_syntax_t parser_parse_compilation_unit(parser_t* parser);
+void parser_free(parser_t* parser);

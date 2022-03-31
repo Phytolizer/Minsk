@@ -2,4 +2,4 @@
 
 #include "check.h"
 
-Suite *parser_suite(void);
+Suite* parser_suite(void);

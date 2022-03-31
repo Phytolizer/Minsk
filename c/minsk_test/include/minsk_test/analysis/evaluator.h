@@ -2,4 +2,4 @@
 
 #include "check.h"
 
-Suite *evaluator_suite(void);
+Suite* evaluator_suite(void);

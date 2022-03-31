@@ -11,6 +11,5 @@ typedef struct {
   object_kind_t result_type;
 } bound_unary_operator_t;
 
-const bound_unary_operator_t *
-bound_unary_operator_bind(syntax_kind_t syntax_kind,
-                          object_kind_t operand_type);
+const bound_unary_operator_t* bound_unary_operator_bind(
+    syntax_kind_t syntax_kind, object_kind_t operand_type);

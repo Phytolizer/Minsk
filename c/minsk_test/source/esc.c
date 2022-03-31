@@ -2,7 +2,7 @@
 #include <ctype.h>
 #include <stdio.h>
 
-sds esc(const char *str) {
+sds esc(const char* str) {
   // Convert special characters to escape codes.
   sds result = sdsempty();
   for (size_t i = 0; str[i] != '\0'; i++) {

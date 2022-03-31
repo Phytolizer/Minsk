@@ -13,7 +13,7 @@ typedef enum {
 #undef X
 } object_kind_t;
 
-const char *object_kind_to_string(object_kind_t kind);
+const char* object_kind_to_string(object_kind_t kind);
 
 typedef struct {
   object_kind_t kind;
@@ -29,9 +29,9 @@ typedef struct {
   bool value;
 } boolean_t;
 
-object_t *integer_new(int value);
-object_t *boolean_new(bool value);
-void object_print(object_t *object, FILE *stream);
-void object_free(object_t *object);
-bool object_equals(object_t *a, object_t *b);
-object_t *object_copy(object_t *object);
+object_t* integer_new(int value);
+object_t* boolean_new(bool value);
+void object_print(object_t* object, FILE* stream);
+void object_free(object_t* object);
+bool object_equals(object_t* a, object_t* b);
+object_t* object_copy(object_t* object);

@@ -23,11 +23,10 @@ static const bound_unary_operator_t operators[] = {
     },
 };
 
-const bound_unary_operator_t *
-bound_unary_operator_bind(syntax_kind_t syntax_kind,
-                          object_kind_t operand_type) {
+const bound_unary_operator_t* bound_unary_operator_bind(
+    syntax_kind_t syntax_kind, object_kind_t operand_type) {
   for (size_t i = 0; i < sizeof(operators) / sizeof(operators[0]); i++) {
-    const bound_unary_operator_t *op = &operators[i];
+    const bound_unary_operator_t* op = &operators[i];
     if (op->syntax_kind == syntax_kind && op->operand_type == operand_type) {
       return op;
     }

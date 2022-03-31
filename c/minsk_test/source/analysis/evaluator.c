@@ -9,8 +9,8 @@
 
 START_TEST(evaluator_correct_evaluation_test) {
   typedef struct {
-    const char *input;
-    object_t *expected;
+    const char* input;
+    object_t* expected;
   } evaluator_test_t;
 
   evaluator_test_t tests[] = {
@@ -62,10 +62,10 @@ START_TEST(evaluator_correct_evaluation_test) {
 }
 END_TEST
 
-Suite *evaluator_suite(void) {
-  Suite *s = suite_create("Evaluator");
+Suite* evaluator_suite(void) {
+  Suite* s = suite_create("Evaluator");
 
-  TCase *tc_evaluator = tcase_create("correct values");
+  TCase* tc_evaluator = tcase_create("correct values");
   tcase_add_test(tc_evaluator, evaluator_correct_evaluation_test);
   suite_add_tcase(s, tc_evaluator);
 

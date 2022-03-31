@@ -12,6 +12,6 @@ typedef struct {
   object_kind_t result_type;
 } bound_binary_operator_t;
 
-const bound_binary_operator_t *
-bound_binary_operator_bind(syntax_kind_t syntax_kind, object_kind_t left_type,
-                           object_kind_t right_type);
+const bound_binary_operator_t* bound_binary_operator_bind(
+    syntax_kind_t syntax_kind, object_kind_t left_type,
+    object_kind_t right_type);
