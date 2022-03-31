@@ -30,7 +30,9 @@ public static class SyntaxFacts
     {
         return text switch
         {
+            "else" => SyntaxKind.ElseKeyword,
             "false" => SyntaxKind.FalseKeyword,
+            "if" => SyntaxKind.IfKeyword,
             "let" => SyntaxKind.LetKeyword,
             "true" => SyntaxKind.TrueKeyword,
             "var" => SyntaxKind.VarKeyword,
@@ -60,7 +62,9 @@ public static class SyntaxFacts
             SyntaxKind.OpenBraceToken => "{",
             SyntaxKind.CloseBraceToken => "}",
             SyntaxKind.EqualsEqualsToken => "==",
+            SyntaxKind.ElseKeyword => "else",
             SyntaxKind.FalseKeyword => "false",
+            SyntaxKind.IfKeyword => "if",
             SyntaxKind.LetKeyword => "let",
             SyntaxKind.TrueKeyword => "true",
             SyntaxKind.VarKeyword => "var",

@@ -31,11 +31,27 @@ internal sealed class Evaluator
             case BoundNodeKind.ExpressionStatement:
                 EvaluateExpressionStatement((BoundExpressionStatement)root);
                 break;
+            case BoundNodeKind.IfStatement:
+                EvaluateIfStatement((BoundIfStatement)root);
+                break;
             case BoundNodeKind.VariableDeclaration:
                 EvaluateVariableDeclaration((BoundVariableDeclaration)root);
                 break;
             default:
                 throw new InvalidOperationException();
+        }
+    }
+
+    private void EvaluateIfStatement(BoundIfStatement root)
+    {
+        var condition = (bool)EvaluateExpression(root.Condition);
+        if (condition)
+        {
+            EvaluateStatement(root.ThenStatement);
+        }
+        else if (root.ElseStatement != null)
+        {
+            EvaluateStatement(root.ElseStatement);
         }
     }
 

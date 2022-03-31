@@ -36,10 +36,21 @@ internal sealed class Binder
         {
             SyntaxKind.BlockStatement => BindBlockStatement((BlockStatementSyntax)syntax),
             SyntaxKind.ExpressionStatement => BindExpressionStatement((ExpressionStatementSyntax)syntax),
+            SyntaxKind.IfStatement => BindIfStatement((IfStatementSyntax)syntax),
             SyntaxKind.VariableDeclaration => BindVariableDeclaration((VariableDeclarationSyntax)syntax),
             _ => throw new InvalidOperationException(),
         };
     }
+
+    private BoundStatement BindIfStatement(IfStatementSyntax syntax)
+    {
+        var condition = BindExpression(syntax.Condition, typeof(bool));
+        var thenStatement = BindStatement(syntax.ThenStatement);
+        var elseStatement = syntax.ElseClause == null ? null : BindStatement(syntax.ElseClause.ElseStatement);
+
+        return new BoundIfStatement(condition, thenStatement, elseStatement);
+    }
+
 
     private BoundStatement BindVariableDeclaration(VariableDeclarationSyntax syntax)
     {
@@ -104,6 +115,16 @@ internal sealed class Binder
 
     public IEnumerable<Diagnostic> Diagnostics => _diagnostics;
 
+    private BoundExpression BindExpression(ExpressionSyntax syntax, Type targetType)
+    {
+        var result = BindExpression(syntax);
+        if (result.Type != targetType)
+        {
+            _diagnostics.ReportCannotConvert(syntax.Span, result.Type, targetType);
+        }
+
+        return result;
+    }
     public BoundExpression BindExpression(ExpressionSyntax syntax)
     {
         // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault

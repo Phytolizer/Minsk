@@ -28,16 +28,20 @@ public enum SyntaxKind
     OpenBraceToken,
     CloseBraceToken,
 
+    ElseKeyword,
     FalseKeyword,
+    IfKeyword,
     LetKeyword,
     TrueKeyword,
     VarKeyword,
 
     // Syntax nodes
     CompilationUnit,
+    ElseClause,
 
     BlockStatement,
     ExpressionStatement,
+    IfStatement,
     VariableDeclaration,
 
     LiteralExpression,

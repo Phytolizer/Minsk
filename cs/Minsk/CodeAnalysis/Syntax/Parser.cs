@@ -69,8 +69,31 @@ internal sealed class Parser
         {
             SyntaxKind.OpenBraceToken => ParseBlockStatement(),
             SyntaxKind.LetKeyword or SyntaxKind.VarKeyword => ParseVariableDeclaration(),
+            SyntaxKind.IfKeyword => ParseIfStatement(),
             _ => ParseExpressionStatement(),
         };
+    }
+
+    private StatementSyntax ParseIfStatement()
+    {
+        var ifKeyword = MatchToken(SyntaxKind.IfKeyword);
+        var condition = ParseExpression();
+        var thenStatement = ParseStatement();
+        var elseClause = ParseElseClause();
+
+        return new IfStatementSyntax(ifKeyword, condition, thenStatement, elseClause);
+    }
+
+    private ElseClauseSyntax? ParseElseClause()
+    {
+        if (Current.Kind != SyntaxKind.ElseKeyword)
+        {
+            return null;
+        }
+
+        var elseKeyword = NextToken();
+        var elseStatement = ParseStatement();
+        return new ElseClauseSyntax(elseKeyword, elseStatement);
     }
 
     private StatementSyntax ParseVariableDeclaration()

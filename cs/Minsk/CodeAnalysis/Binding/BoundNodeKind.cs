@@ -4,6 +4,7 @@ internal enum BoundNodeKind
 {
     BlockStatement,
     ExpressionStatement,
+    IfStatement,
     VariableDeclaration,
 
     BinaryExpression,
