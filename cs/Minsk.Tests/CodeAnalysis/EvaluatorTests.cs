@@ -147,6 +147,74 @@ public sealed class EvaluatorTests
         AssertDiagnostics(text, diagnostics);
     }
 
+    [Fact]
+    public void IfStatementReportsCannotConvert()
+    {
+        const string text = @"
+            {
+                var x = 0
+                if [10]
+                    x = 10
+            }
+        ";
+
+        const string diagnostics = @"
+            Cannot convert type 'System.Int32' to 'System.Boolean'
+        ";
+
+        AssertDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
+    public void WhileStatementReportsCannotConvert()
+    {
+        const string text = @"
+            {
+                var x = 0
+                while [10]
+                    x = 10
+            }
+        ";
+
+        const string diagnostics = @"
+            Cannot convert type 'System.Int32' to 'System.Boolean'
+        ";
+
+        AssertDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
+    public void ForStatementReportsCannotConvertLowerBound()
+    {
+        const string text = @"
+            {
+                var result = 0
+                for i = [false] to 10
+                    result = result + i
+            }
+        ";
+        const string diagnostics = @"
+            Cannot convert type 'System.Boolean' to 'System.Int32'
+        ";
+        AssertDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
+    public void ForStatementReportsCannotConvertUpperBound()
+    {
+        const string text = @"
+            {
+                var result = 0
+                for i = 1 to [true]
+                    result = result + i
+            }
+        ";
+        const string diagnostics = @"
+            Cannot convert type 'System.Boolean' to 'System.Int32'
+        ";
+        AssertDiagnostics(text, diagnostics);
+    }
+
     private static void AssertValue(string text, object expected)
     {
         var syntaxTree = SyntaxTree.Parse(text);

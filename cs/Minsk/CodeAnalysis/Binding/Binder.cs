@@ -46,8 +46,8 @@ internal sealed class Binder
 
     private BoundStatement BindForStatement(ForStatementSyntax syntax)
     {
-        var lowerBound = BindExpression(syntax.LowerBound);
-        var upperBound = BindExpression(syntax.UpperBound);
+        var lowerBound = BindExpression(syntax.LowerBound, typeof(int));
+        var upperBound = BindExpression(syntax.UpperBound, typeof(int));
 
         _scope = new BoundScope(_scope);
 
