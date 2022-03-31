@@ -91,8 +91,13 @@ minsk::analysis::syntax::parser::parse_block_statement() {
   auto statements = std::vector<std::unique_ptr<statement_syntax>>{};
   while (current().kind() != syntax_kind::close_brace_token &&
          current().kind() != syntax_kind::end_of_file_token) {
+    auto *start_token = &current();
     auto statement = parse_statement();
     statements.emplace_back(std::move(statement));
+
+    if (&current() == start_token) {
+      next_token();
+    }
   }
   auto close_brace_token = match_token(syntax_kind::close_brace_token);
   return std::make_unique<block_statement_syntax>(std::move(open_brace_token),

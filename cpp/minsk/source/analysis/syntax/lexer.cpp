@@ -27,7 +27,7 @@ minsk::analysis::syntax::lexer::iterator::scan() {
     m_at_end = true;
     return syntax_token{
         syntax_kind::end_of_file_token,
-        m_position,
+        m_lexer->m_text->length(),
         "",
         nullptr,
     };

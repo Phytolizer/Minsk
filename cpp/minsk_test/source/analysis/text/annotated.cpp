@@ -20,8 +20,12 @@ std::string
 minsk_test::analysis::text::annotated_text::unindent(std::string_view text) {
   auto lines = unindent_lines(text);
   auto ss = std::ostringstream{};
-  for (const auto &line : lines) {
-    ss << line << '\n';
+  for (std::size_t i = 0; i < lines.size(); ++i) {
+    auto line = lines[i];
+    ss << line;
+    if (i < lines.size() - 1) {
+      ss << '\n';
+    }
   }
   return ss.str();
 }

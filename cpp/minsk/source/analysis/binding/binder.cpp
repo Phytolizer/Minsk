@@ -95,6 +95,12 @@ std::unique_ptr<minsk::analysis::binding::bound_expression>
 minsk::analysis::binding::binder::bind_name_expression(
     const syntax::name_expression_syntax *syntax) {
   auto name = syntax->identifier_token().text();
+  if (name.empty()) {
+    // diagnostic has already been reported for this,
+    // as it is a manufactured token
+    return std::make_unique<bound_literal_expression>(
+        std::make_unique<runtime::integer>(0));
+  }
   auto variable = m_scope->try_lookup(name);
   if (!variable) {
     m_diagnostics.report_undefined_name(syntax->identifier_token().span(),

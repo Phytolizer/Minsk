@@ -296,3 +296,23 @@ TEST_CASE("for statement requires integer range") {
 
   assert_has_diagnostics(text, diagnostics);
 }
+
+TEST_CASE("block statement does not loop infinitely") {
+  constexpr std::string_view text = R"(
+    {
+    [)][]
+  )";
+  constexpr std::string_view diagnostics = R"(
+    Expected next token to be <identifier_token>, got <close_parenthesis_token> instead
+    Expected next token to be <close_brace_token>, got <end_of_file_token> instead
+  )";
+  assert_has_diagnostics(text, diagnostics);
+}
+
+TEST_CASE("name expression reports no error when manufactured") {
+  constexpr std::string_view text = "[]";
+  constexpr std::string_view diagnostics = R"(
+    Expected next token to be <identifier_token>, got <end_of_file_token> instead
+  )";
+  assert_has_diagnostics(text, diagnostics);
+}
