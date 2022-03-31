@@ -32,7 +32,7 @@ internal sealed class Parser
         var lastPosition = 0;
         if (_tokens.Length > 0)
         {
-            lastPosition = _tokens.Last().Position;
+            lastPosition = _tokens.Last().Span.End;
         }
 
         return new SyntaxToken(SyntaxKind.EndOfFileToken, "", lastPosition, null);
@@ -142,10 +142,21 @@ internal sealed class Parser
     {
         var openBraceToken = MatchToken(SyntaxKind.OpenBraceToken);
         var statements = ImmutableArray.CreateBuilder<StatementSyntax>();
-        while (Current.Kind != SyntaxKind.EndOfFileToken && Current.Kind != SyntaxKind.CloseBraceToken)
+        var startToken = Current;
+
+        while (Current.Kind is not SyntaxKind.EndOfFileToken and not SyntaxKind.CloseBraceToken)
         {
             var statement = ParseStatement();
             statements.Add(statement);
+
+            // If ParseStatement() did not consume any tokens,
+            // skip the current token and continue. There is no need to
+            // report any error, because we've already tried to parse an
+            // expression statement.
+            if (startToken == Current)
+            {
+                NextToken();
+            }
         }
 
         var closeBraceToken = MatchToken(SyntaxKind.CloseBraceToken);

@@ -73,8 +73,13 @@ internal sealed class AnnotatedText
             }
         }
 
-        var minIndentation = (lines.Where(line => line.Trim().Length != 0)
-            .Select(line => line.Length - line.TrimStart().Length)).Min();
+        if (lines.Count == 0)
+        {
+            return lines;
+        }
+
+        var minIndentation = lines.Where(line => line.Trim().Length != 0)
+            .Select(line => line.Length - line.TrimStart().Length).Min();
 
         for (var i = 0; i < lines.Count; i++)
         {

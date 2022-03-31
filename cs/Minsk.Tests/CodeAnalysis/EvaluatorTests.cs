@@ -166,6 +166,30 @@ public sealed class EvaluatorTests
     }
 
     [Fact]
+    public void BlockStatementNoInfiniteLoop()
+    {
+        const string text = @"
+            {
+            [)][]
+        ";
+        const string diagnostics = @"
+            Expected next token to be IdentifierToken, got CloseParenthesisToken instead
+            Expected next token to be CloseBraceToken, got EndOfFileToken instead
+        ";
+        AssertDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
+    public void NameExpressionReportsNoErrorForInsertedToken()
+    {
+        const string text = "[]";
+        const string diagnostics = @"
+            Expected next token to be IdentifierToken, got EndOfFileToken instead
+        ";
+        AssertDiagnostics(text, diagnostics);
+    }
+
+    [Fact]
     public void WhileStatementReportsCannotConvert()
     {
         const string text = @"
