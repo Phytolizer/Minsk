@@ -38,8 +38,17 @@ internal sealed class Binder
             SyntaxKind.ExpressionStatement => BindExpressionStatement((ExpressionStatementSyntax)syntax),
             SyntaxKind.IfStatement => BindIfStatement((IfStatementSyntax)syntax),
             SyntaxKind.VariableDeclaration => BindVariableDeclaration((VariableDeclarationSyntax)syntax),
+            SyntaxKind.WhileStatement => BindWhileStatement((WhileStatementSyntax)syntax),
             _ => throw new InvalidOperationException(),
         };
+    }
+
+    private BoundStatement BindWhileStatement(WhileStatementSyntax syntax)
+    {
+        var condition = BindExpression(syntax.Condition, typeof(bool));
+        var body = BindStatement(syntax.Body);
+
+        return new BoundWhileStatement(condition, body);
     }
 
     private BoundStatement BindIfStatement(IfStatementSyntax syntax)

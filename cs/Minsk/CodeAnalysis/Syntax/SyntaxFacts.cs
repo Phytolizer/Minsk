@@ -36,6 +36,7 @@ public static class SyntaxFacts
             "let" => SyntaxKind.LetKeyword,
             "true" => SyntaxKind.TrueKeyword,
             "var" => SyntaxKind.VarKeyword,
+            "while" => SyntaxKind.WhileKeyword,
             _ => SyntaxKind.IdentifierToken
         };
     }
@@ -68,6 +69,7 @@ public static class SyntaxFacts
             SyntaxKind.LetKeyword => "let",
             SyntaxKind.TrueKeyword => "true",
             SyntaxKind.VarKeyword => "var",
+            SyntaxKind.WhileKeyword => "while",
             _ => null
         };
     }

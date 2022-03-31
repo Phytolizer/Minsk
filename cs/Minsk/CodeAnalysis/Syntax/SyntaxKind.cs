@@ -34,6 +34,7 @@ public enum SyntaxKind
     LetKeyword,
     TrueKeyword,
     VarKeyword,
+    WhileKeyword,
 
     // Syntax nodes
     CompilationUnit,
@@ -43,11 +44,12 @@ public enum SyntaxKind
     ExpressionStatement,
     IfStatement,
     VariableDeclaration,
+    WhileStatement,
 
     LiteralExpression,
     BinaryExpression,
     ParenthesizedExpression,
     UnaryExpression,
     NameExpression,
-    AssignmentExpression
+    AssignmentExpression,
 }

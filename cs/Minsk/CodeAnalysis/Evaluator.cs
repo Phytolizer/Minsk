@@ -37,8 +37,19 @@ internal sealed class Evaluator
             case BoundNodeKind.VariableDeclaration:
                 EvaluateVariableDeclaration((BoundVariableDeclaration)root);
                 break;
+            case BoundNodeKind.WhileStatement:
+                EvaluateWhileStatement((BoundWhileStatement)root);
+                break;
             default:
                 throw new InvalidOperationException();
+        }
+    }
+
+    private void EvaluateWhileStatement(BoundWhileStatement root)
+    {
+        while ((bool)EvaluateExpression(root.Condition))
+        {
+            EvaluateStatement(root.Body);
         }
     }
 

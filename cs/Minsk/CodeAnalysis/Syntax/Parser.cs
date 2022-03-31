@@ -70,8 +70,18 @@ internal sealed class Parser
             SyntaxKind.OpenBraceToken => ParseBlockStatement(),
             SyntaxKind.LetKeyword or SyntaxKind.VarKeyword => ParseVariableDeclaration(),
             SyntaxKind.IfKeyword => ParseIfStatement(),
+            SyntaxKind.WhileKeyword => ParseWhileStatement(),
             _ => ParseExpressionStatement(),
         };
+    }
+
+    private StatementSyntax ParseWhileStatement()
+    {
+        var keywordToken = MatchToken(SyntaxKind.WhileKeyword);
+        var condition = ParseExpression();
+        var body = ParseStatement();
+
+        return new WhileStatementSyntax(keywordToken, condition, body);
     }
 
     private StatementSyntax ParseIfStatement()
