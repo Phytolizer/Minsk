@@ -51,7 +51,35 @@ internal sealed class BoundBinaryOperator
             typeof(bool),
             typeof(bool),
             typeof(bool)
-        )
+        ),
+        new(
+            SyntaxKind.LessToken,
+            BoundBinaryOperatorKind.LessThan,
+            typeof(int),
+            typeof(int),
+            typeof(bool)
+        ),
+        new(
+            SyntaxKind.LessEqualsToken,
+            BoundBinaryOperatorKind.LessThanOrEqual,
+            typeof(int),
+            typeof(int),
+            typeof(bool)
+        ),
+        new(
+            SyntaxKind.GreaterToken,
+            BoundBinaryOperatorKind.GreaterThan,
+            typeof(int),
+            typeof(int),
+            typeof(bool)
+        ),
+        new(
+            SyntaxKind.GreaterEqualsToken,
+            BoundBinaryOperatorKind.GreaterThanOrEqual,
+            typeof(int),
+            typeof(int),
+            typeof(bool)
+        ),
     };
 
     private BoundBinaryOperator(

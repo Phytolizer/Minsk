@@ -69,7 +69,8 @@ public sealed class LexerTests
             return true;
         }
 
-        if (t1Kind is SyntaxKind.BangToken or SyntaxKind.EqualsToken &&
+        if (t1Kind is SyntaxKind.BangToken or SyntaxKind.EqualsToken
+                    or SyntaxKind.LessToken or SyntaxKind.GreaterToken &&
             t2Kind is SyntaxKind.EqualsToken or SyntaxKind.EqualsEqualsToken)
         {
             return true;

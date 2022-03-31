@@ -112,6 +112,10 @@ internal sealed class Evaluator
             BoundBinaryOperatorKind.LogicalOr => (bool)left || (bool)right,
             BoundBinaryOperatorKind.Equality => left.Equals(right),
             BoundBinaryOperatorKind.Inequality => !left.Equals(right),
+            BoundBinaryOperatorKind.LessThan => (int)left < (int)right,
+            BoundBinaryOperatorKind.LessThanOrEqual => (int)left <= (int)right,
+            BoundBinaryOperatorKind.GreaterThan => (int)left > (int)right,
+            BoundBinaryOperatorKind.GreaterThanOrEqual => (int)left >= (int)right,
             _ => throw new InvalidOperationException()
         };
     }

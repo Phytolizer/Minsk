@@ -124,6 +124,32 @@ internal sealed class Lexer : IEnumerable<SyntaxToken>
                         }
 
                         break;
+                    case '<':
+                        if (Peek(1) == '=')
+                        {
+                            kind = SyntaxKind.LessEqualsToken;
+                            _position += 2;
+                        }
+                        else
+                        {
+                            kind = SyntaxKind.LessToken;
+                            _position++;
+                        }
+
+                        break;
+                    case '>':
+                        if (Peek(1) == '=')
+                        {
+                            kind = SyntaxKind.GreaterEqualsToken;
+                            _position += 2;
+                        }
+                        else
+                        {
+                            kind = SyntaxKind.GreaterToken;
+                            _position++;
+                        }
+
+                        break;
                     case '&':
                         if (Peek(1) == '&')
                         {

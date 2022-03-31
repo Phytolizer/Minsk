@@ -8,7 +8,9 @@ public static class SyntaxFacts
         {
             SyntaxKind.StarToken or SyntaxKind.SlashToken => 5,
             SyntaxKind.PlusToken or SyntaxKind.MinusToken => 4,
-            SyntaxKind.EqualsEqualsToken or SyntaxKind.BangEqualsToken => 3,
+            SyntaxKind.EqualsEqualsToken or SyntaxKind.BangEqualsToken
+                or SyntaxKind.LessToken or SyntaxKind.LessEqualsToken
+                or SyntaxKind.GreaterToken or SyntaxKind.GreaterEqualsToken => 3,
             SyntaxKind.AmpersandAmpersandToken => 2,
             SyntaxKind.PipePipeToken => 1,
             _ => 0
@@ -48,6 +50,10 @@ public static class SyntaxFacts
             SyntaxKind.StarToken => "*",
             SyntaxKind.AmpersandAmpersandToken => "&&",
             SyntaxKind.BangEqualsToken => "!=",
+            SyntaxKind.LessToken => "<",
+            SyntaxKind.LessEqualsToken => "<=",
+            SyntaxKind.GreaterToken => ">",
+            SyntaxKind.GreaterEqualsToken => ">=",
             SyntaxKind.PipePipeToken => "||",
             SyntaxKind.OpenParenthesisToken => "(",
             SyntaxKind.CloseParenthesisToken => ")",
