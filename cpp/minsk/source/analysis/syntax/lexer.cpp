@@ -83,6 +83,14 @@ minsk::analysis::syntax::lexer::iterator::scan() {
       kind = syntax_kind::slash_token;
       m_position += 1;
       break;
+    case '~':
+      kind = syntax_kind::tilde_token;
+      m_position += 1;
+      break;
+    case '^':
+      kind = syntax_kind::hat_token;
+      m_position += 1;
+      break;
     case '=':
       if (peek(1) == '=') {
         kind = syntax_kind::equals_equals_token;
@@ -123,12 +131,18 @@ minsk::analysis::syntax::lexer::iterator::scan() {
       if (peek(1) == '&') {
         kind = syntax_kind::ampersand_ampersand_token;
         m_position += 2;
+      } else {
+        kind = syntax_kind::ampersand_token;
+        m_position += 1;
       }
       break;
     case '|':
       if (peek(1) == '|') {
         kind = syntax_kind::pipe_pipe_token;
         m_position += 2;
+      } else {
+        kind = syntax_kind::pipe_token;
+        m_position += 1;
       }
       break;
     case '(':

@@ -80,6 +80,18 @@ bool requires_separator(const simple_token &t1, const simple_token &t2) {
     return true;
   }
 
+  if (t1.kind == syntax_kind::ampersand_token &&
+      (t2.kind == syntax_kind::ampersand_token ||
+       t2.kind == syntax_kind::ampersand_ampersand_token)) {
+    return true;
+  }
+
+  if (t1.kind == syntax_kind::pipe_token &&
+      (t2.kind == syntax_kind::pipe_token ||
+       t2.kind == syntax_kind::pipe_pipe_token)) {
+    return true;
+  }
+
   return false;
 }
 

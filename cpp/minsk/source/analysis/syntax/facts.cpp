@@ -18,8 +18,11 @@ int minsk::analysis::syntax::facts::binary_operator_precedence(
   case syntax_kind::greater_equals_token:
     return 3;
   case syntax_kind::ampersand_ampersand_token:
+  case syntax_kind::ampersand_token:
     return 2;
   case syntax_kind::pipe_pipe_token:
+  case syntax_kind::pipe_token:
+  case syntax_kind::hat_token:
     return 1;
   default:
     return 0;
@@ -31,6 +34,7 @@ int minsk::analysis::syntax::facts::unary_operator_precedence(
   case syntax_kind::plus_token:
   case syntax_kind::minus_token:
   case syntax_kind::bang_token:
+  case syntax_kind::tilde_token:
     return 6;
   default:
     return 0;
@@ -82,10 +86,18 @@ minsk::analysis::syntax::facts::get_text(syntax_kind kind) {
     return "/";
   case syntax_kind::bang_token:
     return "!";
+  case syntax_kind::tilde_token:
+    return "~";
   case syntax_kind::ampersand_ampersand_token:
     return "&&";
   case syntax_kind::pipe_pipe_token:
     return "||";
+  case syntax_kind::ampersand_token:
+    return "&";
+  case syntax_kind::pipe_token:
+    return "|";
+  case syntax_kind::hat_token:
+    return "^";
   case syntax_kind::equals_equals_token:
     return "==";
   case syntax_kind::bang_equals_token:

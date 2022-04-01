@@ -43,6 +43,10 @@ minsk::runtime::copy_object_ptr(const minsk::runtime::object *ptr) {
   throw std::runtime_error{"unreachable"};
 }
 
+std::ostream &minsk::runtime::operator<<(std::ostream &os, const object &obj) {
+  return obj.print(os);
+}
+
 const minsk::runtime::boolean *minsk::runtime::object::as_boolean() const {
   return dynamic_cast<const boolean *>(this);
 }

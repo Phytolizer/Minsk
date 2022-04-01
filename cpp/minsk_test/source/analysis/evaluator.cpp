@@ -36,6 +36,7 @@ TEST_CASE("correct evaluation") {
       evaluation_test{"1", std::make_unique<integer>(1)},
       evaluation_test{"+1", std::make_unique<integer>(1)},
       evaluation_test{"-1", std::make_unique<integer>(-1)},
+      evaluation_test{"~1", std::make_unique<integer>(-2)},
       evaluation_test{"14 + 12", std::make_unique<integer>(26)},
       evaluation_test{"12 - 3", std::make_unique<integer>(9)},
       evaluation_test{"4 * 2", std::make_unique<integer>(8)},
@@ -53,6 +54,12 @@ TEST_CASE("correct evaluation") {
       evaluation_test{"4 >= 3", std::make_unique<boolean>(true)},
       evaluation_test{"4 < 3", std::make_unique<boolean>(false)},
       evaluation_test{"4 <= 3", std::make_unique<boolean>(false)},
+      evaluation_test{"1 | 2", std::make_unique<integer>(3)},
+      evaluation_test{"1 | 0", std::make_unique<integer>(1)},
+      evaluation_test{"2 & 3", std::make_unique<integer>(2)},
+      evaluation_test{"2 & 1", std::make_unique<integer>(0)},
+      evaluation_test{"1 ^ 3", std::make_unique<integer>(2)},
+      evaluation_test{"1 ^ 2", std::make_unique<integer>(3)},
       evaluation_test{"false == false", std::make_unique<boolean>(true)},
       evaluation_test{"false == true", std::make_unique<boolean>(false)},
       evaluation_test{"true != false", std::make_unique<boolean>(true)},
@@ -65,6 +72,13 @@ TEST_CASE("correct evaluation") {
       evaluation_test{"false || false", std::make_unique<boolean>(false)},
       evaluation_test{"true && false", std::make_unique<boolean>(false)},
       evaluation_test{"true && true", std::make_unique<boolean>(true)},
+      evaluation_test{"true | false", std::make_unique<boolean>(true)},
+      evaluation_test{"false | false", std::make_unique<boolean>(false)},
+      evaluation_test{"true & false", std::make_unique<boolean>(false)},
+      evaluation_test{"true & true", std::make_unique<boolean>(true)},
+      evaluation_test{"true ^ false", std::make_unique<boolean>(true)},
+      evaluation_test{"true ^ true", std::make_unique<boolean>(false)},
+      evaluation_test{"false ^ false", std::make_unique<boolean>(false)},
       evaluation_test{"var a = 10", std::make_unique<integer>(10)},
       evaluation_test{R"(
         {
@@ -146,6 +160,9 @@ TEST_CASE("correct evaluation") {
   auto compilation = minsk::analysis::compilation{std::move(syntax_tree)};
   auto variables = minsk::analysis::variable_map{};
   auto result = compilation.evaluate(&variables);
+  for (const auto &diagnostic : result.diagnostics()) {
+    FAIL_CHECK(diagnostic.message());
+  }
   REQUIRE(result.diagnostics().size() == 0);
   CHECK(*result.value() == *data.expected);
 }

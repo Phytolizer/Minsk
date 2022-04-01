@@ -194,6 +194,30 @@ minsk::analysis::evaluator::evaluate_binary_expression(
   case binding::bound_binary_operator_kind::greater_than_or_equal:
     return std::make_unique<runtime::boolean>(left->as_integer()->value() >=
                                               right->as_integer()->value());
+  case binding::bound_binary_operator_kind::bitwise_and:
+    if (left->kind() == runtime::object_kind::integer) {
+      return std::make_unique<runtime::integer>(left->as_integer()->value() &
+                                                right->as_integer()->value());
+    } else {
+      return std::make_unique<runtime::boolean>(left->as_boolean()->value() &
+                                                right->as_boolean()->value());
+    }
+  case binding::bound_binary_operator_kind::bitwise_or:
+    if (left->kind() == runtime::object_kind::integer) {
+      return std::make_unique<runtime::integer>(left->as_integer()->value() |
+                                                right->as_integer()->value());
+    } else {
+      return std::make_unique<runtime::boolean>(left->as_boolean()->value() |
+                                                right->as_boolean()->value());
+    }
+  case binding::bound_binary_operator_kind::bitwise_xor:
+    if (left->kind() == runtime::object_kind::integer) {
+      return std::make_unique<runtime::integer>(left->as_integer()->value() ^
+                                                right->as_integer()->value());
+    } else {
+      return std::make_unique<runtime::boolean>(left->as_boolean()->value() ^
+                                                right->as_boolean()->value());
+    }
   }
   throw std::runtime_error{"corrupt operator kind"};
 }
@@ -213,6 +237,8 @@ minsk::analysis::evaluator::evaluate_unary_expression(
     return std::make_unique<runtime::integer>(-operand->as_integer()->value());
   case binding::bound_unary_operator_kind::logical_negation:
     return std::make_unique<runtime::boolean>(!operand->as_boolean()->value());
+  case binding::bound_unary_operator_kind::bitwise_negation:
+    return std::make_unique<runtime::integer>(~operand->as_integer()->value());
   }
   throw std::runtime_error{"corrupt operator kind"};
 }

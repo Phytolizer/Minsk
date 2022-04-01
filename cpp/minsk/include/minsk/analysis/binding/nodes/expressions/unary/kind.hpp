@@ -7,6 +7,7 @@ enum class bound_unary_operator_kind {
   identity,
   negation,
   logical_negation,
+  bitwise_negation,
 };
 
 }
