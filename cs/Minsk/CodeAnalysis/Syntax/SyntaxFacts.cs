@@ -11,8 +11,8 @@ public static class SyntaxFacts
             SyntaxKind.EqualsEqualsToken or SyntaxKind.BangEqualsToken
                 or SyntaxKind.LessToken or SyntaxKind.LessEqualsToken
                 or SyntaxKind.GreaterToken or SyntaxKind.GreaterEqualsToken => 3,
-            SyntaxKind.AmpersandAmpersandToken => 2,
-            SyntaxKind.PipePipeToken => 1,
+            SyntaxKind.AmpersandAmpersandToken or SyntaxKind.AmpersandToken => 2,
+            SyntaxKind.PipePipeToken or SyntaxKind.PipeToken or SyntaxKind.HatToken => 1,
             _ => 0
         };
     }
@@ -21,7 +21,11 @@ public static class SyntaxFacts
     {
         return kind switch
         {
-            SyntaxKind.PlusToken or SyntaxKind.MinusToken or SyntaxKind.BangToken => 6,
+            SyntaxKind.PlusToken
+                or SyntaxKind.MinusToken
+                or SyntaxKind.BangToken
+                or SyntaxKind.TildeToken
+                or SyntaxKind.HatToken => 6,
             _ => 0
         };
     }
@@ -53,6 +57,10 @@ public static class SyntaxFacts
             SyntaxKind.PlusToken => "+",
             SyntaxKind.SlashToken => "/",
             SyntaxKind.StarToken => "*",
+            SyntaxKind.TildeToken => "~",
+            SyntaxKind.HatToken => "^",
+            SyntaxKind.AmpersandToken => "&",
+            SyntaxKind.PipeToken => "|",
             SyntaxKind.AmpersandAmpersandToken => "&&",
             SyntaxKind.BangEqualsToken => "!=",
             SyntaxKind.LessToken => "<",

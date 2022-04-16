@@ -135,6 +135,7 @@ internal sealed class Evaluator
             BoundUnaryOperatorKind.Identity => operand,
             BoundUnaryOperatorKind.Negation => -(int)operand,
             BoundUnaryOperatorKind.LogicalNegation => !(bool)operand,
+            BoundUnaryOperatorKind.BitwiseNegation => ~(int)operand,
             _ => throw new InvalidOperationException()
         };
     }
@@ -144,21 +145,79 @@ internal sealed class Evaluator
         var left = EvaluateExpression(root.Left);
         var right = EvaluateExpression(root.Right);
 
-        return root.Op.OperatorKind switch
+        switch (root.Op.OperatorKind)
         {
-            BoundBinaryOperatorKind.Addition => (int)left + (int)right,
-            BoundBinaryOperatorKind.Subtraction => (int)left - (int)right,
-            BoundBinaryOperatorKind.Multiplication => (int)left * (int)right,
-            BoundBinaryOperatorKind.Division => (int)left / (int)right,
-            BoundBinaryOperatorKind.LogicalAnd => (bool)left && (bool)right,
-            BoundBinaryOperatorKind.LogicalOr => (bool)left || (bool)right,
-            BoundBinaryOperatorKind.Equality => left.Equals(right),
-            BoundBinaryOperatorKind.Inequality => !left.Equals(right),
-            BoundBinaryOperatorKind.LessThan => (int)left < (int)right,
-            BoundBinaryOperatorKind.LessThanOrEqual => (int)left <= (int)right,
-            BoundBinaryOperatorKind.GreaterThan => (int)left > (int)right,
-            BoundBinaryOperatorKind.GreaterThanOrEqual => (int)left >= (int)right,
-            _ => throw new InvalidOperationException()
+            case BoundBinaryOperatorKind.Addition:
+                return (int)left + (int)right;
+            case BoundBinaryOperatorKind.Subtraction:
+                return (int)left - (int)right;
+            case BoundBinaryOperatorKind.Multiplication:
+                return (int)left * (int)right;
+            case BoundBinaryOperatorKind.Division:
+                return (int)left / (int)right;
+            case BoundBinaryOperatorKind.LogicalAnd:
+                return (bool)left && (bool)right;
+            case BoundBinaryOperatorKind.LogicalOr:
+                return (bool)left || (bool)right;
+            case BoundBinaryOperatorKind.Equality:
+                return left.Equals(right);
+            case BoundBinaryOperatorKind.Inequality:
+                return !left.Equals(right);
+            case BoundBinaryOperatorKind.LessThan:
+                return (int)left < (int)right;
+            case BoundBinaryOperatorKind.LessThanOrEqual:
+                return (int)left <= (int)right;
+            case BoundBinaryOperatorKind.GreaterThan:
+                return (int)left > (int)right;
+            case BoundBinaryOperatorKind.GreaterThanOrEqual:
+                return (int)left >= (int)right;
+            case BoundBinaryOperatorKind.BitwiseAnd:
+                {
+                    if (root.Type == typeof(int))
+                    {
+                        return (int)left & (int)right;
+                    }
+                    else if (root.Type == typeof(bool))
+                    {
+                        return (bool)left && (bool)right;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException();
+                    }
+                }
+            case BoundBinaryOperatorKind.BitwiseOr:
+                {
+                    if (root.Type == typeof(int))
+                    {
+                        return (int)left | (int)right;
+                    }
+                    else if (root.Type == typeof(bool))
+                    {
+                        return (bool)left || (bool)right;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException();
+                    }
+                }
+            case BoundBinaryOperatorKind.BitwiseXor:
+                {
+                    if (root.Type == typeof(int))
+                    {
+                        return (int)left ^ (int)right;
+                    }
+                    else if (root.Type == typeof(bool))
+                    {
+                        return (bool)left ^ (bool)right;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException();
+                    }
+                }
+            default:
+                throw new InvalidOperationException();
         };
     }
 

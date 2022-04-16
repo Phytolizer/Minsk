@@ -76,6 +76,18 @@ public sealed class LexerTests
             return true;
         }
 
+        if (t1Kind == SyntaxKind.AmpersandToken &&
+            t2Kind is SyntaxKind.AmpersandAmpersandToken or SyntaxKind.AmpersandToken)
+        {
+            return true;
+        }
+
+        if (t1Kind == SyntaxKind.PipeToken &&
+            t2Kind is SyntaxKind.PipePipeToken or SyntaxKind.PipeToken)
+        {
+            return true;
+        }
+
         return false;
     }
 
