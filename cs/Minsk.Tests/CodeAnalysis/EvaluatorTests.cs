@@ -1,4 +1,4 @@
-using Minsk.CodeAnalysis;
+﻿using Minsk.CodeAnalysis;
 using Minsk.CodeAnalysis.Syntax;
 using Minsk.Tests.CodeAnalysis.Text;
 using Xunit;
