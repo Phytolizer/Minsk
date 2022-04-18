@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using Minsk.CodeAnalysis.Text;
 
 namespace Minsk.CodeAnalysis.Syntax;
@@ -98,6 +98,14 @@ internal sealed class Lexer : IEnumerable<SyntaxToken>
                         kind = SyntaxKind.CloseParenthesisToken;
                         _position++;
                         break;
+                    case '~':
+                        kind = SyntaxKind.TildeToken;
+                        _position++;
+                        break;
+                    case '^':
+                        kind = SyntaxKind.HatToken;
+                        _position++;
+                        break;
                     case '!':
                         if (Peek(1) == '=')
                         {
@@ -156,6 +164,11 @@ internal sealed class Lexer : IEnumerable<SyntaxToken>
                             kind = SyntaxKind.AmpersandAmpersandToken;
                             _position += 2;
                         }
+                        else
+                        {
+                            kind = SyntaxKind.AmpersandToken;
+                            _position++;
+                        }
 
                         break;
                     case '|':
@@ -163,6 +176,11 @@ internal sealed class Lexer : IEnumerable<SyntaxToken>
                         {
                             kind = SyntaxKind.PipePipeToken;
                             _position += 2;
+                        }
+                        else
+                        {
+                            kind = SyntaxKind.PipeToken;
+                            _position++;
                         }
 
                         break;

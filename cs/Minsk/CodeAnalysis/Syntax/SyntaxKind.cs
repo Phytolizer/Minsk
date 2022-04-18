@@ -1,4 +1,4 @@
-namespace Minsk.CodeAnalysis.Syntax;
+﻿namespace Minsk.CodeAnalysis.Syntax;
 
 public enum SyntaxKind
 {
@@ -16,6 +16,10 @@ public enum SyntaxKind
     BangToken,
     AmpersandAmpersandToken,
     PipePipeToken,
+    TildeToken,
+    HatToken,
+    AmpersandToken,
+    PipeToken,
     BangEqualsToken,
     EqualsEqualsToken,
     LessToken,

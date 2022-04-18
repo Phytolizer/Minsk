@@ -1,4 +1,4 @@
-using Minsk.CodeAnalysis.Syntax;
+﻿using Minsk.CodeAnalysis.Syntax;
 
 namespace Minsk.CodeAnalysis.Binding;
 
@@ -8,7 +8,8 @@ internal sealed class BoundUnaryOperator
     {
         new(SyntaxKind.PlusToken, BoundUnaryOperatorKind.Identity, typeof(int), typeof(int)),
         new(SyntaxKind.MinusToken, BoundUnaryOperatorKind.Negation, typeof(int), typeof(int)),
-        new(SyntaxKind.BangToken, BoundUnaryOperatorKind.LogicalNegation, typeof(bool), typeof(bool))
+        new(SyntaxKind.BangToken, BoundUnaryOperatorKind.LogicalNegation, typeof(bool), typeof(bool)),
+        new(SyntaxKind.TildeToken, BoundUnaryOperatorKind.BitwiseNegation, typeof(int), typeof(int))
     };
 
     private BoundUnaryOperator(

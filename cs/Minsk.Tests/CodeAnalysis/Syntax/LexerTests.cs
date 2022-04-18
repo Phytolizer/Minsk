@@ -1,4 +1,4 @@
-using Minsk.CodeAnalysis.Syntax;
+﻿using Minsk.CodeAnalysis.Syntax;
 using Xunit;
 
 namespace Minsk.Tests.CodeAnalysis.Syntax;
@@ -72,6 +72,18 @@ public sealed class LexerTests
         if (t1Kind is SyntaxKind.BangToken or SyntaxKind.EqualsToken
                     or SyntaxKind.LessToken or SyntaxKind.GreaterToken &&
             t2Kind is SyntaxKind.EqualsToken or SyntaxKind.EqualsEqualsToken)
+        {
+            return true;
+        }
+
+        if (t1Kind == SyntaxKind.AmpersandToken &&
+            t2Kind is SyntaxKind.AmpersandAmpersandToken or SyntaxKind.AmpersandToken)
+        {
+            return true;
+        }
+
+        if (t1Kind == SyntaxKind.PipeToken &&
+            t2Kind is SyntaxKind.PipePipeToken or SyntaxKind.PipeToken)
         {
             return true;
         }

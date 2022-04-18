@@ -1,4 +1,4 @@
-namespace Minsk.CodeAnalysis.Text;
+﻿namespace Minsk.CodeAnalysis.Text;
 
 public sealed record TextLine(SourceText Text, int Start, int Length, int LengthIncludingLineBreak)
 {

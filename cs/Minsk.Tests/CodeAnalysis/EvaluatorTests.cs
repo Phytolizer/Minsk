@@ -1,4 +1,4 @@
-using Minsk.CodeAnalysis;
+﻿using Minsk.CodeAnalysis;
 using Minsk.CodeAnalysis.Syntax;
 using Minsk.Tests.CodeAnalysis.Text;
 using Xunit;
@@ -30,10 +30,28 @@ public sealed class EvaluatorTests
     [InlineData("3 >= 4", false)]
     [InlineData("4 >= 4", true)]
     [InlineData("5 >= 4", true)]
+    [InlineData("1 | 2", 3)]
+    [InlineData("1 | 0", 1)]
+    [InlineData("1 & 3", 1)]
+    [InlineData("1 & 0", 0)]
+    [InlineData("1 ^ 2", 3)]
+    [InlineData("1 ^ 3", 2)]
+    [InlineData("~1", -2)]
     [InlineData("false == false", true)]
     [InlineData("true == false", false)]
     [InlineData("false != false", false)]
     [InlineData("true != false", true)]
+    [InlineData("true && true", true)]
+    [InlineData("true && false", false)]
+    [InlineData("false || false", false)]
+    [InlineData("true || false", true)]
+    [InlineData("false | false", false)]
+    [InlineData("true | false", true)]
+    [InlineData("false & false", false)]
+    [InlineData("true & false", false)]
+    [InlineData("false ^ false", false)]
+    [InlineData("true ^ false", true)]
+    [InlineData("true ^ true", false)]
     [InlineData("true", true)]
     [InlineData("false", false)]
     [InlineData("!true", false)]

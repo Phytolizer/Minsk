@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using Minsk.CodeAnalysis.Binding;
 using Minsk.CodeAnalysis.Syntax;
 

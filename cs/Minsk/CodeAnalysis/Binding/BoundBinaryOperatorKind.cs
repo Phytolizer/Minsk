@@ -1,4 +1,4 @@
-namespace Minsk.CodeAnalysis.Binding;
+﻿namespace Minsk.CodeAnalysis.Binding;
 
 internal enum BoundBinaryOperatorKind
 {
@@ -13,5 +13,8 @@ internal enum BoundBinaryOperatorKind
     LessThan,
     LessThanOrEqual,
     GreaterThan,
-    GreaterThanOrEqual
+    GreaterThanOrEqual,
+    BitwiseAnd,
+    BitwiseOr,
+    BitwiseXor,
 }

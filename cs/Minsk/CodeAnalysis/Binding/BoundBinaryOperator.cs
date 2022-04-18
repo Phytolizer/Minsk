@@ -1,4 +1,4 @@
-using Minsk.CodeAnalysis.Syntax;
+﻿using Minsk.CodeAnalysis.Syntax;
 
 namespace Minsk.CodeAnalysis.Binding;
 
@@ -78,6 +78,48 @@ internal sealed class BoundBinaryOperator
             BoundBinaryOperatorKind.GreaterThanOrEqual,
             typeof(int),
             typeof(int),
+            typeof(bool)
+        ),
+        new(
+            SyntaxKind.AmpersandToken,
+            BoundBinaryOperatorKind.BitwiseAnd,
+            typeof(int),
+            typeof(int),
+            typeof(int)
+        ),
+        new(
+            SyntaxKind.PipeToken,
+            BoundBinaryOperatorKind.BitwiseOr,
+            typeof(int),
+            typeof(int),
+            typeof(int)
+        ),
+        new(
+            SyntaxKind.HatToken,
+            BoundBinaryOperatorKind.BitwiseXor,
+            typeof(int),
+            typeof(int),
+            typeof(int)
+        ),
+        new(
+            SyntaxKind.AmpersandToken,
+            BoundBinaryOperatorKind.BitwiseAnd,
+            typeof(bool),
+            typeof(bool),
+            typeof(bool)
+        ),
+        new(
+            SyntaxKind.PipeToken,
+            BoundBinaryOperatorKind.BitwiseOr,
+            typeof(bool),
+            typeof(bool),
+            typeof(bool)
+        ),
+        new(
+            SyntaxKind.HatToken,
+            BoundBinaryOperatorKind.BitwiseXor,
+            typeof(bool),
+            typeof(bool),
             typeof(bool)
         ),
     };
