@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.10"
+    kotlin("jvm") version "1.6.20"
     application
 }
 
@@ -13,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.10")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.20")
     implementation(project(":colors"))
     testImplementation("io.kotest:kotest-runner-junit5:5.2.1")
     testImplementation("io.kotest:kotest-assertions-core:5.2.1")
