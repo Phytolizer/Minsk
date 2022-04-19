@@ -6,8 +6,8 @@
 
 const char* object_kind_to_string(object_kind_t kind) {
   switch (kind) {
-#define X(x)                                                                   \
-  case object_kind_##x:                                                        \
+#define X(x) \
+  case object_kind_##x: \
     return #x;
     OBJECT_KINDS_X
 #undef X

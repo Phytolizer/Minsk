@@ -1,13 +1,13 @@
 #pragma once
 
-#define BOUND_BINARY_OPERATOR_KINDS_X                                          \
-  X(addition)                                                                  \
-  X(subtraction)                                                               \
-  X(multiplication)                                                            \
-  X(division)                                                                  \
-  X(logical_and)                                                               \
-  X(logical_or)                                                                \
-  X(equality)                                                                  \
+#define BOUND_BINARY_OPERATOR_KINDS_X \
+  X(addition) \
+  X(subtraction) \
+  X(multiplication) \
+  X(division) \
+  X(logical_and) \
+  X(logical_or) \
+  X(equality) \
   X(inequality)
 
 typedef enum {

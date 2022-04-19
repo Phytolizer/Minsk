@@ -2,4 +2,5 @@ BasedOnStyle: LLVM
 PointerAlignment: Left
 AlignOperands: false
 AlignAfterOpenBracket: false
+AlignEscapedNewlines: DontAlign
 AllowShortFunctionsOnASingleLine: Empty

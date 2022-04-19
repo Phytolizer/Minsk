@@ -6,23 +6,23 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#if defined(__unix__) || defined(__unix) || defined(__linux__) ||              \
+#if defined(__unix__) || defined(__unix) || defined(__linux__) || \
     defined(__APPLE__) || defined(__MACH__)
 #define STYLER_UNIX
 #elif defined(WIN32) || defined(_WIN32) || defined(_WIN64)
 #define STYLER_WINDOWS
 #endif
 
-#define STYLER_STYLES_X                                                        \
-  X(reset)                                                                     \
-  X(bold)                                                                      \
-  X(faint)                                                                     \
-  X(italic)                                                                    \
-  X(underline)                                                                 \
-  X(slow_blink)                                                                \
-  X(rapid_blink)                                                               \
-  X(reverse)                                                                   \
-  X(conceal)                                                                   \
+#define STYLER_STYLES_X \
+  X(reset) \
+  X(bold) \
+  X(faint) \
+  X(italic) \
+  X(underline) \
+  X(slow_blink) \
+  X(rapid_blink) \
+  X(reverse) \
+  X(conceal) \
   X(crossed)
 
 typedef enum {
@@ -31,15 +31,15 @@ typedef enum {
 #undef X
 } styler_style_t;
 
-#define STYLER_FGS_X                                                           \
-  X(black, 30)                                                                 \
-  X(red, 31)                                                                   \
-  X(green, 32)                                                                 \
-  X(yellow, 33)                                                                \
-  X(blue, 34)                                                                  \
-  X(magenta, 35)                                                               \
-  X(cyan, 36)                                                                  \
-  X(white, 37)                                                                 \
+#define STYLER_FGS_X \
+  X(black, 30) \
+  X(red, 31) \
+  X(green, 32) \
+  X(yellow, 33) \
+  X(blue, 34) \
+  X(magenta, 35) \
+  X(cyan, 36) \
+  X(white, 37) \
   X(reset, 39)
 
 typedef enum {
@@ -48,15 +48,15 @@ typedef enum {
 #undef X
 } styler_fg_t;
 
-#define STYLER_BGS_X                                                           \
-  X(black, 40)                                                                 \
-  X(red, 41)                                                                   \
-  X(green, 42)                                                                 \
-  X(yellow, 43)                                                                \
-  X(blue, 44)                                                                  \
-  X(magenta, 45)                                                               \
-  X(cyan, 46)                                                                  \
-  X(white, 47)                                                                 \
+#define STYLER_BGS_X \
+  X(black, 40) \
+  X(red, 41) \
+  X(green, 42) \
+  X(yellow, 43) \
+  X(blue, 44) \
+  X(magenta, 45) \
+  X(cyan, 46) \
+  X(white, 47) \
   X(reset, 49)
 
 typedef enum {
@@ -65,14 +65,14 @@ typedef enum {
 #undef X
 } styler_bg_t;
 
-#define STYLER_BRIGHT_FGS_X                                                    \
-  X(black, 90)                                                                 \
-  X(red, 91)                                                                   \
-  X(green, 92)                                                                 \
-  X(yellow, 93)                                                                \
-  X(blue, 94)                                                                  \
-  X(magenta, 95)                                                               \
-  X(cyan, 96)                                                                  \
+#define STYLER_BRIGHT_FGS_X \
+  X(black, 90) \
+  X(red, 91) \
+  X(green, 92) \
+  X(yellow, 93) \
+  X(blue, 94) \
+  X(magenta, 95) \
+  X(cyan, 96) \
   X(white, 97)
 
 typedef enum {
@@ -81,14 +81,14 @@ typedef enum {
 #undef X
 } styler_fg_bright_t;
 
-#define STYLER_BRIGHT_BGS_X                                                    \
-  X(black, 100)                                                                \
-  X(red, 101)                                                                  \
-  X(green, 102)                                                                \
-  X(yellow, 103)                                                               \
-  X(blue, 104)                                                                 \
-  X(magenta, 105)                                                              \
-  X(cyan, 106)                                                                 \
+#define STYLER_BRIGHT_BGS_X \
+  X(black, 100) \
+  X(red, 101) \
+  X(green, 102) \
+  X(yellow, 103) \
+  X(blue, 104) \
+  X(magenta, 105) \
+  X(cyan, 106) \
   X(white, 107)
 
 typedef enum {
@@ -97,9 +97,9 @@ typedef enum {
 #undef X
 } styler_bg_bright_t;
 
-#define STYLER_CONTROLS_X                                                      \
-  X(off)                                                                       \
-  X(auto)                                                                      \
+#define STYLER_CONTROLS_X \
+  X(off) \
+  X(auto) \
   X(force)
 
 typedef enum {
@@ -108,9 +108,9 @@ typedef enum {
 #undef X
 } styler_control_t;
 
-#define STYLER_WINTERMS_X                                                      \
-  X(auto)                                                                      \
-  X(ansi)                                                                      \
+#define STYLER_WINTERMS_X \
+  X(auto) \
+  X(ansi) \
   X(native)
 
 typedef enum {

@@ -2,9 +2,9 @@
 
 #include <stdbool.h>
 #include <stdio.h>
-#define OBJECT_KINDS_X                                                         \
-  X(null)                                                                      \
-  X(integer)                                                                   \
+#define OBJECT_KINDS_X \
+  X(null) \
+  X(integer) \
   X(boolean)
 
 typedef enum {

@@ -6,6 +6,7 @@
 #include "minsk/analysis/syntax/node/expression/name.h"
 #include "minsk/analysis/syntax/node/expression/parenthesized.h"
 #include "minsk/analysis/syntax/node/expression/unary.h"
+#include "minsk/analysis/syntax/node/statement/block.h"
 #include "minsk/analysis/syntax/token.h"
 #include "sds.h"
 #include "styler/styler.h"
@@ -15,6 +16,9 @@
 
 void syntax_node_free(syntax_node_t* node) {
   switch (node->kind) {
+  case syntax_kind_block_statement:
+    block_statement_syntax_free((block_statement_syntax_t*)node);
+    break;
   case syntax_kind_assignment_expression:
     assignment_expression_syntax_free((assignment_expression_syntax_t*)node);
     break;

@@ -1,8 +1,8 @@
 #pragma once
 
-#define BOUND_UNARY_OPERATOR_KINDS_X                                           \
-  X(identity)                                                                  \
-  X(negation)                                                                  \
+#define BOUND_UNARY_OPERATOR_KINDS_X \
+  X(identity) \
+  X(negation) \
   X(logical_negation)
 
 typedef enum {

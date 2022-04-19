@@ -127,6 +127,14 @@ syntax_token_t lexer_next_token(lexer_t* lexer) {
       kind = syntax_kind_close_parenthesis_token;
       lexer->position += 1;
       break;
+    case '{':
+      kind = syntax_kind_open_brace_token;
+      lexer->position += 1;
+      break;
+    case '}':
+      kind = syntax_kind_close_brace_token;
+      lexer->position += 1;
+      break;
     default:
       break;
     }

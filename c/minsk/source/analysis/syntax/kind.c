@@ -4,9 +4,9 @@
 
 void syntax_kind_print(syntax_kind_t kind, FILE* stream) {
   switch (kind) {
-#define X(x)                                                                   \
-  case syntax_kind_##x:                                                        \
-    fprintf(stream, #x);                                                       \
+#define X(x) \
+  case syntax_kind_##x: \
+    fprintf(stream, #x); \
     break;
     SYNTAX_KINDS_X
 #undef X
@@ -17,8 +17,8 @@ void syntax_kind_print(syntax_kind_t kind, FILE* stream) {
 
 const char* syntax_kind_to_string(syntax_kind_t kind) {
   switch (kind) {
-#define X(x)                                                                   \
-  case syntax_kind_##x:                                                        \
+#define X(x) \
+  case syntax_kind_##x: \
     return #x;
     SYNTAX_KINDS_X
 #undef X

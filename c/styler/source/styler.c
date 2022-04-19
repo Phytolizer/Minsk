@@ -148,14 +148,14 @@ typedef struct {
   BOOLEAN conceal;
 } sgr_t;
 
-#define ATTR_COLORS_X                                                          \
-  X(black, 0)                                                                  \
-  X(red, 4)                                                                    \
-  X(green, 2)                                                                  \
-  X(yellow, 6)                                                                 \
-  X(blue, 1)                                                                   \
-  X(magenta, 5)                                                                \
-  X(cyan, 3)                                                                   \
+#define ATTR_COLORS_X \
+  X(black, 0) \
+  X(red, 4) \
+  X(green, 2) \
+  X(yellow, 6) \
+  X(blue, 1) \
+  X(magenta, 5) \
+  X(cyan, 3) \
   X(white, 7)
 
 typedef enum {

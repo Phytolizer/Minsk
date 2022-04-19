@@ -67,6 +67,10 @@ const char* facts_get_text(syntax_kind_t kind) {
     return "(";
   case syntax_kind_close_parenthesis_token:
     return ")";
+  case syntax_kind_open_brace_token:
+    return "{";
+  case syntax_kind_close_brace_token:
+    return "}";
   case syntax_kind_false_keyword:
     return "false";
   case syntax_kind_true_keyword:

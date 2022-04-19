@@ -1,10 +1,10 @@
 #pragma once
 
-#define BOUND_NODE_KINDS_X                                                     \
-  X(assignment_expression)                                                     \
-  X(binary_expression)                                                         \
-  X(literal_expression)                                                        \
-  X(unary_expression)                                                          \
+#define BOUND_NODE_KINDS_X \
+  X(assignment_expression) \
+  X(binary_expression) \
+  X(literal_expression) \
+  X(unary_expression) \
   X(variable_expression)
 
 typedef enum {

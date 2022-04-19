@@ -29,6 +29,8 @@ add_library(
   "source/analysis/syntax/node/expression/name.c"
   "source/analysis/syntax/node/expression/parenthesized.c"
   "source/analysis/syntax/node/expression/unary.c"
+  "source/analysis/syntax/node/statement.c"
+  "source/analysis/syntax/node/statement/block.c"
   "source/analysis/syntax/node/unit.c"
   "source/analysis/syntax/parser.c"
   "source/analysis/syntax/peek_buffer.c"

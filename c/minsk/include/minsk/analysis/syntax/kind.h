@@ -1,37 +1,41 @@
 #pragma once
 
 #include <stdio.h>
-#define SYNTAX_KINDS_X                                                         \
-  X(bad_token)                                                                 \
-  X(end_of_file_token)                                                         \
-                                                                               \
-  X(identifier_token)                                                          \
-  X(number_token)                                                              \
-  X(whitespace_token)                                                          \
-                                                                               \
-  X(plus_token)                                                                \
-  X(minus_token)                                                               \
-  X(star_token)                                                                \
-  X(slash_token)                                                               \
-  X(bang_token)                                                                \
-  X(ampersand_ampersand_token)                                                 \
-  X(pipe_pipe_token)                                                           \
-  X(bang_equals_token)                                                         \
-  X(equals_equals_token)                                                       \
-  X(equals_token)                                                              \
-  X(open_parenthesis_token)                                                    \
-  X(close_parenthesis_token)                                                   \
-                                                                               \
-  X(true_keyword)                                                              \
-  X(false_keyword)                                                             \
-                                                                               \
-  X(compilation_unit)                                                          \
-                                                                               \
-  X(assignment_expression)                                                     \
-  X(binary_expression)                                                         \
-  X(literal_expression)                                                        \
-  X(name_expression)                                                           \
-  X(parenthesized_expression)                                                  \
+#define SYNTAX_KINDS_X \
+  X(bad_token) \
+  X(end_of_file_token) \
+\
+  X(identifier_token) \
+  X(number_token) \
+  X(whitespace_token) \
+\
+  X(plus_token) \
+  X(minus_token) \
+  X(star_token) \
+  X(slash_token) \
+  X(bang_token) \
+  X(ampersand_ampersand_token) \
+  X(pipe_pipe_token) \
+  X(bang_equals_token) \
+  X(equals_equals_token) \
+  X(equals_token) \
+  X(open_parenthesis_token) \
+  X(close_parenthesis_token) \
+  X(open_brace_token) \
+  X(close_brace_token) \
+\
+  X(true_keyword) \
+  X(false_keyword) \
+\
+  X(compilation_unit) \
+\
+  X(block_statement) \
+\
+  X(assignment_expression) \
+  X(binary_expression) \
+  X(literal_expression) \
+  X(name_expression) \
+  X(parenthesized_expression) \
   X(unary_expression)
 
 typedef enum {
