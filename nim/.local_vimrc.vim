@@ -1,1 +1,1 @@
-set makeprg=nimble\ run
+set makeprg=nimble\ build

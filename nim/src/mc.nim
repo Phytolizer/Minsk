@@ -1,3 +1,6 @@
+import minsk/lexer
+import minsk/syntaxKind
+
 when isMainModule:
   while true:
     stdout.write "> "
@@ -7,7 +10,9 @@ when isMainModule:
       echo ""
       break
 
-    if line == "1 + 2 * 3":
-      echo "7"
-    else:
-      echo "ERROR: Invalid expression!"
+    var lexer = newLexer(line)
+    while true:
+      let token = lexer.nextToken()
+      echo token
+      if token.kind == SyntaxKind.EndOfFileToken:
+        break
