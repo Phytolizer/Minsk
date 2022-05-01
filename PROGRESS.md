@@ -14,6 +14,9 @@ Episode 7.
 ## kt (Kotlin)
 Episode 6.5.
 
+## nim (Nim)
+Episode 0.5.
+
 ## py (Python)
 Episode 6.
 
