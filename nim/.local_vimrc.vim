@@ -1,0 +1,1 @@
+set makeprg=nimble\ run
