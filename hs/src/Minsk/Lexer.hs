@@ -2,13 +2,10 @@ module Minsk.Lexer (allTokens) where
 
 import Control.Monad.Loops (unfoldWhileM)
 import Control.Monad.State (
-    MonadState (state),
     State,
     evalState,
-    execState,
     get,
     put,
-    runState,
  )
 import Data.Text (Text, uncons)
 import qualified Data.Text as Text
@@ -57,13 +54,9 @@ advance = do
             Nothing -> return ()
 
 startToken :: State Lexer ()
-startToken = state $ \lexer ->
-    ( ()
-    , lexer
-        { _start = _pos lexer
-        , _tokenText = []
-        }
-    )
+startToken = do
+    lexer <- get
+    put lexer{_start = _pos lexer, _tokenText = []}
 
 mkToken :: Lexer -> SyntaxKind -> SyntaxToken
 mkToken lexer kind =
