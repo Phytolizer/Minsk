@@ -1,6 +1,5 @@
 module Minsk.Lexer (allTokens) where
 
-import Control.Monad.Loops (unfoldWhileM)
 import Control.Monad.State (
     State,
     evalState,
