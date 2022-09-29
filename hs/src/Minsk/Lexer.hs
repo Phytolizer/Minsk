@@ -10,7 +10,8 @@ import Data.Text (Text, uncons)
 import qualified Data.Text as Text
 import Minsk.SyntaxKind (SyntaxKind)
 import qualified Minsk.SyntaxKind as SyntaxKind
-import Minsk.SyntaxToken (SyntaxToken (..))
+import Minsk.SyntaxToken (SyntaxToken (SyntaxToken))
+import qualified Minsk.SyntaxToken as SyntaxToken
 
 data Lexer = Lexer
     { _text :: Text
@@ -60,16 +61,14 @@ startToken = do
 mkToken :: Lexer -> SyntaxKind -> SyntaxToken
 mkToken lexer kind =
     SyntaxToken
-        { kind = kind
-        , position = _start lexer
-        , text = Text.pack $ _tokenText lexer
-        , value = Nothing
-        }
+        kind
+        (_start lexer)
+        (Text.pack $ _tokenText lexer)
+        Nothing
 
 nextToken :: State Lexer SyntaxToken
 -- Yield next token.
 nextToken = do
-    lexer <- get
     startToken
     c <- current
     case c of
@@ -83,7 +82,8 @@ nextToken = do
             return $ mkToken lexer' SyntaxKind.BadToken
 
 isEndOfFileToken :: SyntaxToken -> Bool
-isEndOfFileToken token = kind token == SyntaxKind.EndOfFileToken
+isEndOfFileToken token =
+    SyntaxToken.kind token == SyntaxKind.EndOfFileToken
 
 allTokens :: Text -> [SyntaxToken]
 allTokens text = evalState go (new text)
@@ -91,7 +91,7 @@ allTokens text = evalState go (new text)
     go :: State Lexer [SyntaxToken]
     go = do
         token <- nextToken
-        case kind token of
+        case SyntaxToken.kind token of
             SyntaxKind.EndOfFileToken -> return [token]
             _ -> do
                 tokens <- go
