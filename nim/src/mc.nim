@@ -1,8 +1,9 @@
 import minsk/lexer
 import minsk/syntaxKind
+from minsk/macros import loop
 
 when isMainModule:
-  while true:
+  loop:
     stdout.write "> "
     stdout.flushFile()
     var line = ""
@@ -11,7 +12,7 @@ when isMainModule:
       break
 
     var lexer = newLexer(line)
-    while true:
+    loop:
       let token = lexer.nextToken()
       echo token
       if token.kind == SyntaxKind.EndOfFileToken:
