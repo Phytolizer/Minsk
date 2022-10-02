@@ -26,87 +26,56 @@ func nextToken*(lexer: var Lexer): SyntaxToken =
       value: moNull(),
     )
   let start = lexer.position
+  var kind = SyntaxKind.BadToken
+  var text = ""
+  var value = moNull()
   if lexer.current.isDigit:
     while lexer.current.isDigit:
       lexer.position += 1
-    let text = lexer.text[start..<lexer.position]
-    var value = moNull()
+    text = lexer.text[start..<lexer.position]
     try:
       value = moInteger(text.parseInt())
     except ValueError:
       # TODO: handle error
       discard
-    return SyntaxToken(
-      kind: SyntaxKind.NumberToken,
-      position: start,
-      text: text,
-      value: value,
-    )
+    kind = SyntaxKind.NumberToken
   elif lexer.current.isSpaceAscii:
     while lexer.current.isSpaceAscii:
       lexer.position += 1
-    let text = lexer.text[start..<lexer.position]
-    return SyntaxToken(
-      kind: SyntaxKind.WhitespaceToken,
-      position: start,
-      text: text,
-      value: moNull(),
-    )
+    text = lexer.text[start..<lexer.position]
+    kind = SyntaxKind.WhitespaceToken
   else:
     case lexer.current:
     of '+':
       lexer.position += 1
-      return SyntaxToken(
-        kind: SyntaxKind.PlusToken,
-        position: start,
-        text: "+",
-        value: moNull(),
-      )
+      kind = SyntaxKind.PlusToken
     of '-':
       lexer.position += 1
-      return SyntaxToken(
-        kind: SyntaxKind.MinusToken,
-        position: start,
-        text: "-",
-        value: moNull(),
-      )
+      kind = SyntaxKind.MinusToken
     of '*':
       lexer.position += 1
-      return SyntaxToken(
-        kind: SyntaxKind.StarToken,
-        position: start,
-        text: "*",
-        value: moNull(),
-      )
+      kind = SyntaxKind.StarToken
     of '/':
       lexer.position += 1
-      return SyntaxToken(
-        kind: SyntaxKind.SlashToken,
-        position: start,
-        text: "/",
-        value: moNull(),
-      )
+      kind = SyntaxKind.SlashToken
     of '(':
       lexer.position += 1
-      return SyntaxToken(
-        kind: SyntaxKind.OpenParenthesisToken,
-        position: start,
-        text: "(",
-        value: moNull(),
-      )
+      kind = SyntaxKind.OpenParenthesisToken
     of ')':
       lexer.position += 1
-      return SyntaxToken(
-        kind: SyntaxKind.CloseParenthesisToken,
-        position: start,
-        text: ")",
-        value: moNull(),
-      )
+      kind = SyntaxKind.CloseParenthesisToken
     else:
-      lexer.position += 1
-      return SyntaxToken(
-        kind: SyntaxKind.BadToken,
-        position: start,
-        text: lexer.text[start..<lexer.position],
-        value: moNull(),
-      )
+      discard
+
+  if kind == SyntaxKind.BadToken:
+    lexer.position += 1
+
+  if text.len == 0:
+    text = lexer.text[start..<lexer.position]
+
+  return SyntaxToken(
+    kind: kind,
+    position: start,
+    text: text,
+    value: value,
+  )
