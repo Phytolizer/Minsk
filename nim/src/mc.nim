@@ -1,6 +1,6 @@
 import minsk/lexer
+import minsk/macros
 import minsk/syntaxKind
-from minsk/macros import loop
 
 when isMainModule:
   loop:
