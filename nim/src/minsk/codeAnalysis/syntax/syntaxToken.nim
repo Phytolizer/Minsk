@@ -1,6 +1,7 @@
+import minsk/minskObject
+
 import syntaxKind
 import syntaxNode
-import minskObject
 
 type
   SyntaxToken* = ref object of SyntaxNode

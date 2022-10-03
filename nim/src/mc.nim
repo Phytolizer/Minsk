@@ -3,8 +3,9 @@ import ansi/colorize
 
 import minsk/codeAnalysis/evaluator
 import minsk/macros
+import minsk/minskObject
+import minsk/codeAnalysis/binding/binder
 import minsk/codeAnalysis/syntax/[
-  minskObject,
   parser,
   syntaxNode,
   syntaxToken,
@@ -50,14 +51,16 @@ when isMainModule:
       prettyPrint(syntaxTree.root)
       stdout.resetColor()
       stdout.flushFile()
-    let diagnostics = syntaxTree.diagnostics
+    var binder = newBinder()
+    let boundRoot = binder.bindExpression(syntaxTree.root)
+    let diagnostics = syntaxTree.diagnostics & binder.diagnostics
     if diagnostics.len > 0:
       stdout.setColor(fgRed)
       for diagnostic in diagnostics:
         echo diagnostic
       stdout.resetColor()
     else:
-      let evaluator = newEvaluator(syntaxTree.root)
+      let evaluator = newEvaluator(boundRoot)
       let result = evaluator.evaluate()
       stdout.setColor(fgGreen)
       echo result

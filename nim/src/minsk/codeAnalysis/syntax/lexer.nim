@@ -1,9 +1,10 @@
 import std/strformat
 import std/strutils
 
+import minsk/minskObject
+
 import syntaxKind
 import syntaxToken
-import minskObject
 
 type
   Lexer* = object

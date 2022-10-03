@@ -1,6 +1,7 @@
 import std/strformat
 
 import minsk/macros
+import minsk/minskObject
 
 import expressions/[
   binaryExpressionSyntax,
@@ -10,7 +11,6 @@ import expressions/[
 ]
 import expressionSyntax
 import lexer
-import minskObject
 import syntaxFacts
 import syntaxKind
 import syntaxToken

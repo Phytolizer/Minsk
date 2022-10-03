@@ -1,59 +1,49 @@
-import std/strformat
-
-import syntax/expressions/[
-  binaryExpressionSyntax,
-  literalExpressionSyntax,
-  parenthesizedExpressionSyntax,
-  unaryExpressionSyntax,
+import binding/expressions/[
+  boundBinaryExpression,
+  boundBinaryOperatorKind,
+  boundLiteralExpression,
+  boundUnaryExpression,
+  boundUnaryOperatorKind,
 ]
-import syntax/[
-  expressionSyntax,
-  syntaxKind,
-  syntaxNode,
+import binding/[
+  boundExpression,
+  boundNode,
+  boundNodeKind,
 ]
 
 type
   Evaluator* = object
-    root: ExpressionSyntax
+    root: BoundExpression
 
-proc newEvaluator*(root: ExpressionSyntax): Evaluator =
+proc newEvaluator*(root: BoundExpression): Evaluator =
   result.root = root
 
-proc evaluateExpression(evaluator: Evaluator, root: ExpressionSyntax): int =
+proc evaluateExpression(evaluator: Evaluator, root: BoundExpression): int =
   case root.kind
-  of SyntaxKind.LiteralExpression:
-    let l = root.LiteralExpressionSyntax
-    return l.literalToken.value.intVal
-  of SyntaxKind.BinaryExpression:
-    let b = root.BinaryExpressionSyntax
+  of BoundNodeKind.LiteralExpression:
+    let l = root.BoundLiteralExpression
+    return l.value.intVal
+  of BoundNodeKind.BinaryExpression:
+    let b = root.BoundBinaryExpression
     let left = evaluateExpression(evaluator, b.left)
     let right = evaluateExpression(evaluator, b.right)
-    case b.operatorToken.kind
-    of SyntaxKind.PlusToken:
+    case b.operatorKind
+    of BoundBinaryOperatorKind.Addition:
       return left + right
-    of SyntaxKind.MinusToken:
+    of BoundBinaryOperatorKind.Subtraction:
       return left - right
-    of SyntaxKind.StarToken:
+    of BoundBinaryOperatorKind.Multiplication:
       return left * right
-    of SyntaxKind.SlashToken:
+    of BoundBinaryOperatorKind.Division:
       return left div right
-    else:
-      raiseAssert fmt"Unexpected binary operator {b.operatorToken.kind}"
-  of SyntaxKind.ParenthesizedExpression:
-    let p = root.ParenthesizedExpressionSyntax
-    return evaluateExpression(evaluator, p.expression)
-  of SyntaxKind.UnaryExpression:
-    let u = root.UnaryExpressionSyntax
+  of BoundNodeKind.UnaryExpression:
+    let u = root.BoundUnaryExpression
     let operand = evaluateExpression(evaluator, u.operand)
-    case u.operatorToken.kind
-    of SyntaxKind.PlusToken:
+    case u.operatorKind
+    of BoundUnaryOperatorKind.Identity:
       return operand
-    of SyntaxKind.MinusToken:
+    of BoundUnaryOperatorKind.Negation:
       return -operand
-    else:
-      raiseAssert fmt"Unexpected unary operator {u.operatorToken.kind}"
-  else:
-    raiseAssert fmt"Unexpected node {root.kind}"
 
 proc evaluate*(evaluator: Evaluator): int =
   evaluator.evaluateExpression(evaluator.root)
