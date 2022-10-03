@@ -17,3 +17,8 @@ func moInteger*(intVal: int): MinskObject =
     kind: mokInteger,
     intVal: intVal,
   )
+
+func `$`*(obj: MinskObject): string =
+  case obj.kind
+  of mokNull: "null"
+  of mokInteger: $obj.intVal

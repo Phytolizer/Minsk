@@ -19,11 +19,11 @@ func current(lexer: Lexer): char =
 
 func nextToken*(lexer: var Lexer): SyntaxToken =
   if lexer.position >= lexer.text.len:
-    return SyntaxToken(
-      kind: SyntaxKind.EndOfFileToken,
-      position: lexer.position,
-      text: "",
-      value: moNull(),
+    return newToken(
+      SyntaxKind.EndOfFileToken,
+      lexer.position,
+      "",
+      moNull(),
     )
   let start = lexer.position
   var kind = SyntaxKind.BadToken
@@ -73,9 +73,4 @@ func nextToken*(lexer: var Lexer): SyntaxToken =
   if text.len == 0:
     text = lexer.text[start..<lexer.position]
 
-  return SyntaxToken(
-    kind: kind,
-    position: start,
-    text: text,
-    value: value,
-  )
+  return newToken(kind, start, text, value)

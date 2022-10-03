@@ -12,3 +12,6 @@ type
     SlashToken
     OpenParenthesisToken
     CloseParenthesisToken
+
+    LiteralExpression
+    BinaryExpression
