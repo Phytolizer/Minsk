@@ -2,10 +2,10 @@ import minsk/minskObject
 
 import binding/expressions/[
   boundBinaryExpression,
-  boundBinaryOperatorKind,
+  boundBinaryOperator,
   boundLiteralExpression,
   boundUnaryExpression,
-  boundUnaryOperatorKind,
+  boundUnaryOperator,
 ]
 import binding/[
   boundExpression,
@@ -29,7 +29,7 @@ proc evaluateExpression(evaluator: Evaluator, root: BoundExpression): MinskObjec
     let b = root.BoundBinaryExpression
     let left = evaluateExpression(evaluator, b.left)
     let right = evaluateExpression(evaluator, b.right)
-    case b.operatorKind
+    case b.op.kind
     of BoundBinaryOperatorKind.Addition:
       return moInteger(left.intVal + right.intVal)
     of BoundBinaryOperatorKind.Subtraction:
@@ -45,7 +45,7 @@ proc evaluateExpression(evaluator: Evaluator, root: BoundExpression): MinskObjec
   of BoundNodeKind.UnaryExpression:
     let u = root.BoundUnaryExpression
     let operand = evaluateExpression(evaluator, u.operand)
-    case u.operatorKind
+    case u.op.kind
     of BoundUnaryOperatorKind.Identity:
       return moInteger(operand.intVal)
     of BoundUnaryOperatorKind.Negation:

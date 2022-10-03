@@ -4,23 +4,23 @@ import minsk/codeAnalysis/binding/[
   boundNodeKind,
 ]
 
-import boundUnaryOperatorKind
+import boundUnaryOperator
 
 type
   BoundUnaryExpression* = ref object of BoundExpression
-    operatorKind*: BoundUnaryOperatorKind
+    op*: BoundUnaryOperator
     operand*: BoundExpression
 
 proc newBoundUnaryExpression*(
-  operatorKind: BoundUnaryOperatorKind,
+  op: BoundUnaryOperator,
   operand: BoundExpression
 ): BoundUnaryExpression =
   new(result)
-  result.operatorKind = operatorKind
+  result.op = op
   result.operand = operand
 
 method kind*(self: BoundUnaryExpression): BoundNodeKind =
   BoundNodeKind.UnaryExpression
 
 method objectKind*(self: BoundUnaryExpression): MinskObjectKind =
-  self.operand.objectKind
+  self.op.resultType

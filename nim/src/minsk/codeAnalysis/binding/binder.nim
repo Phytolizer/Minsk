@@ -17,10 +17,10 @@ import minsk/codeAnalysis/syntax/expressions/[
 import boundExpression
 import expressions/[
   boundBinaryExpression,
-  boundBinaryOperatorKind,
+  boundBinaryOperator,
   boundLiteralExpression,
   boundUnaryExpression,
-  boundUnaryOperatorKind,
+  boundUnaryOperator,
 ]
 
 type
@@ -38,44 +38,16 @@ proc bindExpression*(
   syntax: ExpressionSyntax
 ): BoundExpression
 
-proc bindBinaryOperatorKind(
-  kind: SyntaxKind,
-  leftType: MinskObjectKind,
-  rightType: MinskObjectKind
-): Option[BoundBinaryOperatorKind] =
-  if leftType == mokInteger and rightType == mokInteger:
-    case kind
-    of SyntaxKind.PlusToken:
-      return BoundBinaryOperatorKind.Addition.some
-    of SyntaxKind.MinusToken:
-      return BoundBinaryOperatorKind.Subtraction.some
-    of SyntaxKind.StarToken:
-      return BoundBinaryOperatorKind.Multiplication.some
-    of SyntaxKind.SlashToken:
-      return BoundBinaryOperatorKind.Division.some
-    else:
-      discard
-  elif leftType == mokBoolean and rightType == mokBoolean:
-    case kind
-    of SyntaxKind.AmpersandAmpersandToken:
-      return BoundBinaryOperatorKind.LogicalAnd.some
-    of SyntaxKind.PipePipeToken:
-      return BoundBinaryOperatorKind.LogicalOr.some
-    else:
-      discard
-
-  none[BoundBinaryOperatorKind]()
-
 proc bindBinaryExpression(binder: var Binder,
     syntax: BinaryExpressionSyntax): BoundExpression =
   let boundLeft = binder.bindExpression(syntax.left)
   let boundRight = binder.bindExpression(syntax.right)
-  let boundOperatorKind = bindBinaryOperatorKind(
+  let boundOperator = bindBinaryOperator(
     syntax.operatorToken.kind,
     boundLeft.objectKind,
     boundRight.objectKind
   )
-  if boundOperatorKind.isNone:
+  if boundOperator.isNone:
     binder.mDiagnostics.add(
       fmt"Operator '{syntax.operatorToken.text}' is " &
       fmt"not defined for types '{boundLeft.objectKind}' " &
@@ -83,7 +55,7 @@ proc bindBinaryExpression(binder: var Binder,
     )
     return boundLeft
 
-  return newBoundBinaryExpression(boundLeft, boundOperatorKind.get, boundRight)
+  return newBoundBinaryExpression(boundLeft, boundOperator.get, boundRight)
 
 proc bindLiteralExpression(binder: var Binder,
     syntax: LiteralExpressionSyntax): BoundExpression =
@@ -93,45 +65,21 @@ proc bindParenthesizedExpression(binder: var Binder,
     syntax: ParenthesizedExpressionSyntax): BoundExpression =
   binder.bindExpression(syntax.expression)
 
-proc bindUnaryOperatorKind(
-  kind: SyntaxKind,
-  operandType: MinskObjectKind
-): Option[BoundUnaryOperatorKind] =
-  case operandType
-  of mokInteger:
-    case kind
-    of SyntaxKind.PlusToken:
-      return BoundUnaryOperatorKind.Identity.some
-    of SyntaxKind.MinusToken:
-      return BoundUnaryOperatorKind.Negation.some
-    else:
-      discard
-  of mokBoolean:
-    case kind
-    of SyntaxKind.BangToken:
-      return BoundUnaryOperatorKind.LogicalNegation.some
-    else:
-      discard
-  else:
-    discard
-
-  none[BoundUnaryOperatorKind]()
-
 proc bindUnaryExpression(binder: var Binder,
     syntax: UnaryExpressionSyntax): BoundExpression =
   let boundOperand = binder.bindExpression(syntax.operand)
-  let boundOperatorKind = bindUnaryOperatorKind(
+  let boundOperator = bindUnaryOperator(
     syntax.operatorToken.kind,
     boundOperand.objectKind
   )
-  if boundOperatorKind.isNone:
+  if boundOperator.isNone:
     binder.mDiagnostics.add(
       fmt"Operator '{syntax.operatorToken.text}' is " &
       fmt"not defined for type '{boundOperand.objectKind}'"
     )
     return boundOperand
 
-  return newBoundUnaryExpression(boundOperatorKind.get, boundOperand)
+  return newBoundUnaryExpression(boundOperator.get, boundOperand)
 
 proc bindExpression*(binder: var Binder,
     syntax: ExpressionSyntax): BoundExpression =
