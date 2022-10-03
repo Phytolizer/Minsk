@@ -7,6 +7,7 @@ import expressionSyntax
 import lexer
 import macros
 import minskObject
+import syntaxFacts
 import syntaxKind
 import syntaxToken
 
@@ -65,23 +66,19 @@ proc parsePrimaryExpression(parser: var Parser): ExpressionSyntax =
     let numberToken = parser.matchToken(SyntaxKind.NumberToken)
     return newLiteralExpressionSyntax(numberToken)
 
-proc parseFactor(parser: var Parser): ExpressionSyntax =
+proc parseBinaryExpression(parser: var Parser, parentPrecedence: int = 0): ExpressionSyntax =
   result = parser.parsePrimaryExpression()
-  while parser.current.kind in {SyntaxKind.StarToken, SyntaxKind.SlashToken}:
-    let operatorToken = parser.nextToken()
-    let right = parser.parsePrimaryExpression()
-    result = newBinaryExpressionSyntax(result, operatorToken, right)
+  loop:
+    let precedence = parser.current.kind.binaryOperatorPrecedence
+    if precedence == 0 or precedence <= parentPrecedence:
+      break
 
-proc parseTerm(parser: var Parser): ExpressionSyntax =
-  result = parser.parseFactor()
-
-  while parser.current.kind in {SyntaxKind.PlusToken, SyntaxKind.MinusToken}:
     let operatorToken = parser.nextToken()
-    let right = parser.parseFactor()
+    let right = parser.parseBinaryExpression(precedence)
     result = newBinaryExpressionSyntax(result, operatorToken, right)
 
 proc parseExpression(parser: var Parser): ExpressionSyntax =
-  parser.parseTerm()
+  parser.parseBinaryExpression()
 
 type
   SyntaxTree* = object
