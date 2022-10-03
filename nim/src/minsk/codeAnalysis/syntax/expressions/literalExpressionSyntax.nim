@@ -1,3 +1,4 @@
+import minsk/minskObject
 import minsk/codeAnalysis/syntax/[
   expressionSyntax,
   syntaxKind,
@@ -8,10 +9,15 @@ import minsk/codeAnalysis/syntax/[
 type
   LiteralExpressionSyntax* = ref object of ExpressionSyntax
     literalToken*: SyntaxToken
+    value*: MinskObject
 
-proc newLiteralExpressionSyntax*(literalToken: SyntaxToken): LiteralExpressionSyntax =
+proc newLiteralExpressionSyntax*(
+  literalToken: SyntaxToken,
+  value: MinskObject = literalToken.value
+): LiteralExpressionSyntax =
   new(result)
   result.literalToken = literalToken
+  result.value = value
 
 method kind*(self: LiteralExpressionSyntax): SyntaxKind =
   return SyntaxKind.LiteralExpression

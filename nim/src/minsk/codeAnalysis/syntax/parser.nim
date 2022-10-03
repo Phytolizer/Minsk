@@ -59,16 +59,32 @@ proc matchToken(parser: var Parser, kind: SyntaxKind): SyntaxToken =
 
 proc parseExpression(parser: var Parser): ExpressionSyntax
 
+proc parseParenthesizedExpression(parser: var Parser): ExpressionSyntax =
+  let left = parser.matchToken(SyntaxKind.OpenParenthesisToken)
+  let expression = parser.parseExpression()
+  let right = parser.matchToken(SyntaxKind.CloseParenthesisToken)
+  return newParenthesizedExpressionSyntax(left, expression, right)
+
+proc parseBooleanLiteral(parser: var Parser): ExpressionSyntax =
+  let value = parser.current.kind == SyntaxKind.TrueKeyword
+  let keywordToken = parser.matchToken(
+    if value: SyntaxKind.TrueKeyword
+    else: SyntaxKind.FalseKeyword
+  )
+  return newLiteralExpressionSyntax(keywordToken, moBoolean(value))
+
+proc parseNumberLiteral(parser: var Parser): ExpressionSyntax =
+  let numberToken = parser.matchToken(SyntaxKind.NumberToken)
+  return newLiteralExpressionSyntax(numberToken)
+
 proc parsePrimaryExpression(parser: var Parser): ExpressionSyntax =
   case parser.current.kind
   of SyntaxKind.OpenParenthesisToken:
-    let left = parser.nextToken()
-    let expression = parser.parseExpression()
-    let right = parser.matchToken(SyntaxKind.CloseParenthesisToken)
-    return newParenthesizedExpressionSyntax(left, expression, right)
+    parser.parseParenthesizedExpression()
+  of SyntaxKind.TrueKeyword, SyntaxKind.FalseKeyword:
+    parser.parseBooleanLiteral()
   else:
-    let numberToken = parser.matchToken(SyntaxKind.NumberToken)
-    return newLiteralExpressionSyntax(numberToken)
+    parser.parseNumberLiteral()
 
 proc parseBinaryExpression(parser: var Parser, parentPrecedence: int = 0): ExpressionSyntax =
   let unaryOperatorPrecedence = parser.current.kind.unaryOperatorPrecedence

@@ -15,3 +15,12 @@ proc unaryOperatorPrecedence*(kind: SyntaxKind): int =
     3
   else:
     0
+
+proc keywordKind*(text: string): SyntaxKind =
+  case text
+  of "true":
+    SyntaxKind.TrueKeyword
+  of "false":
+    SyntaxKind.FalseKeyword
+  else:
+    SyntaxKind.IdentifierToken

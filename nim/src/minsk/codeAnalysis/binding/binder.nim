@@ -74,7 +74,7 @@ proc bindBinaryExpression(binder: var Binder, syntax: BinaryExpressionSyntax): B
   return newBoundBinaryExpression(boundLeft, boundOperatorKind.get, boundRight)
 
 proc bindLiteralExpression(binder: var Binder, syntax: LiteralExpressionSyntax): BoundExpression =
-  newBoundLiteralExpression(syntax.literalToken.value)
+  newBoundLiteralExpression(syntax.value)
 
 proc bindParenthesizedExpression(binder: var Binder, syntax: ParenthesizedExpressionSyntax): BoundExpression =
   binder.bindExpression(syntax.expression)

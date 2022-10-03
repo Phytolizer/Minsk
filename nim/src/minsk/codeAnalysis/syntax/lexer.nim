@@ -3,6 +3,7 @@ import std/strutils
 
 import minsk/minskObject
 
+import syntaxFacts
 import syntaxKind
 import syntaxToken
 
@@ -48,6 +49,11 @@ func nextToken*(lexer: var Lexer): SyntaxToken =
       lexer.position += 1
     text = lexer.text[start..<lexer.position]
     kind = SyntaxKind.WhitespaceToken
+  elif lexer.current.isAlphaAscii:
+    while lexer.current.isAlphaAscii:
+      lexer.position += 1
+    text = lexer.text[start..<lexer.position]
+    kind = keywordKind(text)
   else:
     case lexer.current
     of '+':

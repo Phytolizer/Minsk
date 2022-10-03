@@ -5,6 +5,7 @@ type
 
     WhitespaceToken
     NumberToken
+    IdentifierToken
 
     PlusToken
     MinusToken
@@ -12,6 +13,9 @@ type
     SlashToken
     OpenParenthesisToken
     CloseParenthesisToken
+
+    TrueKeyword
+    FalseKeyword
 
     LiteralExpression
     BinaryExpression

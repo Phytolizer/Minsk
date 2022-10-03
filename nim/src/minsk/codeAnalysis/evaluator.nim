@@ -1,3 +1,5 @@
+import minsk/minskObject
+
 import binding/expressions/[
   boundBinaryExpression,
   boundBinaryOperatorKind,
@@ -18,32 +20,32 @@ type
 proc newEvaluator*(root: BoundExpression): Evaluator =
   result.root = root
 
-proc evaluateExpression(evaluator: Evaluator, root: BoundExpression): int =
+proc evaluateExpression(evaluator: Evaluator, root: BoundExpression): MinskObject =
   case root.kind
   of BoundNodeKind.LiteralExpression:
     let l = root.BoundLiteralExpression
-    return l.value.intVal
+    return l.value
   of BoundNodeKind.BinaryExpression:
     let b = root.BoundBinaryExpression
-    let left = evaluateExpression(evaluator, b.left)
-    let right = evaluateExpression(evaluator, b.right)
+    let left = evaluateExpression(evaluator, b.left).intVal
+    let right = evaluateExpression(evaluator, b.right).intVal
     case b.operatorKind
     of BoundBinaryOperatorKind.Addition:
-      return left + right
+      return moInteger(left + right)
     of BoundBinaryOperatorKind.Subtraction:
-      return left - right
+      return moInteger(left - right)
     of BoundBinaryOperatorKind.Multiplication:
-      return left * right
+      return moInteger(left * right)
     of BoundBinaryOperatorKind.Division:
-      return left div right
+      return moInteger(left div right)
   of BoundNodeKind.UnaryExpression:
     let u = root.BoundUnaryExpression
-    let operand = evaluateExpression(evaluator, u.operand)
+    let operand = evaluateExpression(evaluator, u.operand).intVal
     case u.operatorKind
     of BoundUnaryOperatorKind.Identity:
-      return operand
+      return moInteger(operand)
     of BoundUnaryOperatorKind.Negation:
-      return -operand
+      return moInteger(-operand)
 
-proc evaluate*(evaluator: Evaluator): int =
+proc evaluate*(evaluator: Evaluator): MinskObject =
   evaluator.evaluateExpression(evaluator.root)
