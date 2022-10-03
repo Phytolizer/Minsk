@@ -48,7 +48,7 @@ func nextToken*(lexer: var Lexer): SyntaxToken =
     text = lexer.text[start..<lexer.position]
     kind = SyntaxKind.WhitespaceToken
   else:
-    case lexer.current:
+    case lexer.current
     of '+':
       lexer.position += 1
       kind = SyntaxKind.PlusToken
