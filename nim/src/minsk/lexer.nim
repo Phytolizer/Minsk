@@ -1,16 +1,20 @@
+import std/strformat
+import std/strutils
+
 import syntaxKind
 import syntaxToken
 import minskObject
-import std/strutils
 
 type
   Lexer* = object
     text: string
     position: int
+    mDiagnostics: seq[string]
 
 func newLexer*(text: string): Lexer =
   result.text = text
   result.position = 0
+  result.mDiagnostics = @[]
 
 func current(lexer: Lexer): char =
   if lexer.position >= lexer.text.len:
@@ -68,9 +72,13 @@ func nextToken*(lexer: var Lexer): SyntaxToken =
       discard
 
   if kind == SyntaxKind.BadToken:
+    lexer.mDiagnostics.add(fmt"ERROR: Bad character input: '{lexer.current}'")
     lexer.position += 1
 
   if text.len == 0:
     text = lexer.text[start..<lexer.position]
 
   return newToken(kind, start, text, value)
+
+func diagnostics*(lexer: Lexer): seq[string] =
+  lexer.mDiagnostics

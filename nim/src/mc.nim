@@ -31,8 +31,14 @@ when isMainModule:
       break
 
     var parser = newParser(line)
-    let expression = parser.parse()
+    let syntaxTree = parser.parse()
     stdout.setColor(styleDim, fgWhite)
-    expression.prettyPrint()
+    prettyPrint(syntaxTree.root)
     stdout.resetColor()
     stdout.flushFile()
+    if parser.diagnostics.len > 0:
+      stdout.setColor(fgRed)
+      for diagnostic in parser.diagnostics:
+        echo diagnostic
+      stdout.resetColor()
+      stdout.flushFile()
