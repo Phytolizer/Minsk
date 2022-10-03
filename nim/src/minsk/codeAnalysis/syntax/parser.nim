@@ -1,12 +1,15 @@
 import std/strformat
 
-import expressions/binaryExpressionSyntax
-import expressions/literalExpressionSyntax
-import expressions/parenthesizedExpressionSyntax
-import expressions/unaryExpressionSyntax
+import minsk/macros
+
+import expressions/[
+  binaryExpressionSyntax,
+  literalExpressionSyntax,
+  parenthesizedExpressionSyntax,
+  unaryExpressionSyntax,
+]
 import expressionSyntax
 import lexer
-import macros
 import minskObject
 import syntaxFacts
 import syntaxKind

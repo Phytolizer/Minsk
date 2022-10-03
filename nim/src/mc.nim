@@ -2,11 +2,13 @@ import ansi/ansi
 import ansi/colorize
 
 import minsk/codeAnalysis/evaluator
-import minsk/codeAnalysis/macros
-import minsk/codeAnalysis/minskObject
-import minsk/codeAnalysis/parser
-import minsk/codeAnalysis/syntaxNode
-import minsk/codeAnalysis/syntaxToken
+import minsk/macros
+import minsk/codeAnalysis/syntax/[
+  minskObject,
+  parser,
+  syntaxNode,
+  syntaxToken,
+]
 
 proc prettyPrint(
   node: SyntaxNode,

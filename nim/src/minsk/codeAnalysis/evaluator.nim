@@ -1,12 +1,16 @@
 import std/strformat
 
-import expressionSyntax
-import expressions/binaryExpressionSyntax
-import expressions/literalExpressionSyntax
-import expressions/parenthesizedExpressionSyntax
-import expressions/unaryExpressionSyntax
-import syntaxKind
-import syntaxNode
+import syntax/expressions/[
+  binaryExpressionSyntax,
+  literalExpressionSyntax,
+  parenthesizedExpressionSyntax,
+  unaryExpressionSyntax,
+]
+import syntax/[
+  expressionSyntax,
+  syntaxKind,
+  syntaxNode,
+]
 
 type
   Evaluator* = object

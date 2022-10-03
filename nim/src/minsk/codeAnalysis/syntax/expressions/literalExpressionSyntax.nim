@@ -1,7 +1,9 @@
-import ../expressionSyntax
-import ../syntaxKind
-import ../syntaxNode
-import ../syntaxToken
+import minsk/codeAnalysis/syntax/[
+  expressionSyntax,
+  syntaxKind,
+  syntaxNode,
+  syntaxToken,
+]
 
 type
   LiteralExpressionSyntax* = ref object of ExpressionSyntax
