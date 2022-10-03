@@ -2,6 +2,7 @@ import std/strformat
 
 import expressions/binaryExpressionSyntax
 import expressions/literalExpressionSyntax
+import expressions/parenthesizedExpressionSyntax
 import expressionSyntax
 import lexer
 import macros
@@ -52,9 +53,18 @@ proc matchToken(parser: var Parser, kind: SyntaxKind): SyntaxToken =
     parser.mDiagnostics.add(fmt"ERROR: Unexpected token <{result.kind}>, expected <{kind}>")
     result = newToken(kind, result.position, "", moNull())
 
+proc parseExpression(parser: var Parser): ExpressionSyntax
+
 proc parsePrimaryExpression(parser: var Parser): ExpressionSyntax =
-  let numberToken = parser.matchToken(SyntaxKind.NumberToken)
-  return newLiteralExpressionSyntax(numberToken)
+  case parser.current.kind
+  of SyntaxKind.OpenParenthesisToken:
+    let left = parser.nextToken()
+    let expression = parser.parseExpression()
+    let right = parser.matchToken(SyntaxKind.CloseParenthesisToken)
+    return newParenthesizedExpressionSyntax(left, expression, right)
+  else:
+    let numberToken = parser.matchToken(SyntaxKind.NumberToken)
+    return newLiteralExpressionSyntax(numberToken)
 
 proc parseFactor(parser: var Parser): ExpressionSyntax =
   result = parser.parsePrimaryExpression()

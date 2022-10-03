@@ -36,6 +36,7 @@ when isMainModule:
     stdout.setColor(styleDim, fgWhite)
     prettyPrint(syntaxTree.root)
     stdout.resetColor()
+    stdout.flushFile()
     if parser.diagnostics.len > 0:
       stdout.setColor(fgRed)
       for diagnostic in parser.diagnostics:

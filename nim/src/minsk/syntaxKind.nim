@@ -15,3 +15,4 @@ type
 
     LiteralExpression
     BinaryExpression
+    ParenthesizedExpression

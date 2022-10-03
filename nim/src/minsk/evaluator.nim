@@ -3,6 +3,7 @@ import std/strformat
 import expressionSyntax
 import expressions/binaryExpressionSyntax
 import expressions/literalExpressionSyntax
+import expressions/parenthesizedExpressionSyntax
 import syntaxKind
 import syntaxNode
 
@@ -33,6 +34,9 @@ proc evaluateExpression(evaluator: Evaluator, root: ExpressionSyntax): int =
       return left div right
     else:
       raiseAssert fmt"Unexpected binary operator {b.operatorToken.kind}"
+  of SyntaxKind.ParenthesizedExpression:
+    let p = root.ParenthesizedExpressionSyntax
+    return evaluateExpression(evaluator, p.expression)
   else:
     raiseAssert fmt"Unexpected node {root.kind}"
 

@@ -14,7 +14,10 @@ proc newBinaryExpressionSyntax*(
   operatorToken: SyntaxToken,
   right: ExpressionSyntax
 ): BinaryExpressionSyntax =
-  return BinaryExpressionSyntax(left: left, operatorToken: operatorToken, right: right)
+  new(result)
+  result.left = left
+  result.operatorToken = operatorToken
+  result.right = right
 
 method kind*(self: BinaryExpressionSyntax): SyntaxKind =
   return SyntaxKind.BinaryExpression
