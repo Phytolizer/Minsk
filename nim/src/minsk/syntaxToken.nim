@@ -4,7 +4,7 @@ import minskObject
 
 type
   SyntaxToken* = ref object of SyntaxNode
-    pKind: SyntaxKind
+    mKind: SyntaxKind
     position*: int
     text*: string
     value*: MinskObject
@@ -16,13 +16,13 @@ proc newToken*(
   value: MinskObject
 ): SyntaxToken =
   new(result)
-  result.pKind = kind
+  result.mKind = kind
   result.position = position
   result.text = text
   result.value = value
 
 method kind*(self: SyntaxToken): SyntaxKind =
-  self.pKind
+  self.mKind
 
 method children*(self: SyntaxToken): seq[SyntaxNode] =
   @[]
