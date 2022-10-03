@@ -11,5 +11,3 @@ Welcome to the Minsk repository! To contribute, you may work on an existing impl
 - Commits are to be frequent and small in size (with few exceptions):
   - New language implementations are exempt from this rule and may be squashed into one commit.
   - Rationale: Code review is time consuming when commits are large and unfocused.
-- Commits are to be prefixed with the language's folder name in the summary line, enclosed in square brackets.
-  - Example: `[kt] Refactor tests`
