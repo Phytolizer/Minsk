@@ -8,7 +8,8 @@ type
     literalToken*: SyntaxToken
 
 proc newLiteralExpressionSyntax*(literalToken: SyntaxToken): LiteralExpressionSyntax =
-  return LiteralExpressionSyntax(literalToken: literalToken)
+  new(result)
+  result.literalToken = literalToken
 
 method kind*(self: LiteralExpressionSyntax): SyntaxKind =
   return SyntaxKind.LiteralExpression
