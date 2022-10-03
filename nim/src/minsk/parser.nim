@@ -56,13 +56,23 @@ proc parsePrimaryExpression(parser: var Parser): ExpressionSyntax =
   let numberToken = parser.matchToken(SyntaxKind.NumberToken)
   return newLiteralExpressionSyntax(numberToken)
 
-proc parseExpression(parser: var Parser): ExpressionSyntax =
+proc parseFactor(parser: var Parser): ExpressionSyntax =
   result = parser.parsePrimaryExpression()
-
-  while parser.current.kind in {SyntaxKind.PlusToken, SyntaxKind.MinusToken}:
+  while parser.current.kind in {SyntaxKind.StarToken, SyntaxKind.SlashToken}:
     let operatorToken = parser.nextToken()
     let right = parser.parsePrimaryExpression()
     result = newBinaryExpressionSyntax(result, operatorToken, right)
+
+proc parseTerm(parser: var Parser): ExpressionSyntax =
+  result = parser.parseFactor()
+
+  while parser.current.kind in {SyntaxKind.PlusToken, SyntaxKind.MinusToken}:
+    let operatorToken = parser.nextToken()
+    let right = parser.parseFactor()
+    result = newBinaryExpressionSyntax(result, operatorToken, right)
+
+proc parseExpression(parser: var Parser): ExpressionSyntax =
+  parser.parseTerm()
 
 proc parse*(parser: var Parser): SyntaxTree =
   let expression = parser.parseExpression()
