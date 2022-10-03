@@ -1,4 +1,5 @@
-import colorize/colorize
+import ansi/ansi
+import ansi/colorize
 
 import minsk/evaluator
 import minsk/macros
@@ -23,6 +24,7 @@ proc prettyPrint(
     prettyPrint(child, indent, i == node.children.high)
 
 when isMainModule:
+  var showTree = false
   loop:
     stdout.write "> "
     stdout.flushFile()
@@ -31,11 +33,21 @@ when isMainModule:
       echo ""
       break
 
+    if line == "#showTree":
+      showTree = not showTree
+      echo if showTree: "Showing parse trees." else: "Not showing parse trees."
+      continue
+    if line == "#cls":
+      stdout.clear()
+      stdout.flushFile()
+      continue
+
     let syntaxTree = parse(line)
-    stdout.setColor(styleDim, fgWhite)
-    prettyPrint(syntaxTree.root)
-    stdout.resetColor()
-    stdout.flushFile()
+    if showTree:
+      stdout.setColor(styleDim, fgWhite)
+      prettyPrint(syntaxTree.root)
+      stdout.resetColor()
+      stdout.flushFile()
     let diagnostics = syntaxTree.diagnostics
     if diagnostics.len > 0:
       stdout.setColor(fgRed)
