@@ -13,6 +13,9 @@ type
     SlashToken
     OpenParenthesisToken
     CloseParenthesisToken
+    BangToken
+    AmpersandAmpersandToken
+    PipePipeToken
 
     TrueKeyword
     FalseKeyword

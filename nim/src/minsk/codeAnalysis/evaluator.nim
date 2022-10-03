@@ -27,25 +27,31 @@ proc evaluateExpression(evaluator: Evaluator, root: BoundExpression): MinskObjec
     return l.value
   of BoundNodeKind.BinaryExpression:
     let b = root.BoundBinaryExpression
-    let left = evaluateExpression(evaluator, b.left).intVal
-    let right = evaluateExpression(evaluator, b.right).intVal
+    let left = evaluateExpression(evaluator, b.left)
+    let right = evaluateExpression(evaluator, b.right)
     case b.operatorKind
     of BoundBinaryOperatorKind.Addition:
-      return moInteger(left + right)
+      return moInteger(left.intVal + right.intVal)
     of BoundBinaryOperatorKind.Subtraction:
-      return moInteger(left - right)
+      return moInteger(left.intVal - right.intVal)
     of BoundBinaryOperatorKind.Multiplication:
-      return moInteger(left * right)
+      return moInteger(left.intVal * right.intVal)
     of BoundBinaryOperatorKind.Division:
-      return moInteger(left div right)
+      return moInteger(left.intVal div right.intVal)
+    of BoundBinaryOperatorKind.LogicalAnd:
+      return moBoolean(left.boolVal and right.boolVal)
+    of BoundBinaryOperatorKind.LogicalOr:
+      return moBoolean(left.boolVal or right.boolVal)
   of BoundNodeKind.UnaryExpression:
     let u = root.BoundUnaryExpression
-    let operand = evaluateExpression(evaluator, u.operand).intVal
+    let operand = evaluateExpression(evaluator, u.operand)
     case u.operatorKind
     of BoundUnaryOperatorKind.Identity:
-      return moInteger(operand)
+      return moInteger(operand.intVal)
     of BoundUnaryOperatorKind.Negation:
-      return moInteger(-operand)
+      return moInteger(-operand.intVal)
+    of BoundUnaryOperatorKind.LogicalNegation:
+      return moBoolean(not operand.boolVal)
 
 proc evaluate*(evaluator: Evaluator): MinskObject =
   evaluator.evaluateExpression(evaluator.root)

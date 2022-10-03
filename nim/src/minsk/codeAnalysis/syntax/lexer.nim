@@ -18,10 +18,14 @@ func newLexer*(text: string): Lexer =
   result.position = 0
   result.mDiagnostics = @[]
 
-func current(lexer: Lexer): char =
-  if lexer.position >= lexer.text.len:
+func peek(lexer: Lexer, offset: int): char =
+  let index = lexer.position + offset
+  if index >= lexer.text.len:
     return '\0'
-  return lexer.text[lexer.position]
+  lexer.text[index]
+
+func current(lexer: Lexer): char =
+  lexer.peek(0)
 
 func nextToken*(lexer: var Lexer): SyntaxToken =
   if lexer.position >= lexer.text.len:
@@ -74,6 +78,17 @@ func nextToken*(lexer: var Lexer): SyntaxToken =
     of ')':
       lexer.position += 1
       kind = SyntaxKind.CloseParenthesisToken
+    of '!':
+      lexer.position += 1
+      kind = SyntaxKind.BangToken
+    of '&':
+      if lexer.peek(1) == '&':
+        lexer.position += 2
+        kind = SyntaxKind.AmpersandAmpersandToken
+    of '|':
+      if lexer.peek(1) == '|':
+        lexer.position += 2
+        kind = SyntaxKind.PipePipeToken
     else:
       discard
 

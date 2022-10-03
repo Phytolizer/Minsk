@@ -33,29 +33,41 @@ proc newBinder*(): Binder =
 proc diagnostics*(self: Binder): seq[string] =
   self.mDiagnostics
 
-proc bindExpression*(binder: var Binder, syntax: ExpressionSyntax): BoundExpression
+proc bindExpression*(
+  binder: var Binder,
+  syntax: ExpressionSyntax
+): BoundExpression
 
 proc bindBinaryOperatorKind(
   kind: SyntaxKind,
   leftType: MinskObjectKind,
   rightType: MinskObjectKind
 ): Option[BoundBinaryOperatorKind] =
-  if leftType != mokInteger or rightType != mokInteger:
-    return none[BoundBinaryOperatorKind]()
+  if leftType == mokInteger and rightType == mokInteger:
+    case kind
+    of SyntaxKind.PlusToken:
+      return BoundBinaryOperatorKind.Addition.some
+    of SyntaxKind.MinusToken:
+      return BoundBinaryOperatorKind.Subtraction.some
+    of SyntaxKind.StarToken:
+      return BoundBinaryOperatorKind.Multiplication.some
+    of SyntaxKind.SlashToken:
+      return BoundBinaryOperatorKind.Division.some
+    else:
+      discard
+  elif leftType == mokBoolean and rightType == mokBoolean:
+    case kind
+    of SyntaxKind.AmpersandAmpersandToken:
+      return BoundBinaryOperatorKind.LogicalAnd.some
+    of SyntaxKind.PipePipeToken:
+      return BoundBinaryOperatorKind.LogicalOr.some
+    else:
+      discard
 
-  case kind
-  of SyntaxKind.PlusToken:
-    BoundBinaryOperatorKind.Addition.some
-  of SyntaxKind.MinusToken:
-    BoundBinaryOperatorKind.Subtraction.some
-  of SyntaxKind.StarToken:
-    BoundBinaryOperatorKind.Multiplication.some
-  of SyntaxKind.SlashToken:
-    BoundBinaryOperatorKind.Division.some
-  else:
-    raiseAssert fmt"Unexpected binary operator {kind}"
+  none[BoundBinaryOperatorKind]()
 
-proc bindBinaryExpression(binder: var Binder, syntax: BinaryExpressionSyntax): BoundExpression =
+proc bindBinaryExpression(binder: var Binder,
+    syntax: BinaryExpressionSyntax): BoundExpression =
   let boundLeft = binder.bindExpression(syntax.left)
   let boundRight = binder.bindExpression(syntax.right)
   let boundOperatorKind = bindBinaryOperatorKind(
@@ -73,28 +85,40 @@ proc bindBinaryExpression(binder: var Binder, syntax: BinaryExpressionSyntax): B
 
   return newBoundBinaryExpression(boundLeft, boundOperatorKind.get, boundRight)
 
-proc bindLiteralExpression(binder: var Binder, syntax: LiteralExpressionSyntax): BoundExpression =
+proc bindLiteralExpression(binder: var Binder,
+    syntax: LiteralExpressionSyntax): BoundExpression =
   newBoundLiteralExpression(syntax.value)
 
-proc bindParenthesizedExpression(binder: var Binder, syntax: ParenthesizedExpressionSyntax): BoundExpression =
+proc bindParenthesizedExpression(binder: var Binder,
+    syntax: ParenthesizedExpressionSyntax): BoundExpression =
   binder.bindExpression(syntax.expression)
 
 proc bindUnaryOperatorKind(
   kind: SyntaxKind,
   operandType: MinskObjectKind
 ): Option[BoundUnaryOperatorKind] =
-  if operandType != mokInteger:
-    return none[BoundUnaryOperatorKind]()
-
-  case kind
-  of SyntaxKind.PlusToken:
-    BoundUnaryOperatorKind.Identity.some
-  of SyntaxKind.MinusToken:
-    BoundUnaryOperatorKind.Negation.some
+  case operandType
+  of mokInteger:
+    case kind
+    of SyntaxKind.PlusToken:
+      return BoundUnaryOperatorKind.Identity.some
+    of SyntaxKind.MinusToken:
+      return BoundUnaryOperatorKind.Negation.some
+    else:
+      discard
+  of mokBoolean:
+    case kind
+    of SyntaxKind.BangToken:
+      return BoundUnaryOperatorKind.LogicalNegation.some
+    else:
+      discard
   else:
-    raiseAssert fmt"Unexpected unary operator {kind}"
+    discard
 
-proc bindUnaryExpression(binder: var Binder, syntax: UnaryExpressionSyntax): BoundExpression =
+  none[BoundUnaryOperatorKind]()
+
+proc bindUnaryExpression(binder: var Binder,
+    syntax: UnaryExpressionSyntax): BoundExpression =
   let boundOperand = binder.bindExpression(syntax.operand)
   let boundOperatorKind = bindUnaryOperatorKind(
     syntax.operatorToken.kind,
@@ -109,7 +133,8 @@ proc bindUnaryExpression(binder: var Binder, syntax: UnaryExpressionSyntax): Bou
 
   return newBoundUnaryExpression(boundOperatorKind.get, boundOperand)
 
-proc bindExpression*(binder: var Binder, syntax: ExpressionSyntax): BoundExpression =
+proc bindExpression*(binder: var Binder,
+    syntax: ExpressionSyntax): BoundExpression =
   case syntax.kind
   of SyntaxKind.BinaryExpression:
     binder.bindBinaryExpression(syntax.BinaryExpressionSyntax)
