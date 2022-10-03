@@ -5,9 +5,9 @@ import ../syntaxToken
 
 type
   BinaryExpressionSyntax* = ref object of ExpressionSyntax
-    left: ExpressionSyntax
-    operatorToken: SyntaxToken
-    right: ExpressionSyntax
+    left*: ExpressionSyntax
+    operatorToken*: SyntaxToken
+    right*: ExpressionSyntax
 
 proc newBinaryExpressionSyntax*(
   left: ExpressionSyntax,

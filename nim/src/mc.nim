@@ -1,8 +1,9 @@
 import colorize/colorize
 
-import minsk/parser
+import minsk/evaluator
 import minsk/macros
 import minsk/minskObject
+import minsk/parser
 import minsk/syntaxNode
 import minsk/syntaxToken
 
@@ -35,10 +36,15 @@ when isMainModule:
     stdout.setColor(styleDim, fgWhite)
     prettyPrint(syntaxTree.root)
     stdout.resetColor()
-    stdout.flushFile()
     if parser.diagnostics.len > 0:
       stdout.setColor(fgRed)
       for diagnostic in parser.diagnostics:
         echo diagnostic
       stdout.resetColor()
-      stdout.flushFile()
+    else:
+      let evaluator = newEvaluator(syntaxTree.root)
+      let result = evaluator.evaluate()
+      stdout.setColor(fgGreen)
+      echo result
+      stdout.resetColor()
+    stdout.flushFile()

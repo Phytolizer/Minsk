@@ -40,8 +40,7 @@ func nextToken*(lexer: var Lexer): SyntaxToken =
     try:
       value = moInteger(text.parseInt())
     except ValueError:
-      # TODO: handle error
-      discard
+      lexer.mDiagnostics.add(fmt"The number {text} isn't a valid int.")
     kind = SyntaxKind.NumberToken
   elif lexer.current.isSpaceAscii:
     while lexer.current.isSpaceAscii:
