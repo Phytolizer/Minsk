@@ -4,6 +4,7 @@ import expressionSyntax
 import expressions/binaryExpressionSyntax
 import expressions/literalExpressionSyntax
 import expressions/parenthesizedExpressionSyntax
+import expressions/unaryExpressionSyntax
 import syntaxKind
 import syntaxNode
 
@@ -37,6 +38,16 @@ proc evaluateExpression(evaluator: Evaluator, root: ExpressionSyntax): int =
   of SyntaxKind.ParenthesizedExpression:
     let p = root.ParenthesizedExpressionSyntax
     return evaluateExpression(evaluator, p.expression)
+  of SyntaxKind.UnaryExpression:
+    let u = root.UnaryExpressionSyntax
+    let operand = evaluateExpression(evaluator, u.operand)
+    case u.operatorToken.kind
+    of SyntaxKind.PlusToken:
+      return operand
+    of SyntaxKind.MinusToken:
+      return -operand
+    else:
+      raiseAssert fmt"Unexpected unary operator {u.operatorToken.kind}"
   else:
     raiseAssert fmt"Unexpected node {root.kind}"
 

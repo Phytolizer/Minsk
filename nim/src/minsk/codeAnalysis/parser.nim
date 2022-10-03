@@ -3,6 +3,7 @@ import std/strformat
 import expressions/binaryExpressionSyntax
 import expressions/literalExpressionSyntax
 import expressions/parenthesizedExpressionSyntax
+import expressions/unaryExpressionSyntax
 import expressionSyntax
 import lexer
 import macros
@@ -67,7 +68,14 @@ proc parsePrimaryExpression(parser: var Parser): ExpressionSyntax =
     return newLiteralExpressionSyntax(numberToken)
 
 proc parseBinaryExpression(parser: var Parser, parentPrecedence: int = 0): ExpressionSyntax =
-  result = parser.parsePrimaryExpression()
+  let unaryOperatorPrecedence = parser.current.kind.unaryOperatorPrecedence
+  if unaryOperatorPrecedence != 0 and unaryOperatorPrecedence >= parentPrecedence:
+    let operatorToken = parser.nextToken()
+    let operand = parser.parseBinaryExpression(unaryOperatorPrecedence)
+    result = newUnaryExpressionSyntax(operatorToken, operand)
+  else:
+    result = parser.parsePrimaryExpression()
+
   loop:
     let precedence = parser.current.kind.binaryOperatorPrecedence
     if precedence == 0 or precedence <= parentPrecedence:

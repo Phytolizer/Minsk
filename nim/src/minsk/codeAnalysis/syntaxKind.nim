@@ -16,3 +16,4 @@ type
     LiteralExpression
     BinaryExpression
     ParenthesizedExpression
+    UnaryExpression

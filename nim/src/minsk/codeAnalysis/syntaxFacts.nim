@@ -8,3 +8,10 @@ proc binaryOperatorPrecedence*(kind: SyntaxKind): int =
     1
   else:
     0
+
+proc unaryOperatorPrecedence*(kind: SyntaxKind): int =
+  case kind
+  of SyntaxKind.PlusToken, SyntaxKind.MinusToken:
+    3
+  else:
+    0
