@@ -31,15 +31,15 @@ when isMainModule:
       echo ""
       break
 
-    var parser = newParser(line)
-    let syntaxTree = parser.parse()
+    let syntaxTree = parse(line)
     stdout.setColor(styleDim, fgWhite)
     prettyPrint(syntaxTree.root)
     stdout.resetColor()
     stdout.flushFile()
-    if parser.diagnostics.len > 0:
+    let diagnostics = syntaxTree.diagnostics
+    if diagnostics.len > 0:
       stdout.setColor(fgRed)
-      for diagnostic in parser.diagnostics:
+      for diagnostic in diagnostics:
         echo diagnostic
       stdout.resetColor()
     else:

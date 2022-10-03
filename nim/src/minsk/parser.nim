@@ -9,7 +9,6 @@ import macros
 import minskObject
 import syntaxKind
 import syntaxToken
-import syntaxTree
 
 type
   Parser* = object
@@ -84,7 +83,26 @@ proc parseTerm(parser: var Parser): ExpressionSyntax =
 proc parseExpression(parser: var Parser): ExpressionSyntax =
   parser.parseTerm()
 
+type
+  SyntaxTree* = object
+    diagnostics*: seq[string]
+    root*: ExpressionSyntax
+    endOfFileToken*: SyntaxToken
+
+proc newSyntaxTree*(
+  diagnostics: seq[string],
+  root: ExpressionSyntax,
+  endOfFileToken: SyntaxToken
+): SyntaxTree =
+  result.diagnostics = diagnostics
+  result.root = root
+  result.endOfFileToken = endOfFileToken
+
 proc parse*(parser: var Parser): SyntaxTree =
   let expression = parser.parseExpression()
   let endOfFileToken = parser.matchToken(SyntaxKind.EndOfFileToken)
   return newSyntaxTree(parser.diagnostics, expression, endOfFileToken)
+
+proc parse*(text: string): SyntaxTree =
+  var parser = newParser(text)
+  return parser.parse()
