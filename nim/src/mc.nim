@@ -4,10 +4,10 @@ import noise/styler
 import ansi/ansi
 import ansi/colorize
 
-import minsk/codeAnalysis/evaluator
+import minsk/codeAnalysis/compilation
+import minsk/codeAnalysis/evaluationResult
 import minsk/macros
 import minsk/minskObject
-import minsk/codeAnalysis/binding/binder
 import minsk/codeAnalysis/syntax/[
   parser,
   syntaxNode,
@@ -57,19 +57,16 @@ proc main() =
       prettyPrint(syntaxTree.root)
       stdout.resetColor()
       stdout.flushFile()
-    var binder = newBinder()
-    let boundRoot = binder.bindExpression(syntaxTree.root)
-    let diagnostics = syntaxTree.diagnostics & binder.diagnostics
-    if diagnostics.len > 0:
-      stdout.setColor(colorize.fgRed)
-      for diagnostic in diagnostics:
-        echo diagnostic
+    var compilation = newCompilation(syntaxTree)
+    let evaluationResult = compilation.evaluate()
+    if evaluationResult.success:
+      stdout.setColor(colorize.fgGreen)
+      echo evaluationResult.value
       stdout.resetColor()
     else:
-      let evaluator = newEvaluator(boundRoot)
-      let result = evaluator.evaluate()
-      stdout.setColor(colorize.fgGreen)
-      echo result
+      stdout.setColor(colorize.fgRed)
+      for diagnostic in evaluationResult.diagnostics:
+        echo diagnostic
       stdout.resetColor()
     stdout.flushFile()
 
