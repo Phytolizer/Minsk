@@ -12,6 +12,8 @@ type
     Division
     LogicalAnd
     LogicalOr
+    Equality
+    Inequality
 
   BoundBinaryOperator* = object
     syntaxKind: SyntaxKind
@@ -60,6 +62,34 @@ const
     BoundBinaryOperator(
       syntaxKind: SyntaxKind.PipePipeToken,
       kind: BoundBinaryOperatorKind.LogicalOr,
+      leftType: mokBoolean,
+      rightType: mokBoolean,
+      resultType: mokBoolean,
+    ),
+    BoundBinaryOperator(
+      syntaxKind: SyntaxKind.EqualsEqualsToken,
+      kind: BoundBinaryOperatorKind.Equality,
+      leftType: mokInteger,
+      rightType: mokInteger,
+      resultType: mokBoolean,
+    ),
+    BoundBinaryOperator(
+      syntaxKind: SyntaxKind.BangEqualsToken,
+      kind: BoundBinaryOperatorKind.Inequality,
+      leftType: mokInteger,
+      rightType: mokInteger,
+      resultType: mokBoolean,
+    ),
+    BoundBinaryOperator(
+      syntaxKind: SyntaxKind.EqualsEqualsToken,
+      kind: BoundBinaryOperatorKind.Equality,
+      leftType: mokBoolean,
+      rightType: mokBoolean,
+      resultType: mokBoolean,
+    ),
+    BoundBinaryOperator(
+      syntaxKind: SyntaxKind.BangEqualsToken,
+      kind: BoundBinaryOperatorKind.Inequality,
       leftType: mokBoolean,
       rightType: mokBoolean,
       resultType: mokBoolean,

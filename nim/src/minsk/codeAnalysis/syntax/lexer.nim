@@ -79,8 +79,16 @@ proc nextToken*(lexer: var Lexer): SyntaxToken =
       lexer.position += 1
       kind = SyntaxKind.CloseParenthesisToken
     of '!':
-      lexer.position += 1
-      kind = SyntaxKind.BangToken
+      if lexer.peek(1) == '=':
+        lexer.position += 2
+        kind = SyntaxKind.BangEqualsToken
+      else:
+        lexer.position += 1
+        kind = SyntaxKind.BangToken
+    of '=':
+      if lexer.peek(1) == '=':
+        lexer.position += 2
+        kind = SyntaxKind.EqualsEqualsToken
     of '&':
       if lexer.peek(1) == '&':
         lexer.position += 2

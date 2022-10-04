@@ -38,3 +38,9 @@ proc `$`*(obj: MinskObject): string =
   of mokNull: "null"
   of mokInteger: $obj.intVal
   of mokBoolean: $obj.boolVal
+
+proc `==`*(a, b: MinskObject): bool =
+  case a.kind
+  of mokNull: b.kind == mokNull
+  of mokInteger: b.kind == mokInteger and a.intVal == b.intVal
+  of mokBoolean: b.kind == mokBoolean and a.boolVal == b.boolVal

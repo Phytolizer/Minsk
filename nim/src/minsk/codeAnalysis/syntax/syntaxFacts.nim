@@ -3,8 +3,10 @@ import syntaxKind
 proc binaryOperatorPrecedence*(kind: SyntaxKind): int =
   case kind
   of SyntaxKind.StarToken, SyntaxKind.SlashToken:
-    4
+    5
   of SyntaxKind.PlusToken, SyntaxKind.MinusToken:
+    4
+  of SyntaxKind.EqualsEqualsToken, SyntaxKind.BangEqualsToken:
     3
   of SyntaxKind.AmpersandAmpersandToken:
     2
@@ -18,7 +20,7 @@ proc unaryOperatorPrecedence*(kind: SyntaxKind): int =
   of SyntaxKind.PlusToken,
       SyntaxKind.MinusToken,
       SyntaxKind.BangToken:
-    5
+    6
   else:
     0
 

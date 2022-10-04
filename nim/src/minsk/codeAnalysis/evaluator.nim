@@ -42,6 +42,10 @@ proc evaluateExpression(evaluator: Evaluator, root: BoundExpression): MinskObjec
       return moBoolean(left.boolVal and right.boolVal)
     of BoundBinaryOperatorKind.LogicalOr:
       return moBoolean(left.boolVal or right.boolVal)
+    of BoundBinaryOperatorKind.Equality:
+      return moBoolean(left == right)
+    of BoundBinaryOperatorKind.Inequality:
+      return moBoolean(left != right)
   of BoundNodeKind.UnaryExpression:
     let u = root.BoundUnaryExpression
     let operand = evaluateExpression(evaluator, u.operand)
