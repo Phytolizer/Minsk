@@ -7,3 +7,4 @@ srcDir = "src"
 installExt = @["nim"]
 
 requires "nim >= 1.6.4"
+requires "noise >= 0.1.6"

@@ -1,3 +1,6 @@
+import noise
+import noise/styler
+
 import ansi/ansi
 import ansi/colorize
 
@@ -26,15 +29,18 @@ proc prettyPrint(
   for i, child in node.children.pairs:
     prettyPrint(child, indent, i == node.children.high)
 
-when isMainModule:
+proc main() =
   var showTree = false
+  var n = Noise.init()
+  discard n.historyLoad("minsk.history")
+  defer:
+    discard n.historySave("minsk.history")
   loop:
-    stdout.write "> "
-    stdout.flushFile()
-    var line = ""
-    if not stdin.readLine(line):
-      echo ""
+    n.setPrompt("> ")
+    if not n.readLine():
       break
+    let line = n.getLine()
+    n.historyAdd(line)
 
     if line == "#showTree":
       showTree = not showTree
@@ -47,7 +53,7 @@ when isMainModule:
 
     let syntaxTree = parse(line)
     if showTree:
-      stdout.setColor(styleDim, fgWhite)
+      stdout.setColor(colorize.styleDim, colorize.fgWhite)
       prettyPrint(syntaxTree.root)
       stdout.resetColor()
       stdout.flushFile()
@@ -55,14 +61,17 @@ when isMainModule:
     let boundRoot = binder.bindExpression(syntaxTree.root)
     let diagnostics = syntaxTree.diagnostics & binder.diagnostics
     if diagnostics.len > 0:
-      stdout.setColor(fgRed)
+      stdout.setColor(colorize.fgRed)
       for diagnostic in diagnostics:
         echo diagnostic
       stdout.resetColor()
     else:
       let evaluator = newEvaluator(boundRoot)
       let result = evaluator.evaluate()
-      stdout.setColor(fgGreen)
+      stdout.setColor(colorize.fgGreen)
       echo result
       stdout.resetColor()
     stdout.flushFile()
+
+when isMainModule:
+  main()
