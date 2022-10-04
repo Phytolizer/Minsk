@@ -18,7 +18,7 @@ abstract class SyntaxNode {
         }
 
     fun prettyPrint() {
-        prettyPrint(this, System.out, "", true)
+        writeTo(System.out)
     }
 
     fun writeTo(writer: PrintStream) {

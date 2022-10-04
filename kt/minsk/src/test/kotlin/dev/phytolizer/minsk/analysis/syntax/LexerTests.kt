@@ -6,6 +6,7 @@ import io.kotest.datatest.withData
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 
+@Suppress("unused")
 class LexerTests : FunSpec({
     test("tests all tokens") {
         val testedTokens = SyntaxKind.values().filter {

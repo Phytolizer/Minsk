@@ -4,6 +4,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.shouldBe
 
+@Suppress("unused")
 class SyntaxFactsTests : FunSpec({
     context("getText() round trips") {
         withData(SyntaxKind.values().filter { SyntaxFacts.getText(it) != null }) {

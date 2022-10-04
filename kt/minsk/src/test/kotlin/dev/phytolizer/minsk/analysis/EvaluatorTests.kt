@@ -8,6 +8,7 @@ import io.kotest.data.row
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 
+@Suppress("unused")
 class EvaluatorTests : FunSpec({
     test("evaluates correct value") {
         forAll<String, Any>(

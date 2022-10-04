@@ -5,6 +5,7 @@ import io.kotest.data.forAll
 import io.kotest.data.row
 import io.kotest.matchers.shouldBe
 
+@Suppress("unused")
 class SourceTextTests : FunSpec({
     test("SourceText includes last line") {
         forAll(

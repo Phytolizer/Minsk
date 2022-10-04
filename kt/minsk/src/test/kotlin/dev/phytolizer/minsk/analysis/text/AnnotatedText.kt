@@ -8,7 +8,7 @@ class AnnotatedText private constructor(val text: String, val spans: List<TextSp
             val spanBuilder = mutableListOf<TextSpan>()
             val startStack = mutableListOf<Int>()
             var position = 0
-            for (c in text) {
+            for (c in unindentedText) {
                 when (c) {
                     '[' -> {
                         startStack.add(position)

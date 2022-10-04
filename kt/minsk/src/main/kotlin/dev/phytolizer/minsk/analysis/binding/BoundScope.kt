@@ -3,19 +3,19 @@ package dev.phytolizer.minsk.analysis.binding
 import dev.phytolizer.minsk.analysis.VariableSymbol
 
 internal class BoundScope(val parent: BoundScope?) {
-    val _variables = mutableMapOf<String, VariableSymbol>()
+    private val variables = mutableMapOf<String, VariableSymbol>()
 
     fun tryDeclare(variable: VariableSymbol): Boolean {
-        return if (_variables.containsKey(variable.name)) {
+        return if (variables.containsKey(variable.name)) {
             false
         } else {
-            _variables[variable.name] = variable
+            variables[variable.name] = variable
             true
         }
     }
 
     fun tryLookup(name: String): VariableSymbol? {
-        val variable = _variables[name]
+        val variable = variables[name]
         if (variable != null) {
             return variable
         }
@@ -27,5 +27,5 @@ internal class BoundScope(val parent: BoundScope?) {
         return parent.tryLookup(name)
     }
 
-    fun declaredVariables() = _variables.values.toList()
+    fun declaredVariables() = variables.values.toList()
 }

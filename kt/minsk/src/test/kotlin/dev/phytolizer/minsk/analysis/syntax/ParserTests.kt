@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.datatest.withData
 import io.kotest.matchers.types.shouldBeTypeOf
 
+@Suppress("unused")
 class ParserTests : FunSpec({
     context("binary expression honors precedence") {
         withData(nameFn = { "${it[0]} x ${it[1]}" }, binaryOperatorPairs()) {

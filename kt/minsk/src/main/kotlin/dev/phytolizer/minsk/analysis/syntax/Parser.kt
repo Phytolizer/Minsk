@@ -3,7 +3,7 @@ package dev.phytolizer.minsk.analysis.syntax
 import dev.phytolizer.minsk.analysis.DiagnosticBag
 import dev.phytolizer.minsk.analysis.text.SourceText
 
-internal class Parser(private val _text: SourceText) {
+internal class Parser(_text: SourceText) {
     private val _tokens: List<SyntaxToken>
     private var _position = 0
     private val _diagnostics = DiagnosticBag()
