@@ -13,21 +13,21 @@ type
     position: int
     mDiagnostics: seq[string]
 
-func newLexer*(text: string): Lexer =
+proc newLexer*(text: string): Lexer =
   result.text = text
   result.position = 0
   result.mDiagnostics = @[]
 
-func peek(lexer: Lexer, offset: int): char =
+proc peek(lexer: Lexer, offset: int): char =
   let index = lexer.position + offset
   if index >= lexer.text.len:
     return '\0'
   lexer.text[index]
 
-func current(lexer: Lexer): char =
+proc current(lexer: Lexer): char =
   lexer.peek(0)
 
-func nextToken*(lexer: var Lexer): SyntaxToken =
+proc nextToken*(lexer: var Lexer): SyntaxToken =
   if lexer.position >= lexer.text.len:
     return newToken(
       SyntaxKind.EndOfFileToken,
@@ -101,5 +101,5 @@ func nextToken*(lexer: var Lexer): SyntaxToken =
 
   return newToken(kind, start, text, value)
 
-func diagnostics*(lexer: Lexer): seq[string] =
+proc diagnostics*(lexer: Lexer): seq[string] =
   lexer.mDiagnostics

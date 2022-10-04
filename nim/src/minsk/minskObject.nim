@@ -12,28 +12,28 @@ type
     else:
       discard
 
-func moNull*: MinskObject =
+proc moNull*: MinskObject =
   MinskObject(kind: mokNull)
 
-func moInteger*(intVal: int): MinskObject =
+proc moInteger*(intVal: int): MinskObject =
   MinskObject(
     kind: mokInteger,
     intVal: intVal,
   )
 
-func moBoolean*(boolVal: bool): MinskObject =
+proc moBoolean*(boolVal: bool): MinskObject =
   MinskObject(
     kind: mokBoolean,
     boolVal: boolVal,
   )
 
-func `$`*(kind: MinskObjectKind): string =
+proc `$`*(kind: MinskObjectKind): string =
   case kind
   of mokNull: "null"
   of mokInteger: "integer"
   of mokBoolean: "boolean"
 
-func `$`*(obj: MinskObject): string =
+proc `$`*(obj: MinskObject): string =
   case obj.kind
   of mokNull: "null"
   of mokInteger: $obj.intVal
