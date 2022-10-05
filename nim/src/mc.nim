@@ -7,6 +7,7 @@ import ansi/colorize
 import minsk/codeAnalysis/compilation
 import minsk/codeAnalysis/diagnostic
 import minsk/codeAnalysis/evaluationResult
+import minsk/codeAnalysis/textSpan
 import minsk/macros
 import minsk/minskObject
 import minsk/codeAnalysis/syntax/[
@@ -65,10 +66,20 @@ proc main() =
       echo evaluationResult.value
       stdout.resetColor()
     else:
-      stdout.setColor(colorize.fgRed)
       for diagnostic in evaluationResult.diagnostics:
+        stdout.setColor(colorize.fgRed)
         echo diagnostic
-      stdout.resetColor()
+        stdout.resetColor()
+
+        let prefix = line[0..<diagnostic.span.start]
+        let error = line[diagnostic.span.start..<diagnostic.span.stop]
+        let suffix = line[diagnostic.span.stop..<line.len]
+
+        stdout.write "    " & prefix
+        stdout.setColor(colorize.fgRed)
+        stdout.write error
+        stdout.resetColor()
+        stdout.writeLine suffix
     stdout.flushFile()
 
 when isMainModule:

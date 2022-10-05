@@ -10,5 +10,5 @@ proc newTextSpan*(start, length: int): TextSpan =
 proc fromBounds*(start, stop: int): TextSpan =
   newTextSpan(start, stop - start)
 
-proc getEnd*(span: TextSpan): int =
+proc stop*(span: TextSpan): int =
   span.start + span.length

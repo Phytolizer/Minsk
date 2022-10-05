@@ -15,8 +15,11 @@ proc newCompilation*(syntax: SyntaxTree): Compilation =
 
 proc evaluate*(node: Compilation): EvaluationResult =
   var binder = newBinder()
+  var diagnostics = node.syntax.diagnostics
+  if diagnostics.len > 0:
+    return evaluationResultError(diagnostics)
   let boundExpression = binder.bindExpression(node.syntax.root)
-  let diagnostics = node.syntax.diagnostics & binder.diagnostics
+  diagnostics = binder.diagnostics
   if diagnostics.len > 0:
     return evaluationResultError(diagnostics)
 
