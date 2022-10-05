@@ -1,5 +1,7 @@
-import std/strformat
+import std/sequtils
 
+import minsk/codeAnalysis/diagnostic
+import minsk/codeAnalysis/diagnosticBag
 import minsk/macros
 import minsk/minskObject
 
@@ -19,7 +21,7 @@ type
   Parser* = object
     tokens: seq[SyntaxToken]
     position: int
-    mDiagnostics: seq[string]
+    mDiagnostics: DiagnosticBag
 
 proc newParser*(text: string): Parser =
   var lexer = newLexer(text)
@@ -31,10 +33,11 @@ proc newParser*(text: string): Parser =
     if token.kind == SyntaxKind.EndOfFileToken:
       break
   result.position = 0
-  result.mDiagnostics = lexer.diagnostics
+  result.mDiagnostics = newDiagnosticBag()
+  result.mDiagnostics.add(lexer.diagnostics)
 
-proc diagnostics*(parser: Parser): seq[string] =
-  parser.mDiagnostics
+proc diagnostics*(parser: Parser): seq[Diagnostic] =
+  parser.mDiagnostics.diagnostics.toSeq
 
 proc peek(parser: Parser, offset: int): SyntaxToken =
   let index = parser.position + offset
@@ -54,7 +57,7 @@ proc matchToken(parser: var Parser, kind: SyntaxKind): SyntaxToken =
   if result.kind == kind:
     parser.position += 1
   else:
-    parser.mDiagnostics.add(fmt"ERROR: Unexpected token <{result.kind}>, expected <{kind}>")
+    parser.mDiagnostics.reportUnexpectedToken(result.span, result.kind, kind)
     result = newToken(kind, result.position, "", moNull())
 
 proc parseExpression(parser: var Parser): ExpressionSyntax
@@ -109,12 +112,12 @@ proc parseExpression(parser: var Parser): ExpressionSyntax =
 
 type
   SyntaxTree* = object
-    diagnostics*: seq[string]
+    diagnostics*: seq[Diagnostic]
     root*: ExpressionSyntax
     endOfFileToken*: SyntaxToken
 
 proc newSyntaxTree*(
-  diagnostics: seq[string],
+  diagnostics: seq[Diagnostic],
   root: ExpressionSyntax,
   endOfFileToken: SyntaxToken
 ): SyntaxTree =

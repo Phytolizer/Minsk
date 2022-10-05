@@ -1,3 +1,4 @@
+import minsk/codeAnalysis/textSpan
 import minsk/minskObject
 
 import syntaxKind
@@ -21,6 +22,9 @@ proc newToken*(
   result.position = position
   result.text = text
   result.value = value
+
+proc span*(self: SyntaxToken): TextSpan =
+  newTextSpan(self.position, self.text.len)
 
 method kind*(self: SyntaxToken): SyntaxKind =
   self.mKind

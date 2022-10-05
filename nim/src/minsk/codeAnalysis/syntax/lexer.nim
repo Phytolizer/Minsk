@@ -1,6 +1,9 @@
-import std/strformat
+import std/sequtils
 import std/strutils
 
+import minsk/codeAnalysis/diagnostic
+import minsk/codeAnalysis/diagnosticBag
+import minsk/codeAnalysis/textSpan
 import minsk/minskObject
 
 import syntaxFacts
@@ -11,12 +14,12 @@ type
   Lexer* = object
     text: string
     position: int
-    mDiagnostics: seq[string]
+    mDiagnostics: DiagnosticBag
 
 proc newLexer*(text: string): Lexer =
   result.text = text
   result.position = 0
-  result.mDiagnostics = @[]
+  result.mDiagnostics = newDiagnosticBag()
 
 proc peek(lexer: Lexer, offset: int): char =
   let index = lexer.position + offset
@@ -46,7 +49,11 @@ proc nextToken*(lexer: var Lexer): SyntaxToken =
     try:
       value = moInteger(text.parseInt())
     except ValueError:
-      lexer.mDiagnostics.add(fmt"The number {text} isn't a valid int.")
+      lexer.mDiagnostics.reportInvalidInteger(
+        textSpan.fromBounds(start, lexer.position),
+        text,
+        mokInteger
+      )
     kind = SyntaxKind.NumberToken
   elif lexer.current.isSpaceAscii:
     while lexer.current.isSpaceAscii:
@@ -101,7 +108,7 @@ proc nextToken*(lexer: var Lexer): SyntaxToken =
       discard
 
   if kind == SyntaxKind.BadToken:
-    lexer.mDiagnostics.add(fmt"ERROR: Bad character input: '{lexer.current}'")
+    lexer.mDiagnostics.reportBadCharacter(start, lexer.current)
     lexer.position += 1
 
   if text.len == 0:
@@ -109,5 +116,5 @@ proc nextToken*(lexer: var Lexer): SyntaxToken =
 
   return newToken(kind, start, text, value)
 
-proc diagnostics*(lexer: Lexer): seq[string] =
-  lexer.mDiagnostics
+proc diagnostics*(lexer: Lexer): seq[Diagnostic] =
+  lexer.mDiagnostics.diagnostics.toSeq

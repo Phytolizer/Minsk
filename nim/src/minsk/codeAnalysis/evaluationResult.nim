@@ -1,3 +1,4 @@
+import minsk/codeAnalysis/diagnostic
 import minsk/minskObject
 
 type
@@ -6,7 +7,7 @@ type
     of true:
       value*: MinskObject
     of false:
-      diagnostics*: seq[string]
+      diagnostics*: seq[Diagnostic]
 
 proc evaluationResultOk*(value: MinskObject): EvaluationResult =
   EvaluationResult(
@@ -14,7 +15,7 @@ proc evaluationResultOk*(value: MinskObject): EvaluationResult =
     value: value,
   )
 
-proc evaluationResultError*(diagnostics: seq[string]): EvaluationResult =
+proc evaluationResultError*(diagnostics: seq[Diagnostic]): EvaluationResult =
   EvaluationResult(
     success: false,
     diagnostics: diagnostics,

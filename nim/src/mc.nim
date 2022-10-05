@@ -5,6 +5,7 @@ import ansi/ansi
 import ansi/colorize
 
 import minsk/codeAnalysis/compilation
+import minsk/codeAnalysis/diagnostic
 import minsk/codeAnalysis/evaluationResult
 import minsk/macros
 import minsk/minskObject

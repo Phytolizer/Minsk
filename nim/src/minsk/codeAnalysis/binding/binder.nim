@@ -1,7 +1,9 @@
+import std/sequtils
 import std/strformat
 import std/options
 
-import minsk/minskObject
+import minsk/codeAnalysis/diagnostic
+import minsk/codeAnalysis/diagnosticBag
 import minsk/codeAnalysis/syntax/[
   expressionSyntax,
   syntaxKind,
@@ -25,13 +27,13 @@ import expressions/[
 
 type
   Binder* = object
-    mDiagnostics: seq[string]
+    mDiagnostics: DiagnosticBag
 
 proc newBinder*(): Binder =
-  result.mDiagnostics = @[]
+  result.mDiagnostics = newDiagnosticBag()
 
-proc diagnostics*(self: Binder): seq[string] =
-  self.mDiagnostics
+proc diagnostics*(self: Binder): seq[Diagnostic] =
+  self.mDiagnostics.diagnostics.toSeq
 
 proc bindExpression*(
   binder: var Binder,
@@ -48,10 +50,11 @@ proc bindBinaryExpression(binder: var Binder,
     boundRight.objectKind
   )
   if boundOperator.isNone:
-    binder.mDiagnostics.add(
-      fmt"Operator '{syntax.operatorToken.text}' is " &
-      fmt"not defined for types '{boundLeft.objectKind}' " &
-      fmt"and '{boundRight.objectKind}'"
+    binder.mDiagnostics.reportUndefinedBinaryOperator(
+      syntax.operatorToken.span,
+      syntax.operatorToken.text,
+      boundLeft.objectKind,
+      boundRight.objectKind
     )
     return boundLeft
 
@@ -73,9 +76,10 @@ proc bindUnaryExpression(binder: var Binder,
     boundOperand.objectKind
   )
   if boundOperator.isNone:
-    binder.mDiagnostics.add(
-      fmt"Operator '{syntax.operatorToken.text}' is " &
-      fmt"not defined for type '{boundOperand.objectKind}'"
+    binder.mDiagnostics.reportUndefinedUnaryOperator(
+      syntax.operatorToken.span,
+      syntax.operatorToken.text,
+      boundOperand.objectKind
     )
     return boundOperand
 
