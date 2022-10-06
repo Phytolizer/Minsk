@@ -1,6 +1,4 @@
-import std/tables
-
-import minsk/minskObject
+import variableMap
 
 import binding/binder
 import evaluationResult
@@ -19,7 +17,7 @@ proc newCompilation*(syntax: SyntaxTree): Compilation =
 
 proc evaluate*(
   node: Compilation,
-  variables: TableRef[string, MinskObject]
+  variables: VariableMap
 ): EvaluationResult =
   var binder = newBinder(variables)
   var diagnostics = node.syntax.diagnostics

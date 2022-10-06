@@ -3,22 +3,18 @@ import minsk/codeAnalysis/binding/[
   boundExpression,
   boundNodeKind,
 ]
+import minsk/codeAnalysis/variableSymbol
 
 type
   BoundVariableExpression* = ref object of BoundExpression
-    name*: string
-    mTy*: MinskObjectKind
+    variable*: VariableSymbol
 
-proc newBoundVariableExpression*(
-  name: string,
-  ty: MinskObjectKind
-): BoundVariableExpression =
+proc newBoundVariableExpression*(variable: VariableSymbol): BoundVariableExpression =
   new(result)
-  result.name = name
-  result.mTy = ty
+  result.variable = variable
 
 method kind*(self: BoundVariableExpression): BoundNodeKind =
   BoundNodeKind.VariableExpression
 
 method ty*(self: BoundVariableExpression): MinskObjectKind =
-  self.mTy
+  self.variable.ty

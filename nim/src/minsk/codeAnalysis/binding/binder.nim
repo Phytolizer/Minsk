@@ -1,7 +1,8 @@
 import std/sequtils
 import std/strformat
 import std/options
-import std/tables
+
+import sequtilsExt/sequtilsExt
 
 import minsk/codeAnalysis/diagnostic
 import minsk/codeAnalysis/diagnosticBag
@@ -18,6 +19,8 @@ import minsk/codeAnalysis/syntax/expressions/[
   parenthesizedExpressionSyntax,
   unaryExpressionSyntax,
 ]
+import minsk/codeAnalysis/variableMap
+import minsk/codeAnalysis/variableSymbol
 import minsk/minskObject
 
 import boundExpression
@@ -34,9 +37,9 @@ import expressions/[
 type
   Binder* = object
     mDiagnostics: DiagnosticBag
-    variables: TableRef[string, MinskObject]
+    variables: VariableMap
 
-proc newBinder*(variables: TableRef[string, MinskObject]): Binder =
+proc newBinder*(variables: VariableMap): Binder =
   result.mDiagnostics = newDiagnosticBag()
   result.variables = variables
 
@@ -54,16 +57,18 @@ proc bindAssignmentExpression(
 ): BoundExpression =
   let name = syntax.identifierToken.text
   let boundExpression = binder.bindExpression(syntax.expression)
-  let defaultValue = case boundExpression.ty
-    of mokInteger:
-      moInteger(0)
-    of mokBoolean:
-      moBoolean(false)
-    of mokNull:
-      moNull()
 
-  binder.variables[name] = defaultValue
-  return newBoundAssignmentExpression(name, boundExpression)
+  let existingVariable = sequtilsExt.find(
+    binder.variables.keys,
+    proc(v: VariableSymbol): bool =
+      v.name == name
+  )
+  if existingVariable.isSome:
+    binder.variables.del(existingVariable.get)
+
+  let variable = newVariableSymbol(name, boundExpression.ty)
+  binder.variables[variable] = moNull()
+  return newBoundAssignmentExpression(variable, boundExpression)
 
 proc bindBinaryExpression(
   binder: var Binder,
@@ -98,12 +103,15 @@ proc bindNameExpression(
   syntax: NameExpressionSyntax
 ): BoundExpression =
   let name = syntax.identifierToken.text
-  if not binder.variables.hasKey(name):
+  let variable = sequtilsExt.find(
+    binder.variables.keys,
+    proc(v: VariableSymbol): bool = v.name == name
+  )
+  if variable.isNone:
     binder.mDiagnostics.reportUndefinedName(syntax.identifierToken.span, name)
     return newBoundLiteralExpression(moInteger(0))
 
-  let ty = binder.variables[name].kind
-  return newBoundVariableExpression(name, ty)
+  return newBoundVariableExpression(variable.get)
 
 proc bindParenthesizedExpression(
   binder: var Binder,

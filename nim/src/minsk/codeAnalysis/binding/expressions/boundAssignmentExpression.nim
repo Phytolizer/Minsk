@@ -4,18 +4,19 @@ import minsk/codeAnalysis/binding/[
   boundExpression,
   boundNodeKind,
 ]
+import minsk/codeAnalysis/variableSymbol
 
 type
   BoundAssignmentExpression* = ref object of BoundExpression
-    name*: string
+    variable*: VariableSymbol
     expression*: BoundExpression
 
 proc newBoundAssignmentExpression*(
-  name: string,
+  variable: VariableSymbol,
   expression: BoundExpression
 ): BoundAssignmentExpression =
   new(result)
-  result.name = name
+  result.variable = variable
   result.expression = expression
 
 method kind*(self: BoundAssignmentExpression): BoundNodeKind =

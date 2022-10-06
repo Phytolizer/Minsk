@@ -1,5 +1,3 @@
-import std/tables
-
 import noise
 import noise/styler
 
@@ -10,6 +8,7 @@ import minsk/codeAnalysis/compilation
 import minsk/codeAnalysis/diagnostic
 import minsk/codeAnalysis/evaluationResult
 import minsk/codeAnalysis/textSpan
+import minsk/codeAnalysis/variableMap
 import minsk/macros
 import minsk/minskObject
 import minsk/codeAnalysis/syntax/[
@@ -39,7 +38,7 @@ proc main() =
   discard n.historyLoad("minsk.history")
   defer:
     discard n.historySave("minsk.history")
-  var variables = newTable[string, MinskObject]()
+  var variables = newVariableMap()
   loop:
     n.setPrompt("> ")
     if not n.readLine():
