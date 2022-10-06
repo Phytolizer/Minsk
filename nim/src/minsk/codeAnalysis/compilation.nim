@@ -1,3 +1,7 @@
+import std/tables
+
+import minsk/minskObject
+
 import binding/binder
 import evaluationResult
 import evaluator
@@ -13,8 +17,11 @@ proc newCompilation*(syntax: SyntaxTree): Compilation =
   new(result)
   result.syntax = syntax
 
-proc evaluate*(node: Compilation): EvaluationResult =
-  var binder = newBinder()
+proc evaluate*(
+  node: Compilation,
+  variables: TableRef[string, MinskObject]
+): EvaluationResult =
+  var binder = newBinder(variables)
   var diagnostics = node.syntax.diagnostics
   if diagnostics.len > 0:
     return evaluationResultError(diagnostics)
@@ -23,6 +30,6 @@ proc evaluate*(node: Compilation): EvaluationResult =
   if diagnostics.len > 0:
     return evaluationResultError(diagnostics)
 
-  var evaluator = newEvaluator(boundExpression)
+  var evaluator = newEvaluator(boundExpression, variables)
   let value = evaluator.evaluate()
   return evaluationResultOk(value)

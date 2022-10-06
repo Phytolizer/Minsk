@@ -18,6 +18,7 @@ type
     PipePipeToken
     EqualsEqualsToken
     BangEqualsToken
+    EqualsToken
 
     TrueKeyword
     FalseKeyword
@@ -26,3 +27,5 @@ type
     BinaryExpression
     ParenthesizedExpression
     UnaryExpression
+    NameExpression
+    AssignmentExpression

@@ -1,3 +1,5 @@
+import std/tables
+
 import noise
 import noise/styler
 
@@ -37,6 +39,7 @@ proc main() =
   discard n.historyLoad("minsk.history")
   defer:
     discard n.historySave("minsk.history")
+  var variables = newTable[string, MinskObject]()
   loop:
     n.setPrompt("> ")
     if not n.readLine():
@@ -60,7 +63,7 @@ proc main() =
       stdout.resetColor()
       stdout.flushFile()
     var compilation = newCompilation(syntaxTree)
-    let evaluationResult = compilation.evaluate()
+    let evaluationResult = compilation.evaluate(variables)
     if evaluationResult.success:
       stdout.setColor(colorize.fgGreen)
       echo evaluationResult.value

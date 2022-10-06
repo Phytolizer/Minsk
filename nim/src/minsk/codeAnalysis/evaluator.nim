@@ -1,11 +1,15 @@
+import std/tables
+
 import minsk/minskObject
 
 import binding/expressions/[
+  boundAssignmentExpression,
   boundBinaryExpression,
   boundBinaryOperator,
   boundLiteralExpression,
   boundUnaryExpression,
   boundUnaryOperator,
+  boundVariableExpression,
 ]
 import binding/[
   boundExpression,
@@ -16,12 +20,22 @@ import binding/[
 type
   Evaluator* = object
     root: BoundExpression
+    variables: TableRef[string, MinskObject]
 
-proc newEvaluator*(root: BoundExpression): Evaluator =
+proc newEvaluator*(
+  root: BoundExpression,
+  variables: TableRef[string, MinskObject]
+): Evaluator =
   result.root = root
+  result.variables = variables
 
-proc evaluateExpression(evaluator: Evaluator, root: BoundExpression): MinskObject =
+proc evaluateExpression(evaluator: var Evaluator, root: BoundExpression): MinskObject =
   case root.kind
+  of BoundNodeKind.AssignmentExpression:
+    let a = root.BoundAssignmentExpression
+    let value = evaluator.evaluateExpression(a.expression)
+    evaluator.variables[a.name] = value
+    return value
   of BoundNodeKind.LiteralExpression:
     let l = root.BoundLiteralExpression
     return l.value
@@ -56,6 +70,9 @@ proc evaluateExpression(evaluator: Evaluator, root: BoundExpression): MinskObjec
       return moInteger(-operand.intVal)
     of BoundUnaryOperatorKind.LogicalNegation:
       return moBoolean(not operand.boolVal)
+  of BoundNodeKind.VariableExpression:
+    let v = root.BoundVariableExpression
+    return evaluator.variables[v.name]
 
-proc evaluate*(evaluator: Evaluator): MinskObject =
+proc evaluate*(evaluator: var Evaluator): MinskObject =
   evaluator.evaluateExpression(evaluator.root)

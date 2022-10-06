@@ -22,5 +22,5 @@ proc newBoundUnaryExpression*(
 method kind*(self: BoundUnaryExpression): BoundNodeKind =
   BoundNodeKind.UnaryExpression
 
-method objectKind*(self: BoundUnaryExpression): MinskObjectKind =
+method ty*(self: BoundUnaryExpression): MinskObjectKind =
   self.op.resultType

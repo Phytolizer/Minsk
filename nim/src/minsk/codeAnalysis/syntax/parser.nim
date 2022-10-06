@@ -6,8 +6,10 @@ import minsk/macros
 import minsk/minskObject
 
 import expressions/[
+  assignmentExpressionSyntax,
   binaryExpressionSyntax,
   literalExpressionSyntax,
+  nameExpressionSyntax,
   parenthesizedExpressionSyntax,
   unaryExpressionSyntax,
 ]
@@ -80,12 +82,18 @@ proc parseNumberLiteral(parser: var Parser): ExpressionSyntax =
   let numberToken = parser.matchToken(SyntaxKind.NumberToken)
   return newLiteralExpressionSyntax(numberToken)
 
+proc parseNameExpression(parser: var Parser): ExpressionSyntax =
+  let identifierToken = parser.matchToken(SyntaxKind.IdentifierToken)
+  return newNameExpressionSyntax(identifierToken)
+
 proc parsePrimaryExpression(parser: var Parser): ExpressionSyntax =
   case parser.current.kind
   of SyntaxKind.OpenParenthesisToken:
     parser.parseParenthesizedExpression()
   of SyntaxKind.TrueKeyword, SyntaxKind.FalseKeyword:
     parser.parseBooleanLiteral()
+  of SyntaxKind.IdentifierToken:
+    parser.parseNameExpression()
   else:
     parser.parseNumberLiteral()
 
@@ -107,8 +115,20 @@ proc parseBinaryExpression(parser: var Parser, parentPrecedence: int = 0): Expre
     let right = parser.parseBinaryExpression(precedence)
     result = newBinaryExpressionSyntax(result, operatorToken, right)
 
+proc parseAssignmentExpression(parser: var Parser): ExpressionSyntax =
+  if (
+    parser.current.kind == SyntaxKind.IdentifierToken and
+    parser.peek(1).kind == SyntaxKind.EqualsToken
+  ):
+    let identifierToken = parser.matchToken(SyntaxKind.IdentifierToken)
+    let equalsToken = parser.matchToken(SyntaxKind.EqualsToken)
+    let expression = parser.parseAssignmentExpression()
+    return newAssignmentExpressionSyntax(identifierToken, equalsToken, expression)
+
+  return parser.parseBinaryExpression()
+
 proc parseExpression(parser: var Parser): ExpressionSyntax =
-  parser.parseBinaryExpression()
+  parser.parseAssignmentExpression()
 
 type
   SyntaxTree* = object

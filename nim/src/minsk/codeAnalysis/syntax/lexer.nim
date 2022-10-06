@@ -96,6 +96,9 @@ proc nextToken*(lexer: var Lexer): SyntaxToken =
       if lexer.peek(1) == '=':
         lexer.position += 2
         kind = SyntaxKind.EqualsEqualsToken
+      else:
+        lexer.position += 1
+        kind = SyntaxKind.EqualsToken
     of '&':
       if lexer.peek(1) == '&':
         lexer.position += 2

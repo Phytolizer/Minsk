@@ -63,3 +63,10 @@ proc reportUndefinedUnaryOperator*(
   let message =
     fmt"Unary operator '{operatorText}' is not defined for type '{operandType}'."
   bag.report(span, message)
+
+proc reportUndefinedName*(
+  bag: var DiagnosticBag,
+  span: TextSpan,
+  name: string
+) =
+  bag.report(span, fmt"Variable '{name}' doesn't exist.")

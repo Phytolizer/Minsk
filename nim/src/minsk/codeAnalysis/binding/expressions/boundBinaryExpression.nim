@@ -25,5 +25,5 @@ proc newBoundBinaryExpression*(
 method kind*(self: BoundBinaryExpression): BoundNodeKind =
   BoundNodeKind.BinaryExpression
 
-method objectKind*(self: BoundBinaryExpression): MinskObjectKind =
+method ty*(self: BoundBinaryExpression): MinskObjectKind =
   self.op.resultType

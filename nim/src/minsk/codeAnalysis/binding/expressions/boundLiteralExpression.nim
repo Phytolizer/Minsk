@@ -15,5 +15,5 @@ proc newBoundLiteralExpression*(value: MinskObject): BoundLiteralExpression =
 method kind*(self: BoundLiteralExpression): BoundNodeKind =
   BoundNodeKind.LiteralExpression
 
-method objectKind*(self: BoundLiteralExpression): MinskObjectKind =
+method ty*(self: BoundLiteralExpression): MinskObjectKind =
   self.value.kind
