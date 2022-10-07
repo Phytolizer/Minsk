@@ -19,6 +19,7 @@ jobs:
         working-directory: nim
 
     steps:
+    - uses: actions/checkout@v2
     - name: Install Nim
       if: steps.cache-choosenim.outputs.cache-hit != 'true' || steps.cache-nimble.outputs.cache-hit != 'true'
       run: |
