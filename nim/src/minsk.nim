@@ -1,8 +1,8 @@
 import noise
 import noise/styler
 
-import ansi/ansi
-import ansi/colorize
+import minskpkg/ansi/ansi
+import minskpkg/ansi/colorize
 
 import minskpkg/codeAnalysis/compilation
 import minskpkg/codeAnalysis/diagnostic

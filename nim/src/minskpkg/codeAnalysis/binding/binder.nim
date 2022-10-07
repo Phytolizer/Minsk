@@ -2,7 +2,7 @@ import std/sequtils
 import std/strformat
 import std/options
 
-import sequtilsExt/sequtilsExt
+import minskpkg/sequtilsExt/sequtilsExt
 
 import minskpkg/codeAnalysis/diagnostic
 import minskpkg/codeAnalysis/diagnosticBag

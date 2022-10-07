@@ -2,7 +2,7 @@ import std/options
 
 import minskpkg/minskObject
 import minskpkg/codeAnalysis/syntax/syntaxKind
-import sequtilsExt/sequtilsExt
+import minskpkg/sequtilsExt/sequtilsExt
 
 type
   BoundBinaryOperatorKind* {.pure.} = enum
