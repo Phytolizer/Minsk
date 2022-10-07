@@ -15,7 +15,7 @@ Episode 7.
 Episode 6.5.
 
 ## nim (Nim)
-Episode 2.
+Episode 3.
 
 ## py (Python)
 Episode 6.
