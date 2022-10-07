@@ -1,10 +1,10 @@
-import minsk/minskObject
+import minskpkg/minskObject
 
-import minsk/codeAnalysis/binding/[
+import minskpkg/codeAnalysis/binding/[
   boundExpression,
   boundNodeKind,
 ]
-import minsk/codeAnalysis/variableSymbol
+import minskpkg/codeAnalysis/variableSymbol
 
 type
   BoundAssignmentExpression* = ref object of BoundExpression

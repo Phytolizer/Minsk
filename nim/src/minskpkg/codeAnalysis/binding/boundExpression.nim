@@ -1,4 +1,4 @@
-import minsk/minskObject
+import minskpkg/minskObject
 
 import boundNode
 

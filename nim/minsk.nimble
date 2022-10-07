@@ -2,7 +2,7 @@ version = "0.1.0"
 author = "Kyle Coffey"
 description = "Minsk compiler."
 license = "MIT"
-bin = @["mc"]
+bin = @["minsk"]
 srcDir = "src"
 installExt = @["nim"]
 

@@ -1,5 +1,5 @@
-import minsk/minskObject
-import minsk/codeAnalysis/binding/[
+import minskpkg/minskObject
+import minskpkg/codeAnalysis/binding/[
   boundExpression,
   boundNodeKind,
 ]

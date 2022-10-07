@@ -4,14 +4,14 @@ import std/options
 
 import sequtilsExt/sequtilsExt
 
-import minsk/codeAnalysis/diagnostic
-import minsk/codeAnalysis/diagnosticBag
-import minsk/codeAnalysis/syntax/[
+import minskpkg/codeAnalysis/diagnostic
+import minskpkg/codeAnalysis/diagnosticBag
+import minskpkg/codeAnalysis/syntax/[
   expressionSyntax,
   syntaxKind,
   syntaxToken,
 ]
-import minsk/codeAnalysis/syntax/expressions/[
+import minskpkg/codeAnalysis/syntax/expressions/[
   assignmentExpressionSyntax,
   binaryExpressionSyntax,
   literalExpressionSyntax,
@@ -19,9 +19,9 @@ import minsk/codeAnalysis/syntax/expressions/[
   parenthesizedExpressionSyntax,
   unaryExpressionSyntax,
 ]
-import minsk/codeAnalysis/variableMap
-import minsk/codeAnalysis/variableSymbol
-import minsk/minskObject
+import minskpkg/codeAnalysis/variableMap
+import minskpkg/codeAnalysis/variableSymbol
+import minskpkg/minskObject
 
 import boundExpression
 import expressions/[

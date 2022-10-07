@@ -1,9 +1,9 @@
 import std/sequtils
 
-import minsk/codeAnalysis/diagnostic
-import minsk/codeAnalysis/diagnosticBag
-import minsk/macros
-import minsk/minskObject
+import minskpkg/codeAnalysis/diagnostic
+import minskpkg/codeAnalysis/diagnosticBag
+import minskpkg/macros
+import minskpkg/minskObject
 
 import expressions/[
   assignmentExpressionSyntax,

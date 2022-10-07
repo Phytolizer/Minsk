@@ -4,14 +4,14 @@ import noise/styler
 import ansi/ansi
 import ansi/colorize
 
-import minsk/codeAnalysis/compilation
-import minsk/codeAnalysis/diagnostic
-import minsk/codeAnalysis/evaluationResult
-import minsk/codeAnalysis/textSpan
-import minsk/codeAnalysis/variableMap
-import minsk/macros
-import minsk/minskObject
-import minsk/codeAnalysis/syntax/[
+import minskpkg/codeAnalysis/compilation
+import minskpkg/codeAnalysis/diagnostic
+import minskpkg/codeAnalysis/evaluationResult
+import minskpkg/codeAnalysis/textSpan
+import minskpkg/codeAnalysis/variableMap
+import minskpkg/macros
+import minskpkg/minskObject
+import minskpkg/codeAnalysis/syntax/[
   parser,
   syntaxNode,
   syntaxToken,

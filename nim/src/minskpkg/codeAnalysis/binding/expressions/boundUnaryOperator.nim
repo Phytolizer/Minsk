@@ -1,7 +1,7 @@
 import std/options
 
-import minsk/minskObject
-import minsk/codeAnalysis/syntax/syntaxKind
+import minskpkg/minskObject
+import minskpkg/codeAnalysis/syntax/syntaxKind
 import sequtilsExt/sequtilsExt
 
 type

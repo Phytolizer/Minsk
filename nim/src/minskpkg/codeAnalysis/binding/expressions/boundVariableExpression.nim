@@ -1,9 +1,9 @@
-import minsk/minskObject
-import minsk/codeAnalysis/binding/[
+import minskpkg/minskObject
+import minskpkg/codeAnalysis/binding/[
   boundExpression,
   boundNodeKind,
 ]
-import minsk/codeAnalysis/variableSymbol
+import minskpkg/codeAnalysis/variableSymbol
 
 type
   BoundVariableExpression* = ref object of BoundExpression

@@ -1,6 +1,6 @@
 import std/strformat
 
-import minsk/minskObject
+import minskpkg/minskObject
 import syntax/syntaxKind
 
 import diagnostic

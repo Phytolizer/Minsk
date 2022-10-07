@@ -1,10 +1,10 @@
 import std/sequtils
 import std/strutils
 
-import minsk/codeAnalysis/diagnostic
-import minsk/codeAnalysis/diagnosticBag
-import minsk/codeAnalysis/textSpan
-import minsk/minskObject
+import minskpkg/codeAnalysis/diagnostic
+import minskpkg/codeAnalysis/diagnosticBag
+import minskpkg/codeAnalysis/textSpan
+import minskpkg/minskObject
 
 import syntaxFacts
 import syntaxKind

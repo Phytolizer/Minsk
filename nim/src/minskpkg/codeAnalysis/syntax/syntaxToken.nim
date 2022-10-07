@@ -1,5 +1,5 @@
-import minsk/codeAnalysis/textSpan
-import minsk/minskObject
+import minskpkg/codeAnalysis/textSpan
+import minskpkg/minskObject
 
 import syntaxKind
 import syntaxNode

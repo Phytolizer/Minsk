@@ -1,5 +1,5 @@
-import minsk/minskObject
-import minsk/codeAnalysis/syntax/[
+import minskpkg/minskObject
+import minskpkg/codeAnalysis/syntax/[
   expressionSyntax,
   syntaxKind,
   syntaxNode,

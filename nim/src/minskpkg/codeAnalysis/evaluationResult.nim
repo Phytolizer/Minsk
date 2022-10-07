@@ -1,5 +1,5 @@
-import minsk/codeAnalysis/diagnostic
-import minsk/minskObject
+import minskpkg/codeAnalysis/diagnostic
+import minskpkg/minskObject
 
 type
   EvaluationResult* = object

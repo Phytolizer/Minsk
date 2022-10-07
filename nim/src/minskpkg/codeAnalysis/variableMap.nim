@@ -1,7 +1,7 @@
 import std/sequtils
 import std/tables
 
-import minsk/minskObject
+import minskpkg/minskObject
 
 import variableSymbol
 

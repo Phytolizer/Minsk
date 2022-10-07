@@ -1,4 +1,4 @@
-import minsk/codeAnalysis/syntax/[
+import minskpkg/codeAnalysis/syntax/[
   expressionSyntax,
   syntaxKind,
   syntaxNode,
