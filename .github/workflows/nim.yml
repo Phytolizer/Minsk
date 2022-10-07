@@ -25,6 +25,7 @@ jobs:
       run: |
         export PATH=$HOME/.nimble/bin:$PATH
         echo $PATH
+        cd nim
         nimble test -y
     - name: Cache choosenim
       id: cache-choosenim
