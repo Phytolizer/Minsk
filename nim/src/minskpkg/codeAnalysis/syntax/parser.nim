@@ -153,3 +153,12 @@ proc parse*(parser: var Parser): SyntaxTree =
 proc parse*(text: string): SyntaxTree =
   var parser = newParser(text)
   return parser.parse()
+
+proc parseTokens*(text: string): seq[SyntaxToken] =
+  var lexer = newLexer(text)
+  result = @[]
+  loop:
+    let token = lexer.nextToken()
+    if token.kind == SyntaxKind.EndOfFileToken:
+      break
+    result.add(token)
