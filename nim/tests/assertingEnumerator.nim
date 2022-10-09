@@ -23,9 +23,6 @@ proc newEnumerator(nodes: sink seq[SyntaxNode]): Enumerator =
   result.i = 0
 
 proc next(e: var Enumerator): Option[SyntaxNode] =
-  for n in e.nodes:
-    echo n.kind
-  echo ""
   if e.i < e.nodes.len:
     result = some(e.nodes[e.i])
     e.i += 1
