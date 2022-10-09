@@ -57,13 +57,13 @@ fn pretty_print_node(
     if is_to_console {
         writer.execute(SetForegroundColor(Color::DarkGrey))?;
     }
-    write!(writer, "{}", indent)?;
+    write!(writer, "{indent}")?;
     let marker = if is_last {
         "└───"
     } else {
         "├───"
     };
-    write!(writer, "{}", marker)?;
+    write!(writer, "{marker}")?;
     if is_to_console {
         writer.execute(SetForegroundColor(if node.is_token() {
             Color::Blue
@@ -77,7 +77,7 @@ fn pretty_print_node(
     }
     if node.is_token() {
         if let Some(value) = node.token_value() {
-            write!(writer, " {}", value)?;
+            write!(writer, " {value}")?;
         }
     }
     writeln!(writer)?;
