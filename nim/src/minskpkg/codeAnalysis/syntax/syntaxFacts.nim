@@ -1,3 +1,6 @@
+import std/options
+import std/sequtils
+
 import syntaxKind
 
 proc binaryOperatorPrecedence*(kind: SyntaxKind): int =
@@ -32,3 +35,48 @@ proc keywordKind*(text: string): SyntaxKind =
     SyntaxKind.FalseKeyword
   else:
     SyntaxKind.IdentifierToken
+
+proc text*(kind: SyntaxKind): Option[string] =
+  case kind
+  of SyntaxKind.PlusToken:
+    "+".some
+  of SyntaxKind.MinusToken:
+    "-".some
+  of SyntaxKind.StarToken:
+    "*".some
+  of SyntaxKind.SlashToken:
+    "/".some
+  of SyntaxKind.BangToken:
+    "!".some
+  of SyntaxKind.EqualsToken:
+    "=".some
+  of SyntaxKind.AmpersandAmpersandToken:
+    "&&".some
+  of SyntaxKind.PipePipeToken:
+    "||".some
+  of SyntaxKind.EqualsEqualsToken:
+    "==".some
+  of SyntaxKind.BangEqualsToken:
+    "!=".some
+  of SyntaxKind.OpenParenthesisToken:
+    "(".some
+  of SyntaxKind.CloseParenthesisToken:
+    ")".some
+  of SyntaxKind.FalseKeyword:
+    "false".some
+  of SyntaxKind.TrueKeyword:
+    "true".some
+  else:
+    none(string)
+
+proc binaryOperators*(): seq[SyntaxKind] =
+  SyntaxKind.toSeq.filter(
+    proc(kind: SyntaxKind): bool =
+      kind.binaryOperatorPrecedence > 0
+  )
+
+proc unaryOperators*(): seq[SyntaxKind] =
+  SyntaxKind.toSeq.filter(
+    proc(kind: SyntaxKind): bool =
+      kind.unaryOperatorPrecedence > 0
+  )

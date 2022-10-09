@@ -9,6 +9,7 @@ import minskpkg/codeAnalysis/syntax/[
   syntaxToken,
 ]
 
+import helpers
 import strutilsExt
 
 type
@@ -98,9 +99,7 @@ iterator getTokenPairsWithSeparator(): tuple[
 suite "lexer":
   proc testLexerLexesToken(kind: SyntaxKind, text: string) =
     test fmt"lexer lexes token ({kind}, ""{text.readableEscape}"")":
-      let tokens = parseTokens(text)
-      assert tokens.len == 1
-      let token = tokens[0]
+      let token = parseTokens(text).assertSingle()
       assert token.kind == kind
       assert token.text == text
 
