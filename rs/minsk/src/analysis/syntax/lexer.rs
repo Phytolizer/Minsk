@@ -16,7 +16,7 @@ pub(crate) struct Lexer<'src> {
 impl<'src> Lexer<'src> {
     pub(crate) fn new(text: &'src SourceText) -> Self {
         Self {
-            text: text,
+            text,
             diagnostics: DiagnosticBag::new(),
         }
     }
@@ -79,8 +79,8 @@ impl<'a, 'src> Iterator for LexerIterator<'a, 'src> {
                 }
                 kind = SyntaxKind::WhitespaceToken;
             }
-            c if c.is_digit(10) => {
-                while self.current().is_digit(10) {
+            c if c.is_ascii_digit() => {
+                while self.current().is_ascii_digit() {
                     self.position += 1;
                 }
                 kind = SyntaxKind::NumberToken;
@@ -203,13 +203,7 @@ mod tests {
 
     fn get_tokens() -> impl Iterator<Item = SimpleToken> {
         SyntaxKind::iter()
-            .filter_map(|kind| {
-                if let Some(text) = facts::get_text(kind) {
-                    Some(SimpleToken::new(kind, text))
-                } else {
-                    None
-                }
-            })
+            .filter_map(|kind| facts::get_text(kind).map(|text| SimpleToken::new(kind, text)))
             .chain(
                 [
                     SimpleToken::new(SyntaxKind::IdentifierToken, "a"),
@@ -286,23 +280,14 @@ mod tests {
         let t1_is_keyword = format!("{:?}", t1.kind).ends_with("Keyword");
         let t2_is_keyword = format!("{:?}", t2.kind).ends_with("Keyword");
 
-        if (t1.kind == SyntaxKind::IdentifierToken || t1_is_keyword)
-            && (t2.kind == SyntaxKind::IdentifierToken || t2_is_keyword)
-        {
-            true
-        } else if (t1.kind == SyntaxKind::NumberToken
-            || t1.kind == SyntaxKind::IdentifierToken
-            || t1_is_keyword)
-            && t2.kind == SyntaxKind::NumberToken
-        {
-            true
-        } else if (t1.kind == SyntaxKind::BangToken || t1.kind == SyntaxKind::EqualsToken)
-            && (t2.kind == SyntaxKind::EqualsToken || t2.kind == SyntaxKind::EqualsEqualsToken)
-        {
-            true
-        } else {
-            false
-        }
+        ((t1.kind == SyntaxKind::IdentifierToken || t1_is_keyword)
+            && (t2.kind == SyntaxKind::IdentifierToken || t2_is_keyword))
+            || ((t1.kind == SyntaxKind::NumberToken
+                || t1.kind == SyntaxKind::IdentifierToken
+                || t1_is_keyword)
+                && t2.kind == SyntaxKind::NumberToken)
+            || ((t1.kind == SyntaxKind::BangToken || t1.kind == SyntaxKind::EqualsToken)
+                && (t2.kind == SyntaxKind::EqualsToken || t2.kind == SyntaxKind::EqualsEqualsToken))
     }
 
     #[test]

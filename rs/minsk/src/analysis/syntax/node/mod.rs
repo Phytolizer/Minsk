@@ -87,14 +87,14 @@ fn pretty_print_node(
         indent + "│   "
     };
     let children = node.children();
-    let last_child = children.last().copied();
-    for child in children.into_iter() {
+    let n_children = children.len();
+    for (i, child) in children.into_iter().enumerate() {
         pretty_print_node(
             child,
             writer,
             is_to_console,
             indent.clone(),
-            std::ptr::eq(child, last_child.unwrap()),
+            i == n_children - 1,
         )?;
     }
     Ok(())

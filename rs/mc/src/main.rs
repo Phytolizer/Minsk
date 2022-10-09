@@ -39,7 +39,7 @@ fn main() -> std::io::Result<()> {
             break;
         }
 
-        if text_builder.len() == 0 {
+        if text_builder.is_empty() {
             match input_line.trim() {
                 "#showTree" => {
                     show_tree = !show_tree;

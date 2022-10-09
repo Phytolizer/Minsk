@@ -42,7 +42,7 @@ impl Parser {
             return self.tokens[index].clone();
         }
 
-        let last_position = if self.tokens.len() > 0 {
+        let last_position = if !self.tokens.is_empty() {
             self.tokens.last().unwrap().span().end()
         } else {
             0

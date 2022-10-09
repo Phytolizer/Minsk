@@ -90,25 +90,24 @@ impl<'v> Binder<'v> {
     fn bind_binary_expression(&mut self, syntax: &BinaryExpressionSyntax) -> BoundExpression {
         let bound_left = self.bind_expression(&syntax.left);
         let bound_right = self.bind_expression(&syntax.right);
-        match BoundBinaryOperator::bind(
+        if let Some(operator) = BoundBinaryOperator::bind(
             syntax.operator_token.kind(),
             bound_left.ty(),
             bound_right.ty(),
         ) {
-            Some(operator) => BoundExpression::Binary(BoundBinaryExpression {
+            BoundExpression::Binary(BoundBinaryExpression {
                 left: Box::new(bound_left),
                 operator,
                 right: Box::new(bound_right),
-            }),
-            None => {
-                self.diagnostics.report_undefined_binary_operator(
-                    syntax.operator_token.span(),
-                    syntax.operator_token.text(),
-                    bound_left.ty(),
-                    bound_right.ty(),
-                );
-                bound_left
-            }
+            })
+        } else {
+            self.diagnostics.report_undefined_binary_operator(
+                syntax.operator_token.span(),
+                syntax.operator_token.text(),
+                bound_left.ty(),
+                bound_right.ty(),
+            );
+            bound_left
         }
     }
 

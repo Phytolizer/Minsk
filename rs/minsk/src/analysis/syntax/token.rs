@@ -52,9 +52,8 @@ impl SyntaxToken {
 impl Display for SyntaxToken {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{:?} '{}'", self.kind, self.text)?;
-        match self.value.as_ref() {
-            Some(v) => write!(f, " {}", v)?,
-            None => {}
+        if let Some(v) = self.value.as_ref() {
+            write!(f, " {}", v)?
         }
         Ok(())
     }
