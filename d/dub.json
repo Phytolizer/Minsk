@@ -1,0 +1,12 @@
+{
+	"authors": [
+		"Kyle Coffey"
+	],
+	"copyright": "Copyright © 2023, Kyle Coffey",
+	"dependencies": {
+		"optional": "~>1.3.0"
+	},
+	"description": "Minsk compiler in D.",
+	"license": "MIT",
+	"name": "minsk"
+}
