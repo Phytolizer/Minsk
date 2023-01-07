@@ -8,6 +8,8 @@ import minsk.support.color : color, Fg, Style;
 
 void main() {
 	char[] buf;
+	auto showTree = false;
+
 	while (true) {
 		write("> ");
 		if (buf.readln() == 0) {
@@ -16,11 +18,23 @@ void main() {
 		}
 		auto line = cast(immutable) buf.strip();
 
+		if (line == "#showTree") {
+			showTree = !showTree;
+			writeln(showTree ? "Showing parse trees." : "Not showing parse trees.");
+			continue;
+		}
+		if (line == "#cls") {
+			write("\x1b[2J\x1b[H");
+			continue;
+		}
+
 		const syntaxTree = SyntaxTree.parse(line);
 
-		color(Fg.white, Style.faint);
-		SyntaxNode.prettyPrint(syntaxTree.root);
-		color(Style.reset);
+		if (showTree) {
+			color(Fg.white, Style.faint);
+			SyntaxNode.prettyPrint(syntaxTree.root);
+			color(Style.reset);
+		}
 
 		if (syntaxTree.diagnostics.empty) {
 			color(Fg.magenta);
