@@ -11,7 +11,8 @@ import minsk.code_analysis.syntax.syntax_token : SyntaxToken;
 import minsk.code_analysis.syntax.syntax_tree : SyntaxTree;
 import minsk.code_analysis.syntax.syntax_node : ExpressionSyntax,
     BinaryExpressionSyntax,
-    LiteralExpressionSyntax;
+    LiteralExpressionSyntax,
+    ParenthesizedExpressionSyntax;
 
 final class Parser {
     private SyntaxToken[] _tokens;
@@ -93,6 +94,17 @@ final class Parser {
     }
 
     private ExpressionSyntax parsePrimaryExpression() {
+        if (current.kind == SyntaxKind.OpenParenthesisToken) {
+            const openParenthesisToken = nextToken();
+            const expression = parseExpression();
+            const closeParenthesisToken = match(SyntaxKind.CloseParenthesisToken);
+            return new ParenthesizedExpressionSyntax(
+                openParenthesisToken,
+                expression,
+                closeParenthesisToken,
+            );
+        }
+
         const numberToken = match(SyntaxKind.NumberToken);
         return new LiteralExpressionSyntax(numberToken);
     }

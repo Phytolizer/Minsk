@@ -3,6 +3,7 @@ module minsk.code_analysis.evaluator;
 import minsk.code_analysis.syntax : BinaryExpressionSyntax,
     ExpressionSyntax,
     LiteralExpressionSyntax,
+    ParenthesizedExpressionSyntax,
     SyntaxKind;
 import minsk.runtime.object : Integer, Obj;
 
@@ -23,6 +24,8 @@ final class Evaluator {
                 return evaluateLiteralExpression(cast(LiteralExpressionSyntax) root);
             case SyntaxKind.BinaryExpression:
                 return evaluateBinaryExpression(cast(BinaryExpressionSyntax) root);
+            case SyntaxKind.ParenthesizedExpression:
+                return evaluateParenthesizedExpression(cast(ParenthesizedExpressionSyntax) root);
             default:
                 assert(false);
         }
@@ -47,5 +50,9 @@ final class Evaluator {
             default:
                 assert(false);
         }
+    }
+
+    private int evaluateParenthesizedExpression(ParenthesizedExpressionSyntax root) {
+        return evaluateExpression(root.expression);
     }
 }

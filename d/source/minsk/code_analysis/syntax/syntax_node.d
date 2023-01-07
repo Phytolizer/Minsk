@@ -91,3 +91,43 @@ final class BinaryExpressionSyntax : ExpressionSyntax {
         return [cast(SyntaxNode) left, operatorToken, right];
     }
 }
+
+final class ParenthesizedExpressionSyntax : ExpressionSyntax {
+    private const(SyntaxToken) _openParenthesisToken;
+    private const(ExpressionSyntax) _expression;
+    private const(SyntaxToken) _closeParenthesisToken;
+
+    this(
+        const(SyntaxToken) openParenthesisToken,
+        const(ExpressionSyntax) expression,
+        const(SyntaxToken) closeParenthesisToken,
+    ) {
+        _openParenthesisToken = openParenthesisToken;
+        _expression = expression;
+        _closeParenthesisToken = closeParenthesisToken;
+    }
+
+    const(SyntaxToken) openParenthesisToken() const @property {
+        return _openParenthesisToken;
+    }
+
+    const(ExpressionSyntax) expression() const @property {
+        return _expression;
+    }
+
+    const(SyntaxToken) closeParenthesisToken() const @property {
+        return _closeParenthesisToken;
+    }
+
+    override SyntaxKind kind() const {
+        return SyntaxKind.ParenthesizedExpression;
+    }
+
+    override const(SyntaxNode)[] children() const {
+        return [
+            cast(SyntaxNode) _openParenthesisToken,
+            _expression,
+            _closeParenthesisToken,
+        ];
+    }
+}
