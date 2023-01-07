@@ -22,15 +22,15 @@ void main() {
 		SyntaxNode.prettyPrint(syntaxTree.root);
 		color(Style.reset);
 
-		if (!syntaxTree.diagnostics.empty) {
+		if (syntaxTree.diagnostics.empty) {
+			color(Fg.magenta);
+			writeln(new Evaluator(syntaxTree.root).evaluate());
+			color(Style.reset);
+		} else {
 			color(Fg.red, Style.faint);
 			foreach (diagnostic; syntaxTree.diagnostics) {
 				writeln(diagnostic);
 			}
-			color(Style.reset);
-		} else {
-			color(Fg.magenta);
-			writeln(new Evaluator(syntaxTree.root).evaluate());
 			color(Style.reset);
 		}
 	}

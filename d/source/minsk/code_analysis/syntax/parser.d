@@ -65,9 +65,25 @@ final class Parser {
     }
 
     private ExpressionSyntax parseExpression() {
-        auto left = parsePrimaryExpression();
+        return parseTerm();
+    }
+
+    private ExpressionSyntax parseTerm() {
+        auto left = parseFactor();
 
         while (current.kind.among(SyntaxKind.PlusToken, SyntaxKind.MinusToken)) {
+            const operatorToken = nextToken();
+            const right = parseFactor();
+            left = new BinaryExpressionSyntax(left, operatorToken, right);
+        }
+
+        return left;
+    }
+
+    private ExpressionSyntax parseFactor() {
+        auto left = parsePrimaryExpression();
+
+        while (current.kind.among(SyntaxKind.StarToken, SyntaxKind.SlashToken)) {
             const operatorToken = nextToken();
             const right = parsePrimaryExpression();
             left = new BinaryExpressionSyntax(left, operatorToken, right);
