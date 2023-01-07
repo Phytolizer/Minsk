@@ -16,6 +16,7 @@ interface SyntaxNode {
         bool isLast = true,
     ) {
         write(indent);
+        write(isLast ? "└── " : "├── ");
         write(node.kind);
         if (auto t = cast(SyntaxToken) node)
             if (t.value) {
@@ -24,11 +25,10 @@ interface SyntaxNode {
             }
         writeln();
 
-        indent ~= "    ";
+        indent ~= isLast ? "    " : "│   ";
         const children = node.children;
-        const lastChild = node.children.takeOne;
-        foreach (child; children) {
-            prettyPrint(child, indent, child is lastChild.front);
+        foreach (i, child; children) {
+            prettyPrint(child, indent, i + 1 == children.length);
         }
     }
 }
