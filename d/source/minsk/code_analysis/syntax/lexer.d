@@ -2,6 +2,7 @@ module minsk.code_analysis.syntax.lexer;
 
 import std.ascii : isDigit, isWhite;
 import std.conv : to;
+import std.format : format;
 
 import minsk.runtime.object : Integer, Obj;
 import minsk.code_analysis.syntax.syntax_kind : SyntaxKind;
@@ -15,6 +16,7 @@ final class Lexer {
     private SyntaxToken _token;
     private bool _atEof = false;
     bool empty = false;
+    private string[] _diagnostics = [];
 
     this(string text) {
         _text = text;
@@ -81,6 +83,7 @@ final class Lexer {
                     _atEof = true;
                     break;
                 default:
+                    _diagnostics ~= format!"ERROR: bad character in input: '%c'"(current);
                     _position++;
                     break;
             }
@@ -100,5 +103,9 @@ final class Lexer {
 
     void popFront() {
         _token = nextToken();
+    }
+
+    const(string[]) diagnostics() const {
+        return _diagnostics;
     }
 }

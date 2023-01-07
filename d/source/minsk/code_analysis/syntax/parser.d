@@ -2,6 +2,7 @@ module minsk.code_analysis.syntax.parser;
 
 import std.algorithm : among, filter;
 import std.array : array;
+import std.format : format;
 import std.range : InputRange;
 
 import minsk.code_analysis.syntax.lexer : Lexer;
@@ -14,14 +15,17 @@ import minsk.code_analysis.syntax.syntax_node : ExpressionSyntax,
 final class Parser {
     private SyntaxToken[] _tokens;
     private int _position = 0;
+    private string[] _diagnostics;
 
     this(string text) {
-        _tokens = new Lexer(text)
+        auto lexer = new Lexer(text);
+        _tokens = lexer
             .filter!(tok => !tok.kind.among(
                     SyntaxKind.BadToken,
                     SyntaxKind.WhitespaceToken,
             ))
             .array;
+        _diagnostics ~= lexer.diagnostics;
     }
 
     private SyntaxToken peek(int offset) {
@@ -46,6 +50,10 @@ final class Parser {
         if (current.kind == kind)
             return nextToken();
 
+        _diagnostics ~= format!"ERROR: Unexpected token <%s>, expected <%s>."(
+            current.kind,
+            kind,
+        );
         return new SyntaxToken(kind, current.position, "", null);
     }
 
@@ -64,5 +72,9 @@ final class Parser {
     private ExpressionSyntax parsePrimaryExpression() {
         const numberToken = match(SyntaxKind.NumberToken);
         return new LiteralExpressionSyntax(numberToken);
+    }
+
+    const(string[]) diagnostics() const {
+        return _diagnostics;
     }
 }
