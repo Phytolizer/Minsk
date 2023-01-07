@@ -3,6 +3,7 @@ module minsk.code_analysis.syntax.lexer;
 import std.ascii : isDigit, isWhite;
 import std.conv : to, ConvException;
 import std.format : format;
+import std.range : isInputRange;
 
 import minsk.runtime.object : Integer, Obj;
 import minsk.code_analysis.syntax.syntax_kind : SyntaxKind;
@@ -113,3 +114,5 @@ final class Lexer {
         return _diagnostics;
     }
 }
+
+static assert(isInputRange!Lexer);
