@@ -86,7 +86,7 @@ final class Lexer {
             }
         }
 
-        return SyntaxToken(
+        return new SyntaxToken(
             kind,
             start,
             text.or(some(_text[start .. _position])).front,

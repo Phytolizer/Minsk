@@ -11,4 +11,7 @@ enum SyntaxKind {
     SlashToken,
     OpenParenthesisToken,
     CloseParenthesisToken,
+
+    BinaryExpression,
+    LiteralExpression,
 }

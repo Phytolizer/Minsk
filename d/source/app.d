@@ -1,23 +1,23 @@
 import std.stdio : readln, write, writeln;
 import std.string : strip;
 
-import minsk.code_analysis.syntax.lexer : Lexer;
-import minsk.code_analysis.syntax.syntax_kind : SyntaxKind;
+import minsk.code_analysis.syntax : Lexer, Parser, SyntaxKind, SyntaxNode;
+import minsk.support.color : color, Fg, Style;
 
 void main() {
 	char[] buf;
 	while (true) {
 		write("> ");
-		if (buf.readln() == 0)
+		if (buf.readln() == 0) {
+			writeln();
 			break;
+		}
 		auto line = cast(immutable) buf.strip();
 
-		foreach (token; new Lexer(line)) {
-			write(token.kind, ": '", token.text, "'");
-			if (token.value) {
-				write(" ", token.value);
-			}
-			writeln();
-		}
+		auto parser = new Parser(line);
+		const expression = parser.parse();
+		color(Fg.white, Style.faint);
+		SyntaxNode.prettyPrint(expression);
+		color(Style.reset);
 	}
 }
