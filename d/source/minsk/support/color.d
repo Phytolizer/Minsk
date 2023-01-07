@@ -79,8 +79,7 @@ enum BackgroundBright : int {
 
 alias BgBright = BackgroundBright;
 
-void color(Colors...)(Colors colors)
-if (Colors.length != 0) {
+void color(int[] colors...) {
     foreach (c; colors) {
         c.esc.write;
     }
