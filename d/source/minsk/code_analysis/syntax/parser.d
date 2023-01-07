@@ -8,6 +8,7 @@ import std.range : InputRange;
 import minsk.code_analysis.syntax.lexer : Lexer;
 import minsk.code_analysis.syntax.syntax_kind : SyntaxKind;
 import minsk.code_analysis.syntax.syntax_token : SyntaxToken;
+import minsk.code_analysis.syntax.syntax_tree : SyntaxTree;
 import minsk.code_analysis.syntax.syntax_node : ExpressionSyntax,
     BinaryExpressionSyntax,
     LiteralExpressionSyntax;
@@ -57,7 +58,13 @@ final class Parser {
         return new SyntaxToken(kind, current.position, "", null);
     }
 
-    ExpressionSyntax parse() {
+    SyntaxTree parse() {
+        const expression = parseExpression();
+        const endOfFileToken = match(SyntaxKind.EndOfFileToken);
+        return SyntaxTree(expression, endOfFileToken, diagnostics);
+    }
+
+    private ExpressionSyntax parseExpression() {
         auto left = parsePrimaryExpression();
 
         while (current.kind.among(SyntaxKind.PlusToken, SyntaxKind.MinusToken)) {

@@ -15,16 +15,15 @@ void main() {
 		}
 		auto line = cast(immutable) buf.strip();
 
-		auto parser = new Parser(line);
-		const expression = parser.parse();
+		const syntaxTree = new Parser(line).parse();
 
 		color(Fg.white, Style.faint);
-		SyntaxNode.prettyPrint(expression);
+		SyntaxNode.prettyPrint(syntaxTree.root);
 		color(Style.reset);
 
-		if (!parser.diagnostics.empty) {
+		if (!syntaxTree.diagnostics.empty) {
 			color(Fg.red, Style.faint);
-			foreach (diagnostic; parser.diagnostics) {
+			foreach (diagnostic; syntaxTree.diagnostics) {
 				writeln(diagnostic);
 			}
 			color(Style.reset);
