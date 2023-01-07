@@ -3,7 +3,7 @@ import std.stdio : readln, write, writeln;
 import std.string : strip;
 
 import minsk.code_analysis.evaluator : Evaluator;
-import minsk.code_analysis.syntax : Lexer, Parser, SyntaxKind, SyntaxNode;
+import minsk.code_analysis.syntax : Lexer, SyntaxKind, SyntaxNode, SyntaxTree;
 import minsk.support.color : color, Fg, Style;
 
 void main() {
@@ -16,7 +16,7 @@ void main() {
 		}
 		auto line = cast(immutable) buf.strip();
 
-		const syntaxTree = new Parser(line).parse();
+		const syntaxTree = SyntaxTree.parse(line);
 
 		color(Fg.white, Style.faint);
 		SyntaxNode.prettyPrint(syntaxTree.root);
