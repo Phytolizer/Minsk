@@ -1,7 +1,7 @@
 module minsk.code_analysis.syntax.lexer;
 
 import std.ascii : isDigit, isWhite;
-import std.conv : to;
+import std.conv : to, ConvException;
 import std.format : format;
 
 import minsk.runtime.object : Integer, Obj;
@@ -43,7 +43,11 @@ final class Lexer {
             }
 
             text = _text[start .. _position];
-            value = new Integer(text.front.to!int);
+            try {
+                value = new Integer(text.front.to!int);
+            } catch (ConvException) {
+                _diagnostics ~= format!"The number '%s' isn't a valid int."(text.front);
+            }
             kind = SyntaxKind.NumberToken;
         } else if (isWhite(current)) {
             while (isWhite(current)) {

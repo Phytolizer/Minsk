@@ -2,6 +2,7 @@ import std.range : empty;
 import std.stdio : readln, write, writeln;
 import std.string : strip;
 
+import minsk.code_analysis.evaluator : Evaluator;
 import minsk.code_analysis.syntax : Lexer, Parser, SyntaxKind, SyntaxNode;
 import minsk.support.color : color, Fg, Style;
 
@@ -26,6 +27,10 @@ void main() {
 			foreach (diagnostic; syntaxTree.diagnostics) {
 				writeln(diagnostic);
 			}
+			color(Style.reset);
+		} else {
+			color(Fg.magenta);
+			writeln(new Evaluator(syntaxTree.root).evaluate());
 			color(Style.reset);
 		}
 	}
