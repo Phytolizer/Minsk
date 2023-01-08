@@ -6,6 +6,7 @@ import std.format : format;
 import std.range : InputRange;
 
 import minsk.code_analysis.syntax.lexer : Lexer;
+import minsk.code_analysis.syntax.facts : binaryPrecedence;
 import minsk.code_analysis.syntax.syntax_kind : SyntaxKind;
 import minsk.code_analysis.syntax.syntax_token : SyntaxToken;
 import minsk.code_analysis.syntax.syntax_tree : SyntaxTree;
@@ -66,27 +67,20 @@ final class Parser {
     }
 
     private ExpressionSyntax parseExpression() {
-        return parseTerm();
+        return parseBinaryExpression();
     }
 
-    private ExpressionSyntax parseTerm() {
+    private ExpressionSyntax parseBinaryExpression(int parentPrecedence = 0) {
         auto left = parseFactor();
 
-        while (current.kind.among(SyntaxKind.PlusToken, SyntaxKind.MinusToken)) {
+        while (true) {
+            const precedence = current.kind.binaryPrecedence;
+            if (precedence == 0 || precedence <= parentPrecedence) {
+                break;
+            }
+
             const operatorToken = nextToken();
-            const right = parseFactor();
-            left = new BinaryExpressionSyntax(left, operatorToken, right);
-        }
-
-        return left;
-    }
-
-    private ExpressionSyntax parseFactor() {
-        auto left = parsePrimaryExpression();
-
-        while (current.kind.among(SyntaxKind.StarToken, SyntaxKind.SlashToken)) {
-            const operatorToken = nextToken();
-            const right = parsePrimaryExpression();
+            const right = parseBinaryExpression(precedence);
             left = new BinaryExpressionSyntax(left, operatorToken, right);
         }
 

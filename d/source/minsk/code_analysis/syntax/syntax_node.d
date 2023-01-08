@@ -9,27 +9,27 @@ import minsk.code_analysis.syntax.syntax_token : SyntaxToken;
 interface SyntaxNode {
     SyntaxKind kind() const;
     const(SyntaxNode)[] children() const;
+}
 
-    static void prettyPrint(
-        const(SyntaxNode) node,
-        string indent = "",
-        bool isLast = true,
-    ) {
-        write(indent);
-        write(isLast ? "└── " : "├── ");
-        write(node.kind);
-        if (auto t = cast(SyntaxToken) node)
-            if (t.value) {
-                write(" ");
-                write(t.value);
-            }
-        writeln();
-
-        indent ~= isLast ? "    " : "│   ";
-        const children = node.children;
-        foreach (i, child; children) {
-            prettyPrint(child, indent, i + 1 == children.length);
+void prettyPrint(
+    const(SyntaxNode) node,
+    string indent = "",
+    bool isLast = true,
+) {
+    write(indent);
+    write(isLast ? "└── " : "├── ");
+    write(node.kind);
+    if (auto t = cast(SyntaxToken) node)
+        if (t.value) {
+            write(" ");
+            write(t.value);
         }
+    writeln();
+
+    indent ~= isLast ? "    " : "│   ";
+    const children = node.children;
+    foreach (i, child; children) {
+        prettyPrint(child, indent, i + 1 == children.length);
     }
 }
 

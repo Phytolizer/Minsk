@@ -3,7 +3,11 @@ import std.stdio : readln, write, writeln;
 import std.string : strip;
 
 import minsk.code_analysis.evaluator : Evaluator;
-import minsk.code_analysis.syntax : Lexer, SyntaxKind, SyntaxNode, SyntaxTree;
+import minsk.code_analysis.syntax : Lexer,
+	SyntaxKind,
+	SyntaxNode,
+	SyntaxTree,
+	prettyPrint;
 import minsk.support.color : color, Fg, Style;
 
 void main() {
@@ -32,7 +36,7 @@ void main() {
 
 		if (showTree) {
 			color(Fg.white, Style.faint);
-			SyntaxNode.prettyPrint(syntaxTree.root);
+			prettyPrint(syntaxTree.root);
 			color(Style.reset);
 		}
 
