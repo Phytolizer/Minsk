@@ -71,7 +71,7 @@ final class Parser {
     }
 
     private ExpressionSyntax parseBinaryExpression(int parentPrecedence = 0) {
-        auto left = parseFactor();
+        auto left = parsePrimaryExpression();
 
         while (true) {
             const precedence = current.kind.binaryPrecedence;
