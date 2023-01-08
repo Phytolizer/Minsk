@@ -1,8 +1,8 @@
-module minsk.code_analysis.syntax.syntax_token;
+module minsk.code_analysis.syntax.token;
 
 import minsk.runtime.object : Obj;
-import minsk.code_analysis.syntax.syntax_kind : SyntaxKind;
-import minsk.code_analysis.syntax.syntax_node : SyntaxNode;
+import minsk.code_analysis.syntax.kind : SyntaxKind;
+import minsk.code_analysis.syntax.node : SyntaxNode;
 
 class SyntaxToken : SyntaxNode {
     private SyntaxKind _kind;

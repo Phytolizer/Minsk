@@ -1,10 +1,10 @@
-module minsk.code_analysis.syntax.syntax_node;
+module minsk.code_analysis.syntax.node;
 
 import std.range : takeOne, front;
 import std.stdio : write, writeln;
 
-import minsk.code_analysis.syntax.syntax_kind : SyntaxKind;
-import minsk.code_analysis.syntax.syntax_token : SyntaxToken;
+import minsk.code_analysis.syntax.kind : SyntaxKind;
+import minsk.code_analysis.syntax.token : SyntaxToken;
 
 interface SyntaxNode {
     SyntaxKind kind() const;

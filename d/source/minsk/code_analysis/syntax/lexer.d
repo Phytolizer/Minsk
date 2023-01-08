@@ -6,8 +6,8 @@ import std.format : format;
 import std.range : isInputRange, ElementType;
 
 import minsk.runtime.object : Integer, Obj;
-import minsk.code_analysis.syntax.syntax_kind : SyntaxKind;
-import minsk.code_analysis.syntax.syntax_token : SyntaxToken;
+import minsk.code_analysis.syntax.kind : SyntaxKind;
+import minsk.code_analysis.syntax.token : SyntaxToken;
 
 import optional : no, or, some;
 

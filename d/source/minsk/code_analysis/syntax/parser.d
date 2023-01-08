@@ -7,10 +7,10 @@ import std.range : InputRange;
 
 import minsk.code_analysis.syntax.lexer : Lexer;
 import minsk.code_analysis.syntax.facts : binaryPrecedence;
-import minsk.code_analysis.syntax.syntax_kind : SyntaxKind;
-import minsk.code_analysis.syntax.syntax_token : SyntaxToken;
-import minsk.code_analysis.syntax.syntax_tree : SyntaxTree;
-import minsk.code_analysis.syntax.syntax_node : ExpressionSyntax,
+import minsk.code_analysis.syntax.kind : SyntaxKind;
+import minsk.code_analysis.syntax.token : SyntaxToken;
+import minsk.code_analysis.syntax.tree : SyntaxTree;
+import minsk.code_analysis.syntax.node : ExpressionSyntax,
     BinaryExpressionSyntax,
     LiteralExpressionSyntax,
     ParenthesizedExpressionSyntax;

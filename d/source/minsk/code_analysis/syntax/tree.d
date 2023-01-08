@@ -1,8 +1,8 @@
-module minsk.code_analysis.syntax.syntax_tree;
+module minsk.code_analysis.syntax.tree;
 
 import minsk.code_analysis.syntax.parser : Parser;
-import minsk.code_analysis.syntax.syntax_node : ExpressionSyntax;
-import minsk.code_analysis.syntax.syntax_token : SyntaxToken;
+import minsk.code_analysis.syntax.node : ExpressionSyntax;
+import minsk.code_analysis.syntax.token : SyntaxToken;
 
 struct SyntaxTree {
     const(ExpressionSyntax) root;

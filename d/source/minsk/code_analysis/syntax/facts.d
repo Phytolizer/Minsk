@@ -1,6 +1,6 @@
 module minsk.code_analysis.syntax.facts;
 
-import minsk.code_analysis.syntax.syntax_kind : SyntaxKind;
+import minsk.code_analysis.syntax.kind : SyntaxKind;
 
 int binaryPrecedence(SyntaxKind kind) {
     switch (kind) {

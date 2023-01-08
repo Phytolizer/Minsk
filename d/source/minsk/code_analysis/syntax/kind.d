@@ -1,4 +1,4 @@
-module minsk.code_analysis.syntax.syntax_kind;
+module minsk.code_analysis.syntax.kind;
 
 enum SyntaxKind {
     BadToken,
