@@ -4,6 +4,7 @@ import std.conv : to;
 
 enum Type {
     Integer,
+    Boolean,
 }
 
 interface Obj {
@@ -24,5 +25,21 @@ class Integer : Obj {
 
     override string toString() const @safe pure nothrow {
         return value.to!string;
+    }
+}
+
+class Boolean : Obj {
+    bool value;
+
+    this(bool value) {
+        this.value = value;
+    }
+
+    override Type type() const @safe pure nothrow {
+        return Type.Boolean;
+    }
+
+    override string toString() const @safe pure nothrow {
+        return value ? "true" : "false";
     }
 }

@@ -7,7 +7,11 @@ import minsk.code_analysis.binding : BoundNodeKind,
     BoundLiteralExpression,
     BoundUnaryExpression,
     BoundUnaryOperatorKind;
-import minsk.runtime.object : Integer, Obj;
+import minsk.runtime.object : Boolean, Integer, Obj;
+
+private int intVal(const(Obj) o) {
+    return (cast(Integer) o).value;
+}
 
 final class Evaluator {
     private const(BoundExpression) _root;
@@ -16,11 +20,11 @@ final class Evaluator {
         _root = root;
     }
 
-    int evaluate() {
+    const(Obj) evaluate() {
         return evaluateExpression(_root);
     }
 
-    private int evaluateExpression(const(BoundExpression) root) {
+    private const(Obj) evaluateExpression(const(BoundExpression) root) {
         switch (root.kind) {
             case BoundNodeKind.LiteralExpression:
                 return evaluateLiteralExpression(cast(BoundLiteralExpression) root);
@@ -33,32 +37,32 @@ final class Evaluator {
         }
     }
 
-    private int evaluateLiteralExpression(BoundLiteralExpression root) {
-        return (cast(Integer) root.value).value;
+    private const(Obj) evaluateLiteralExpression(BoundLiteralExpression root) {
+        return root.value;
     }
 
-    private int evaluateBinaryExpression(BoundBinaryExpression root) {
-        const left = evaluateExpression(root.left);
-        const right = evaluateExpression(root.right);
+    private const(Obj) evaluateBinaryExpression(BoundBinaryExpression root) {
+        const left = evaluateExpression(root.left).intVal;
+        const right = evaluateExpression(root.right).intVal;
         final switch (root.operatorKind) {
             case BoundBinaryOperatorKind.Addition:
-                return left + right;
+                return new Integer(left + right);
             case BoundBinaryOperatorKind.Subtraction:
-                return left - right;
+                return new Integer(left - right);
             case BoundBinaryOperatorKind.Multiplication:
-                return left * right;
+                return new Integer(left * right);
             case BoundBinaryOperatorKind.Division:
-                return left / right;
+                return new Integer(left / right);
         }
     }
 
-    private int evaluateUnaryExpression(BoundUnaryExpression root) {
-        const operand = evaluateExpression(root.operand);
+    private const(Obj) evaluateUnaryExpression(BoundUnaryExpression root) {
+        const operand = evaluateExpression(root.operand).intVal;
         final switch (root.operatorKind) {
             case BoundUnaryOperatorKind.Identity:
-                return operand;
+                return new Integer(operand);
             case BoundUnaryOperatorKind.Negation:
-                return -operand;
+                return new Integer(-operand);
         }
     }
 }

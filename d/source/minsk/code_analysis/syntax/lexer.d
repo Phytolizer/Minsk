@@ -1,11 +1,12 @@
 module minsk.code_analysis.syntax.lexer;
 
-import std.ascii : isDigit, isWhite;
+import std.ascii : isAlpha, isDigit, isWhite;
 import std.conv : to, ConvException;
 import std.format : format;
 import std.range : isInputRange, ElementType;
 
 import minsk.runtime.object : Integer, Obj;
+import minsk.code_analysis.syntax.facts : keywordKind;
 import minsk.code_analysis.syntax.kind : SyntaxKind;
 import minsk.code_analysis.syntax.token : SyntaxToken;
 
@@ -38,8 +39,8 @@ final class Lexer {
             return _token;
         }
 
-        if (isDigit(current)) {
-            while (isDigit(current)) {
+        if (current.isDigit) {
+            while (current.isDigit) {
                 _position++;
             }
 
@@ -50,13 +51,20 @@ final class Lexer {
                 _diagnostics ~= format!"The number '%s' isn't a valid int."(text.front);
             }
             kind = SyntaxKind.NumberToken;
-        } else if (isWhite(current)) {
-            while (isWhite(current)) {
+        } else if (current.isWhite) {
+            while (current.isWhite) {
                 _position++;
             }
 
             text = _text[start .. _position];
             kind = SyntaxKind.WhitespaceToken;
+        } else if (current.isAlpha) {
+            while (current.isAlpha) {
+                _position++;
+            }
+
+            text = _text[start .. _position];
+            kind = text.front.keywordKind;
         } else {
             switch (current) {
                 case '+':

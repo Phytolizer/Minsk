@@ -110,7 +110,7 @@ class Binder {
     }
 
     private const(BoundExpression) bindLiteralExpression(const(LiteralExpressionSyntax) syntax) {
-        return new BoundLiteralExpression(syntax.literalToken.value);
+        return new BoundLiteralExpression(syntax.value);
     }
 
     private const(BoundExpression) bindParenthesizedExpression(const(ParenthesizedExpressionSyntax) syntax) {

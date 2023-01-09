@@ -15,6 +15,7 @@ import minsk.code_analysis.syntax.node : ExpressionSyntax,
     LiteralExpressionSyntax,
     ParenthesizedExpressionSyntax,
     UnaryExpressionSyntax;
+import minsk.runtime.object : Boolean;
 
 final class Parser {
     private SyntaxToken[] _tokens;
@@ -106,6 +107,10 @@ final class Parser {
                 expression,
                 closeParenthesisToken,
             );
+        } else if (current.kind.among(SyntaxKind.TrueKeyword, SyntaxKind.FalseKeyword)) {
+            const keywordToken = nextToken();
+            const value = keywordToken.kind == SyntaxKind.TrueKeyword;
+            return new LiteralExpressionSyntax(keywordToken, new Boolean(value));
         }
 
         const numberToken = match(SyntaxKind.NumberToken);

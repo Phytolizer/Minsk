@@ -5,12 +5,16 @@ enum SyntaxKind {
     EndOfFileToken,
     WhitespaceToken,
     NumberToken,
+    IdentifierToken,
     PlusToken,
     MinusToken,
     StarToken,
     SlashToken,
     OpenParenthesisToken,
     CloseParenthesisToken,
+
+    TrueKeyword,
+    FalseKeyword,
 
     BinaryExpression,
     LiteralExpression,

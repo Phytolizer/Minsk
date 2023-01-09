@@ -21,3 +21,14 @@ int binaryPrecedence(SyntaxKind kind) {
             return 0;
     }
 }
+
+SyntaxKind keywordKind(string text) {
+    switch (text) {
+        case "true":
+            return SyntaxKind.TrueKeyword;
+        case "false":
+            return SyntaxKind.FalseKeyword;
+        default:
+            return SyntaxKind.IdentifierToken;
+    }
+}

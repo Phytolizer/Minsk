@@ -5,6 +5,7 @@ import std.stdio : write, writeln;
 
 import minsk.code_analysis.syntax.kind : SyntaxKind;
 import minsk.code_analysis.syntax.token : SyntaxToken;
+import minsk.runtime.object : Obj;
 
 interface SyntaxNode {
     SyntaxKind kind() const;
@@ -38,13 +39,23 @@ interface ExpressionSyntax : SyntaxNode {
 
 final class LiteralExpressionSyntax : ExpressionSyntax {
     private const(SyntaxToken) _literalToken;
+    private const(Obj) _value;
 
     this(const(SyntaxToken) literalToken) {
+        this(literalToken, literalToken.value);
+    }
+
+    this(const(SyntaxToken) literalToken, const(Obj) value) {
         _literalToken = literalToken;
+        _value = value;
     }
 
     const(SyntaxToken) literalToken() const @property {
         return _literalToken;
+    }
+
+    const(Obj) value() const @property {
+        return _value;
     }
 
     override SyntaxKind kind() const {
