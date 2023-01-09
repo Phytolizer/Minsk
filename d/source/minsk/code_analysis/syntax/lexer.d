@@ -25,8 +25,13 @@ final class Lexer {
         _token = nextToken();
     }
 
+    private char peek(int offset) {
+        const index = _position + offset;
+        return index >= _text.length ? '\0' : _text[index];
+    }
+
     private char current() {
-        return _position >= _text.length ? '\0' : _text[_position];
+        return peek(0);
     }
 
     private SyntaxToken nextToken() {
@@ -90,6 +95,22 @@ final class Lexer {
                 case ')':
                     _position++;
                     kind = SyntaxKind.CloseParenthesisToken;
+                    break;
+                case '!':
+                    _position++;
+                    kind = SyntaxKind.BangToken;
+                    break;
+                case '&':
+                    if (peek(1) == '&') {
+                        _position += 2;
+                        kind = SyntaxKind.AmpersandAmpersandToken;
+                    }
+                    break;
+                case '|':
+                    if (peek(1) == '|') {
+                        _position += 2;
+                        kind = SyntaxKind.PipePipeToken;
+                    }
                     break;
                 case '\0':
                     kind = SyntaxKind.EndOfFileToken;

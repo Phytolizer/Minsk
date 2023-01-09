@@ -12,6 +12,9 @@ enum SyntaxKind {
     SlashToken,
     OpenParenthesisToken,
     CloseParenthesisToken,
+    BangToken,
+    AmpersandAmpersandToken,
+    PipePipeToken,
 
     TrueKeyword,
     FalseKeyword,

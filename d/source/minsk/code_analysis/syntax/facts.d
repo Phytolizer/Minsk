@@ -4,8 +4,8 @@ import minsk.code_analysis.syntax.kind : SyntaxKind;
 
 int unaryPrecedence(SyntaxKind kind) {
     switch (kind) {
-        case SyntaxKind.PlusToken, SyntaxKind.MinusToken:
-            return 3;
+        case SyntaxKind.PlusToken, SyntaxKind.MinusToken, SyntaxKind.BangToken:
+            return 5;
         default:
             return 0;
     }
@@ -14,8 +14,12 @@ int unaryPrecedence(SyntaxKind kind) {
 int binaryPrecedence(SyntaxKind kind) {
     switch (kind) {
         case SyntaxKind.StarToken, SyntaxKind.SlashToken:
-            return 2;
+            return 4;
         case SyntaxKind.PlusToken, SyntaxKind.MinusToken:
+            return 3;
+        case SyntaxKind.AmpersandAmpersandToken:
+            return 2;
+        case SyntaxKind.PipePipeToken:
             return 1;
         default:
             return 0;

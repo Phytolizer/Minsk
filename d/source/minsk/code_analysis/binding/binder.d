@@ -44,21 +44,30 @@ class Binder {
         Type leftType,
         Type rightType
     ) {
-        if (leftType != Type.Integer || rightType != Type.Integer) {
-            return no!BoundBinaryOperatorKind;
+        if (leftType == Type.Integer && rightType == Type.Integer) {
+            switch (kind) {
+                case SyntaxKind.PlusToken:
+                    return some(BoundBinaryOperatorKind.Addition);
+                case SyntaxKind.MinusToken:
+                    return some(BoundBinaryOperatorKind.Subtraction);
+                case SyntaxKind.StarToken:
+                    return some(BoundBinaryOperatorKind.Multiplication);
+                case SyntaxKind.SlashToken:
+                    return some(BoundBinaryOperatorKind.Division);
+                default:
+                    break;
+            }
+        } else if (leftType == Type.Boolean && rightType == Type.Boolean) {
+            switch (kind) {
+                case SyntaxKind.AmpersandAmpersandToken:
+                    return some(BoundBinaryOperatorKind.LogicalAnd);
+                case SyntaxKind.PipePipeToken:
+                    return some(BoundBinaryOperatorKind.LogicalOr);
+                default:
+                    break;
+            }
         }
-        switch (kind) {
-            case SyntaxKind.PlusToken:
-                return some(BoundBinaryOperatorKind.Addition);
-            case SyntaxKind.MinusToken:
-                return some(BoundBinaryOperatorKind.Subtraction);
-            case SyntaxKind.StarToken:
-                return some(BoundBinaryOperatorKind.Multiplication);
-            case SyntaxKind.SlashToken:
-                return some(BoundBinaryOperatorKind.Division);
-            default:
-                assert(false);
-        }
+        return no!BoundBinaryOperatorKind;
     }
 
     private const(BoundExpression) bindBinaryExpression(const(BinaryExpressionSyntax) syntax) {
@@ -82,17 +91,24 @@ class Binder {
     }
 
     private Optional!BoundUnaryOperatorKind bindUnaryOperatorKind(SyntaxKind kind, Type operandType) {
-        if (operandType != Type.Integer) {
-            return no!BoundUnaryOperatorKind;
+        if (operandType == Type.Integer) {
+            switch (kind) {
+                case SyntaxKind.PlusToken:
+                    return some(BoundUnaryOperatorKind.Identity);
+                case SyntaxKind.MinusToken:
+                    return some(BoundUnaryOperatorKind.ArithmeticNegation);
+                default:
+                    break;
+            }
+        } else if (operandType == Type.Boolean) {
+            switch (kind) {
+                case SyntaxKind.BangToken:
+                    return some(BoundUnaryOperatorKind.LogicalNegation);
+                default:
+                    break;
+            }
         }
-        switch (kind) {
-            case SyntaxKind.PlusToken:
-                return some(BoundUnaryOperatorKind.Identity);
-            case SyntaxKind.MinusToken:
-                return some(BoundUnaryOperatorKind.Negation);
-            default:
-                assert(false);
-        }
+        return no!BoundUnaryOperatorKind;
     }
 
     private const(BoundExpression) bindUnaryExpression(const(UnaryExpressionSyntax) syntax) {

@@ -13,6 +13,10 @@ private int intVal(const(Obj) o) {
     return (cast(Integer) o).value;
 }
 
+private bool boolVal(const(Obj) o) {
+    return (cast(Boolean) o).value;
+}
+
 final class Evaluator {
     private const(BoundExpression) _root;
 
@@ -42,27 +46,33 @@ final class Evaluator {
     }
 
     private const(Obj) evaluateBinaryExpression(BoundBinaryExpression root) {
-        const left = evaluateExpression(root.left).intVal;
-        const right = evaluateExpression(root.right).intVal;
+        const left = evaluateExpression(root.left);
+        const right = evaluateExpression(root.right);
         final switch (root.operatorKind) {
             case BoundBinaryOperatorKind.Addition:
-                return new Integer(left + right);
+                return new Integer(left.intVal + right.intVal);
             case BoundBinaryOperatorKind.Subtraction:
-                return new Integer(left - right);
+                return new Integer(left.intVal - right.intVal);
             case BoundBinaryOperatorKind.Multiplication:
-                return new Integer(left * right);
+                return new Integer(left.intVal * right.intVal);
             case BoundBinaryOperatorKind.Division:
-                return new Integer(left / right);
+                return new Integer(left.intVal / right.intVal);
+            case BoundBinaryOperatorKind.LogicalAnd:
+                return new Boolean(left.boolVal && right.boolVal);
+            case BoundBinaryOperatorKind.LogicalOr:
+                return new Boolean(left.boolVal || right.boolVal);
         }
     }
 
     private const(Obj) evaluateUnaryExpression(BoundUnaryExpression root) {
-        const operand = evaluateExpression(root.operand).intVal;
+        const operand = evaluateExpression(root.operand);
         final switch (root.operatorKind) {
             case BoundUnaryOperatorKind.Identity:
-                return new Integer(operand);
-            case BoundUnaryOperatorKind.Negation:
-                return new Integer(-operand);
+                return new Integer(operand.intVal);
+            case BoundUnaryOperatorKind.ArithmeticNegation:
+                return new Integer(-operand.intVal);
+            case BoundUnaryOperatorKind.LogicalNegation:
+                return new Boolean(!operand.boolVal);
         }
     }
 }

@@ -41,6 +41,8 @@ enum BoundBinaryOperatorKind {
     Subtraction,
     Multiplication,
     Division,
+    LogicalAnd,
+    LogicalOr,
 }
 
 final class BoundBinaryExpression : BoundExpression {
@@ -81,7 +83,8 @@ final class BoundBinaryExpression : BoundExpression {
 
 enum BoundUnaryOperatorKind {
     Identity,
-    Negation,
+    ArithmeticNegation,
+    LogicalNegation,
 }
 
 final class BoundUnaryExpression : BoundExpression {
