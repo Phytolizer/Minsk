@@ -2,6 +2,7 @@ import std.range : empty;
 import std.stdio : readln, write, writeln;
 import std.string : strip;
 
+import minsk.code_analysis.binding : Binder;
 import minsk.code_analysis.evaluator : Evaluator;
 import minsk.code_analysis.syntax : Lexer,
 	SyntaxKind,
@@ -33,6 +34,9 @@ void main() {
 		}
 
 		const syntaxTree = SyntaxTree.parse(line);
+		auto binder = new Binder();
+		const boundExpression = binder.bindExpression(syntaxTree.root);
+		const diagnostics = syntaxTree.diagnostics ~ binder.diagnostics;
 
 		if (showTree) {
 			color(Fg.white, Style.faint);
@@ -40,13 +44,13 @@ void main() {
 			color(Style.reset);
 		}
 
-		if (syntaxTree.diagnostics.empty) {
+		if (diagnostics.empty) {
 			color(Fg.magenta);
-			writeln(new Evaluator(syntaxTree.root).evaluate());
+			writeln(new Evaluator(boundExpression).evaluate());
 			color(Style.reset);
 		} else {
 			color(Fg.red, Style.faint);
-			foreach (diagnostic; syntaxTree.diagnostics) {
+			foreach (diagnostic; diagnostics) {
 				writeln(diagnostic);
 			}
 			color(Style.reset);
