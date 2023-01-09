@@ -7,7 +7,9 @@ import minsk.code_analysis.binding.node : BoundExpression,
     BoundBinaryOperatorKind,
     BoundLiteralExpression,
     BoundUnaryExpression,
-    BoundUnaryOperatorKind;
+    BoundUnaryOperatorKind,
+    bindBinaryOperator,
+    bindUnaryOperator;
 import minsk.code_analysis.syntax : ExpressionSyntax,
     BinaryExpressionSyntax,
     LiteralExpressionSyntax,
@@ -15,7 +17,6 @@ import minsk.code_analysis.syntax : ExpressionSyntax,
     UnaryExpressionSyntax,
     SyntaxKind;
 import minsk.runtime.object : Obj, Integer, Type;
-import optional : Optional, no, some;
 
 class Binder {
     private string[] _diagnostics = [];
@@ -39,46 +40,15 @@ class Binder {
         }
     }
 
-    private Optional!BoundBinaryOperatorKind bindBinaryOperatorKind(
-        SyntaxKind kind,
-        Type leftType,
-        Type rightType
-    ) {
-        if (leftType == Type.Integer && rightType == Type.Integer) {
-            switch (kind) {
-                case SyntaxKind.PlusToken:
-                    return some(BoundBinaryOperatorKind.Addition);
-                case SyntaxKind.MinusToken:
-                    return some(BoundBinaryOperatorKind.Subtraction);
-                case SyntaxKind.StarToken:
-                    return some(BoundBinaryOperatorKind.Multiplication);
-                case SyntaxKind.SlashToken:
-                    return some(BoundBinaryOperatorKind.Division);
-                default:
-                    break;
-            }
-        } else if (leftType == Type.Boolean && rightType == Type.Boolean) {
-            switch (kind) {
-                case SyntaxKind.AmpersandAmpersandToken:
-                    return some(BoundBinaryOperatorKind.LogicalAnd);
-                case SyntaxKind.PipePipeToken:
-                    return some(BoundBinaryOperatorKind.LogicalOr);
-                default:
-                    break;
-            }
-        }
-        return no!BoundBinaryOperatorKind;
-    }
-
     private const(BoundExpression) bindBinaryExpression(const(BinaryExpressionSyntax) syntax) {
         const left = bindExpression(syntax.left);
         const right = bindExpression(syntax.right);
-        const operatorKind = bindBinaryOperatorKind(
+        const operator = bindBinaryOperator(
             syntax.operatorToken.kind,
             left.type,
-            right.type
+            right.type,
         );
-        if (operatorKind.empty) {
+        if (operator.empty) {
             _diagnostics ~= format!"Binary operator '%s' is not defined for types '%s' and '%s'."(
                 syntax.operatorToken.text,
                 left.type,
@@ -87,34 +57,13 @@ class Binder {
             return left;
         }
 
-        return new BoundBinaryExpression(left, operatorKind.front, right);
-    }
-
-    private Optional!BoundUnaryOperatorKind bindUnaryOperatorKind(SyntaxKind kind, Type operandType) {
-        if (operandType == Type.Integer) {
-            switch (kind) {
-                case SyntaxKind.PlusToken:
-                    return some(BoundUnaryOperatorKind.Identity);
-                case SyntaxKind.MinusToken:
-                    return some(BoundUnaryOperatorKind.ArithmeticNegation);
-                default:
-                    break;
-            }
-        } else if (operandType == Type.Boolean) {
-            switch (kind) {
-                case SyntaxKind.BangToken:
-                    return some(BoundUnaryOperatorKind.LogicalNegation);
-                default:
-                    break;
-            }
-        }
-        return no!BoundUnaryOperatorKind;
+        return new BoundBinaryExpression(left, operator.front, right);
     }
 
     private const(BoundExpression) bindUnaryExpression(const(UnaryExpressionSyntax) syntax) {
         const operand = bindExpression(syntax.operand);
-        const operatorKind = bindUnaryOperatorKind(syntax.operatorToken.kind, operand.type);
-        if (operatorKind.empty) {
+        const operator = bindUnaryOperator(syntax.operatorToken.kind, operand.type);
+        if (operator.empty) {
             _diagnostics ~= format!"Unary operator '%s' is not defined for type '%s'."(
                 syntax.operatorToken.text,
                 operand.type,
@@ -122,7 +71,7 @@ class Binder {
             return operand;
         }
 
-        return new BoundUnaryExpression(operatorKind.front, operand);
+        return new BoundUnaryExpression(operator.front, operand);
     }
 
     private const(BoundExpression) bindLiteralExpression(const(LiteralExpressionSyntax) syntax) {

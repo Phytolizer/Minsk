@@ -48,7 +48,7 @@ final class Evaluator {
     private const(Obj) evaluateBinaryExpression(BoundBinaryExpression root) {
         const left = evaluateExpression(root.left);
         const right = evaluateExpression(root.right);
-        final switch (root.operatorKind) {
+        final switch (root.operator.kind) {
             case BoundBinaryOperatorKind.Addition:
                 return new Integer(left.intVal + right.intVal);
             case BoundBinaryOperatorKind.Subtraction:
@@ -61,12 +61,16 @@ final class Evaluator {
                 return new Boolean(left.boolVal && right.boolVal);
             case BoundBinaryOperatorKind.LogicalOr:
                 return new Boolean(left.boolVal || right.boolVal);
+            case BoundBinaryOperatorKind.Equality:
+                return new Boolean(left == right);
+            case BoundBinaryOperatorKind.Inequality:
+                return new Boolean(left != right);
         }
     }
 
     private const(Obj) evaluateUnaryExpression(BoundUnaryExpression root) {
         const operand = evaluateExpression(root.operand);
-        final switch (root.operatorKind) {
+        final switch (root.operator.kind) {
             case BoundUnaryOperatorKind.Identity:
                 return new Integer(operand.intVal);
             case BoundUnaryOperatorKind.ArithmeticNegation:

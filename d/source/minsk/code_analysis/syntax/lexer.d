@@ -97,8 +97,19 @@ final class Lexer {
                     kind = SyntaxKind.CloseParenthesisToken;
                     break;
                 case '!':
-                    _position++;
-                    kind = SyntaxKind.BangToken;
+                    if (peek(1) == '=') {
+                        _position += 2;
+                        kind = SyntaxKind.BangEqualsToken;
+                    } else {
+                        _position++;
+                        kind = SyntaxKind.BangToken;
+                    }
+                    break;
+                case '=':
+                    if (peek(1) == '=') {
+                        _position += 2;
+                        kind = SyntaxKind.EqualsEqualsToken;
+                    }
                     break;
                 case '&':
                     if (peek(1) == '&') {

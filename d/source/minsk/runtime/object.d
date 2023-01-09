@@ -26,6 +26,11 @@ class Integer : Obj {
     override string toString() const @safe pure nothrow {
         return value.to!string;
     }
+
+    override bool opEquals(Object b) {
+        const ib = cast(Integer) b;
+        return ib !is null && ib.value == value;
+    }
 }
 
 class Boolean : Obj {
@@ -41,5 +46,10 @@ class Boolean : Obj {
 
     override string toString() const @safe pure nothrow {
         return value ? "true" : "false";
+    }
+
+    override bool opEquals(Object b) {
+        const bb = cast(Boolean) b;
+        return bb !is null && bb.value == value;
     }
 }
