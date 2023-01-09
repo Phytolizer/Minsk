@@ -2,6 +2,15 @@ module minsk.code_analysis.syntax.facts;
 
 import minsk.code_analysis.syntax.kind : SyntaxKind;
 
+int unaryPrecedence(SyntaxKind kind) {
+    switch (kind) {
+        case SyntaxKind.PlusToken, SyntaxKind.MinusToken:
+            return 3;
+        default:
+            return 0;
+    }
+}
+
 int binaryPrecedence(SyntaxKind kind) {
     switch (kind) {
         case SyntaxKind.StarToken, SyntaxKind.SlashToken:

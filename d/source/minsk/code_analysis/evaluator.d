@@ -4,6 +4,7 @@ import minsk.code_analysis.syntax : BinaryExpressionSyntax,
     ExpressionSyntax,
     LiteralExpressionSyntax,
     ParenthesizedExpressionSyntax,
+    UnaryExpressionSyntax,
     SyntaxKind;
 import minsk.runtime.object : Integer, Obj;
 
@@ -26,6 +27,8 @@ final class Evaluator {
                 return evaluateBinaryExpression(cast(BinaryExpressionSyntax) root);
             case SyntaxKind.ParenthesizedExpression:
                 return evaluateParenthesizedExpression(cast(ParenthesizedExpressionSyntax) root);
+            case SyntaxKind.UnaryExpression:
+                return evaluateUnaryExpression(cast(UnaryExpressionSyntax) root);
             default:
                 assert(false);
         }
@@ -54,5 +57,17 @@ final class Evaluator {
 
     private int evaluateParenthesizedExpression(ParenthesizedExpressionSyntax root) {
         return evaluateExpression(root.expression);
+    }
+
+    private int evaluateUnaryExpression(UnaryExpressionSyntax root) {
+        const operand = evaluateExpression(root.operand);
+        switch (root.operatorToken.kind) {
+            case SyntaxKind.PlusToken:
+                return operand;
+            case SyntaxKind.MinusToken:
+                return -operand;
+            default:
+                assert(false);
+        }
     }
 }

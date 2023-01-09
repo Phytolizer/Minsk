@@ -131,3 +131,32 @@ final class ParenthesizedExpressionSyntax : ExpressionSyntax {
         ];
     }
 }
+
+final class UnaryExpressionSyntax : ExpressionSyntax {
+    private const(SyntaxToken) _operatorToken;
+    private const(ExpressionSyntax) _operand;
+
+    this(
+        const(SyntaxToken) operatorToken,
+        const(ExpressionSyntax) operand,
+    ) {
+        _operatorToken = operatorToken;
+        _operand = operand;
+    }
+
+    const(SyntaxToken) operatorToken() const @property {
+        return _operatorToken;
+    }
+
+    const(ExpressionSyntax) operand() const @property {
+        return _operand;
+    }
+
+    override const(SyntaxKind) kind() const {
+        return SyntaxKind.UnaryExpression;
+    }
+
+    override const(SyntaxNode)[] children() const {
+        return [cast(SyntaxNode) _operatorToken, _operand];
+    }
+}
