@@ -10,7 +10,9 @@ void statement_syntax_vector_init(statement_syntax_vector_t* vector) {
 }
 
 void statement_syntax_vector_push(
-    statement_syntax_vector_t* vector, statement_syntax_t* value) {
+    statement_syntax_vector_t* vector,
+    statement_syntax_t* value
+) {
   if (vector->length == vector->capacity) {
     vector->capacity = vector->capacity == 0 ? 1 : vector->capacity * 2;
     statement_syntax_t** new_data =

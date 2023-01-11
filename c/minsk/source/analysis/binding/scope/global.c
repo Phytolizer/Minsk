@@ -1,9 +1,13 @@
 #include "minsk/analysis/binding/scope/global.h"
 #include "minsk/analysis/binding/node.h"
 
-void bound_global_scope_init(bound_global_scope_t* scope,
-    bound_global_scope_t* previous, diagnostic_bag_t diagnostics,
-    variable_symbol_vector_t variables, bound_expression_t* expression) {
+void bound_global_scope_init(
+    bound_global_scope_t* scope,
+    bound_global_scope_t* previous,
+    diagnostic_bag_t diagnostics,
+    variable_symbol_vector_t variables,
+    bound_expression_t* expression
+) {
   scope->previous = previous;
   scope->diagnostics = diagnostics;
   scope->variables = variables;

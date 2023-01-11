@@ -16,7 +16,10 @@ typedef struct {
 
 void bound_scope_map_init(bound_scope_map_t* map);
 void bound_scope_map_insert(
-    bound_scope_map_t* map, sds name, variable_symbol_t value);
-variable_symbol_t* bound_scope_map_lookup(
-    const bound_scope_map_t* map, const sds name);
+    bound_scope_map_t* map,
+    sds name,
+    variable_symbol_t value
+);
+variable_symbol_t*
+bound_scope_map_lookup(const bound_scope_map_t* map, const sds name);
 void bound_scope_map_free(bound_scope_map_t* map);

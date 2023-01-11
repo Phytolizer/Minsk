@@ -15,5 +15,7 @@ typedef struct {
 
 void statement_syntax_vector_init(statement_syntax_vector_t* vector);
 void statement_syntax_vector_push(
-    statement_syntax_vector_t* vector, statement_syntax_t* value);
+    statement_syntax_vector_t* vector,
+    statement_syntax_t* value
+);
 void statement_syntax_vector_free(statement_syntax_vector_t* vector);

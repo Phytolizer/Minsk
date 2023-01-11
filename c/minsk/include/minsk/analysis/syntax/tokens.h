@@ -11,4 +11,6 @@ typedef struct {
 void syntax_token_vector_init(syntax_token_vector_t* vector);
 void syntax_token_vector_free(syntax_token_vector_t* vector);
 void syntax_token_vector_push(
-    syntax_token_vector_t* vector, syntax_token_t token);
+    syntax_token_vector_t* vector,
+    syntax_token_t token
+);

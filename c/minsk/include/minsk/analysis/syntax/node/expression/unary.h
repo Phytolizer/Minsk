@@ -10,7 +10,9 @@ typedef struct {
 } unary_expression_syntax_t;
 
 expression_syntax_t* unary_expression_syntax_new(
-    syntax_token_t operator_token, expression_syntax_t* operand);
+    syntax_token_t operator_token,
+    expression_syntax_t* operand
+);
 void unary_expression_syntax_free(unary_expression_syntax_t* syntax);
-syntax_node_children_t unary_expression_syntax_children(
-    unary_expression_syntax_t* syntax);
+syntax_node_children_t
+unary_expression_syntax_children(unary_expression_syntax_t* syntax);

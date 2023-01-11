@@ -1,7 +1,10 @@
 #include "minsk/analysis/symbol.h"
 
 void variable_symbol_init(
-    variable_symbol_t* symbol, sds name, object_kind_t type) {
+    variable_symbol_t* symbol,
+    sds name,
+    object_kind_t type
+) {
   symbol->name = name;
   symbol->type = type;
 }

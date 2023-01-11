@@ -10,8 +10,8 @@ typedef struct {
   size_t length_including_line_break;
 } text_line_t;
 
-text_line_t text_line_new(
-    size_t start, size_t length, size_t length_including_line_break);
+text_line_t
+text_line_new(size_t start, size_t length, size_t length_including_line_break);
 size_t text_line_end(text_line_t line);
 size_t text_line_end_including_line_break(text_line_t line);
 text_span_t text_line_span(text_line_t line);

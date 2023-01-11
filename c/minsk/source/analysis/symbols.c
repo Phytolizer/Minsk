@@ -10,7 +10,9 @@ void variable_symbol_vector_init(variable_symbol_vector_t* vector) {
 }
 
 void variable_symbol_vector_push(
-    variable_symbol_vector_t* vector, variable_symbol_t value) {
+    variable_symbol_vector_t* vector,
+    variable_symbol_t value
+) {
   if (vector->length == vector->capacity) {
     vector->capacity = vector->capacity == 0 ? 4 : vector->capacity * 2;
     variable_symbol_t* new_data =

@@ -15,8 +15,8 @@ static uint64_t hash_fnv1a_init(void) {
   return 0xcbf29ce484222325ULL;
 }
 
-static void hash_fnv1a_continue(
-    uint64_t* hash, const void* data, size_t length) {
+static void
+hash_fnv1a_continue(uint64_t* hash, const void* data, size_t length) {
   uint64_t h = *hash;
   const char* str = data;
   for (size_t i = 0; i < length; ++i) {
@@ -34,8 +34,10 @@ static uint64_t hash_variable_symbol(const variable_symbol_t* symbol) {
 }
 
 static variable_map_bucket_t* variable_map_find_bucket(
-    variable_map_bucket_t* buckets, size_t bucket_count,
-    variable_symbol_t variable) {
+    variable_map_bucket_t* buckets,
+    size_t bucket_count,
+    variable_symbol_t variable
+) {
   // Finds a bucket for insertion or lookup using linear probing.
   uint64_t h = hash_variable_symbol(&variable);
   size_t i = h % bucket_count;
@@ -69,7 +71,10 @@ void variable_map_free(variable_map_t* map) {
 }
 
 void variable_map_insert(
-    variable_map_t* map, variable_symbol_t variable, object_t* value) {
+    variable_map_t* map,
+    variable_symbol_t variable,
+    object_t* value
+) {
   if ((double)map->length + 1 > (double)map->capacity * MAX_LOAD_FACTOR) {
     size_t new_capacity = map->capacity * 2;
     if (new_capacity == 0) {
@@ -85,7 +90,10 @@ void variable_map_insert(
       variable_map_bucket_t* bucket = &map->buckets[i];
       if (bucket->variable.name != NULL) {
         variable_map_bucket_t* new_bucket = variable_map_find_bucket(
-            new_buckets, new_capacity, bucket->variable);
+            new_buckets,
+            new_capacity,
+            bucket->variable
+        );
         new_bucket->variable = bucket->variable;
         new_bucket->value = bucket->value;
       }
@@ -109,8 +117,8 @@ void variable_map_insert(
   ++map->length;
 }
 
-variable_map_bucket_t* variable_map_find(
-    variable_map_t* map, variable_symbol_t variable) {
+variable_map_bucket_t*
+variable_map_find(variable_map_t* map, variable_symbol_t variable) {
   if (map->capacity == 0) {
     return NULL;
   }
@@ -122,8 +130,8 @@ variable_map_bucket_t* variable_map_find(
   return bucket;
 }
 
-variable_map_bucket_t* variable_map_find_by_name(
-    variable_map_t* map, const char* name) {
+variable_map_bucket_t*
+variable_map_find_by_name(variable_map_t* map, const char* name) {
   for (size_t i = 0; i < map->capacity; i++) {
     variable_map_bucket_t* bucket = &map->buckets[i];
     if (bucket->variable.name != NULL &&

@@ -15,7 +15,10 @@ static uint64_t bound_scope_map_hash_fnv1a(const sds name) {
 }
 
 static bound_scope_map_bucket_t* bound_scope_map_find_bucket(
-    bound_scope_map_bucket_t* buckets, size_t capacity, const sds name) {
+    bound_scope_map_bucket_t* buckets,
+    size_t capacity,
+    const sds name
+) {
   // find matching or empty bucket
   if (capacity == 0) {
     return NULL;
@@ -37,7 +40,10 @@ void bound_scope_map_init(bound_scope_map_t* map) {
 }
 
 void bound_scope_map_insert(
-    bound_scope_map_t* map, sds name, variable_symbol_t value) {
+    bound_scope_map_t* map,
+    sds name,
+    variable_symbol_t value
+) {
   if (map->length >= map->capacity) {
     size_t new_capacity = map->capacity * 2;
     bound_scope_map_bucket_t* new_data =
@@ -50,7 +56,10 @@ void bound_scope_map_insert(
     for (size_t i = 0; i < map->capacity; i++) {
       if (map->data[i].name != NULL) {
         bound_scope_map_bucket_t* bucket = bound_scope_map_find_bucket(
-            new_data, new_capacity, map->data[i].name);
+            new_data,
+            new_capacity,
+            map->data[i].name
+        );
         *bucket = map->data[i];
       }
     }
@@ -65,8 +74,8 @@ void bound_scope_map_insert(
   map->length++;
 }
 
-variable_symbol_t* bound_scope_map_lookup(
-    const bound_scope_map_t* map, const sds name) {
+variable_symbol_t*
+bound_scope_map_lookup(const bound_scope_map_t* map, const sds name) {
   bound_scope_map_bucket_t* bucket =
       bound_scope_map_find_bucket(map->data, map->capacity, name);
 

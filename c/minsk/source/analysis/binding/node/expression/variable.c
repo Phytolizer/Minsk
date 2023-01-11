@@ -9,8 +9,8 @@ bound_expression_t* bound_variable_expression_new(variable_symbol_t variable) {
   return (bound_expression_t*)expression;
 }
 
-object_kind_t bound_variable_expression_type(
-    const bound_variable_expression_t* expression) {
+object_kind_t
+bound_variable_expression_type(const bound_variable_expression_t* expression) {
   return expression->variable.type;
 }
 

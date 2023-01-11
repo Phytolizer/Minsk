@@ -3,8 +3,10 @@
 #include <stdlib.h>
 
 expression_syntax_t* assignment_expression_syntax_new(
-    syntax_token_t identifier_token, syntax_token_t equals_token,
-    expression_syntax_t* expression) {
+    syntax_token_t identifier_token,
+    syntax_token_t equals_token,
+    expression_syntax_t* expression
+) {
   assignment_expression_syntax_t* syntax =
       malloc(sizeof(assignment_expression_syntax_t));
   syntax->base.base.is_token = false;
@@ -23,7 +25,8 @@ void assignment_expression_syntax_free(assignment_expression_syntax_t* syntax) {
 }
 
 syntax_node_children_t assignment_expression_syntax_children(
-    const assignment_expression_syntax_t* syntax) {
+    const assignment_expression_syntax_t* syntax
+) {
   syntax_node_children_t children = {
       .length = 3,
       .data = malloc(sizeof(const syntax_node_t*) * 3),

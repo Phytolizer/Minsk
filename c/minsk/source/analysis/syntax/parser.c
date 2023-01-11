@@ -27,8 +27,12 @@ static syntax_token_t match_token(parser_t* parser, syntax_kind_t kind) {
     return peek_buffer_pop(&parser->peek_buffer);
   }
 
-  diagnostic_bag_report_unexpected_token(&parser->diagnostics,
-      token_span(current(parser)), current(parser)->base.kind, kind);
+  diagnostic_bag_report_unexpected_token(
+      &parser->diagnostics,
+      token_span(current(parser)),
+      current(parser)->base.kind,
+      kind
+  );
   return (syntax_token_t){
       .base = {.kind = kind, .is_token = true},
       .position = current(parser)->position,
@@ -46,13 +50,18 @@ static expression_syntax_t* parse_parenthesized_expression(parser_t* parser) {
   syntax_token_t close_parenthesis_token =
       match_token(parser, syntax_kind_close_parenthesis_token);
   return parenthesized_expression_syntax_new(
-      open_parenthesis_token, expression, close_parenthesis_token);
+      open_parenthesis_token,
+      expression,
+      close_parenthesis_token
+  );
 }
 
 static expression_syntax_t* parse_boolean_literal(parser_t* parser) {
   bool is_true = current(parser)->base.kind == syntax_kind_true_keyword;
   syntax_token_t token = match_token(
-      parser, is_true ? syntax_kind_true_keyword : syntax_kind_false_keyword);
+      parser,
+      is_true ? syntax_kind_true_keyword : syntax_kind_false_keyword
+  );
   return literal_expression_syntax_new(token, boolean_new(is_true));
 }
 
@@ -81,8 +90,8 @@ static expression_syntax_t* parse_primary_expression(parser_t* parser) {
   }
 }
 
-static expression_syntax_t* parse_binary_expression(
-    parser_t* parser, int parent_precedence) {
+static expression_syntax_t*
+parse_binary_expression(parser_t* parser, int parent_precedence) {
   expression_syntax_t* left;
   int unary_operator_precedence =
       facts_unary_operator_precedence(current(parser)->base.kind);
@@ -120,7 +129,10 @@ static expression_syntax_t* parse_assignment_expression(parser_t* parser) {
     syntax_token_t equals_token = match_token(parser, syntax_kind_equals_token);
     expression_syntax_t* expression = parse_expression(parser);
     return assignment_expression_syntax_new(
-        identifier_token, equals_token, expression);
+        identifier_token,
+        equals_token,
+        expression
+    );
   }
 
   return parse_binary_expression(parser, 0);

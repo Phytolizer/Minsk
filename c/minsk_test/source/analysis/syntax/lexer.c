@@ -42,7 +42,10 @@ static simple_token_vector_t get_tokens(void) {
       .capacity = num_dynamic_tokens,
   };
   memcpy(
-      tokens.data, dynamic_tokens, sizeof(simple_token_t) * num_dynamic_tokens);
+      tokens.data,
+      dynamic_tokens,
+      sizeof(simple_token_t) * num_dynamic_tokens
+  );
 
   for (int i = 0; i < syntax_kind_count; i++) {
     const char* text = facts_get_text(i);
@@ -83,7 +86,10 @@ static simple_token_vector_t get_separators(void) {
       .capacity = num_separators,
   };
   memcpy(
-      all_separators.data, separators, sizeof(simple_token_t) * num_separators);
+      all_separators.data,
+      separators,
+      sizeof(simple_token_t) * num_separators
+  );
   return all_separators;
 }
 
@@ -152,9 +158,9 @@ static bool requires_separator(simple_token_t* t1, simple_token_t* t2) {
   }
 
   if ((t1->kind == syntax_kind_bang_token ||
-          t1->kind == syntax_kind_equals_token) &&
+       t1->kind == syntax_kind_equals_token) &&
       (t2->kind == syntax_kind_equals_equals_token ||
-          t2->kind == syntax_kind_equals_token)) {
+       t2->kind == syntax_kind_equals_token)) {
     return true;
   }
 
@@ -171,7 +177,11 @@ START_TEST(lexes_token_pairs_test) {
       }
 
       sds text = sdscatfmt(
-          sdsempty(), "%s%s", tokens.data[i].text, tokens.data[j].text);
+          sdsempty(),
+          "%s%s",
+          tokens.data[i].text,
+          tokens.data[j].text
+      );
       printf("Lexer: token pairs[%zu, %zu]: '%s'\n", i, j, text);
       syntax_token_vector_t lexed_tokens = syntax_tree_parse_tokens(text);
       sdsfree(text);
@@ -198,11 +208,21 @@ START_TEST(lexes_token_pairs_with_separator_test) {
     for (size_t j = 0; j < tokens.length; j++) {
       if (requires_separator(&tokens.data[i], &tokens.data[j])) {
         for (size_t k = 0; k < separators.length; k++) {
-          sds text = sdscatfmt(sdsempty(), "%s%s%s", tokens.data[i].text,
-              separators.data[k].text, tokens.data[j].text);
+          sds text = sdscatfmt(
+              sdsempty(),
+              "%s%s%s",
+              tokens.data[i].text,
+              separators.data[k].text,
+              tokens.data[j].text
+          );
           sds text_escaped = esc(text);
-          printf("Lexer: token pairs with separator[%zu, %zu, %zu]: '%s'\n", i,
-              k, j, text_escaped);
+          printf(
+              "Lexer: token pairs with separator[%zu, %zu, %zu]: '%s'\n",
+              i,
+              k,
+              j,
+              text_escaped
+          );
           sdsfree(text_escaped);
           syntax_token_vector_t lexed_tokens = syntax_tree_parse_tokens(text);
           sdsfree(text);
@@ -210,7 +230,9 @@ START_TEST(lexes_token_pairs_with_separator_test) {
           ck_assert_int_eq(lexed_tokens.data[0].base.kind, tokens.data[i].kind);
           ck_assert_str_eq(lexed_tokens.data[0].text, tokens.data[i].text);
           ck_assert_int_eq(
-              lexed_tokens.data[1].base.kind, separators.data[k].kind);
+              lexed_tokens.data[1].base.kind,
+              separators.data[k].kind
+          );
           ck_assert_str_eq(lexed_tokens.data[1].text, separators.data[k].text);
           ck_assert_int_eq(lexed_tokens.data[2].base.kind, tokens.data[j].kind);
           ck_assert_str_eq(lexed_tokens.data[2].text, tokens.data[j].text);
@@ -245,8 +267,10 @@ Suite* lexer_suite(void) {
 
   TCase* tc_lexes_token_pairs_with_separator =
       tcase_create("lexes token pairs with separator");
-  tcase_add_test(tc_lexes_token_pairs_with_separator,
-      lexes_token_pairs_with_separator_test);
+  tcase_add_test(
+      tc_lexes_token_pairs_with_separator,
+      lexes_token_pairs_with_separator_test
+  );
   suite_add_tcase(s, tc_lexes_token_pairs_with_separator);
 
   return s;

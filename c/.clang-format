@@ -1,6 +1,10 @@
 BasedOnStyle: LLVM
 PointerAlignment: Left
 AlignOperands: false
-AlignAfterOpenBracket: false
+AlignAfterOpenBracket: BlockIndent
 AlignEscapedNewlines: DontAlign
 AllowShortFunctionsOnASingleLine: Empty
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+BinPackArguments: false
+BinPackParameters: false

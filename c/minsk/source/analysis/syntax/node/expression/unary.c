@@ -1,7 +1,9 @@
 #include "minsk/analysis/syntax/node/expression/unary.h"
 #include <malloc.h>
 expression_syntax_t* unary_expression_syntax_new(
-    syntax_token_t operator_token, expression_syntax_t* operand) {
+    syntax_token_t operator_token,
+    expression_syntax_t* operand
+) {
   unary_expression_syntax_t* syntax = malloc(sizeof(unary_expression_syntax_t));
   syntax->base.base.kind = syntax_kind_unary_expression;
   syntax->base.base.is_token = false;
@@ -14,8 +16,8 @@ void unary_expression_syntax_free(unary_expression_syntax_t* syntax) {
   syntax_node_free((syntax_node_t*)syntax->operand);
   free(syntax);
 }
-syntax_node_children_t unary_expression_syntax_children(
-    unary_expression_syntax_t* syntax) {
+syntax_node_children_t
+unary_expression_syntax_children(unary_expression_syntax_t* syntax) {
   syntax_node_children_t children = {
       .length = 2,
       .data = malloc(sizeof(const syntax_node_t*) * 2),

@@ -7,7 +7,10 @@ void bound_scope_init(bound_scope_t* scope, bound_scope_t* parent) {
 }
 
 bool bound_scope_try_declare(
-    bound_scope_t* scope, sds name, variable_symbol_t value) {
+    bound_scope_t* scope,
+    sds name,
+    variable_symbol_t value
+) {
   if (bound_scope_map_lookup(&scope->variables, name) != NULL) {
     return false;
   }
@@ -16,8 +19,8 @@ bool bound_scope_try_declare(
   return true;
 }
 
-variable_symbol_t* bound_scope_try_lookup(
-    const bound_scope_t* scope, const sds name) {
+variable_symbol_t*
+bound_scope_try_lookup(const bound_scope_t* scope, const sds name) {
   variable_symbol_t* symbol = bound_scope_map_lookup(&scope->variables, name);
   if (symbol != NULL) {
     return symbol;
@@ -30,15 +33,17 @@ variable_symbol_t* bound_scope_try_lookup(
   return NULL;
 }
 
-variable_symbol_vector_t bound_scope_get_declared_variables(
-    const bound_scope_t* scope) {
+variable_symbol_vector_t
+bound_scope_get_declared_variables(const bound_scope_t* scope) {
   variable_symbol_vector_t result;
   variable_symbol_vector_init(&result);
 
   for (size_t i = 0; i < scope->variables.capacity; i++) {
     if (scope->variables.data[i].name != NULL) {
       variable_symbol_vector_push(
-          &result, variable_symbol_copy(&scope->variables.data[i].value));
+          &result,
+          variable_symbol_copy(&scope->variables.data[i].value)
+      );
     }
   }
 

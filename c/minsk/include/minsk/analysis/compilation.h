@@ -17,10 +17,12 @@ typedef struct {
   object_t* value;
 } evaluation_result_t;
 
-compilation_t* compilation_new(
-    compilation_t* previous, const syntax_tree_t* syntax);
+compilation_t*
+compilation_new(compilation_t* previous, const syntax_tree_t* syntax);
 compilation_t* compilation_continue_with(
-    compilation_t* compilation, const syntax_tree_t* syntax);
-evaluation_result_t compilation_evaluate(
-    compilation_t* compilation, variable_map_t* variables);
+    compilation_t* compilation,
+    const syntax_tree_t* syntax
+);
+evaluation_result_t
+compilation_evaluate(compilation_t* compilation, variable_map_t* variables);
 void compilation_free(compilation_t* compilation);

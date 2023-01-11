@@ -10,8 +10,11 @@ typedef struct {
 } bound_assignment_expression_t;
 
 bound_expression_t* bound_assignment_expression_new(
-    variable_symbol_t variable, bound_expression_t* expression);
-object_kind_t bound_assignment_expression_type(
-    const bound_assignment_expression_t* expression);
-void bound_assignment_expression_free(
-    bound_assignment_expression_t* expression);
+    variable_symbol_t variable,
+    bound_expression_t* expression
+);
+object_kind_t
+bound_assignment_expression_type(const bound_assignment_expression_t* expression
+);
+void bound_assignment_expression_free(bound_assignment_expression_t* expression
+);

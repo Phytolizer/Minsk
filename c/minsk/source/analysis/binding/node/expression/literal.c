@@ -11,8 +11,8 @@ bound_expression_t* bound_literal_expression_new(object_t* value) {
   return (bound_expression_t*)expression;
 }
 
-object_kind_t bound_literal_expression_type(
-    const bound_literal_expression_t* expression) {
+object_kind_t
+bound_literal_expression_type(const bound_literal_expression_t* expression) {
   if (expression->value == NULL) {
     return object_kind_null;
   }

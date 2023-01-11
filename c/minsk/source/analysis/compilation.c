@@ -9,8 +9,8 @@
 #include "minsk/runtime/object.h"
 #include <stdlib.h>
 
-compilation_t* compilation_new(
-    compilation_t* previous, const syntax_tree_t* syntax) {
+compilation_t*
+compilation_new(compilation_t* previous, const syntax_tree_t* syntax) {
   compilation_t* compilation = malloc(sizeof(compilation_t));
   compilation->previous = previous;
   compilation->syntax = syntax;
@@ -24,21 +24,27 @@ compilation_t* compilation_new(
 }
 
 compilation_t* compilation_continue_with(
-    compilation_t* compilation, const syntax_tree_t* syntax) {
+    compilation_t* compilation,
+    const syntax_tree_t* syntax
+) {
   return compilation_new(compilation, syntax);
 }
 
-evaluation_result_t compilation_evaluate(
-    compilation_t* compilation, variable_map_t* variables) {
+evaluation_result_t
+compilation_evaluate(compilation_t* compilation, variable_map_t* variables) {
   diagnostic_bag_t diagnostics;
   diagnostic_bag_init(&diagnostics);
   for (size_t i = 0; i < compilation->syntax->diagnostics.length; i++) {
     diagnostic_bag_copy_diagnostic(
-        &diagnostics, compilation->syntax->diagnostics.data[i]);
+        &diagnostics,
+        compilation->syntax->diagnostics.data[i]
+    );
   }
   for (size_t i = 0; i < compilation->global_scope.diagnostics.length; i++) {
     diagnostic_bag_copy_diagnostic(
-        &diagnostics, compilation->global_scope.diagnostics.data[i]);
+        &diagnostics,
+        compilation->global_scope.diagnostics.data[i]
+    );
   }
   if (diagnostics.length > 0) {
     return (evaluation_result_t){.diagnostics = diagnostics};

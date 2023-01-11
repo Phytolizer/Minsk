@@ -33,7 +33,8 @@ void syntax_node_free(syntax_node_t* node) {
     break;
   case syntax_kind_parenthesized_expression:
     parenthesized_expression_syntax_free(
-        (parenthesized_expression_syntax_t*)node);
+        (parenthesized_expression_syntax_t*)node
+    );
     break;
   case syntax_kind_unary_expression:
     unary_expression_syntax_free((unary_expression_syntax_t*)node);
@@ -49,17 +50,19 @@ syntax_node_children_t syntax_node_children(const syntax_node_t* node) {
   switch (node->kind) {
   case syntax_kind_assignment_expression:
     return assignment_expression_syntax_children(
-        (const assignment_expression_syntax_t*)node);
+        (const assignment_expression_syntax_t*)node
+    );
   case syntax_kind_binary_expression:
     return binary_expression_syntax_children((binary_expression_syntax_t*)node);
   case syntax_kind_literal_expression:
-    return literal_expression_syntax_children(
-        (literal_expression_syntax_t*)node);
+    return literal_expression_syntax_children((literal_expression_syntax_t*)node
+    );
   case syntax_kind_name_expression:
     return name_expression_syntax_children((name_expression_syntax_t*)node);
   case syntax_kind_parenthesized_expression:
     return parenthesized_expression_syntax_children(
-        (parenthesized_expression_syntax_t*)node);
+        (parenthesized_expression_syntax_t*)node
+    );
   case syntax_kind_unary_expression:
     return unary_expression_syntax_children((unary_expression_syntax_t*)node);
   default:
@@ -67,8 +70,13 @@ syntax_node_children_t syntax_node_children(const syntax_node_t* node) {
     return (syntax_node_children_t){0};
   }
 }
-static void pretty_print(const syntax_node_t* node, FILE* stream,
-    bool is_to_console, sds indent, bool is_last) {
+static void pretty_print(
+    const syntax_node_t* node,
+    FILE* stream,
+    bool is_to_console,
+    sds indent,
+    bool is_last
+) {
   fprintf(stream, "%s", indent);
   fprintf(stream, "%s", is_last ? "└── " : "├── ");
   if (is_to_console) {
@@ -92,8 +100,13 @@ static void pretty_print(const syntax_node_t* node, FILE* stream,
   syntax_node_children_t children = syntax_node_children(node);
   if (children.length != 0) {
     for (size_t i = 0; i < children.length; i++) {
-      pretty_print(children.data[i], stream, is_to_console, sdsdup(new_indent),
-          i == children.length - 1);
+      pretty_print(
+          children.data[i],
+          stream,
+          is_to_console,
+          sdsdup(new_indent),
+          i == children.length - 1
+      );
     }
   }
   syntax_node_children_free(&children);
@@ -117,7 +130,9 @@ text_span_t syntax_node_span(const syntax_node_t* node) {
   const syntax_node_t* last = children.data[children.length - 1];
 
   text_span_t span = text_span_from_bounds(
-      syntax_node_span(first).start, text_span_end(syntax_node_span(last)));
+      syntax_node_span(first).start,
+      text_span_end(syntax_node_span(last))
+  );
   syntax_node_children_free(&children);
   return span;
 }

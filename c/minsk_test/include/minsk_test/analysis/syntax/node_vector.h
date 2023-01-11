@@ -11,6 +11,8 @@ typedef struct {
 
 void syntax_node_vector_init(syntax_node_vector_t* vector);
 void syntax_node_vector_push(
-    syntax_node_vector_t* vector, const syntax_node_t* node);
+    syntax_node_vector_t* vector,
+    const syntax_node_t* node
+);
 const syntax_node_t* syntax_node_vector_pop(syntax_node_vector_t* vector);
 void syntax_node_vector_free(syntax_node_vector_t* vector);

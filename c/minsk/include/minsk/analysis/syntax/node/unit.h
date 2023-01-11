@@ -10,6 +10,9 @@ typedef struct {
   syntax_token_t end_of_file_token;
 } compilation_unit_syntax_t;
 
-void compilation_unit_syntax_init(compilation_unit_syntax_t* unit,
-    expression_syntax_t* root, syntax_token_t end_of_file_token);
+void compilation_unit_syntax_init(
+    compilation_unit_syntax_t* unit,
+    expression_syntax_t* root,
+    syntax_token_t end_of_file_token
+);
 void compilation_unit_syntax_free(compilation_unit_syntax_t* unit);

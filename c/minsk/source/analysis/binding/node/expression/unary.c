@@ -6,7 +6,9 @@
 #include <stdlib.h>
 
 bound_expression_t* bound_unary_expression_new(
-    const bound_unary_operator_t* op, bound_expression_t* operand) {
+    const bound_unary_operator_t* op,
+    bound_expression_t* operand
+) {
   bound_unary_expression_t* expression =
       malloc(sizeof(bound_unary_expression_t));
   expression->base.base.kind = bound_node_kind_unary_expression;
@@ -15,8 +17,8 @@ bound_expression_t* bound_unary_expression_new(
   return (bound_expression_t*)expression;
 }
 
-object_kind_t bound_unary_expression_type(
-    const bound_unary_expression_t* expression) {
+object_kind_t
+bound_unary_expression_type(const bound_unary_expression_t* expression) {
   if (expression->op == NULL) {
     return object_kind_null;
   }

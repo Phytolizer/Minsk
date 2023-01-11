@@ -20,7 +20,10 @@ static uint64_t syntax_kind_hash_fnv1a(const void* raw_key) {
 }
 
 static syntax_kind_set_bucket_t* find_bucket(
-    syntax_kind_set_bucket_t* buckets, size_t capacity, syntax_kind_t kind) {
+    syntax_kind_set_bucket_t* buckets,
+    size_t capacity,
+    syntax_kind_t kind
+) {
   // find matching or empty bucket
   size_t index = syntax_kind_hash_fnv1a(&kind) % capacity;
   while (buckets[index].present) {
@@ -73,7 +76,9 @@ void syntax_kind_set_insert(syntax_kind_set_t* set, syntax_kind_t kind) {
 }
 
 bool syntax_kind_set_contains(
-    const syntax_kind_set_t* set, syntax_kind_t kind) {
+    const syntax_kind_set_t* set,
+    syntax_kind_t kind
+) {
   uint64_t hash = syntax_kind_hash_fnv1a(&kind);
   // open addressing with linear probing
   for (size_t i = 0; i < set->capacity; i++) {

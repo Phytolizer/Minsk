@@ -12,9 +12,12 @@ typedef struct minsk_bound_scope {
 
 void bound_scope_init(bound_scope_t* scope, bound_scope_t* parent);
 bool bound_scope_try_declare(
-    bound_scope_t* scope, sds name, variable_symbol_t value);
-variable_symbol_t* bound_scope_try_lookup(
-    const bound_scope_t* scope, const sds name);
-variable_symbol_vector_t bound_scope_get_declared_variables(
-    const bound_scope_t* scope);
+    bound_scope_t* scope,
+    sds name,
+    variable_symbol_t value
+);
+variable_symbol_t*
+bound_scope_try_lookup(const bound_scope_t* scope, const sds name);
+variable_symbol_vector_t
+bound_scope_get_declared_variables(const bound_scope_t* scope);
 void bound_scope_free(bound_scope_t* scope);

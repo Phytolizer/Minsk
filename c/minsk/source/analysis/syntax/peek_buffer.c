@@ -15,7 +15,7 @@ static void peek_buffer_push(peek_buffer_t* buffer) {
   }
   syntax_token_t tok = lexer_next_token(&buffer->lexer);
   while (tok.base.kind == syntax_kind_whitespace_token ||
-      tok.base.kind == syntax_kind_bad_token) {
+         tok.base.kind == syntax_kind_bad_token) {
     token_free(&tok);
     tok = lexer_next_token(&buffer->lexer);
   }

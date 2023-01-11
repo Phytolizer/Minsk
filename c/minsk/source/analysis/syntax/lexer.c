@@ -54,9 +54,11 @@ syntax_token_t lexer_next_token(lexer_t* lexer) {
     long long_val = strtol(text, &endptr, 10);
     if (errno != 0 || long_val < INT_MIN || long_val > INT_MAX ||
         (endptr != NULL && *endptr != '\0')) {
-      diagnostic_bag_report_invalid_int(&lexer->diagnostics,
+      diagnostic_bag_report_invalid_int(
+          &lexer->diagnostics,
           (text_span_t){.start = start, .length = lexer->position - start},
-          sdsdup(text));
+          sdsdup(text)
+      );
     }
 
     value = integer_new((int)long_val);
@@ -142,7 +144,10 @@ syntax_token_t lexer_next_token(lexer_t* lexer) {
 
   if (kind == syntax_kind_bad_token) {
     diagnostic_bag_report_bad_character(
-        &lexer->diagnostics, lexer->position, current(lexer));
+        &lexer->diagnostics,
+        lexer->position,
+        current(lexer)
+    );
     lexer->position += 1;
   }
 

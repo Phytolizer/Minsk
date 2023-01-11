@@ -60,15 +60,18 @@ static bool is_support_color(void) {
 }
 
 #ifdef STYLER_WINDOWS
-typedef BOOL (*get_file_information_by_handle_ex_func_t)(HANDLE hFile,
-    FILE_INFO_BY_HANDLE_CLASS FileInformationClass, LPVOID lpFileInformation,
-    DWORD dwBufferSize);
+typedef BOOL (*get_file_information_by_handle_ex_func_t
+)(HANDLE hFile,
+  FILE_INFO_BY_HANDLE_CLASS FileInformationClass,
+  LPVOID lpFileInformation,
+  DWORD dwBufferSize);
 
 static bool is_msys_pty(int fd) {
   get_file_information_by_handle_ex_func_t ptr_file_info =
       (get_file_information_by_handle_ex_func_t)GetProcAddress(
           GetModuleHandle(TEXT("kernel32.dll")),
-          "GetFileInformationByHandleEx");
+          "GetFileInformationByHandleEx"
+      );
 
   if (ptr_file_info == NULL) {
     return false;
@@ -94,12 +97,16 @@ static bool is_msys_pty(int fd) {
   }
 
   if (!ptr_file_info(
-          handle, FileNameInfo, p_name_info, sizeof(my_file_name_info_t))) {
+          handle,
+          FileNameInfo,
+          p_name_info,
+          sizeof(my_file_name_info_t)
+      )) {
     return false;
   }
 
   if ((wcsstr(p_name_info->file_name, L"msys-") == NULL &&
-          wcsstr(p_name_info->file_name, L"cygwin-") == NULL) ||
+       wcsstr(p_name_info->file_name, L"cygwin-") == NULL) ||
       wcsstr(p_name_info->file_name, L"-pty") == NULL) {
     free(p_name_info);
     return false;
@@ -369,8 +376,8 @@ static void set_win_color_native_bg(FILE* stream, styler_bg_t bg) {
   }
 }
 
-static void set_win_color_native_fg_bright(
-    FILE* stream, styler_fg_bright_t fg) {
+static void
+set_win_color_native_fg_bright(FILE* stream, styler_fg_bright_t fg) {
   HANDLE handle = get_console_handle(stream);
   if (handle != INVALID_HANDLE_VALUE) {
     set_win_sgr_fg_bright(fg, get_current_state());
@@ -379,8 +386,8 @@ static void set_win_color_native_fg_bright(
   }
 }
 
-static void set_win_color_native_bg_bright(
-    FILE* stream, styler_bg_bright_t bg) {
+static void
+set_win_color_native_bg_bright(FILE* stream, styler_bg_bright_t bg) {
   HANDLE handle = get_console_handle(stream);
   if (handle != INVALID_HANDLE_VALUE) {
     set_win_sgr_bg_bright(bg, get_current_state());
@@ -497,7 +504,7 @@ void styler_apply_fg(styler_fg_t fg, FILE* stream) {
   styler_control_t control_mode = *get_control_mode();
 
   if ((control_mode == styler_control_auto && is_support_color() &&
-          is_terminal(stream)) ||
+       is_terminal(stream)) ||
       control_mode == styler_control_force) {
     set_color_fg(stream, fg);
   }
@@ -507,7 +514,7 @@ void styler_apply_bg(styler_bg_t bg, FILE* stream) {
   styler_control_t control_mode = *get_control_mode();
 
   if ((control_mode == styler_control_auto && is_support_color() &&
-          is_terminal(stream)) ||
+       is_terminal(stream)) ||
       control_mode == styler_control_force) {
     set_color_bg(stream, bg);
   }
@@ -517,7 +524,7 @@ void styler_apply_fg_bright(styler_fg_bright_t fg, FILE* stream) {
   styler_control_t control_mode = *get_control_mode();
 
   if ((control_mode == styler_control_auto && is_support_color() &&
-          is_terminal(stream)) ||
+       is_terminal(stream)) ||
       control_mode == styler_control_force) {
     set_color_fg_bright(stream, fg);
   }
@@ -527,7 +534,7 @@ void styler_apply_bg_bright(styler_bg_bright_t bg, FILE* stream) {
   styler_control_t control_mode = *get_control_mode();
 
   if ((control_mode == styler_control_auto && is_support_color() &&
-          is_terminal(stream)) ||
+       is_terminal(stream)) ||
       control_mode == styler_control_force) {
     set_color_bg_bright(stream, bg);
   }
@@ -537,7 +544,7 @@ void styler_apply_style(styler_style_t style, FILE* stream) {
   styler_control_t control_mode = *get_control_mode();
 
   if ((control_mode == styler_control_auto && is_support_color() &&
-          is_terminal(stream)) ||
+       is_terminal(stream)) ||
       control_mode == styler_control_force) {
     set_color_style(stream, style);
   }

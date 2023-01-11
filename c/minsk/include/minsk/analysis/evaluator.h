@@ -10,6 +10,9 @@ typedef struct {
   variable_map_t* variables;
 } evaluator_t;
 
-void evaluator_init(evaluator_t* evaluator, const bound_expression_t* root,
-    variable_map_t* variables);
+void evaluator_init(
+    evaluator_t* evaluator,
+    const bound_expression_t* root,
+    variable_map_t* variables
+);
 object_t* evaluator_evaluate(evaluator_t* evaluator);

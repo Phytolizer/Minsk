@@ -10,5 +10,7 @@ typedef struct {
 
 void variable_symbol_vector_init(variable_symbol_vector_t* vector);
 void variable_symbol_vector_push(
-    variable_symbol_vector_t* vector, variable_symbol_t value);
+    variable_symbol_vector_t* vector,
+    variable_symbol_t value
+);
 void variable_symbol_vector_free(variable_symbol_vector_t* vector);

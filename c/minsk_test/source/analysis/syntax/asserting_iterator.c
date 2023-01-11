@@ -6,7 +6,9 @@
 #include <assert.h>
 
 void asserting_iterator_init(
-    asserting_iterator_t* iterator, const syntax_node_t* root) {
+    asserting_iterator_t* iterator,
+    const syntax_node_t* root
+) {
   iterator->position = 0;
   syntax_node_vector_t stack;
   syntax_node_vector_init(&stack);
@@ -28,7 +30,9 @@ void asserting_iterator_init(
 }
 
 void asserting_iterator_assert_node(
-    asserting_iterator_t* iterator, syntax_kind_t kind) {
+    asserting_iterator_t* iterator,
+    syntax_kind_t kind
+) {
   // Assert that the current node is not a token, and that it has the correct
   // kind.
   ck_assert_int_lt(iterator->position, iterator->nodes.length);
@@ -39,7 +43,10 @@ void asserting_iterator_assert_node(
 }
 
 void asserting_iterator_assert_token(
-    asserting_iterator_t* iterator, syntax_kind_t kind, const char* text) {
+    asserting_iterator_t* iterator,
+    syntax_kind_t kind,
+    const char* text
+) {
   // Assert that the current node is a token, and that it has the correct kind
   // and text.
   ck_assert_int_lt(iterator->position, iterator->nodes.length);

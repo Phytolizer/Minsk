@@ -4,8 +4,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-text_line_t text_line_new(
-    size_t start, size_t length, size_t length_including_line_break) {
+text_line_t
+text_line_new(size_t start, size_t length, size_t length_including_line_break) {
   text_line_t line = {
       .start = start,
       .length = length,
@@ -68,8 +68,12 @@ static size_t get_line_break_width(sds text, size_t position) {
   return 0;
 }
 
-static void add_line(text_line_vector_t* vector, size_t start, size_t end,
-    size_t line_break_width) {
+static void add_line(
+    text_line_vector_t* vector,
+    size_t start,
+    size_t end,
+    size_t line_break_width
+) {
   size_t length = end - start;
   size_t length_including_line_break = length + line_break_width;
   text_line_t line = text_line_new(start, length, length_including_line_break);

@@ -18,19 +18,26 @@
 #include "minsk/runtime/object.h"
 #include <assert.h>
 
-static object_t* evaluate_expression(
-    evaluator_t* evaluator, const bound_expression_t* root);
+static object_t*
+evaluate_expression(evaluator_t* evaluator, const bound_expression_t* root);
 
 static object_t* evaluate_assignment_expression(
-    evaluator_t* evaluator, const bound_assignment_expression_t* root) {
+    evaluator_t* evaluator,
+    const bound_assignment_expression_t* root
+) {
   object_t* value = evaluate_expression(evaluator, root->expression);
-  variable_map_insert(evaluator->variables,
-      variable_symbol_copy(&root->variable), object_copy(value));
+  variable_map_insert(
+      evaluator->variables,
+      variable_symbol_copy(&root->variable),
+      object_copy(value)
+  );
   return value;
 }
 
 static object_t* evaluate_binary_expression(
-    evaluator_t* evaluator, const bound_binary_expression_t* root) {
+    evaluator_t* evaluator,
+    const bound_binary_expression_t* root
+) {
   object_t* left = evaluate_expression(evaluator, root->left);
   object_t* right = evaluate_expression(evaluator, root->right);
 
@@ -96,13 +103,17 @@ static object_t* evaluate_binary_expression(
 }
 
 static object_t* evaluate_literal_expression(
-    evaluator_t* evaluator, const bound_literal_expression_t* root) {
+    evaluator_t* evaluator,
+    const bound_literal_expression_t* root
+) {
   (void)evaluator;
   return object_copy(root->value);
 }
 
 static object_t* evaluate_unary_expression(
-    evaluator_t* evaluator, const bound_unary_expression_t* root) {
+    evaluator_t* evaluator,
+    const bound_unary_expression_t* root
+) {
   object_t* operand = evaluate_expression(evaluator, root->operand);
 
   switch (root->op->kind) {
@@ -128,38 +139,53 @@ static object_t* evaluate_unary_expression(
 }
 
 static object_t* evaluate_variable_expression(
-    evaluator_t* evaluator, const bound_variable_expression_t* root) {
+    evaluator_t* evaluator,
+    const bound_variable_expression_t* root
+) {
   variable_map_bucket_t* bucket =
       variable_map_find(evaluator->variables, root->variable);
   assert(bucket != NULL);
   return object_copy(bucket->value);
 }
 
-static object_t* evaluate_expression(
-    evaluator_t* evaluator, const bound_expression_t* root) {
+static object_t*
+evaluate_expression(evaluator_t* evaluator, const bound_expression_t* root) {
   switch (root->base.kind) {
   case bound_node_kind_assignment_expression:
     return evaluate_assignment_expression(
-        evaluator, (const bound_assignment_expression_t*)root);
+        evaluator,
+        (const bound_assignment_expression_t*)root
+    );
   case bound_node_kind_binary_expression:
     return evaluate_binary_expression(
-        evaluator, (bound_binary_expression_t*)root);
+        evaluator,
+        (bound_binary_expression_t*)root
+    );
   case bound_node_kind_literal_expression:
     return evaluate_literal_expression(
-        evaluator, (bound_literal_expression_t*)root);
+        evaluator,
+        (bound_literal_expression_t*)root
+    );
   case bound_node_kind_unary_expression:
     return evaluate_unary_expression(
-        evaluator, (bound_unary_expression_t*)root);
+        evaluator,
+        (bound_unary_expression_t*)root
+    );
   case bound_node_kind_variable_expression:
     return evaluate_variable_expression(
-        evaluator, (bound_variable_expression_t*)root);
+        evaluator,
+        (bound_variable_expression_t*)root
+    );
   }
   assert(false && "unexpected expression syntax");
   return NULL;
 }
 
-void evaluator_init(evaluator_t* evaluator, const bound_expression_t* root,
-    variable_map_t* variables) {
+void evaluator_init(
+    evaluator_t* evaluator,
+    const bound_expression_t* root,
+    variable_map_t* variables
+) {
   evaluator->root = root;
   evaluator->variables = variables;
 }

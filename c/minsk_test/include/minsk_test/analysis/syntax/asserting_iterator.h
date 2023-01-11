@@ -10,9 +10,16 @@ typedef struct {
 } asserting_iterator_t;
 
 void asserting_iterator_init(
-    asserting_iterator_t* iterator, const syntax_node_t* root);
+    asserting_iterator_t* iterator,
+    const syntax_node_t* root
+);
 void asserting_iterator_assert_node(
-    asserting_iterator_t* iterator, syntax_kind_t kind);
+    asserting_iterator_t* iterator,
+    syntax_kind_t kind
+);
 void asserting_iterator_assert_token(
-    asserting_iterator_t* iterator, syntax_kind_t kind, const char* text);
+    asserting_iterator_t* iterator,
+    syntax_kind_t kind,
+    const char* text
+);
 void asserting_iterator_free(asserting_iterator_t* iterator);

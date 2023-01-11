@@ -17,8 +17,11 @@ typedef struct {
 void variable_map_init(variable_map_t* map);
 void variable_map_free(variable_map_t* map);
 void variable_map_insert(
-    variable_map_t* map, variable_symbol_t variable, object_t* value);
-variable_map_bucket_t* variable_map_find(
-    variable_map_t* map, variable_symbol_t variable);
-variable_map_bucket_t* variable_map_find_by_name(
-    variable_map_t* map, const char* name);
+    variable_map_t* map,
+    variable_symbol_t variable,
+    object_t* value
+);
+variable_map_bucket_t*
+variable_map_find(variable_map_t* map, variable_symbol_t variable);
+variable_map_bucket_t*
+variable_map_find_by_name(variable_map_t* map, const char* name);

@@ -9,7 +9,9 @@ void syntax_node_vector_init(syntax_node_vector_t* vector) {
 }
 
 void syntax_node_vector_push(
-    syntax_node_vector_t* vector, const syntax_node_t* node) {
+    syntax_node_vector_t* vector,
+    const syntax_node_t* node
+) {
   if (vector->length == vector->capacity) {
     vector->capacity *= 2;
     const syntax_node_t** new_data =
