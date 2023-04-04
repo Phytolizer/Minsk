@@ -95,10 +95,28 @@ pub fn parse(self: *Self) !SyntaxTree {
 }
 
 fn parseExpression(self: *Self) !*ExpressionSyntax {
-    var left = try self.parsePrimaryExpression();
+    return try self.parseTerm();
+}
+
+fn parseTerm(self: *Self) !*ExpressionSyntax {
+    var left = try self.parseFactor();
     errdefer left.deinit(self.allocator);
 
     while (self.current().kind == .plus_token or self.current().kind == .minus_token) {
+        const operator_token = self.nextToken();
+        const right = try self.parseFactor();
+        errdefer right.deinit(self.allocator);
+        left = try BinaryExpressionSyntax.init(self.allocator, left, operator_token, right);
+    }
+
+    return left;
+}
+
+fn parseFactor(self: *Self) !*ExpressionSyntax {
+    var left = try self.parsePrimaryExpression();
+    errdefer left.deinit(self.allocator);
+
+    while (self.current().kind == .star_token or self.current().kind == .slash_token) {
         const operator_token = self.nextToken();
         const right = try self.parsePrimaryExpression();
         errdefer right.deinit(self.allocator);
