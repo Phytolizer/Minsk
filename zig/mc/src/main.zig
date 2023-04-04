@@ -2,6 +2,7 @@ const std = @import("std");
 const builtin = @import("builtin");
 const SyntaxTree = @import("minsk").code_analysis.syntax.SyntaxTree;
 const Evaluator = @import("minsk").code_analysis.Evaluator;
+const Binder = @import("minsk").code_analysis.binding.Binder;
 
 fn readUntilDelimiterOrEofArrayList(
     writer: anytype,
@@ -120,8 +121,29 @@ pub fn main() !void {
         defer parser_arena.deinit();
         const parser_alloc = pickAllocator(parser_arena.allocator(), allocator);
 
-        const tree = try SyntaxTree.parse(parser_alloc, line);
+        var tree = try SyntaxTree.parse(parser_alloc, line);
         defer tree.deinit();
+        var binder = Binder.init(parser_alloc);
+        defer binder.deinit();
+        const bound_expression = try binder.bindExpression(tree.root);
+        defer bound_expression.deinit(parser_alloc);
+
+        const diagnostics = blk: {
+            const slices = [_][][]const u8{
+                tree.takeDiagnostics(),
+                try binder.diagnostics.toOwnedSlice(),
+            };
+            defer for (slices) |s| {
+                parser_alloc.free(s);
+            };
+            break :blk try std.mem.concat(parser_alloc, []const u8, &slices);
+        };
+        defer {
+            for (diagnostics) |d| {
+                parser_alloc.free(d);
+            }
+            parser_alloc.free(diagnostics);
+        }
 
         if (show_tree) {
             tty.setColor(stderr, .Dim) catch unreachable;
@@ -129,16 +151,16 @@ pub fn main() !void {
             try tree.root.base.prettyPrint(parser_alloc, "", true, stderr);
         }
 
-        if (tree.diagnostics.len > 0) {
+        if (diagnostics.len > 0) {
             tty.setColor(stderr, .Red) catch unreachable;
             tty.setColor(stderr, .Dim) catch unreachable;
             defer tty.setColor(stderr, .Reset) catch unreachable;
 
-            for (tree.diagnostics) |d| {
+            for (diagnostics) |d| {
                 stderr.print("{s}\n", .{d}) catch unreachable;
             }
         } else {
-            const evaluator = Evaluator.init(tree.root);
+            const evaluator = Evaluator.init(bound_expression);
             const result = evaluator.evaluate();
             stderr.print("{d}\n", .{result}) catch unreachable;
         }

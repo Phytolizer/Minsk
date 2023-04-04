@@ -37,3 +37,9 @@ pub fn parse(allocator: std.mem.Allocator, text: []const u8) !Self {
     defer parser.deinit();
     return try parser.parse();
 }
+
+pub fn takeDiagnostics(self: *Self) [][]const u8 {
+    const result = self.diagnostics;
+    self.diagnostics = &.{};
+    return result;
+}

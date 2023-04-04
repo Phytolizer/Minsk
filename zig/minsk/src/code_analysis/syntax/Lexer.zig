@@ -4,6 +4,7 @@ const SyntaxKind = @import("syntax_kind.zig").SyntaxKind;
 const ArrayDeque = @import("ds_ext").ArrayDeque;
 const glyph = @import("ziglyph");
 const Object = @import("minsk_runtime").Object;
+const syntax_facts = @import("syntax_facts.zig");
 
 const AllocError = std.mem.Allocator.Error;
 
@@ -60,7 +61,7 @@ fn next(self: *Self) void {
     }
 }
 
-pub fn nextToken(self: *Self) AllocError!?SyntaxToken {
+pub fn lex(self: *Self) AllocError!?SyntaxToken {
     const start = self.position;
     var kind: SyntaxKind = .bad_token;
     var text: ?[]const u8 = null;
@@ -81,13 +82,19 @@ pub fn nextToken(self: *Self) AllocError!?SyntaxToken {
             ));
             break :blk 0;
         };
-        value = .{ .int = raw_val };
+        value = .{ .integer = raw_val };
         kind = .number_token;
     } else if (glyph.isWhiteSpace(try self.current())) {
         while (glyph.isWhiteSpace(try self.current())) {
             self.next();
         }
         kind = .whitespace_token;
+    } else if (glyph.isLetter(try self.current())) {
+        while (glyph.isAlphaNum(try self.current())) {
+            self.next();
+        }
+        text = self.source[start..self.position];
+        kind = syntax_facts.keywordKind(text.?);
     } else switch (try self.current()) {
         0 => {
             self.was_eof = true;
@@ -117,16 +124,40 @@ pub fn nextToken(self: *Self) AllocError!?SyntaxToken {
             self.next();
             kind = .close_parenthesis_token;
         },
-        else => {
-            var unichar_buf: [3]u8 = undefined;
-            const len = std.unicode.utf8Encode(try self.current(), &unichar_buf) catch unreachable;
-            try self.diagnostics.append(try std.fmt.allocPrint(
-                self.allocator,
-                "ERROR: bad character input: '{s}'",
-                .{unichar_buf[0..len]},
-            ));
+        '!' => if (try self.look(1) == '=') {
             self.next();
+            self.next();
+            kind = .bang_equals_token;
+        } else {
+            self.next();
+            kind = .bang_token;
         },
+        '&' => if (try self.look(1) == '&') {
+            self.next();
+            self.next();
+            kind = .ampersand_ampersand_token;
+        },
+        '|' => if (try self.look(1) == '|') {
+            self.next();
+            self.next();
+            kind = .pipe_pipe_token;
+        },
+        '=' => if (try self.look(1) == '=') {
+            self.next();
+            self.next();
+            kind = .equals_equals_token;
+        },
+        else => {},
+    }
+    if (kind == .bad_token) {
+        var unichar_buf: [3]u8 = undefined;
+        const len = std.unicode.utf8Encode(try self.current(), &unichar_buf) catch unreachable;
+        try self.diagnostics.append(try std.fmt.allocPrint(
+            self.allocator,
+            "ERROR: bad character input: '{s}'",
+            .{unichar_buf[0..len]},
+        ));
+        self.next();
     }
     return SyntaxToken.init(
         kind,

@@ -9,6 +9,8 @@ pub fn build(b: *std.Build) void {
     const minsk_runtime_mod = @import("minsk_runtime/build.zig").build(b);
     const minsk_meta_mod = @import("minsk_meta/build.zig").build(b);
 
+    minsk_runtime_mod.dependencies.put("minsk_meta", minsk_meta_mod) catch unreachable;
+
     minsk_mod.dependencies.put("ds_ext", ds_ext_mod) catch unreachable;
     minsk_mod.dependencies.put("minsk_runtime", minsk_runtime_mod) catch unreachable;
     minsk_mod.dependencies.put("minsk_meta", minsk_meta_mod) catch unreachable;
