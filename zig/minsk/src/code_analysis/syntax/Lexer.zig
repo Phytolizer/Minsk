@@ -1,0 +1,77 @@
+const std = @import("std");
+const SyntaxToken = @import("SyntaxToken.zig");
+const SyntaxKind = @import("syntax_kind.zig").SyntaxKind;
+const ArrayDeque = @import("ds_ext").ArrayDeque;
+const glyph = @import("ziglyph");
+const Object = @import("minsk_runtime").Object;
+
+const AllocError = std.mem.Allocator.Error;
+
+allocator: std.mem.Allocator,
+source: []const u8,
+position: usize,
+it: std.unicode.Utf8Iterator,
+peek_deq: ArrayDeque(u21),
+
+const Self = @This();
+
+pub fn init(allocator: std.mem.Allocator, text: []const u8) !Self {
+    return .{
+        .allocator = allocator,
+        .source = text,
+        .position = 0,
+        .it = (try std.unicode.Utf8View.init(text)).iterator(),
+        .peek_deq = ArrayDeque(u21).init(allocator),
+    };
+}
+
+fn look(self: *Self, n: usize) AllocError!u21 {
+    try self.peek_deq.ensureTotalCapacity(n);
+    var last_inserted: ?u21 = null;
+    while (self.peek_deq.len < n + 1) {
+        const cp = self.it.nextCodepoint() orelse return 0;
+        try self.peek_deq.push(cp);
+        last_inserted = cp;
+    }
+    return last_inserted orelse self.peek_deq.peek(n).?;
+}
+
+fn current(self: *Self) AllocError!u21 {
+    return self.look(0);
+}
+
+fn next(self: *Self) void {
+    const val = if (self.peek_deq.len > 0)
+        self.peek_deq.pop()
+    else
+        self.it.nextCodepoint();
+    if (val) |cp| {
+        self.position += std.unicode.utf8CodepointSequenceLength(cp) catch unreachable;
+    }
+}
+
+pub fn nextToken(self: *Self) AllocError!?SyntaxToken {
+    const start = self.position;
+    var kind: SyntaxKind = .bad_token;
+    var text: ?[]const u8 = null;
+    var value: ?Object = null;
+
+    if (glyph.isAsciiDigit(try self.current())) {
+        while (glyph.isAsciiDigit(try self.current())) {
+            self.next();
+        }
+        text = self.source[start..self.position];
+        const raw_val = std.fmt.parseInt(u64, text.?, 10) catch {
+            // TODO: handle
+            unreachable;
+        };
+        value = .{ .int = raw_val };
+        kind = .number_token;
+    }
+    return .{
+        .kind = kind,
+        .position = start,
+        .text = text orelse self.source[start..self.position],
+        .value = value,
+    };
+}

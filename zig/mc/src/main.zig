@@ -1,4 +1,5 @@
 const std = @import("std");
+const Lexer = @import("minsk").code_analysis.syntax.Lexer;
 
 fn readUntilDelimiterOrEofArrayList(
     writer: anytype,
@@ -31,6 +32,10 @@ pub fn main() !void {
     var stderr_buf = std.io.bufferedWriter(std.io.getStdErr().writer());
     const stderr = stderr_buf.writer();
     const stdin = std.io.getStdIn().reader();
+
+    var lexer = try Lexer.init(line_alloc, "123 hi");
+    const token = try lexer.nextToken();
+    std.debug.print("{}\n", .{token.?});
 
     while (true) {
         stderr.writeAll("> ") catch unreachable;
