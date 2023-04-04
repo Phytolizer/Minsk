@@ -1,6 +1,7 @@
 const std = @import("std");
 const builtin = @import("builtin");
 const Parser = @import("minsk").code_analysis.syntax.Parser;
+const Evaluator = @import("minsk").code_analysis.Evaluator;
 
 fn readUntilDelimiterOrEofArrayList(
     writer: anytype,
@@ -80,6 +81,10 @@ pub fn main() !void {
             for (tree.diagnostics) |d| {
                 stderr.print("{s}\n", .{d}) catch unreachable;
             }
+        } else {
+            const evaluator = Evaluator.init(tree.root);
+            const result = evaluator.evaluate();
+            stderr.print("{d}\n", .{result}) catch unreachable;
         }
     }
 }

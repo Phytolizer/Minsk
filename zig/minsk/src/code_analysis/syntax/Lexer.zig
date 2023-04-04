@@ -73,9 +73,13 @@ pub fn nextToken(self: *Self) AllocError!?SyntaxToken {
             self.next();
         }
         text = self.source[start..self.position];
-        const raw_val = std.fmt.parseInt(u64, text.?, 10) catch {
-            // TODO: handle
-            unreachable;
+        const raw_val = std.fmt.parseInt(u63, text.?, 10) catch blk: {
+            try self.diagnostics.append(try std.fmt.allocPrint(
+                self.allocator,
+                "ERROR: '{s}' cannot be represented as a u63",
+                .{text.?},
+            ));
+            break :blk 0;
         };
         value = .{ .int = raw_val };
         kind = .number_token;

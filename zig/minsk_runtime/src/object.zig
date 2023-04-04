@@ -1,7 +1,7 @@
 const std = @import("std");
 
 pub const Object = union(enum) {
-    int: u64,
+    int: u63,
 
     const Self = @This();
 
