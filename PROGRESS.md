@@ -25,3 +25,6 @@ Episode 6.
 
 ## rs (Rust)
 Episode 5.
+
+## zig (Zig)
+Episode 1.
