@@ -1,6 +1,6 @@
 const std = @import("std");
 const builtin = @import("builtin");
-const Parser = @import("minsk").code_analysis.syntax.Parser;
+const SyntaxTree = @import("minsk").code_analysis.syntax.SyntaxTree;
 const Evaluator = @import("minsk").code_analysis.Evaluator;
 
 fn readUntilDelimiterOrEofArrayList(
@@ -62,9 +62,7 @@ pub fn main() !void {
         defer parser_arena.deinit();
         const parser_alloc = pickAllocator(parser_arena.allocator(), allocator);
 
-        var parser = try Parser.init(parser_alloc, line);
-        defer parser.deinit();
-        const tree = try parser.parse();
+        const tree = try SyntaxTree.parse(parser_alloc, line);
         defer tree.deinit();
 
         {

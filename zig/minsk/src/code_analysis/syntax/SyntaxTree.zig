@@ -1,6 +1,7 @@
 const std = @import("std");
 const ExpressionSyntax = @import("ExpressionSyntax.zig");
 const SyntaxToken = @import("SyntaxToken.zig");
+const Parser = @import("Parser.zig");
 
 allocator: std.mem.Allocator,
 diagnostics: [][]const u8,
@@ -29,4 +30,10 @@ pub fn deinit(self: Self) void {
     }
     self.allocator.free(self.diagnostics);
     self.root.deinit(self.allocator);
+}
+
+pub fn parse(allocator: std.mem.Allocator, text: []const u8) !Self {
+    var parser = try Parser.init(allocator, text);
+    defer parser.deinit();
+    return try parser.parse();
 }
