@@ -13,6 +13,7 @@ position: usize = 0,
 was_eof: bool = false,
 it: std.unicode.Utf8Iterator,
 peek_deq: ArrayDeque(u21),
+diagnostics: std.ArrayList([]const u8),
 
 const Self = @This();
 
@@ -22,11 +23,16 @@ pub fn init(allocator: std.mem.Allocator, text: []const u8) !Self {
         .source = text,
         .it = (try std.unicode.Utf8View.init(text)).iterator(),
         .peek_deq = ArrayDeque(u21).init(allocator),
+        .diagnostics = std.ArrayList([]const u8).init(allocator),
     };
 }
 
 pub fn deinit(self: Self) void {
     self.peek_deq.deinit();
+    for (self.diagnostics.items) |d| {
+        self.allocator.free(d);
+    }
+    self.diagnostics.deinit();
 }
 
 fn look(self: *Self, n: usize) AllocError!u21 {
@@ -108,6 +114,13 @@ pub fn nextToken(self: *Self) AllocError!?SyntaxToken {
             kind = .close_parenthesis_token;
         },
         else => {
+            var unichar_buf: [3]u8 = undefined;
+            const len = std.unicode.utf8Encode(try self.current(), &unichar_buf) catch unreachable;
+            try self.diagnostics.append(try std.fmt.allocPrint(
+                self.allocator,
+                "ERROR: bad character input: '{s}'",
+                .{unichar_buf[0..len]},
+            ));
             self.next();
         },
     }

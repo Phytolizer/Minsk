@@ -9,6 +9,7 @@ const SyntaxKind = @import("syntax_kind.zig").SyntaxKind;
 allocator: std.mem.Allocator,
 tokens: []SyntaxToken,
 position: usize = 0,
+diagnostics: std.ArrayList([]const u8),
 
 const Self = @This();
 
@@ -19,19 +20,27 @@ pub fn init(allocator: std.mem.Allocator, text: []const u8) !Self {
     defer tokens.deinit();
 
     while (try lexer.nextToken()) |token| {
-        if (token.kind == .whitespace_token or token.kind == .end_of_file_token)
+        if (token.kind == .whitespace_token or token.kind == .bad_token)
             continue;
         try tokens.append(token);
     }
+    var diagnostics = std.ArrayList([]const u8).init(allocator);
+    try diagnostics.appendSlice(lexer.diagnostics.items);
+    lexer.diagnostics.clearAndFree();
 
     return .{
         .allocator = allocator,
         .tokens = try tokens.toOwnedSlice(),
+        .diagnostics = diagnostics,
     };
 }
 
 pub fn deinit(self: Self) void {
     self.allocator.free(self.tokens);
+    for (self.diagnostics.items) |d| {
+        self.allocator.free(d);
+    }
+    self.diagnostics.deinit();
 }
 
 fn peek(self: Self, offset: usize) SyntaxToken {
@@ -52,11 +61,19 @@ fn nextToken(self: *Self) SyntaxToken {
     return result;
 }
 
-fn matchToken(self: *Self, kind: SyntaxKind) SyntaxToken {
+fn matchToken(self: *Self, kind: SyntaxKind) std.mem.Allocator.Error!SyntaxToken {
     if (self.current().kind == kind) {
         return self.nextToken();
     }
 
+    try self.diagnostics.append(try std.fmt.allocPrint(
+        self.allocator,
+        "ERROR: unexpected token <{s}>, expected <{s}>",
+        .{
+            self.current().kind.displayName(),
+            kind.displayName(),
+        },
+    ));
     return SyntaxToken.init(
         kind,
         self.current().position,
@@ -80,6 +97,6 @@ pub fn parse(self: *Self) !*ExpressionSyntax {
 }
 
 fn parsePrimaryExpression(self: *Self) !*ExpressionSyntax {
-    const number_token = self.matchToken(.number_token);
+    const number_token = try self.matchToken(.number_token);
     return try LiteralExpressionSyntax.init(self.allocator, number_token);
 }

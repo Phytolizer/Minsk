@@ -66,7 +66,15 @@ pub fn main() !void {
         const expression = try parser.parse();
         defer expression.deinit(parser_alloc);
 
-        {
+        if (parser.diagnostics.items.len > 0) {
+            tty.setColor(stderr, .Red) catch unreachable;
+            tty.setColor(stderr, .Dim) catch unreachable;
+            defer tty.setColor(stderr, .Reset) catch unreachable;
+
+            for (parser.diagnostics.items) |d| {
+                stderr.print("{s}\n", .{d}) catch unreachable;
+            }
+        } else {
             tty.setColor(stderr, .Dim) catch unreachable;
             defer tty.setColor(stderr, .Reset) catch unreachable;
             try expression.base.prettyPrint(parser_alloc, "", true, stderr);
