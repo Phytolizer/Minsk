@@ -40,7 +40,7 @@ fn evaluateBinaryExpression(self: Self, node: *const BoundBinaryExpression) Obje
     return switch (node.operator.kind) {
         .addition => .{ .integer = left.integer + right.integer },
         .subtraction => .{ .integer = left.integer - right.integer },
-        .multiplication => .{ .integer = @mulWithOverflow(left.integer, right.integer).@"0" },
+        .multiplication => .{ .integer = left.integer *% right.integer },
         .division => .{ .integer = @divTrunc(left.integer, right.integer) },
         .logical_and => .{ .boolean = left.boolean and right.boolean },
         .logical_or => .{ .boolean = left.boolean or right.boolean },
