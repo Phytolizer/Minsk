@@ -1,4 +1,5 @@
 const std = @import("std");
+const builtin = @import("builtin");
 const Parser = @import("minsk").code_analysis.syntax.Parser;
 
 fn readUntilDelimiterOrEofArrayList(
@@ -21,14 +22,22 @@ fn readUntilDelimiterOrEofArrayList(
     return array_list.items;
 }
 
+fn pickAllocator(normal_alloc: std.mem.Allocator, debug_alloc: std.mem.Allocator) std.mem.Allocator {
+    return switch (builtin.mode) {
+        .Debug => debug_alloc,
+        else => normal_alloc,
+    };
+}
+
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
     var line_arena = std.heap.ArenaAllocator.init(allocator);
     defer line_arena.deinit();
-    const line_alloc = line_arena.allocator();
+    const line_alloc = pickAllocator(line_arena.allocator(), allocator);
     var line_buf = std.ArrayList(u8).init(line_alloc);
+    defer line_buf.deinit();
     var stderr_buf = std.io.bufferedWriter(std.io.getStdErr().writer());
     const stderr = stderr_buf.writer();
     const stdin = std.io.getStdIn().reader();
@@ -49,10 +58,12 @@ pub fn main() !void {
 
         var parser_arena = std.heap.ArenaAllocator.init(allocator);
         defer parser_arena.deinit();
-        const parser_alloc = parser_arena.allocator();
+        const parser_alloc = pickAllocator(parser_arena.allocator(), allocator);
 
         var parser = try Parser.init(parser_alloc, line);
+        defer parser.deinit();
         const expression = try parser.parse();
+        defer expression.deinit(parser_alloc);
         try expression.base.prettyPrint(parser_alloc, "", true, std.io.getStdErr().writer());
     }
 }
