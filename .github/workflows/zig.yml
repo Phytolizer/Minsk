@@ -3,6 +3,8 @@ name: Zig
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'zig/**'
   pull_request:
     branches: [ main ]
   schedule:
@@ -17,6 +19,6 @@ jobs:
         working-directory: zig
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: goto-bus-stop/setup-zig@v2
       - run: zig build --verbose
