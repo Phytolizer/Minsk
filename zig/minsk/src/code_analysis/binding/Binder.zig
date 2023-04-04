@@ -41,7 +41,11 @@ pub fn bindExpression(self: *Self, syntax: *ExpressionSyntax) std.mem.Allocator.
 fn bindBinaryExpression(self: *Self, syntax: *BinaryExpressionSyntax) !*BoundExpression {
     const left = try self.bindExpression(syntax.left);
     const right = try self.bindExpression(syntax.right);
-    const operator_kind = BoundBinaryExpression.OperatorKind.bind(syntax.operator_token.kind, left.type(), right.type()) orelse {
+    const operator = BoundBinaryExpression.Operator.bind(
+        syntax.operator_token.kind,
+        left.type(),
+        right.type(),
+    ) orelse {
         try self.diagnostics.append(try std.fmt.allocPrint(
             self.allocator,
             "Binary operator '{s}' is not defined for types {s} and {s}.",
@@ -54,7 +58,7 @@ fn bindBinaryExpression(self: *Self, syntax: *BinaryExpressionSyntax) !*BoundExp
         right.deinit(self.allocator);
         return left;
     };
-    return try BoundBinaryExpression.init(self.allocator, left, operator_kind, right);
+    return try BoundBinaryExpression.init(self.allocator, left, operator, right);
 }
 
 fn bindLiteralExpression(self: *Self, syntax: *LiteralExpressionSyntax) !*BoundExpression {
@@ -68,7 +72,10 @@ fn bindParenthesizedExpression(self: *Self, syntax: *ParenthesizedExpressionSynt
 
 fn bindUnaryExpression(self: *Self, syntax: *UnaryExpressionSyntax) !*BoundExpression {
     const operand = try self.bindExpression(syntax.operand);
-    const operator_kind = BoundUnaryExpression.OperatorKind.bind(syntax.operator_token.kind, operand.type()) orelse {
+    const operator = BoundUnaryExpression.Operator.bind(
+        syntax.operator_token.kind,
+        operand.type(),
+    ) orelse {
         try self.diagnostics.append(try std.fmt.allocPrint(
             self.allocator,
             "Unary operator '{s}' is not defined for type {s}.",
@@ -79,5 +86,5 @@ fn bindUnaryExpression(self: *Self, syntax: *UnaryExpressionSyntax) !*BoundExpre
         ));
         return operand;
     };
-    return try BoundUnaryExpression.init(self.allocator, operator_kind, operand);
+    return try BoundUnaryExpression.init(self.allocator, operator, operand);
 }

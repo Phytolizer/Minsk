@@ -6,31 +6,51 @@ const SyntaxKind = @import("../syntax/syntax_kind.zig").SyntaxKind;
 
 base: BoundExpression,
 left: *BoundExpression,
-operator_kind: OperatorKind,
+operator: Operator,
 right: *BoundExpression,
 
-pub const OperatorKind = enum {
-    addition,
-    subtraction,
-    multiplication,
-    division,
-    logical_and,
-    logical_or,
+pub const Operator = struct {
+    syntax_kind: SyntaxKind,
+    kind: Kind,
+    left_type: Object.Type,
+    right_type: Object.Type,
+    result_type: Object.Type,
 
-    pub fn bind(syntax_kind: SyntaxKind, left_type: Object.Type, right_type: Object.Type) ?OperatorKind {
-        if (left_type == .integer and right_type == .integer) {
-            switch (syntax_kind) {
-                .plus_token => return .addition,
-                .minus_token => return .subtraction,
-                .star_token => return .multiplication,
-                .slash_token => return .division,
-                else => {},
-            }
-        } else if (left_type == .boolean and right_type == .boolean) {
-            switch (syntax_kind) {
-                .ampersand_ampersand_token => return .logical_and,
-                .pipe_pipe_token => return .logical_or,
-                else => {},
+    pub const Kind = enum {
+        addition,
+        subtraction,
+        multiplication,
+        division,
+        logical_and,
+        logical_or,
+    };
+
+    fn initMatching(syntax_kind: SyntaxKind, kind: Kind, matching_type: Object.Type) Operator {
+        return .{
+            .syntax_kind = syntax_kind,
+            .kind = kind,
+            .left_type = matching_type,
+            .right_type = matching_type,
+            .result_type = matching_type,
+        };
+    }
+
+    const operators = [_]Operator{
+        initMatching(.plus_token, .addition, .integer),
+        initMatching(.minus_token, .subtraction, .integer),
+        initMatching(.star_token, .multiplication, .integer),
+        initMatching(.slash_token, .division, .integer),
+        initMatching(.ampersand_ampersand_token, .logical_and, .boolean),
+        initMatching(.pipe_pipe_token, .logical_or, .boolean),
+    };
+
+    pub fn bind(syntax_kind: SyntaxKind, left_type: Object.Type, right_type: Object.Type) ?Operator {
+        for (operators) |op| {
+            if (op.syntax_kind == syntax_kind and
+                op.left_type == left_type and
+                op.right_type == right_type)
+            {
+                return op;
             }
         }
         return null;
@@ -42,14 +62,14 @@ const Self = @This();
 pub fn init(
     allocator: std.mem.Allocator,
     left: *BoundExpression,
-    operator_kind: OperatorKind,
+    operator: Operator,
     right: *BoundExpression,
 ) !*BoundExpression {
     const result = try allocator.create(Self);
     result.* = .{
         .base = BoundExpression.init(.binary_expression, &deinit, &@"type"),
         .left = left,
-        .operator_kind = operator_kind,
+        .operator = operator,
         .right = right,
     };
     return &result.base;
@@ -64,5 +84,5 @@ fn deinit(node: *const BoundNode, allocator: std.mem.Allocator) void {
 
 fn @"type"(node: *const BoundExpression) Object.Type {
     const self = BoundExpression.downcast(node, Self);
-    return self.left.type();
+    return self.operator.result_type;
 }
