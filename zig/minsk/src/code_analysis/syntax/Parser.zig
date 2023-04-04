@@ -4,6 +4,7 @@ const Lexer = @import("Lexer.zig");
 const ExpressionSyntax = @import("ExpressionSyntax.zig");
 const BinaryExpressionSyntax = @import("BinaryExpressionSyntax.zig");
 const LiteralExpressionSyntax = @import("LiteralExpressionSyntax.zig");
+const ParenthesizedExpressionSyntax = @import("ParenthesizedExpressionSyntax.zig");
 const SyntaxKind = @import("syntax_kind.zig").SyntaxKind;
 const SyntaxTree = @import("SyntaxTree.zig");
 
@@ -83,7 +84,7 @@ fn matchToken(self: *Self, kind: SyntaxKind) std.mem.Allocator.Error!SyntaxToken
     );
 }
 
-pub fn parse(self: *Self) !SyntaxTree {
+pub fn parse(self: *Self) std.mem.Allocator.Error!SyntaxTree {
     const expression = try self.parseExpression();
     const end_of_file_token = try self.matchToken(.end_of_file_token);
     return SyntaxTree.init(
@@ -94,7 +95,7 @@ pub fn parse(self: *Self) !SyntaxTree {
     );
 }
 
-fn parseExpression(self: *Self) !*ExpressionSyntax {
+fn parseExpression(self: *Self) std.mem.Allocator.Error!*ExpressionSyntax {
     return try self.parseTerm();
 }
 
@@ -127,6 +128,19 @@ fn parseFactor(self: *Self) !*ExpressionSyntax {
 }
 
 fn parsePrimaryExpression(self: *Self) !*ExpressionSyntax {
+    if (self.current().kind == .open_parenthesis_token) {
+        const left = self.nextToken();
+        const expression = try self.parseExpression();
+        errdefer expression.deinit(self.allocator);
+        const right = try self.matchToken(.close_parenthesis_token);
+        return try ParenthesizedExpressionSyntax.init(
+            self.allocator,
+            left,
+            expression,
+            right,
+        );
+    }
+
     const number_token = try self.matchToken(.number_token);
     return try LiteralExpressionSyntax.init(self.allocator, number_token);
 }

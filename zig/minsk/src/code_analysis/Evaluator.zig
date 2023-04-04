@@ -2,6 +2,7 @@ const std = @import("std");
 const ExpressionSyntax = @import("syntax/ExpressionSyntax.zig");
 const LiteralExpressionSyntax = @import("syntax/LiteralExpressionSyntax.zig");
 const BinaryExpressionSyntax = @import("syntax/BinaryExpressionSyntax.zig");
+const ParenthesizedExpressionSyntax = @import("syntax/ParenthesizedExpressionSyntax.zig");
 
 root: *const ExpressionSyntax,
 
@@ -34,6 +35,11 @@ fn evaluateExpression(self: Self, node: *const ExpressionSyntax) i64 {
                 .slash_token => @divTrunc(left, right),
                 else => unreachable,
             };
+        },
+        .parenthesized_expression => {
+            return self.evaluateExpression(
+                ExpressionSyntax.downcast(&node.base, ParenthesizedExpressionSyntax).expression,
+            );
         },
         else => unreachable,
     }

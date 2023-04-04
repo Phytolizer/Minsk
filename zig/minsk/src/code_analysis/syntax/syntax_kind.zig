@@ -16,6 +16,7 @@ pub const SyntaxKind = enum(usize) {
 
     literal_expression,
     binary_expression,
+    parenthesized_expression,
 
     const Self = @This();
 
