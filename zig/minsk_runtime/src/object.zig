@@ -18,6 +18,19 @@ pub const Object = union(Type) {
         return std.meta.activeTag(self);
     }
 
+    pub fn eq(self: Self, other: Self) bool {
+        return switch (self) {
+            .boolean => |s| switch (other) {
+                .boolean => |o| s == o,
+                else => false,
+            },
+            .integer => |s| switch (other) {
+                .integer => |o| s == o,
+                else => false,
+            },
+        };
+    }
+
     pub const Type = enum {
         integer,
         boolean,

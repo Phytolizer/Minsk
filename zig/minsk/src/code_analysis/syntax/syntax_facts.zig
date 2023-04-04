@@ -5,15 +5,16 @@ pub fn binaryOperatorPrecedence(kind: SyntaxKind) usize {
     return switch (kind) {
         .pipe_pipe_token => 1,
         .ampersand_ampersand_token => 2,
-        .plus_token, .minus_token => 3,
-        .star_token, .slash_token => 4,
+        .equals_equals_token, .bang_equals_token => 3,
+        .plus_token, .minus_token => 4,
+        .star_token, .slash_token => 5,
         else => 0,
     };
 }
 
 pub fn unaryOperatorPrecedence(kind: SyntaxKind) usize {
     return switch (kind) {
-        .plus_token, .minus_token, .bang_token => 5,
+        .plus_token, .minus_token, .bang_token => 6,
         else => 0,
     };
 }

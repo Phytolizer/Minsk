@@ -44,6 +44,8 @@ fn evaluateBinaryExpression(self: Self, node: *const BoundBinaryExpression) Obje
         .division => .{ .integer = @divTrunc(left.integer, right.integer) },
         .logical_and => .{ .boolean = left.boolean and right.boolean },
         .logical_or => .{ .boolean = left.boolean or right.boolean },
+        .equality => .{ .boolean = left.eq(right) },
+        .inequality => .{ .boolean = !left.eq(right) },
     };
 }
 

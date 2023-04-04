@@ -23,16 +23,34 @@ pub const Operator = struct {
         division,
         logical_and,
         logical_or,
+        equality,
+        inequality,
     };
 
-    fn initMatching(syntax_kind: SyntaxKind, kind: Kind, matching_type: Object.Type) Operator {
+    fn init(
+        syntax_kind: SyntaxKind,
+        kind: Kind,
+        left_type: Object.Type,
+        right_type: Object.Type,
+        result_type: Object.Type,
+    ) Operator {
         return .{
             .syntax_kind = syntax_kind,
             .kind = kind,
-            .left_type = matching_type,
-            .right_type = matching_type,
-            .result_type = matching_type,
+            .left_type = left_type,
+            .right_type = right_type,
+            .result_type = result_type,
         };
+    }
+
+    fn initMatching(syntax_kind: SyntaxKind, kind: Kind, matching_type: Object.Type) Operator {
+        return Operator.init(
+            syntax_kind,
+            kind,
+            matching_type,
+            matching_type,
+            matching_type,
+        );
     }
 
     const operators = [_]Operator{
@@ -42,6 +60,12 @@ pub const Operator = struct {
         initMatching(.slash_token, .division, .integer),
         initMatching(.ampersand_ampersand_token, .logical_and, .boolean),
         initMatching(.pipe_pipe_token, .logical_or, .boolean),
+
+        initMatching(.equals_equals_token, .equality, .boolean),
+        Operator.init(.equals_equals_token, .equality, .integer, .integer, .boolean),
+
+        initMatching(.bang_equals_token, .inequality, .boolean),
+        Operator.init(.bang_equals_token, .inequality, .integer, .integer, .boolean),
     };
 
     pub fn bind(syntax_kind: SyntaxKind, left_type: Object.Type, right_type: Object.Type) ?Operator {

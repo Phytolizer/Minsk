@@ -18,6 +18,8 @@ pub const SyntaxKind = enum(usize) {
     bang_token,
     ampersand_ampersand_token,
     pipe_pipe_token,
+    equals_equals_token,
+    bang_equals_token,
 
     true_keyword,
     false_keyword,

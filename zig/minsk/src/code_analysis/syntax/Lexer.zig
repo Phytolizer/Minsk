@@ -124,7 +124,11 @@ pub fn lex(self: *Self) AllocError!?SyntaxToken {
             self.next();
             kind = .close_parenthesis_token;
         },
-        '!' => {
+        '!' => if (try self.look(1) == '=') {
+            self.next();
+            self.next();
+            kind = .bang_equals_token;
+        } else {
             self.next();
             kind = .bang_token;
         },
@@ -137,6 +141,11 @@ pub fn lex(self: *Self) AllocError!?SyntaxToken {
             self.next();
             self.next();
             kind = .pipe_pipe_token;
+        },
+        '=' => if (try self.look(1) == '=') {
+            self.next();
+            self.next();
+            kind = .equals_equals_token;
         },
         else => {},
     }
