@@ -1,8 +1,7 @@
 const std = @import("std");
 const builtin = @import("builtin");
 const SyntaxTree = @import("minsk").code_analysis.syntax.SyntaxTree;
-const Evaluator = @import("minsk").code_analysis.Evaluator;
-const Binder = @import("minsk").code_analysis.binding.Binder;
+const Compilation = @import("minsk").code_analysis.Compilation;
 
 fn readUntilDelimiterOrEofArrayList(
     writer: anytype,
@@ -121,48 +120,31 @@ pub fn main() !void {
         defer parser_arena.deinit();
         const parser_alloc = pickAllocator(parser_arena.allocator(), allocator);
 
-        var tree = try SyntaxTree.parse(parser_alloc, line);
-        defer tree.deinit();
-        var binder = Binder.init(parser_alloc);
-        defer binder.deinit();
-        const bound_expression = try binder.bindExpression(tree.root);
-        defer bound_expression.deinit(parser_alloc);
-
-        const diagnostics = blk: {
-            const slices = [_][][]const u8{
-                tree.takeDiagnostics(),
-                try binder.diagnostics.toOwnedSlice(),
-            };
-            defer for (slices) |s| {
-                parser_alloc.free(s);
-            };
-            break :blk try std.mem.concat(parser_alloc, []const u8, &slices);
-        };
-        defer {
-            for (diagnostics) |d| {
-                parser_alloc.free(d);
-            }
-            parser_alloc.free(diagnostics);
-        }
+        const tree = try SyntaxTree.parse(parser_alloc, line);
+        var compilation = Compilation.init(parser_alloc, tree);
+        defer compilation.deinit();
+        const result = try compilation.evaluate();
+        defer result.deinit(parser_alloc);
 
         if (show_tree) {
             tty.setColor(stderr, .Dim) catch unreachable;
             defer tty.setColor(stderr, .Reset) catch unreachable;
-            try tree.root.base.prettyPrint(parser_alloc, "", true, stderr);
+            try compilation.syntax_tree.root.base.prettyPrint(parser_alloc, "", true, stderr);
         }
 
-        if (diagnostics.len > 0) {
-            tty.setColor(stderr, .Red) catch unreachable;
-            tty.setColor(stderr, .Dim) catch unreachable;
-            defer tty.setColor(stderr, .Reset) catch unreachable;
+        switch (result) {
+            .failure => |diagnostics| {
+                tty.setColor(stderr, .Red) catch unreachable;
+                tty.setColor(stderr, .Dim) catch unreachable;
+                defer tty.setColor(stderr, .Reset) catch unreachable;
 
-            for (diagnostics) |d| {
-                stderr.print("{s}\n", .{d}) catch unreachable;
-            }
-        } else {
-            const evaluator = Evaluator.init(bound_expression);
-            const result = evaluator.evaluate();
-            stderr.print("{d}\n", .{result}) catch unreachable;
+                for (diagnostics) |d| {
+                    stderr.print("{s}\n", .{d}) catch unreachable;
+                }
+            },
+            .success => |value| {
+                stderr.print("{d}\n", .{value}) catch unreachable;
+            },
         }
     }
 }
