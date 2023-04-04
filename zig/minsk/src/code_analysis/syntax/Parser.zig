@@ -3,6 +3,7 @@ const SyntaxToken = @import("SyntaxToken.zig");
 const Lexer = @import("Lexer.zig");
 const ExpressionSyntax = @import("ExpressionSyntax.zig");
 const BinaryExpressionSyntax = @import("BinaryExpressionSyntax.zig");
+const UnaryExpressionSyntax = @import("UnaryExpressionSyntax.zig");
 const LiteralExpressionSyntax = @import("LiteralExpressionSyntax.zig");
 const ParenthesizedExpressionSyntax = @import("ParenthesizedExpressionSyntax.zig");
 const SyntaxKind = @import("syntax_kind.zig").SyntaxKind;
@@ -101,7 +102,13 @@ fn parseExpression(self: *Self) std.mem.Allocator.Error!*ExpressionSyntax {
 }
 
 fn parseBinaryExpression(self: *Self, parent_precedence: usize) !*ExpressionSyntax {
-    var left = try self.parsePrimaryExpression();
+    const unary_operator_precedence = syntax_facts.unaryOperatorPrecedence(self.current().kind);
+    var left = if (unary_operator_precedence != 0 and unary_operator_precedence >= parent_precedence) blk: {
+        const operator_token = self.nextToken();
+        const operand = try self.parseBinaryExpression(unary_operator_precedence);
+        break :blk try UnaryExpressionSyntax.init(self.allocator, operator_token, operand);
+    } else try self.parsePrimaryExpression();
+
     errdefer left.deinit(self.allocator);
 
     while (true) {

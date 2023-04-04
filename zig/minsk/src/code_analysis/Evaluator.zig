@@ -3,6 +3,7 @@ const ExpressionSyntax = @import("syntax/ExpressionSyntax.zig");
 const LiteralExpressionSyntax = @import("syntax/LiteralExpressionSyntax.zig");
 const BinaryExpressionSyntax = @import("syntax/BinaryExpressionSyntax.zig");
 const ParenthesizedExpressionSyntax = @import("syntax/ParenthesizedExpressionSyntax.zig");
+const UnaryExpressionSyntax = @import("syntax/UnaryExpressionSyntax.zig");
 
 root: *const ExpressionSyntax,
 
@@ -40,6 +41,16 @@ fn evaluateExpression(self: Self, node: *const ExpressionSyntax) i64 {
             return self.evaluateExpression(
                 ExpressionSyntax.downcast(&node.base, ParenthesizedExpressionSyntax).expression,
             );
+        },
+        .unary_expression => {
+            const u = ExpressionSyntax.downcast(&node.base, UnaryExpressionSyntax);
+            const operand = self.evaluateExpression(u.operand);
+
+            return switch (u.operator_token.kind) {
+                .plus_token => operand,
+                .minus_token => -operand,
+                else => unreachable,
+            };
         },
         else => unreachable,
     }
