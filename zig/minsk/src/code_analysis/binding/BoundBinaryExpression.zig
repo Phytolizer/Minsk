@@ -16,7 +16,7 @@ pub const OperatorKind = enum {
     division,
 
     pub fn bind(syntax_kind: SyntaxKind, left_type: Object.Type, right_type: Object.Type) ?OperatorKind {
-        if (left_type != .int or right_type != .int)
+        if (left_type != .integer or right_type != .integer)
             return null;
 
         return switch (syntax_kind) {

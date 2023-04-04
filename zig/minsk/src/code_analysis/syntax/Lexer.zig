@@ -4,6 +4,7 @@ const SyntaxKind = @import("syntax_kind.zig").SyntaxKind;
 const ArrayDeque = @import("ds_ext").ArrayDeque;
 const glyph = @import("ziglyph");
 const Object = @import("minsk_runtime").Object;
+const syntax_facts = @import("syntax_facts.zig");
 
 const AllocError = std.mem.Allocator.Error;
 
@@ -81,13 +82,19 @@ pub fn lex(self: *Self) AllocError!?SyntaxToken {
             ));
             break :blk 0;
         };
-        value = .{ .int = raw_val };
+        value = .{ .integer = raw_val };
         kind = .number_token;
     } else if (glyph.isWhiteSpace(try self.current())) {
         while (glyph.isWhiteSpace(try self.current())) {
             self.next();
         }
         kind = .whitespace_token;
+    } else if (glyph.isLetter(try self.current())) {
+        while (glyph.isAlphaNum(try self.current())) {
+            self.next();
+        }
+        text = self.source[start..self.position];
+        kind = syntax_facts.keywordKind(text.?);
     } else switch (try self.current()) {
         0 => {
             self.was_eof = true;

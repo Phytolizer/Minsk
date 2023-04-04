@@ -126,19 +126,35 @@ fn parseBinaryExpression(self: *Self, parent_precedence: usize) !*ExpressionSynt
 }
 
 fn parsePrimaryExpression(self: *Self) !*ExpressionSyntax {
-    if (self.current().kind == .open_parenthesis_token) {
-        const left = self.nextToken();
-        const expression = try self.parseExpression();
-        errdefer expression.deinit(self.allocator);
-        const right = try self.matchToken(.close_parenthesis_token);
-        return try ParenthesizedExpressionSyntax.init(
-            self.allocator,
-            left,
-            expression,
-            right,
-        );
+    switch (self.current().kind) {
+        .open_parenthesis_token => {
+            const left = self.nextToken();
+            const expression = try self.parseExpression();
+            errdefer expression.deinit(self.allocator);
+            const right = try self.matchToken(.close_parenthesis_token);
+            return try ParenthesizedExpressionSyntax.init(
+                self.allocator,
+                left,
+                expression,
+                right,
+            );
+        },
+        .false_keyword, .true_keyword => {
+            const keyword_token = self.nextToken();
+            const value = keyword_token.kind == .true_keyword;
+            return try LiteralExpressionSyntax.init(
+                self.allocator,
+                keyword_token,
+                .{ .boolean = value },
+            );
+        },
+        else => {
+            const number_token = try self.matchToken(.number_token);
+            return try LiteralExpressionSyntax.init(
+                self.allocator,
+                number_token,
+                number_token.value.?,
+            );
+        },
     }
-
-    const number_token = try self.matchToken(.number_token);
-    return try LiteralExpressionSyntax.init(self.allocator, number_token);
 }

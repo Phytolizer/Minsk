@@ -45,15 +45,20 @@ fn bindBinaryExpression(self: *Self, syntax: *BinaryExpressionSyntax) !*BoundExp
         try self.diagnostics.append(try std.fmt.allocPrint(
             self.allocator,
             "Binary operator '{s}' is not defined for types {s} and {s}.",
-            .{ syntax.operator_token.text, std.meta.tagName(left.type()), std.meta.tagName(right.type()) },
+            .{
+                syntax.operator_token.text,
+                left.type().displayName(),
+                right.type().displayName(),
+            },
         ));
+        right.deinit(self.allocator);
         return left;
     };
     return try BoundBinaryExpression.init(self.allocator, left, operator_kind, right);
 }
 
 fn bindLiteralExpression(self: *Self, syntax: *LiteralExpressionSyntax) !*BoundExpression {
-    const value = syntax.literal_token.value orelse Object{ .int = 0 };
+    const value = syntax.value;
     return try BoundLiteralExpression.init(self.allocator, value);
 }
 
@@ -67,7 +72,10 @@ fn bindUnaryExpression(self: *Self, syntax: *UnaryExpressionSyntax) !*BoundExpre
         try self.diagnostics.append(try std.fmt.allocPrint(
             self.allocator,
             "Unary operator '{s}' is not defined for type {s}.",
-            .{ syntax.operator_token.text, std.meta.tagName(operand.type()) },
+            .{
+                syntax.operator_token.text,
+                operand.type().displayName(),
+            },
         ));
         return operand;
     };

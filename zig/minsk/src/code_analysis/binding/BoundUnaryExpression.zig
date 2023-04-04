@@ -13,7 +13,7 @@ pub const OperatorKind = enum {
     negation,
 
     pub fn bind(syntax_kind: SyntaxKind, operand_type: Object.Type) ?OperatorKind {
-        if (operand_type != .int) return null;
+        if (operand_type != .integer) return null;
 
         return switch (syntax_kind) {
             .plus_token => .identity,

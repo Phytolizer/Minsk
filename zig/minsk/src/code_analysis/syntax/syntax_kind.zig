@@ -1,4 +1,5 @@
 const std = @import("std");
+const snakeToCamel = @import("minsk_meta").snakeToCamel;
 
 pub const SyntaxKind = enum(usize) {
     bad_token,
@@ -6,6 +7,7 @@ pub const SyntaxKind = enum(usize) {
 
     whitespace_token,
     number_token,
+    identifier_token,
 
     plus_token,
     minus_token,
@@ -14,28 +16,15 @@ pub const SyntaxKind = enum(usize) {
     open_parenthesis_token,
     close_parenthesis_token,
 
+    true_keyword,
+    false_keyword,
+
     literal_expression,
     binary_expression,
     parenthesized_expression,
     unary_expression,
 
     const Self = @This();
-
-    fn snakeToCamel(comptime name: []const u8) []const u8 {
-        var result: []const u8 = "";
-        var was_underscore = true;
-        for (name) |c| {
-            if (c == '_') {
-                was_underscore = true;
-            } else if (was_underscore) {
-                was_underscore = false;
-                result = result ++ &[_]u8{std.ascii.toUpper(c)};
-            } else {
-                result = result ++ &[_]u8{c};
-            }
-        }
-        return result;
-    }
 
     const display_names = blk: {
         const fields = std.meta.fields(Self);

@@ -1,1 +1,2 @@
-pub const DowncastedPointer = @import("downcasted_pointer.zig").DowncastedPointer;
+pub usingnamespace @import("downcasted_pointer.zig");
+pub usingnamespace @import("snake_to_camel.zig");
