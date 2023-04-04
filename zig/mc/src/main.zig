@@ -1,5 +1,5 @@
 const std = @import("std");
-const Lexer = @import("minsk").code_analysis.syntax.Lexer;
+const Parser = @import("minsk").code_analysis.syntax.Parser;
 
 fn readUntilDelimiterOrEofArrayList(
     writer: anytype,
@@ -47,13 +47,12 @@ pub fn main() !void {
             break;
         };
 
-        var lexer_arena = std.heap.ArenaAllocator.init(allocator);
-        defer lexer_arena.deinit();
-        const lexer_alloc = lexer_arena.allocator();
+        var parser_arena = std.heap.ArenaAllocator.init(allocator);
+        defer parser_arena.deinit();
+        const parser_alloc = parser_arena.allocator();
 
-        var lexer = try Lexer.init(lexer_alloc, line);
-        while (try lexer.nextToken()) |token| {
-            stderr.print("{}\n", .{token}) catch unreachable;
-        }
+        var parser = try Parser.init(parser_alloc, line);
+        const expression = try parser.parse();
+        try expression.base.prettyPrint(parser_alloc, "", true, std.io.getStdErr().writer());
     }
 }

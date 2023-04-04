@@ -9,8 +9,8 @@ const AllocError = std.mem.Allocator.Error;
 
 allocator: std.mem.Allocator,
 source: []const u8,
-position: usize,
-was_eof: bool,
+position: usize = 0,
+was_eof: bool = false,
 it: std.unicode.Utf8Iterator,
 peek_deq: ArrayDeque(u21),
 
@@ -20,11 +20,13 @@ pub fn init(allocator: std.mem.Allocator, text: []const u8) !Self {
     return .{
         .allocator = allocator,
         .source = text,
-        .position = 0,
-        .was_eof = false,
         .it = (try std.unicode.Utf8View.init(text)).iterator(),
         .peek_deq = ArrayDeque(u21).init(allocator),
     };
+}
+
+pub fn deinit(self: Self) void {
+    self.peek_deq.deinit();
 }
 
 fn look(self: *Self, n: usize) AllocError!u21 {
@@ -109,10 +111,10 @@ pub fn nextToken(self: *Self) AllocError!?SyntaxToken {
             self.next();
         },
     }
-    return .{
-        .kind = kind,
-        .position = start,
-        .text = text orelse self.source[start..self.position],
-        .value = value,
-    };
+    return SyntaxToken.init(
+        kind,
+        start,
+        text orelse self.source[start..self.position],
+        value,
+    );
 }

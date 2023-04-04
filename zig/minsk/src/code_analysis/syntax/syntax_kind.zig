@@ -14,6 +14,9 @@ pub const SyntaxKind = enum(usize) {
     open_parenthesis_token,
     close_parenthesis_token,
 
+    literal_expression,
+    binary_expression,
+
     const Self = @This();
 
     fn snakeToCamel(comptime name: []const u8) []const u8 {
