@@ -40,6 +40,7 @@ pub fn main() !void {
     defer line_buf.deinit();
     var stderr_buf = std.io.bufferedWriter(std.io.getStdErr().writer());
     const stderr = stderr_buf.writer();
+    const tty = std.debug.detectTTYConfig(std.io.getStdErr());
     const stdin = std.io.getStdIn().reader();
 
     while (true) {
@@ -64,6 +65,9 @@ pub fn main() !void {
         defer parser.deinit();
         const expression = try parser.parse();
         defer expression.deinit(parser_alloc);
-        try expression.base.prettyPrint(parser_alloc, "", true, std.io.getStdErr().writer());
+
+        tty.setColor(stderr, .Dim) catch unreachable;
+        try expression.base.prettyPrint(parser_alloc, "", true, stderr);
+        tty.setColor(stderr, .Reset) catch unreachable;
     }
 }
