@@ -3,8 +3,12 @@ name: Nim
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'nim/**'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'nim/**'
   workflow_dispatch:
 
 jobs:
@@ -19,7 +23,7 @@ jobs:
         working-directory: nim
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Install Nim
       if: steps.cache-choosenim.outputs.cache-hit != 'true' || steps.cache-nimble.outputs.cache-hit != 'true'
       run: |
