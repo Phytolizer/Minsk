@@ -1,6 +1,6 @@
 const std = @import("std");
 
-pub const Object = union(enum) {
+pub const Object = union(Type) {
     int: u63,
 
     const Self = @This();
@@ -10,4 +10,8 @@ pub const Object = union(enum) {
             .int => |v| try writer.print("{d}", .{v}),
         }
     }
+
+    pub const Type = enum {
+        int,
+    };
 };

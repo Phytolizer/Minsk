@@ -1,15 +1,14 @@
 const std = @import("std");
-const ExpressionSyntax = @import("syntax/ExpressionSyntax.zig");
-const LiteralExpressionSyntax = @import("syntax/LiteralExpressionSyntax.zig");
-const BinaryExpressionSyntax = @import("syntax/BinaryExpressionSyntax.zig");
-const ParenthesizedExpressionSyntax = @import("syntax/ParenthesizedExpressionSyntax.zig");
-const UnaryExpressionSyntax = @import("syntax/UnaryExpressionSyntax.zig");
+const BoundExpression = @import("binding/BoundExpression.zig");
+const BoundBinaryExpression = @import("binding/BoundBinaryExpression.zig");
+const BoundLiteralExpression = @import("binding/BoundLiteralExpression.zig");
+const BoundUnaryExpression = @import("binding/BoundUnaryExpression.zig");
 
-root: *const ExpressionSyntax,
+root: *const BoundExpression,
 
 const Self = @This();
 
-pub fn init(root: *const ExpressionSyntax) Self {
+pub fn init(root: *const BoundExpression) Self {
     return .{
         .root = root,
     };
@@ -19,39 +18,31 @@ pub fn evaluate(self: Self) i64 {
     return self.evaluateExpression(self.root);
 }
 
-fn evaluateExpression(self: Self, node: *const ExpressionSyntax) i64 {
+fn evaluateExpression(self: Self, node: *const BoundExpression) i64 {
     switch (node.base.kind) {
         .literal_expression => {
-            return ExpressionSyntax.downcast(&node.base, LiteralExpressionSyntax).literal_token.value.?.int;
+            return BoundExpression.downcast(node, BoundLiteralExpression).value.int;
         },
         .binary_expression => {
-            const b = ExpressionSyntax.downcast(&node.base, BinaryExpressionSyntax);
+            const b = BoundExpression.downcast(node, BoundBinaryExpression);
             const left = self.evaluateExpression(b.left);
             const right = self.evaluateExpression(b.right);
 
-            return switch (b.operator_token.kind) {
-                .plus_token => left + right,
-                .minus_token => left - right,
-                .star_token => @mulWithOverflow(left, right).@"0",
-                .slash_token => @divTrunc(left, right),
-                else => unreachable,
+            return switch (b.operator_kind) {
+                .addition => left + right,
+                .subtraction => left - right,
+                .multiplication => @mulWithOverflow(left, right).@"0",
+                .division => @divTrunc(left, right),
             };
-        },
-        .parenthesized_expression => {
-            return self.evaluateExpression(
-                ExpressionSyntax.downcast(&node.base, ParenthesizedExpressionSyntax).expression,
-            );
         },
         .unary_expression => {
-            const u = ExpressionSyntax.downcast(&node.base, UnaryExpressionSyntax);
+            const u = BoundExpression.downcast(node, BoundUnaryExpression);
             const operand = self.evaluateExpression(u.operand);
 
-            return switch (u.operator_token.kind) {
-                .plus_token => operand,
-                .minus_token => -operand,
-                else => unreachable,
+            return switch (u.operator_kind) {
+                .identity => operand,
+                .negation => -operand,
             };
         },
-        else => unreachable,
     }
 }
