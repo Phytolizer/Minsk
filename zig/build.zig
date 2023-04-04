@@ -7,9 +7,11 @@ pub fn build(b: *std.Build) void {
     const minsk_mod = @import("minsk/build.zig").build(b);
     const ds_ext_mod = @import("ds_ext/build.zig").build(b);
     const minsk_runtime_mod = @import("minsk_runtime/build.zig").build(b);
+    const minsk_meta_mod = @import("minsk_meta/build.zig").build(b);
 
     minsk_mod.dependencies.put("ds_ext", ds_ext_mod) catch unreachable;
     minsk_mod.dependencies.put("minsk_runtime", minsk_runtime_mod) catch unreachable;
+    minsk_mod.dependencies.put("minsk_meta", minsk_meta_mod) catch unreachable;
 
     const ziglyph_dep = b.dependency("ziglyph", .{
         .target = target,

@@ -1,7 +1,7 @@
 const std = @import("std");
 const SyntaxNode = @import("SyntaxNode.zig");
 const SyntaxKind = @import("syntax_kind.zig").SyntaxKind;
-const DowncastedPointer = @import("ptr_downcast.zig").DowncastedPointer;
+const DowncastedPointer = @import("minsk_meta").DowncastedPointer;
 
 base: SyntaxNode,
 

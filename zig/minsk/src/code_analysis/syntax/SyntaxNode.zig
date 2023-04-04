@@ -1,7 +1,7 @@
 const std = @import("std");
 const SyntaxKind = @import("syntax_kind.zig").SyntaxKind;
 const SyntaxToken = @import("SyntaxToken.zig");
-const DowncastedPointer = @import("ptr_downcast.zig").DowncastedPointer;
+const DowncastedPointer = @import("minsk_meta").DowncastedPointer;
 
 pub const DeinitFn = *const fn (self: *const Self, allocator: std.mem.Allocator) void;
 pub const ChildrenFn = *const fn (self: *const Self, allocator: std.mem.Allocator) std.mem.Allocator.Error![]const *const Self;
