@@ -66,6 +66,12 @@ pub fn main() !void {
         const tree = try parser.parse();
         defer tree.deinit();
 
+        {
+            tty.setColor(stderr, .Dim) catch unreachable;
+            defer tty.setColor(stderr, .Reset) catch unreachable;
+            try tree.root.base.prettyPrint(parser_alloc, "", true, stderr);
+        }
+
         if (tree.diagnostics.len > 0) {
             tty.setColor(stderr, .Red) catch unreachable;
             tty.setColor(stderr, .Dim) catch unreachable;
@@ -74,10 +80,6 @@ pub fn main() !void {
             for (tree.diagnostics) |d| {
                 stderr.print("{s}\n", .{d}) catch unreachable;
             }
-        } else {
-            tty.setColor(stderr, .Dim) catch unreachable;
-            defer tty.setColor(stderr, .Reset) catch unreachable;
-            try tree.root.base.prettyPrint(parser_alloc, "", true, stderr);
         }
     }
 }
