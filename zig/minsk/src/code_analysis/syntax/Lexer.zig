@@ -60,7 +60,7 @@ fn next(self: *Self) void {
     }
 }
 
-pub fn nextToken(self: *Self) AllocError!?SyntaxToken {
+pub fn lex(self: *Self) AllocError!?SyntaxToken {
     const start = self.position;
     var kind: SyntaxKind = .bad_token;
     var text: ?[]const u8 = null;

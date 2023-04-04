@@ -21,7 +21,7 @@ pub fn init(allocator: std.mem.Allocator, text: []const u8) !Self {
     var tokens = std.ArrayList(SyntaxToken).init(allocator);
     defer tokens.deinit();
 
-    while (try lexer.nextToken()) |token| {
+    while (try lexer.lex()) |token| {
         if (token.kind == .whitespace_token or token.kind == .bad_token)
             continue;
         try tokens.append(token);
