@@ -30,6 +30,48 @@ fn pickAllocator(normal_alloc: std.mem.Allocator, debug_alloc: std.mem.Allocator
     };
 }
 
+fn clearScreen(tty: std.debug.TTY.Config, writer: anytype) !void {
+    nosuspend switch (tty) {
+        .no_color => return,
+        .escape_codes => {
+            const clear_string = "\x1b[2J\x1b[H";
+            try writer.writeAll(clear_string);
+        },
+        .windows_api => |wapi| if (builtin.os.tag == .windows) {
+            var screen_info: std.os.windows.CONSOLE_SCREEN_BUFFER_INFO = undefined;
+            const kernel32 = std.os.windows.kernel32;
+            if (kernel32.GetConsoleScreenBufferInfo(wapi.handle, &screen_info) == 0) {
+                switch (kernel32.GetLastError()) {
+                    else => |err| return std.os.windows.unexpectedError(err),
+                }
+            }
+            var num_chars: std.os.windows.DWORD = undefined;
+            if (kernel32.FillConsoleOutputCharacterA(
+                wapi.handle,
+                ' ',
+                @intCast(
+                    std.os.windows.DWORD,
+                    screen_info.dwSize.X * screen_info.dwSize.Y,
+                ),
+                std.os.windows.COORD{ .X = 0, .Y = 0 },
+                &num_chars,
+            ) == 0) {
+                switch (kernel32.GetLastError()) {
+                    else => |err| return std.os.windows.unexpectedError(err),
+                }
+            }
+            if (kernel32.SetConsoleCursorPosition(
+                wapi.handle,
+                std.os.windows.COORD{ .X = 0, .Y = 0 },
+            ) == 0) {
+                switch (kernel32.GetLastError()) {
+                    else => |err| return std.os.windows.unexpectedError(err),
+                }
+            }
+        } else unreachable,
+    };
+}
+
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
@@ -43,6 +85,8 @@ pub fn main() !void {
     const stderr = stderr_buf.writer();
     const tty = std.debug.detectTTYConfig(std.io.getStdErr());
     const stdin = std.io.getStdIn().reader();
+
+    var show_tree = false;
 
     while (true) {
         stderr.writeAll("> ") catch unreachable;
@@ -58,6 +102,20 @@ pub fn main() !void {
             break;
         };
 
+        if (std.mem.eql(u8, line, "#showTree")) {
+            show_tree = !show_tree;
+            stderr.print("{s}\n", .{
+                if (show_tree)
+                    "Showing parse trees."
+                else
+                    "Not showing parse trees.",
+            }) catch unreachable;
+            continue;
+        } else if (std.mem.eql(u8, line, "#cls")) {
+            try clearScreen(tty, stderr);
+            continue;
+        }
+
         var parser_arena = std.heap.ArenaAllocator.init(allocator);
         defer parser_arena.deinit();
         const parser_alloc = pickAllocator(parser_arena.allocator(), allocator);
@@ -65,7 +123,7 @@ pub fn main() !void {
         const tree = try SyntaxTree.parse(parser_alloc, line);
         defer tree.deinit();
 
-        {
+        if (show_tree) {
             tty.setColor(stderr, .Dim) catch unreachable;
             defer tty.setColor(stderr, .Reset) catch unreachable;
             try tree.root.base.prettyPrint(parser_alloc, "", true, stderr);
