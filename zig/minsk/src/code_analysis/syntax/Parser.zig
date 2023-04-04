@@ -6,6 +6,7 @@ const BinaryExpressionSyntax = @import("BinaryExpressionSyntax.zig");
 const LiteralExpressionSyntax = @import("LiteralExpressionSyntax.zig");
 const ParenthesizedExpressionSyntax = @import("ParenthesizedExpressionSyntax.zig");
 const SyntaxKind = @import("syntax_kind.zig").SyntaxKind;
+const syntax_facts = @import("syntax_facts.zig");
 const SyntaxTree = @import("SyntaxTree.zig");
 
 allocator: std.mem.Allocator,
@@ -96,30 +97,20 @@ pub fn parse(self: *Self) std.mem.Allocator.Error!SyntaxTree {
 }
 
 fn parseExpression(self: *Self) std.mem.Allocator.Error!*ExpressionSyntax {
-    return try self.parseTerm();
+    return try self.parseBinaryExpression(0);
 }
 
-fn parseTerm(self: *Self) !*ExpressionSyntax {
-    var left = try self.parseFactor();
-    errdefer left.deinit(self.allocator);
-
-    while (self.current().kind == .plus_token or self.current().kind == .minus_token) {
-        const operator_token = self.nextToken();
-        const right = try self.parseFactor();
-        errdefer right.deinit(self.allocator);
-        left = try BinaryExpressionSyntax.init(self.allocator, left, operator_token, right);
-    }
-
-    return left;
-}
-
-fn parseFactor(self: *Self) !*ExpressionSyntax {
+fn parseBinaryExpression(self: *Self, parent_precedence: usize) !*ExpressionSyntax {
     var left = try self.parsePrimaryExpression();
     errdefer left.deinit(self.allocator);
 
-    while (self.current().kind == .star_token or self.current().kind == .slash_token) {
+    while (true) {
+        const precedence = syntax_facts.binaryOperatorPrecedence(self.current().kind);
+        if (precedence == 0 or precedence <= parent_precedence)
+            break;
+
         const operator_token = self.nextToken();
-        const right = try self.parsePrimaryExpression();
+        const right = try self.parseBinaryExpression(precedence);
         errdefer right.deinit(self.allocator);
         left = try BinaryExpressionSyntax.init(self.allocator, left, operator_token, right);
     }
