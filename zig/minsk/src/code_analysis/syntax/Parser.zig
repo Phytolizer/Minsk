@@ -5,6 +5,7 @@ const ExpressionSyntax = @import("ExpressionSyntax.zig");
 const BinaryExpressionSyntax = @import("BinaryExpressionSyntax.zig");
 const LiteralExpressionSyntax = @import("LiteralExpressionSyntax.zig");
 const SyntaxKind = @import("syntax_kind.zig").SyntaxKind;
+const SyntaxTree = @import("SyntaxTree.zig");
 
 allocator: std.mem.Allocator,
 tokens: []SyntaxToken,
@@ -82,7 +83,18 @@ fn matchToken(self: *Self, kind: SyntaxKind) std.mem.Allocator.Error!SyntaxToken
     );
 }
 
-pub fn parse(self: *Self) !*ExpressionSyntax {
+pub fn parse(self: *Self) !SyntaxTree {
+    const expression = try self.parseExpression();
+    const end_of_file_token = try self.matchToken(.end_of_file_token);
+    return SyntaxTree.init(
+        self.allocator,
+        try self.diagnostics.toOwnedSlice(),
+        expression,
+        end_of_file_token,
+    );
+}
+
+fn parseExpression(self: *Self) !*ExpressionSyntax {
     var left = try self.parsePrimaryExpression();
     errdefer left.deinit(self.allocator);
 

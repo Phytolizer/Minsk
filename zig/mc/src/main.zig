@@ -63,21 +63,21 @@ pub fn main() !void {
 
         var parser = try Parser.init(parser_alloc, line);
         defer parser.deinit();
-        const expression = try parser.parse();
-        defer expression.deinit(parser_alloc);
+        const tree = try parser.parse();
+        defer tree.deinit();
 
-        if (parser.diagnostics.items.len > 0) {
+        if (tree.diagnostics.len > 0) {
             tty.setColor(stderr, .Red) catch unreachable;
             tty.setColor(stderr, .Dim) catch unreachable;
             defer tty.setColor(stderr, .Reset) catch unreachable;
 
-            for (parser.diagnostics.items) |d| {
+            for (tree.diagnostics) |d| {
                 stderr.print("{s}\n", .{d}) catch unreachable;
             }
         } else {
             tty.setColor(stderr, .Dim) catch unreachable;
             defer tty.setColor(stderr, .Reset) catch unreachable;
-            try expression.base.prettyPrint(parser_alloc, "", true, stderr);
+            try tree.root.base.prettyPrint(parser_alloc, "", true, stderr);
         }
     }
 }
