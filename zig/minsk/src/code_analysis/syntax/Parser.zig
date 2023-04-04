@@ -9,11 +9,12 @@ const ParenthesizedExpressionSyntax = @import("ParenthesizedExpressionSyntax.zig
 const SyntaxKind = @import("syntax_kind.zig").SyntaxKind;
 const syntax_facts = @import("syntax_facts.zig");
 const SyntaxTree = @import("SyntaxTree.zig");
+const DiagnosticBag = @import("../DiagnosticBag.zig");
 
 allocator: std.mem.Allocator,
 tokens: []SyntaxToken,
 position: usize = 0,
-diagnostics: std.ArrayList([]const u8),
+diagnostics: DiagnosticBag,
 
 const Self = @This();
 
@@ -28,9 +29,8 @@ pub fn init(allocator: std.mem.Allocator, text: []const u8) !Self {
             continue;
         try tokens.append(token);
     }
-    var diagnostics = std.ArrayList([]const u8).init(allocator);
-    try diagnostics.appendSlice(lexer.diagnostics.items);
-    lexer.diagnostics.clearAndFree();
+    var diagnostics = DiagnosticBag.init(allocator);
+    try diagnostics.extend(&lexer.diagnostics);
 
     return .{
         .allocator = allocator,
@@ -41,9 +41,6 @@ pub fn init(allocator: std.mem.Allocator, text: []const u8) !Self {
 
 pub fn deinit(self: Self) void {
     self.allocator.free(self.tokens);
-    for (self.diagnostics.items) |d| {
-        self.allocator.free(d);
-    }
     self.diagnostics.deinit();
 }
 
@@ -70,14 +67,11 @@ fn matchToken(self: *Self, kind: SyntaxKind) std.mem.Allocator.Error!SyntaxToken
         return self.nextToken();
     }
 
-    try self.diagnostics.append(try std.fmt.allocPrint(
-        self.allocator,
-        "ERROR: unexpected token <{s}>, expected <{s}>",
-        .{
-            self.current().kind.displayName(),
-            kind.displayName(),
-        },
-    ));
+    try self.diagnostics.reportUnexpectedToken(
+        self.current().span(),
+        self.current().kind,
+        kind,
+    );
     return SyntaxToken.init(
         kind,
         self.current().position,
@@ -91,10 +85,16 @@ pub fn parse(self: *Self) std.mem.Allocator.Error!SyntaxTree {
     const end_of_file_token = try self.matchToken(.end_of_file_token);
     return SyntaxTree.init(
         self.allocator,
-        try self.diagnostics.toOwnedSlice(),
+        self.takeDiagnostics(),
         expression,
         end_of_file_token,
     );
+}
+
+fn takeDiagnostics(self: *Self) DiagnosticBag {
+    const result = self.diagnostics;
+    self.diagnostics = DiagnosticBag.init(self.allocator);
+    return result;
 }
 
 fn parseExpression(self: *Self) std.mem.Allocator.Error!*ExpressionSyntax {

@@ -2,6 +2,7 @@ const std = @import("std");
 const SyntaxKind = @import("syntax_kind.zig").SyntaxKind;
 const Object = @import("minsk_runtime").Object;
 const SyntaxNode = @import("SyntaxNode.zig");
+const TextSpan = @import("../text/TextSpan.zig");
 
 base: SyntaxNode,
 kind: SyntaxKind,
@@ -41,4 +42,11 @@ pub fn format(self: Self, comptime _: []const u8, _: std.fmt.FormatOptions, writ
     if (self.value) |value| {
         try writer.print(" {}", .{value});
     }
+}
+
+pub fn span(self: Self) TextSpan {
+    return .{
+        .start = self.position,
+        .length = self.text.len,
+    };
 }

@@ -3,6 +3,7 @@ const SyntaxTree = @import("syntax/SyntaxTree.zig");
 const Object = @import("minsk_runtime").Object;
 const Binder = @import("binding/Binder.zig");
 const Evaluator = @import("Evaluator.zig");
+const Diagnostic = @import("Diagnostic.zig");
 
 allocator: std.mem.Allocator,
 syntax_tree: SyntaxTree,
@@ -21,14 +22,14 @@ pub fn deinit(self: Self) void {
 }
 
 pub const EvaluationResult = union(enum) {
-    failure: [][]const u8,
+    failure: []Diagnostic,
     success: Object,
 
     pub fn deinit(self: @This(), allocator: std.mem.Allocator) void {
         switch (self) {
             .failure => |diagnostics| {
                 for (diagnostics) |d| {
-                    allocator.free(d);
+                    d.deinit(allocator);
                 }
                 allocator.free(diagnostics);
             },
@@ -42,14 +43,10 @@ pub fn evaluate(self: *Self) !EvaluationResult {
     const bound_expression = try binder.bindExpression(self.syntax_tree.root);
     defer bound_expression.deinit(self.allocator);
     const diagnostics = blk: {
-        const slices = [_][][]const u8{
-            self.syntax_tree.takeDiagnostics(),
-            try binder.diagnostics.toOwnedSlice(),
-        };
-        defer for (slices) |s| {
-            self.allocator.free(s);
-        };
-        break :blk try std.mem.concat(self.allocator, []const u8, &slices);
+        var diagnostics = self.syntax_tree.takeDiagnostics();
+        try diagnostics.extend(&binder.diagnostics);
+        binder.diagnostics.clear();
+        break :blk try diagnostics.diagnostics.toOwnedSlice();
     };
     if (diagnostics.len > 0) {
         return .{ .failure = diagnostics };

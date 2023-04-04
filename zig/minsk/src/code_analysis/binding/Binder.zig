@@ -12,15 +12,17 @@ const BoundUnaryExpression = @import("BoundUnaryExpression.zig");
 
 const Object = @import("minsk_runtime").Object;
 
+const DiagnosticBag = @import("../DiagnosticBag.zig");
+
 allocator: std.mem.Allocator,
-diagnostics: std.ArrayList([]const u8),
+diagnostics: DiagnosticBag,
 
 const Self = @This();
 
 pub fn init(allocator: std.mem.Allocator) Self {
     return .{
         .allocator = allocator,
-        .diagnostics = std.ArrayList([]const u8).init(allocator),
+        .diagnostics = DiagnosticBag.init(allocator),
     };
 }
 
@@ -46,15 +48,12 @@ fn bindBinaryExpression(self: *Self, syntax: *BinaryExpressionSyntax) !*BoundExp
         left.type(),
         right.type(),
     ) orelse {
-        try self.diagnostics.append(try std.fmt.allocPrint(
-            self.allocator,
-            "Binary operator '{s}' is not defined for types {s} and {s}.",
-            .{
-                syntax.operator_token.text,
-                left.type().displayName(),
-                right.type().displayName(),
-            },
-        ));
+        try self.diagnostics.reportUndefinedBinaryOperator(
+            syntax.operator_token.span(),
+            syntax.operator_token.text,
+            left.type(),
+            right.type(),
+        );
         right.deinit(self.allocator);
         return left;
     };
@@ -76,14 +75,11 @@ fn bindUnaryExpression(self: *Self, syntax: *UnaryExpressionSyntax) !*BoundExpre
         syntax.operator_token.kind,
         operand.type(),
     ) orelse {
-        try self.diagnostics.append(try std.fmt.allocPrint(
-            self.allocator,
-            "Unary operator '{s}' is not defined for type {s}.",
-            .{
-                syntax.operator_token.text,
-                operand.type().displayName(),
-            },
-        ));
+        try self.diagnostics.reportUndefinedUnaryOperator(
+            syntax.operator_token.span(),
+            syntax.operator_token.text,
+            operand.type(),
+        );
         return operand;
     };
     return try BoundUnaryExpression.init(self.allocator, operator, operand);
