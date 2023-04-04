@@ -11,15 +11,21 @@ operand: *BoundExpression,
 pub const OperatorKind = enum {
     identity,
     negation,
+    logical_negation,
 
     pub fn bind(syntax_kind: SyntaxKind, operand_type: Object.Type) ?OperatorKind {
-        if (operand_type != .integer) return null;
-
-        return switch (syntax_kind) {
-            .plus_token => .identity,
-            .minus_token => .negation,
-            else => unreachable,
-        };
+        switch (operand_type) {
+            .integer => switch (syntax_kind) {
+                .plus_token => return .identity,
+                .minus_token => return .negation,
+                else => {},
+            },
+            .boolean => switch (syntax_kind) {
+                .bang_token => return .logical_negation,
+                else => {},
+            },
+        }
+        return null;
     }
 };
 

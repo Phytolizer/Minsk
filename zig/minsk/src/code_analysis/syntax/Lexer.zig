@@ -124,16 +124,31 @@ pub fn lex(self: *Self) AllocError!?SyntaxToken {
             self.next();
             kind = .close_parenthesis_token;
         },
-        else => {
-            var unichar_buf: [3]u8 = undefined;
-            const len = std.unicode.utf8Encode(try self.current(), &unichar_buf) catch unreachable;
-            try self.diagnostics.append(try std.fmt.allocPrint(
-                self.allocator,
-                "ERROR: bad character input: '{s}'",
-                .{unichar_buf[0..len]},
-            ));
+        '!' => {
             self.next();
+            kind = .bang_token;
         },
+        '&' => if (try self.look(1) == '&') {
+            self.next();
+            self.next();
+            kind = .ampersand_ampersand_token;
+        },
+        '|' => if (try self.look(1) == '|') {
+            self.next();
+            self.next();
+            kind = .pipe_pipe_token;
+        },
+        else => {},
+    }
+    if (kind == .bad_token) {
+        var unichar_buf: [3]u8 = undefined;
+        const len = std.unicode.utf8Encode(try self.current(), &unichar_buf) catch unreachable;
+        try self.diagnostics.append(try std.fmt.allocPrint(
+            self.allocator,
+            "ERROR: bad character input: '{s}'",
+            .{unichar_buf[0..len]},
+        ));
+        self.next();
     }
     return SyntaxToken.init(
         kind,

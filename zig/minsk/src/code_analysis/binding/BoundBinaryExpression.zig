@@ -14,18 +14,26 @@ pub const OperatorKind = enum {
     subtraction,
     multiplication,
     division,
+    logical_and,
+    logical_or,
 
     pub fn bind(syntax_kind: SyntaxKind, left_type: Object.Type, right_type: Object.Type) ?OperatorKind {
-        if (left_type != .integer or right_type != .integer)
-            return null;
-
-        return switch (syntax_kind) {
-            .plus_token => .addition,
-            .minus_token => .subtraction,
-            .star_token => .multiplication,
-            .slash_token => .division,
-            else => unreachable,
-        };
+        if (left_type == .integer and right_type == .integer) {
+            switch (syntax_kind) {
+                .plus_token => return .addition,
+                .minus_token => return .subtraction,
+                .star_token => return .multiplication,
+                .slash_token => return .division,
+                else => {},
+            }
+        } else if (left_type == .boolean and right_type == .boolean) {
+            switch (syntax_kind) {
+                .ampersand_ampersand_token => return .logical_and,
+                .pipe_pipe_token => return .logical_or,
+                else => {},
+            }
+        }
+        return null;
     }
 };
 

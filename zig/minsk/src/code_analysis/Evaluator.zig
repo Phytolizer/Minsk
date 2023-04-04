@@ -34,14 +34,16 @@ fn evaluateExpression(self: Self, node: *const BoundExpression) Object {
 }
 
 fn evaluateBinaryExpression(self: Self, node: *const BoundBinaryExpression) Object {
-    const left = self.evaluateExpression(node.left).integer;
-    const right = self.evaluateExpression(node.right).integer;
+    const left = self.evaluateExpression(node.left);
+    const right = self.evaluateExpression(node.right);
 
     return switch (node.operator_kind) {
-        .addition => .{ .integer = left + right },
-        .subtraction => .{ .integer = left - right },
-        .multiplication => .{ .integer = @mulWithOverflow(left, right).@"0" },
-        .division => .{ .integer = @divTrunc(left, right) },
+        .addition => .{ .integer = left.integer + right.integer },
+        .subtraction => .{ .integer = left.integer - right.integer },
+        .multiplication => .{ .integer = @mulWithOverflow(left.integer, right.integer).@"0" },
+        .division => .{ .integer = @divTrunc(left.integer, right.integer) },
+        .logical_and => .{ .boolean = left.boolean and right.boolean },
+        .logical_or => .{ .boolean = left.boolean or right.boolean },
     };
 }
 
@@ -50,10 +52,11 @@ fn evaluateLiteralExpression(_: Self, node: *const BoundLiteralExpression) Objec
 }
 
 fn evaluateUnaryExpression(self: Self, node: *const BoundUnaryExpression) Object {
-    const operand = self.evaluateExpression(node.operand).integer;
+    const operand = self.evaluateExpression(node.operand);
 
     return switch (node.operator_kind) {
-        .identity => .{ .integer = operand },
-        .negation => .{ .integer = -operand },
+        .identity => .{ .integer = operand.integer },
+        .negation => .{ .integer = -operand.integer },
+        .logical_negation => .{ .boolean = !operand.boolean },
     };
 }

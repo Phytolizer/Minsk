@@ -153,7 +153,7 @@ fn parsePrimaryExpression(self: *Self) !*ExpressionSyntax {
             return try LiteralExpressionSyntax.init(
                 self.allocator,
                 number_token,
-                number_token.value.?,
+                number_token.value orelse .{ .integer = 0 },
             );
         },
     }

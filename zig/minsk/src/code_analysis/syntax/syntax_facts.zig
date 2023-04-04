@@ -3,15 +3,17 @@ const SyntaxKind = @import("syntax_kind.zig").SyntaxKind;
 
 pub fn binaryOperatorPrecedence(kind: SyntaxKind) usize {
     return switch (kind) {
-        .plus_token, .minus_token => 1,
-        .star_token, .slash_token => 2,
+        .pipe_pipe_token => 1,
+        .ampersand_ampersand_token => 2,
+        .plus_token, .minus_token => 3,
+        .star_token, .slash_token => 4,
         else => 0,
     };
 }
 
 pub fn unaryOperatorPrecedence(kind: SyntaxKind) usize {
     return switch (kind) {
-        .plus_token, .minus_token => 3,
+        .plus_token, .minus_token, .bang_token => 5,
         else => 0,
     };
 }
