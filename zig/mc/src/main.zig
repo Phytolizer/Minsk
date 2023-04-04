@@ -27,15 +27,11 @@ pub fn main() !void {
     const allocator = gpa.allocator();
     var line_arena = std.heap.ArenaAllocator.init(allocator);
     defer line_arena.deinit();
-    var line_alloc = line_arena.allocator();
+    const line_alloc = line_arena.allocator();
     var line_buf = std.ArrayList(u8).init(line_alloc);
     var stderr_buf = std.io.bufferedWriter(std.io.getStdErr().writer());
     const stderr = stderr_buf.writer();
     const stdin = std.io.getStdIn().reader();
-
-    var lexer = try Lexer.init(line_alloc, "123 hi");
-    const token = try lexer.nextToken();
-    std.debug.print("{}\n", .{token.?});
 
     while (true) {
         stderr.writeAll("> ") catch unreachable;
@@ -51,10 +47,13 @@ pub fn main() !void {
             break;
         };
 
-        if (std.mem.eql(u8, line, "1 + 2 * 3")) {
-            stderr.writeAll("7\n") catch unreachable;
-        } else {
-            stderr.writeAll("ERROR: Invalid expression!\n") catch unreachable;
+        var lexer_arena = std.heap.ArenaAllocator.init(allocator);
+        defer lexer_arena.deinit();
+        const lexer_alloc = lexer_arena.allocator();
+
+        var lexer = try Lexer.init(lexer_alloc, line);
+        while (try lexer.nextToken()) |token| {
+            stderr.print("{}\n", .{token}) catch unreachable;
         }
     }
 }

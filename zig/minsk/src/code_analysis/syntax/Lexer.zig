@@ -10,6 +10,7 @@ const AllocError = std.mem.Allocator.Error;
 allocator: std.mem.Allocator,
 source: []const u8,
 position: usize,
+was_eof: bool,
 it: std.unicode.Utf8Iterator,
 peek_deq: ArrayDeque(u21),
 
@@ -20,6 +21,7 @@ pub fn init(allocator: std.mem.Allocator, text: []const u8) !Self {
         .allocator = allocator,
         .source = text,
         .position = 0,
+        .was_eof = false,
         .it = (try std.unicode.Utf8View.init(text)).iterator(),
         .peek_deq = ArrayDeque(u21).init(allocator),
     };
@@ -56,7 +58,9 @@ pub fn nextToken(self: *Self) AllocError!?SyntaxToken {
     var text: ?[]const u8 = null;
     var value: ?Object = null;
 
-    if (glyph.isAsciiDigit(try self.current())) {
+    if (self.was_eof) {
+        return null;
+    } else if (glyph.isAsciiDigit(try self.current())) {
         while (glyph.isAsciiDigit(try self.current())) {
             self.next();
         }
@@ -67,6 +71,43 @@ pub fn nextToken(self: *Self) AllocError!?SyntaxToken {
         };
         value = .{ .int = raw_val };
         kind = .number_token;
+    } else if (glyph.isWhiteSpace(try self.current())) {
+        while (glyph.isWhiteSpace(try self.current())) {
+            self.next();
+        }
+        kind = .whitespace_token;
+    } else switch (try self.current()) {
+        0 => {
+            self.was_eof = true;
+            kind = .end_of_file_token;
+        },
+        '+' => {
+            self.next();
+            kind = .plus_token;
+        },
+        '-' => {
+            self.next();
+            kind = .minus_token;
+        },
+        '*' => {
+            self.next();
+            kind = .star_token;
+        },
+        '/' => {
+            self.next();
+            kind = .slash_token;
+        },
+        '(' => {
+            self.next();
+            kind = .open_parenthesis_token;
+        },
+        ')' => {
+            self.next();
+            kind = .close_parenthesis_token;
+        },
+        else => {
+            self.next();
+        },
     }
     return .{
         .kind = kind,
