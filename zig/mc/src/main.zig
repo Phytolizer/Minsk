@@ -66,8 +66,10 @@ pub fn main() !void {
         const expression = try parser.parse();
         defer expression.deinit(parser_alloc);
 
-        tty.setColor(stderr, .Dim) catch unreachable;
-        try expression.base.prettyPrint(parser_alloc, "", true, stderr);
-        tty.setColor(stderr, .Reset) catch unreachable;
+        {
+            tty.setColor(stderr, .Dim) catch unreachable;
+            defer tty.setColor(stderr, .Reset) catch unreachable;
+            try expression.base.prettyPrint(parser_alloc, "", true, stderr);
+        }
     }
 }
