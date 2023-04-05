@@ -2,22 +2,23 @@ const std = @import("std");
 const BoundNode = @import("BoundNode.zig");
 const BoundExpression = @import("BoundExpression.zig");
 const Object = @import("minsk_runtime").Object;
+const VariableSymbol = @import("../VariableSymbol.zig");
 
 base: BoundExpression,
-name: []const u8,
+variable: VariableSymbol,
 expression: *BoundExpression,
 
 const Self = @This();
 
 pub fn init(
     allocator: std.mem.Allocator,
-    name: []const u8,
+    variable: VariableSymbol,
     expression: *BoundExpression,
 ) !*BoundExpression {
     const result = try allocator.create(Self);
     result.* = .{
         .base = BoundExpression.init(.assignment_expression, &deinit, &@"type"),
-        .name = name,
+        .variable = variable,
         .expression = expression,
     };
     return &result.base;

@@ -6,13 +6,17 @@ const BoundLiteralExpression = @import("binding/BoundLiteralExpression.zig");
 const BoundUnaryExpression = @import("binding/BoundUnaryExpression.zig");
 const BoundVariableExpression = @import("binding/BoundVariableExpression.zig");
 const Object = @import("minsk_runtime").Object;
+const VariableSymbol = @import("VariableSymbol.zig");
 
 root: *const BoundExpression,
-variables: *std.StringArrayHashMap(Object),
+variables: *VariableSymbol.Map,
 
 const Self = @This();
 
-pub fn init(root: *const BoundExpression, variables: *std.StringArrayHashMap(Object)) Self {
+pub fn init(
+    root: *const BoundExpression,
+    variables: *VariableSymbol.Map,
+) Self {
     return .{
         .root = root,
         .variables = variables,
@@ -45,7 +49,7 @@ fn evaluateExpression(self: Self, node: *const BoundExpression) std.mem.Allocato
 
 fn evaluateAssignmentExpression(self: Self, node: *const BoundAssignmentExpression) !Object {
     const value = try self.evaluateExpression(node.expression);
-    try self.variables.put(node.name, value);
+    try self.variables.put(node.variable, value);
     return value;
 }
 
@@ -80,5 +84,5 @@ fn evaluateUnaryExpression(self: Self, node: *const BoundUnaryExpression) !Objec
 }
 
 fn evaluateVariableExpression(self: Self, node: *const BoundVariableExpression) !Object {
-    return self.variables.get(node.name).?;
+    return self.variables.get(node.variable).?.?;
 }

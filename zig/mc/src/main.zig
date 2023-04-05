@@ -3,6 +3,7 @@ const builtin = @import("builtin");
 const SyntaxTree = @import("minsk").code_analysis.syntax.SyntaxTree;
 const Compilation = @import("minsk").code_analysis.Compilation;
 const Object = @import("minsk_runtime").Object;
+const VariableSymbol = @import("minsk").code_analysis.VariableSymbol;
 
 fn readUntilDelimiterOrEofArrayList(
     writer: anytype,
@@ -124,8 +125,13 @@ pub fn main() !void {
     const stdin = std.io.getStdIn().reader();
 
     var show_tree = false;
-    var variables = std.StringArrayHashMap(Object).init(allocator);
-    defer variables.deinit();
+    var variables = VariableSymbol.Map.init(allocator);
+    defer {
+        for (variables.keys()) |vs| {
+            allocator.free(vs.name);
+        }
+        variables.deinit();
+    }
 
     if (builtin.os.tag == .windows) {
         // Ensure we are using UTF-8
@@ -207,6 +213,13 @@ pub fn main() !void {
             .success => |value| {
                 stderr.print("{d}\n", .{value}) catch unreachable;
             },
+        }
+
+        for (variables.keys()) |*vs| {
+            if (!vs.duped) {
+                vs.name = try allocator.dupe(u8, vs.name);
+                vs.duped = true;
+            }
         }
     }
 }

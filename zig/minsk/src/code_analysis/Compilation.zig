@@ -4,6 +4,7 @@ const Object = @import("minsk_runtime").Object;
 const Binder = @import("binding/Binder.zig");
 const Evaluator = @import("Evaluator.zig");
 const Diagnostic = @import("Diagnostic.zig");
+const VariableSymbol = @import("VariableSymbol.zig");
 
 allocator: std.mem.Allocator,
 syntax_tree: SyntaxTree,
@@ -38,7 +39,7 @@ pub const EvaluationResult = union(enum) {
     }
 };
 
-pub fn evaluate(self: *Self, variables: *std.StringArrayHashMap(Object)) !EvaluationResult {
+pub fn evaluate(self: *Self, variables: *VariableSymbol.Map) !EvaluationResult {
     var binder = Binder.init(self.allocator, variables);
     const bound_expression = try binder.bindExpression(self.syntax_tree.root);
     defer bound_expression.deinit(self.allocator);

@@ -17,16 +17,17 @@ const BoundVariableExpression = @import("BoundVariableExpression.zig");
 const Object = @import("minsk_runtime").Object;
 
 const DiagnosticBag = @import("../DiagnosticBag.zig");
+const VariableSymbol = @import("../VariableSymbol.zig");
 
 allocator: std.mem.Allocator,
 diagnostics: DiagnosticBag,
-variables: *std.StringArrayHashMap(Object),
+variables: *VariableSymbol.Map,
 
 const Self = @This();
 
 pub fn init(
     allocator: std.mem.Allocator,
-    variables: *std.StringArrayHashMap(Object),
+    variables: *VariableSymbol.Map,
 ) Self {
     return .{
         .allocator = allocator,
@@ -66,7 +67,18 @@ pub fn bindExpression(self: *Self, syntax: *ExpressionSyntax) std.mem.Allocator.
 fn bindAssignmentExpression(self: *Self, syntax: *AssignmentExpressionSyntax) !*BoundExpression {
     const name = syntax.identifier_token.text;
     const expression = try self.bindExpression(syntax.expression);
-    return try BoundAssignmentExpression.init(self.allocator, name, expression);
+
+    if (VariableSymbol.MapExt.matchName(self.variables, name)) |vs| {
+        self.allocator.free(vs.name);
+        _ = self.variables.swapRemove(vs);
+    }
+
+    const variable = VariableSymbol{
+        .name = name,
+        .ty = expression.type(),
+    };
+    try self.variables.put(variable, null);
+    return try BoundAssignmentExpression.init(self.allocator, variable, expression);
 }
 
 fn bindBinaryExpression(self: *Self, syntax: *BinaryExpressionSyntax) !*BoundExpression {
@@ -96,16 +108,12 @@ fn bindLiteralExpression(self: *Self, syntax: *LiteralExpressionSyntax) !*BoundE
 
 fn bindNameExpression(self: *Self, syntax: *NameExpressionSyntax) !*BoundExpression {
     const name = syntax.identifier_token.text;
-    const value = if (self.variables.get(name)) |value|
-        value
-    else {
+    const variable = VariableSymbol.MapExt.matchName(self.variables, name) orelse {
         try self.diagnostics.reportUndefinedName(syntax.identifier_token.span(), name);
         return try BoundLiteralExpression.init(self.allocator, .{ .integer = 0 });
     };
-    _ = value;
 
-    const ty = Object.Type.integer;
-    return try BoundVariableExpression.init(self.allocator, name, ty);
+    return try BoundVariableExpression.init(self.allocator, variable);
 }
 
 fn bindParenthesizedExpression(self: *Self, syntax: *ParenthesizedExpressionSyntax) !*BoundExpression {
