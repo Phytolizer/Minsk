@@ -72,6 +72,37 @@ fn clearScreen(tty: std.debug.TTY.Config, writer: anytype) !void {
     };
 }
 
+const Color = enum {
+    dim_red,
+    gray,
+    reset,
+};
+
+pub fn setColor(conf: std.debug.TTY.Config, out_stream: anytype, color: Color) !void {
+    nosuspend switch (conf) {
+        .no_color => return,
+        .escape_codes => {
+            const color_string = switch (color) {
+                .dim_red => "\x1b[31;2m",
+                .gray => "\x1b[2m",
+                .reset => "\x1b[0m",
+            };
+            try out_stream.writeAll(color_string);
+        },
+        .windows_api => |ctx| if (builtin.os.tag == .windows) {
+            const windows = std.os.windows;
+            const attributes = switch (color) {
+                .dim_red => windows.FOREGROUND_RED,
+                .gray => windows.FOREGROUND_RED | windows.FOREGROUND_GREEN | windows.FOREGROUND_BLUE,
+                .Reset => ctx.reset_attributes,
+            };
+            try windows.SetConsoleTextAttribute(ctx.handle, attributes);
+        } else {
+            unreachable;
+        },
+    };
+}
+
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
@@ -127,16 +158,15 @@ pub fn main() !void {
         defer result.deinit(parser_alloc);
 
         if (show_tree) {
-            tty.setColor(stderr, .Dim) catch unreachable;
-            defer tty.setColor(stderr, .Reset) catch unreachable;
+            setColor(tty, stderr, .gray) catch unreachable;
+            defer setColor(tty, stderr, .reset) catch unreachable;
             try compilation.syntax_tree.root.base.prettyPrint(parser_alloc, "", true, stderr);
         }
 
         switch (result) {
             .failure => |diagnostics| {
-                tty.setColor(stderr, .Red) catch unreachable;
-                tty.setColor(stderr, .Dim) catch unreachable;
-                defer tty.setColor(stderr, .Reset) catch unreachable;
+                setColor(tty, stderr, .dim_red) catch unreachable;
+                defer setColor(tty, stderr, .reset) catch unreachable;
 
                 for (diagnostics) |d| {
                     stderr.print("{s}\n", .{d}) catch unreachable;
