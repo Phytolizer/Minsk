@@ -1,26 +1,38 @@
 const std = @import("std");
 const ExpressionSyntax = @import("../syntax/ExpressionSyntax.zig");
+const AssignmentExpressionSyntax = @import("../syntax/AssignmentExpressionSyntax.zig");
 const BinaryExpressionSyntax = @import("../syntax/BinaryExpressionSyntax.zig");
 const LiteralExpressionSyntax = @import("../syntax/LiteralExpressionSyntax.zig");
+const NameExpressionSyntax = @import("../syntax/NameExpressionSyntax.zig");
 const ParenthesizedExpressionSyntax = @import("../syntax/ParenthesizedExpressionSyntax.zig");
 const UnaryExpressionSyntax = @import("../syntax/UnaryExpressionSyntax.zig");
 
 const BoundExpression = @import("BoundExpression.zig");
+const BoundAssignmentExpression = @import("BoundAssignmentExpression.zig");
 const BoundBinaryExpression = @import("BoundBinaryExpression.zig");
 const BoundLiteralExpression = @import("BoundLiteralExpression.zig");
 const BoundUnaryExpression = @import("BoundUnaryExpression.zig");
+const BoundVariableExpression = @import("BoundVariableExpression.zig");
 
 const Object = @import("minsk_runtime").Object;
 
+const DiagnosticBag = @import("../DiagnosticBag.zig");
+const VariableSymbol = @import("../VariableSymbol.zig");
+
 allocator: std.mem.Allocator,
-diagnostics: std.ArrayList([]const u8),
+diagnostics: DiagnosticBag,
+variables: *VariableSymbol.Map,
 
 const Self = @This();
 
-pub fn init(allocator: std.mem.Allocator) Self {
+pub fn init(
+    allocator: std.mem.Allocator,
+    variables: *VariableSymbol.Map,
+) Self {
     return .{
         .allocator = allocator,
-        .diagnostics = std.ArrayList([]const u8).init(allocator),
+        .diagnostics = DiagnosticBag.init(allocator),
+        .variables = variables,
     };
 }
 
@@ -30,12 +42,43 @@ pub fn deinit(self: Self) void {
 
 pub fn bindExpression(self: *Self, syntax: *ExpressionSyntax) std.mem.Allocator.Error!*BoundExpression {
     return switch (syntax.base.kind) {
-        .binary_expression => try self.bindBinaryExpression(ExpressionSyntax.downcast(&syntax.base, BinaryExpressionSyntax)),
-        .literal_expression => try self.bindLiteralExpression(ExpressionSyntax.downcast(&syntax.base, LiteralExpressionSyntax)),
-        .parenthesized_expression => try self.bindParenthesizedExpression(ExpressionSyntax.downcast(&syntax.base, ParenthesizedExpressionSyntax)),
-        .unary_expression => try self.bindUnaryExpression(ExpressionSyntax.downcast(&syntax.base, UnaryExpressionSyntax)),
+        .assignment_expression => try self.bindAssignmentExpression(
+            ExpressionSyntax.downcast(&syntax.base, AssignmentExpressionSyntax),
+        ),
+        .binary_expression => try self.bindBinaryExpression(
+            ExpressionSyntax.downcast(&syntax.base, BinaryExpressionSyntax),
+        ),
+        .literal_expression => try self.bindLiteralExpression(
+            ExpressionSyntax.downcast(&syntax.base, LiteralExpressionSyntax),
+        ),
+        .name_expression => try self.bindNameExpression(
+            ExpressionSyntax.downcast(&syntax.base, NameExpressionSyntax),
+        ),
+        .parenthesized_expression => try self.bindParenthesizedExpression(
+            ExpressionSyntax.downcast(&syntax.base, ParenthesizedExpressionSyntax),
+        ),
+        .unary_expression => try self.bindUnaryExpression(
+            ExpressionSyntax.downcast(&syntax.base, UnaryExpressionSyntax),
+        ),
         else => unreachable,
     };
+}
+
+fn bindAssignmentExpression(self: *Self, syntax: *AssignmentExpressionSyntax) !*BoundExpression {
+    const name = syntax.identifier_token.text;
+    const expression = try self.bindExpression(syntax.expression);
+
+    if (VariableSymbol.MapExt.matchName(self.variables, name)) |vs| {
+        self.allocator.free(vs.name);
+        _ = self.variables.swapRemove(vs);
+    }
+
+    const variable = VariableSymbol{
+        .name = name,
+        .ty = expression.type(),
+    };
+    try self.variables.put(variable, null);
+    return try BoundAssignmentExpression.init(self.allocator, variable, expression);
 }
 
 fn bindBinaryExpression(self: *Self, syntax: *BinaryExpressionSyntax) !*BoundExpression {
@@ -46,15 +89,12 @@ fn bindBinaryExpression(self: *Self, syntax: *BinaryExpressionSyntax) !*BoundExp
         left.type(),
         right.type(),
     ) orelse {
-        try self.diagnostics.append(try std.fmt.allocPrint(
-            self.allocator,
-            "Binary operator '{s}' is not defined for types {s} and {s}.",
-            .{
-                syntax.operator_token.text,
-                left.type().displayName(),
-                right.type().displayName(),
-            },
-        ));
+        try self.diagnostics.reportUndefinedBinaryOperator(
+            syntax.operator_token.span(),
+            syntax.operator_token.text,
+            left.type(),
+            right.type(),
+        );
         right.deinit(self.allocator);
         return left;
     };
@@ -64,6 +104,16 @@ fn bindBinaryExpression(self: *Self, syntax: *BinaryExpressionSyntax) !*BoundExp
 fn bindLiteralExpression(self: *Self, syntax: *LiteralExpressionSyntax) !*BoundExpression {
     const value = syntax.value;
     return try BoundLiteralExpression.init(self.allocator, value);
+}
+
+fn bindNameExpression(self: *Self, syntax: *NameExpressionSyntax) !*BoundExpression {
+    const name = syntax.identifier_token.text;
+    const variable = VariableSymbol.MapExt.matchName(self.variables, name) orelse {
+        try self.diagnostics.reportUndefinedName(syntax.identifier_token.span(), name);
+        return try BoundLiteralExpression.init(self.allocator, .{ .integer = 0 });
+    };
+
+    return try BoundVariableExpression.init(self.allocator, variable);
 }
 
 fn bindParenthesizedExpression(self: *Self, syntax: *ParenthesizedExpressionSyntax) !*BoundExpression {
@@ -76,14 +126,11 @@ fn bindUnaryExpression(self: *Self, syntax: *UnaryExpressionSyntax) !*BoundExpre
         syntax.operator_token.kind,
         operand.type(),
     ) orelse {
-        try self.diagnostics.append(try std.fmt.allocPrint(
-            self.allocator,
-            "Unary operator '{s}' is not defined for type {s}.",
-            .{
-                syntax.operator_token.text,
-                operand.type().displayName(),
-            },
-        ));
+        try self.diagnostics.reportUndefinedUnaryOperator(
+            syntax.operator_token.span(),
+            syntax.operator_token.text,
+            operand.type(),
+        );
         return operand;
     };
     return try BoundUnaryExpression.init(self.allocator, operator, operand);

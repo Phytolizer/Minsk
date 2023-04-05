@@ -1,6 +1,6 @@
-pub const binding = @import("code_analysis/binding.zig");
 pub const syntax = @import("code_analysis/syntax.zig");
-pub const Evaluator = @import("code_analysis/Evaluator.zig");
+pub const Compilation = @import("code_analysis/Compilation.zig");
+pub const VariableSymbol = @import("code_analysis/VariableSymbol.zig");
 
 comptime {
     const std = @import("std");

@@ -5,6 +5,7 @@ const ArrayDeque = @import("ds_ext").ArrayDeque;
 const glyph = @import("ziglyph");
 const Object = @import("minsk_runtime").Object;
 const syntax_facts = @import("syntax_facts.zig");
+const DiagnosticBag = @import("../DiagnosticBag.zig");
 
 const AllocError = std.mem.Allocator.Error;
 
@@ -14,7 +15,7 @@ position: usize = 0,
 was_eof: bool = false,
 it: std.unicode.Utf8Iterator,
 peek_deq: ArrayDeque(u21),
-diagnostics: std.ArrayList([]const u8),
+diagnostics: DiagnosticBag,
 
 const Self = @This();
 
@@ -24,15 +25,12 @@ pub fn init(allocator: std.mem.Allocator, text: []const u8) !Self {
         .source = text,
         .it = (try std.unicode.Utf8View.init(text)).iterator(),
         .peek_deq = ArrayDeque(u21).init(allocator),
-        .diagnostics = std.ArrayList([]const u8).init(allocator),
+        .diagnostics = DiagnosticBag.init(allocator),
     };
 }
 
 pub fn deinit(self: Self) void {
     self.peek_deq.deinit();
-    for (self.diagnostics.items) |d| {
-        self.allocator.free(d);
-    }
     self.diagnostics.deinit();
 }
 
@@ -75,11 +73,10 @@ pub fn lex(self: *Self) AllocError!?SyntaxToken {
         }
         text = self.source[start..self.position];
         const raw_val = std.fmt.parseInt(u63, text.?, 10) catch blk: {
-            try self.diagnostics.append(try std.fmt.allocPrint(
-                self.allocator,
-                "ERROR: '{s}' cannot be represented as a u63",
-                .{text.?},
-            ));
+            try self.diagnostics.reportInvalidNumber(.{
+                .start = self.position,
+                .length = text.?.len,
+            }, text.?, u63);
             break :blk 0;
         };
         value = .{ .integer = raw_val };
@@ -146,17 +143,14 @@ pub fn lex(self: *Self) AllocError!?SyntaxToken {
             self.next();
             self.next();
             kind = .equals_equals_token;
+        } else {
+            self.next();
+            kind = .equals_token;
         },
         else => {},
     }
     if (kind == .bad_token) {
-        var unichar_buf: [3]u8 = undefined;
-        const len = std.unicode.utf8Encode(try self.current(), &unichar_buf) catch unreachable;
-        try self.diagnostics.append(try std.fmt.allocPrint(
-            self.allocator,
-            "ERROR: bad character input: '{s}'",
-            .{unichar_buf[0..len]},
-        ));
+        try self.diagnostics.reportBadCharacter(self.position, try self.current());
         self.next();
     }
     return SyntaxToken.init(

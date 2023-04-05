@@ -26,6 +26,7 @@ pub fn build(b: *std.Build) void {
     const mc_exe = @import("mc/build.zig").build(b, target, optimize);
 
     mc_exe.addModule("minsk", minsk_mod);
+    mc_exe.addModule("minsk_runtime", minsk_runtime_mod);
     mc_exe.install();
 
     const mc_run = b.addRunArtifact(mc_exe);

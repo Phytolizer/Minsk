@@ -1,41 +1,61 @@
 const std = @import("std");
 const BoundExpression = @import("binding/BoundExpression.zig");
+const BoundAssignmentExpression = @import("binding/BoundAssignmentExpression.zig");
 const BoundBinaryExpression = @import("binding/BoundBinaryExpression.zig");
 const BoundLiteralExpression = @import("binding/BoundLiteralExpression.zig");
 const BoundUnaryExpression = @import("binding/BoundUnaryExpression.zig");
+const BoundVariableExpression = @import("binding/BoundVariableExpression.zig");
 const Object = @import("minsk_runtime").Object;
+const VariableSymbol = @import("VariableSymbol.zig");
 
 root: *const BoundExpression,
+variables: *VariableSymbol.Map,
 
 const Self = @This();
 
-pub fn init(root: *const BoundExpression) Self {
+pub fn init(
+    root: *const BoundExpression,
+    variables: *VariableSymbol.Map,
+) Self {
     return .{
         .root = root,
+        .variables = variables,
     };
 }
 
-pub fn evaluate(self: Self) Object {
-    return self.evaluateExpression(self.root);
+pub fn evaluate(self: Self) !Object {
+    return try self.evaluateExpression(self.root);
 }
 
-fn evaluateExpression(self: Self, node: *const BoundExpression) Object {
+fn evaluateExpression(self: Self, node: *const BoundExpression) std.mem.Allocator.Error!Object {
     return switch (node.base.kind) {
-        .binary_expression => self.evaluateBinaryExpression(
+        .assignment_expression => try self.evaluateAssignmentExpression(
+            BoundExpression.downcast(node, BoundAssignmentExpression),
+        ),
+        .binary_expression => try self.evaluateBinaryExpression(
             BoundExpression.downcast(node, BoundBinaryExpression),
         ),
-        .literal_expression => self.evaluateLiteralExpression(
+        .literal_expression => try self.evaluateLiteralExpression(
             BoundExpression.downcast(node, BoundLiteralExpression),
         ),
-        .unary_expression => self.evaluateUnaryExpression(
+        .unary_expression => try self.evaluateUnaryExpression(
             BoundExpression.downcast(node, BoundUnaryExpression),
+        ),
+        .variable_expression => try self.evaluateVariableExpression(
+            BoundExpression.downcast(node, BoundVariableExpression),
         ),
     };
 }
 
-fn evaluateBinaryExpression(self: Self, node: *const BoundBinaryExpression) Object {
-    const left = self.evaluateExpression(node.left);
-    const right = self.evaluateExpression(node.right);
+fn evaluateAssignmentExpression(self: Self, node: *const BoundAssignmentExpression) !Object {
+    const value = try self.evaluateExpression(node.expression);
+    try self.variables.put(node.variable, value);
+    return value;
+}
+
+fn evaluateBinaryExpression(self: Self, node: *const BoundBinaryExpression) !Object {
+    const left = try self.evaluateExpression(node.left);
+    const right = try self.evaluateExpression(node.right);
 
     return switch (node.operator.kind) {
         .addition => .{ .integer = left.integer + right.integer },
@@ -49,16 +69,20 @@ fn evaluateBinaryExpression(self: Self, node: *const BoundBinaryExpression) Obje
     };
 }
 
-fn evaluateLiteralExpression(_: Self, node: *const BoundLiteralExpression) Object {
+fn evaluateLiteralExpression(_: Self, node: *const BoundLiteralExpression) !Object {
     return node.value;
 }
 
-fn evaluateUnaryExpression(self: Self, node: *const BoundUnaryExpression) Object {
-    const operand = self.evaluateExpression(node.operand);
+fn evaluateUnaryExpression(self: Self, node: *const BoundUnaryExpression) !Object {
+    const operand = try self.evaluateExpression(node.operand);
 
     return switch (node.operator.kind) {
         .identity => .{ .integer = operand.integer },
         .negation => .{ .integer = -operand.integer },
         .logical_negation => .{ .boolean = !operand.boolean },
     };
+}
+
+fn evaluateVariableExpression(self: Self, node: *const BoundVariableExpression) !Object {
+    return self.variables.get(node.variable).?.?;
 }
