@@ -86,8 +86,8 @@ pub fn lex(self: *Self) AllocError!?SyntaxToken {
             self.next();
         }
         kind = .whitespace_token;
-    } else if (glyph.isLetter(try self.current())) {
-        while (glyph.isAlphaNum(try self.current())) {
+    } else if (glyph.derived_core_properties.isXidStart(try self.current())) {
+        while (glyph.derived_core_properties.isXidContinue(try self.current())) {
             self.next();
         }
         text = self.source[start..self.position];
