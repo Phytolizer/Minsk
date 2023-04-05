@@ -121,9 +121,12 @@ pub fn main() !void {
 
     if (builtin.os.tag == .windows) {
         // Ensure we are using UTF-8
-        if (std.os.windows.kernel32.SetConsoleOutputCP(65001) == 0) {
-            switch (std.os.windows.kernel32.GetLastError()) {
-                else => |err| return std.os.windows.unexpectedError(err),
+        const utf8_codepage = 65001;
+        const windows = std.os.windows;
+        const kernel32 = windows.kernel32;
+        if (kernel32.SetConsoleOutputCP(utf8_codepage) == 0) {
+            switch (kernel32.GetLastError()) {
+                else => |err| return windows.unexpectedError(err),
             }
         }
     }
