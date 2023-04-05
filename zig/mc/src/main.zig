@@ -174,7 +174,7 @@ pub fn main() !void {
             setColor(tty, stderr, .gray) catch unreachable;
             defer {
                 // Need to flush for Windows because the coloring isn't buffered
-                stderr_buf.flush() catch unreachable;
+                if (builtin.os.tag == .windows) stderr_buf.flush() catch unreachable;
                 setColor(tty, stderr, .reset) catch unreachable;
             }
             try compilation.syntax_tree.root.base.prettyPrint(parser_alloc, "", true, stderr);
@@ -185,7 +185,7 @@ pub fn main() !void {
                 setColor(tty, stderr, .dim_red) catch unreachable;
                 defer {
                     // Need to flush for Windows because the coloring isn't buffered
-                    stderr_buf.flush() catch unreachable;
+                    if (builtin.os.tag == .windows) stderr_buf.flush() catch unreachable;
                     setColor(tty, stderr, .reset) catch unreachable;
                 }
 
