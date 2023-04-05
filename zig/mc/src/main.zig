@@ -94,7 +94,7 @@ pub fn setColor(conf: std.debug.TTY.Config, out_stream: anytype, color: Color) !
             const attributes = switch (color) {
                 .dim_red => windows.FOREGROUND_RED,
                 .gray => windows.FOREGROUND_RED | windows.FOREGROUND_GREEN | windows.FOREGROUND_BLUE,
-                .Reset => ctx.reset_attributes,
+                .reset => ctx.reset_attributes,
             };
             try windows.SetConsoleTextAttribute(ctx.handle, attributes);
         } else {
@@ -119,18 +119,31 @@ pub fn main() !void {
 
     var show_tree = false;
 
+    if (builtin.os.tag == .windows) {
+        // Ensure we are using UTF-8
+        if (std.os.windows.kernel32.SetConsoleOutputCP(65001) == 0) {
+            switch (std.os.windows.kernel32.GetLastError()) {
+                else => |err| return std.os.windows.unexpectedError(err),
+            }
+        }
+    }
+
     while (true) {
         stderr.writeAll("> ") catch unreachable;
         stderr_buf.flush() catch unreachable;
-        const line = try readUntilDelimiterOrEofArrayList(
-            stdin,
-            &line_buf,
-            '\n',
-            std.math.maxInt(usize),
-        ) orelse {
-            stderr.writeByte('\n') catch unreachable;
-            stderr_buf.flush() catch unreachable;
-            break;
+        const line = blk: {
+            var line = try readUntilDelimiterOrEofArrayList(
+                stdin,
+                &line_buf,
+                '\n',
+                std.math.maxInt(usize),
+            ) orelse {
+                stderr.writeByte('\n') catch unreachable;
+                stderr_buf.flush() catch unreachable;
+                break;
+            };
+            line = std.mem.trimRight(u8, line, "\r");
+            break :blk line;
         };
 
         if (std.mem.eql(u8, line, "#showTree")) {
