@@ -93,7 +93,7 @@ pub fn setColor(conf: std.debug.TTY.Config, out_stream: anytype, color: Color) !
             const windows = std.os.windows;
             const attributes = switch (color) {
                 .dim_red => windows.FOREGROUND_RED,
-                .gray => windows.FOREGROUND_RED | windows.FOREGROUND_GREEN | windows.FOREGROUND_BLUE,
+                .gray => windows.FOREGROUND_INTENSITY,
                 .reset => ctx.reset_attributes,
             };
             try windows.SetConsoleTextAttribute(ctx.handle, attributes);
@@ -172,14 +172,22 @@ pub fn main() !void {
 
         if (show_tree) {
             setColor(tty, stderr, .gray) catch unreachable;
-            defer setColor(tty, stderr, .reset) catch unreachable;
+            defer {
+                // Need to flush for Windows because the coloring isn't buffered
+                stderr_buf.flush() catch unreachable;
+                setColor(tty, stderr, .reset) catch unreachable;
+            }
             try compilation.syntax_tree.root.base.prettyPrint(parser_alloc, "", true, stderr);
         }
 
         switch (result) {
             .failure => |diagnostics| {
                 setColor(tty, stderr, .dim_red) catch unreachable;
-                defer setColor(tty, stderr, .reset) catch unreachable;
+                defer {
+                    // Need to flush for Windows because the coloring isn't buffered
+                    stderr_buf.flush() catch unreachable;
+                    setColor(tty, stderr, .reset) catch unreachable;
+                }
 
                 for (diagnostics) |d| {
                     stderr.print("{s}\n", .{d}) catch unreachable;
