@@ -103,6 +103,11 @@ pub fn setColor(conf: std.debug.TTY.Config, out_stream: anytype, color: Color) !
     };
 }
 
+fn resetColor(tty: std.debug.TTY.Config, buf: anytype) void {
+    if (builtin.os.tag == .windows) buf.flush() catch unreachable;
+    setColor(tty, buf.writer(), .reset) catch unreachable;
+}
+
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
@@ -175,25 +180,25 @@ pub fn main() !void {
 
         if (show_tree) {
             setColor(tty, stderr, .gray) catch unreachable;
-            defer {
-                // Need to flush for Windows because the coloring isn't buffered
-                if (builtin.os.tag == .windows) stderr_buf.flush() catch unreachable;
-                setColor(tty, stderr, .reset) catch unreachable;
-            }
+            defer resetColor(tty, &stderr_buf);
             try compilation.syntax_tree.root.base.prettyPrint(parser_alloc, "", true, stderr);
         }
 
         switch (result) {
             .failure => |diagnostics| {
-                setColor(tty, stderr, .dim_red) catch unreachable;
-                defer {
-                    // Need to flush for Windows because the coloring isn't buffered
-                    if (builtin.os.tag == .windows) stderr_buf.flush() catch unreachable;
-                    setColor(tty, stderr, .reset) catch unreachable;
-                }
-
                 for (diagnostics) |d| {
+                    setColor(tty, stderr, .dim_red) catch unreachable;
                     stderr.print("{s}\n", .{d}) catch unreachable;
+                    resetColor(tty, &stderr_buf);
+
+                    const prefix = line[0..d.span.start];
+                    const err = line[d.span.start..d.span.end()];
+                    const suffix = line[d.span.end()..];
+                    stderr.print("    {s}", .{prefix}) catch unreachable;
+                    setColor(tty, stderr, .dim_red) catch unreachable;
+                    stderr.print("{s}", .{err}) catch unreachable;
+                    resetColor(tty, &stderr_buf);
+                    stderr.print("{s}\n", .{suffix}) catch unreachable;
                 }
             },
             .success => |value| {
