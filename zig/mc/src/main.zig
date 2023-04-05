@@ -2,6 +2,7 @@ const std = @import("std");
 const builtin = @import("builtin");
 const SyntaxTree = @import("minsk").code_analysis.syntax.SyntaxTree;
 const Compilation = @import("minsk").code_analysis.Compilation;
+const Object = @import("minsk_runtime").Object;
 
 fn readUntilDelimiterOrEofArrayList(
     writer: anytype,
@@ -123,6 +124,8 @@ pub fn main() !void {
     const stdin = std.io.getStdIn().reader();
 
     var show_tree = false;
+    var variables = std.StringArrayHashMap(Object).init(allocator);
+    defer variables.deinit();
 
     if (builtin.os.tag == .windows) {
         // Ensure we are using UTF-8
@@ -175,7 +178,7 @@ pub fn main() !void {
         const tree = try SyntaxTree.parse(parser_alloc, line);
         var compilation = Compilation.init(parser_alloc, tree);
         defer compilation.deinit();
-        const result = try compilation.evaluate();
+        const result = try compilation.evaluate(&variables);
         defer result.deinit(parser_alloc);
 
         if (show_tree) {

@@ -105,3 +105,12 @@ pub fn reportUndefinedUnaryOperator(
     );
     try self.report(span, message);
 }
+
+pub fn reportUndefinedName(self: *Self, span: TextSpan, name: []const u8) !void {
+    const message = try std.fmt.allocPrint(
+        self.allocator,
+        "Variable '{s}' doesn't exist.",
+        .{name},
+    );
+    try self.report(span, message);
+}

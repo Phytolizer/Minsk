@@ -143,6 +143,9 @@ pub fn lex(self: *Self) AllocError!?SyntaxToken {
             self.next();
             self.next();
             kind = .equals_equals_token;
+        } else {
+            self.next();
+            kind = .equals_token;
         },
         else => {},
     }

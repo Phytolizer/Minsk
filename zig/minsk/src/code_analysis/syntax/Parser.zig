@@ -6,6 +6,8 @@ const BinaryExpressionSyntax = @import("BinaryExpressionSyntax.zig");
 const UnaryExpressionSyntax = @import("UnaryExpressionSyntax.zig");
 const LiteralExpressionSyntax = @import("LiteralExpressionSyntax.zig");
 const ParenthesizedExpressionSyntax = @import("ParenthesizedExpressionSyntax.zig");
+const AssignmentExpressionSyntax = @import("AssignmentExpressionSyntax.zig");
+const NameExpressionSyntax = @import("NameExpressionSyntax.zig");
 const SyntaxKind = @import("syntax_kind.zig").SyntaxKind;
 const syntax_facts = @import("syntax_facts.zig");
 const SyntaxTree = @import("SyntaxTree.zig");
@@ -98,6 +100,19 @@ fn takeDiagnostics(self: *Self) DiagnosticBag {
 }
 
 fn parseExpression(self: *Self) std.mem.Allocator.Error!*ExpressionSyntax {
+    return try self.parseAssignmentExpression();
+}
+
+fn parseAssignmentExpression(self: *Self) !*ExpressionSyntax {
+    if (self.peek(0).kind == .identifier_token and
+        self.peek(1).kind == .equals_token)
+    {
+        const identifier_token = self.nextToken();
+        const equals_token = self.nextToken();
+        const expression = try self.parseAssignmentExpression();
+        return try AssignmentExpressionSyntax.init(self.allocator, identifier_token, equals_token, expression);
+    }
+
     return try self.parseBinaryExpression(0);
 }
 
@@ -147,6 +162,10 @@ fn parsePrimaryExpression(self: *Self) !*ExpressionSyntax {
                 keyword_token,
                 .{ .boolean = value },
             );
+        },
+        .identifier_token => {
+            const identifier_token = self.nextToken();
+            return try NameExpressionSyntax.init(self.allocator, identifier_token);
         },
         else => {
             const number_token = try self.matchToken(.number_token);

@@ -38,8 +38,8 @@ pub const EvaluationResult = union(enum) {
     }
 };
 
-pub fn evaluate(self: *Self) !EvaluationResult {
-    var binder = Binder.init(self.allocator);
+pub fn evaluate(self: *Self, variables: *std.StringArrayHashMap(Object)) !EvaluationResult {
+    var binder = Binder.init(self.allocator, variables);
     const bound_expression = try binder.bindExpression(self.syntax_tree.root);
     defer bound_expression.deinit(self.allocator);
     const diagnostics = blk: {
@@ -52,6 +52,6 @@ pub fn evaluate(self: *Self) !EvaluationResult {
         return .{ .failure = diagnostics };
     }
 
-    var evaluator = Evaluator.init(bound_expression);
-    return .{ .success = evaluator.evaluate() };
+    var evaluator = Evaluator.init(bound_expression, variables);
+    return .{ .success = try evaluator.evaluate() };
 }

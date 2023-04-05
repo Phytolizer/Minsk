@@ -20,6 +20,7 @@ pub const SyntaxKind = enum(usize) {
     pipe_pipe_token,
     equals_equals_token,
     bang_equals_token,
+    equals_token,
 
     true_keyword,
     false_keyword,
@@ -28,6 +29,8 @@ pub const SyntaxKind = enum(usize) {
     binary_expression,
     parenthesized_expression,
     unary_expression,
+    name_expression,
+    assignment_expression,
 
     const Self = @This();
 
