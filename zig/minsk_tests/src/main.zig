@@ -19,19 +19,19 @@ pub fn main() !void {
 
     t.runSuite(
         &state,
-        code_analysis.syntax.lexer_test_suite,
+        code_analysis.syntax.lexerTestSuite,
         "lexer",
         .static,
     );
     t.runSuite(
         &state,
-        code_analysis.syntax.parser_test_suite,
+        code_analysis.syntax.parserTestSuite,
         "parser",
         .static,
     );
     t.runSuite(
         &state,
-        code_analysis.syntax.syntax_facts_test_suite,
+        code_analysis.syntax.syntaxFactsTestSuite,
         "syntax facts",
         .static,
     );

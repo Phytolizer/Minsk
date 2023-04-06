@@ -38,7 +38,7 @@ fn testToken(
     );
 }
 
-fn lexes_token(
+fn lexesToken(
     state: *t.TestState,
     ctx: SimpleToken,
     out_msg: *[]const u8,
@@ -57,7 +57,7 @@ fn lexes_token(
     try testToken(state, token, ctx, out_msg);
 }
 
-fn lexes_token_pair(
+fn lexesTokenPair(
     state: *t.TestState,
     ctx: [2]SimpleToken,
     out_msg: *[]const u8,
@@ -79,7 +79,7 @@ fn lexes_token_pair(
     try testToken(state, tokens[1], ctx[1], out_msg);
 }
 
-fn lexes_token_pair_with_separator(
+fn lexesTokenPairWithSeparator(
     state: *t.TestState,
     ctx: [3]SimpleToken,
     out_msg: *[]const u8,
@@ -116,7 +116,7 @@ fn requiresSeparator(k1: SyntaxKind, k2: SyntaxKind) bool {
         (k1 == .bang_token or k1 == .equals_token) and (k2 == .equals_token or k2 == .equals_equals_token);
 }
 
-pub fn lexer_test_suite(state: *t.TestState) void {
+pub fn lexerTestSuite(state: *t.TestState) void {
     const st = SimpleToken.init;
     const simple_tokens = [_]SimpleToken{
         st(.identifier_token, "a"),
@@ -152,7 +152,7 @@ pub fn lexer_test_suite(state: *t.TestState) void {
         t.runTest(
             state,
             SimpleToken,
-            lexes_token,
+            lexesToken,
             tok,
             std.fmt.allocPrint(t.allocator, "lexes token {}", .{tok}) catch unreachable,
             .allocated,
@@ -164,7 +164,7 @@ pub fn lexer_test_suite(state: *t.TestState) void {
             t.runTest(
                 state,
                 [2]SimpleToken,
-                lexes_token_pair,
+                lexesTokenPair,
                 .{ t1, t2 },
                 std.fmt.allocPrint(
                     t.allocator,
@@ -179,7 +179,7 @@ pub fn lexer_test_suite(state: *t.TestState) void {
             t.runTest(
                 state,
                 [3]SimpleToken,
-                lexes_token_pair_with_separator,
+                lexesTokenPairWithSeparator,
                 .{ t1, sep, t2 },
                 std.fmt.allocPrint(
                     t.allocator,

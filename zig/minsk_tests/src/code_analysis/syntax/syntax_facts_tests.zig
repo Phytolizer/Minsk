@@ -5,7 +5,7 @@ const SyntaxKind = @import("minsk").code_analysis.syntax.SyntaxKind;
 const SyntaxToken = @import("minsk").code_analysis.syntax.SyntaxToken;
 const SyntaxTree = @import("minsk").code_analysis.syntax.SyntaxTree;
 
-fn get_text_round_trip(state: *t.TestState, kind: SyntaxKind, out_msg: *[]const u8) t.TestExit!void {
+fn getTextRoundTrip(state: *t.TestState, kind: SyntaxKind, out_msg: *[]const u8) t.TestExit!void {
     const text = syntax_facts.getText(kind) orelse return error.TestSkipped;
 
     const tokens = SyntaxTree.parseTokens(t.allocator, text) catch unreachable;
@@ -35,12 +35,12 @@ fn get_text_round_trip(state: *t.TestState, kind: SyntaxKind, out_msg: *[]const 
     );
 }
 
-pub fn syntax_facts_test_suite(state: *t.TestState) void {
+pub fn syntaxFactsTestSuite(state: *t.TestState) void {
     for (std.meta.tags(SyntaxKind)) |k| {
         t.runTest(
             state,
             SyntaxKind,
-            get_text_round_trip,
+            getTextRoundTrip,
             k,
             std.fmt.allocPrint(
                 t.allocator,
