@@ -79,6 +79,33 @@ fn lexes_token_pair(
     try testToken(state, tokens[1], ctx[1], out_msg);
 }
 
+fn lexes_token_pair_with_separator(
+    state: *t.TestState,
+    ctx: [3]SimpleToken,
+    out_msg: *[]const u8,
+) t.TestExit!void {
+    const text = std.mem.concat(
+        t.allocator,
+        u8,
+        &.{ ctx[0].text, ctx[1].text, ctx[2].text },
+    ) catch unreachable;
+    defer t.allocator.free(text);
+    const tokens = SyntaxTree.parseTokens(t.allocator, text) catch unreachable;
+    defer t.allocator.free(tokens);
+
+    try t.assert(
+        state,
+        tokens.len == 3,
+        "incorrect token count ({d} != {d})",
+        .{ tokens.len, 3 },
+        out_msg,
+    );
+
+    try testToken(state, tokens[0], ctx[0], out_msg);
+    try testToken(state, tokens[1], ctx[1], out_msg);
+    try testToken(state, tokens[2], ctx[2], out_msg);
+}
+
 fn requiresSeparator(k1: SyntaxKind, k2: SyntaxKind) bool {
     const k1_kw = std.mem.endsWith(u8, k1.displayName(), "Keyword");
     const k2_kw = std.mem.endsWith(u8, k2.displayName(), "Keyword");
@@ -94,11 +121,6 @@ pub fn lexer_test_suite(state: *t.TestState) void {
     const simple_tokens = [_]SimpleToken{
         st(.identifier_token, "a"),
         st(.identifier_token, "abc"),
-        st(.whitespace_token, " "),
-        st(.whitespace_token, "  "),
-        st(.whitespace_token, "\r"),
-        st(.whitespace_token, "\n"),
-        st(.whitespace_token, "\r\n"),
         st(.number_token, "1"),
         st(.number_token, "123"),
 
@@ -118,6 +140,14 @@ pub fn lexer_test_suite(state: *t.TestState) void {
         st(.true_keyword, "true"),
     };
 
+    const separators = [_]SimpleToken{
+        st(.whitespace_token, " "),
+        st(.whitespace_token, "  "),
+        st(.whitespace_token, "\r"),
+        st(.whitespace_token, "\n"),
+        st(.whitespace_token, "\r\n"),
+    };
+
     for (simple_tokens) |tok| {
         t.runTest(
             state,
@@ -129,19 +159,33 @@ pub fn lexer_test_suite(state: *t.TestState) void {
         );
     }
 
-    for (simple_tokens) |t1|
-        for (simple_tokens) |t2|
-            if (!requiresSeparator(t1.kind, t2.kind))
-                t.runTest(
-                    state,
-                    [2]SimpleToken,
-                    lexes_token_pair,
+    for (simple_tokens) |t1| for (simple_tokens) |t2|
+        if (!requiresSeparator(t1.kind, t2.kind))
+            t.runTest(
+                state,
+                [2]SimpleToken,
+                lexes_token_pair,
+                .{ t1, t2 },
+                std.fmt.allocPrint(
+                    t.allocator,
+                    "lexes token pair {}, {}",
                     .{ t1, t2 },
-                    std.fmt.allocPrint(
-                        t.allocator,
-                        "lexes token pair {}, {}",
-                        .{ t1, t2 },
-                    ) catch unreachable,
-                    .allocated,
-                );
+                ) catch unreachable,
+                .allocated,
+            );
+
+    for (simple_tokens) |t1| for (simple_tokens) |t2|
+        if (requiresSeparator(t1.kind, t2.kind)) for (separators) |sep|
+            t.runTest(
+                state,
+                [3]SimpleToken,
+                lexes_token_pair_with_separator,
+                .{ t1, sep, t2 },
+                std.fmt.allocPrint(
+                    t.allocator,
+                    "lexes token pair with separator {}, {}, {}",
+                    .{ t1, sep, t2 },
+                ) catch unreachable,
+                .allocated,
+            );
 }
