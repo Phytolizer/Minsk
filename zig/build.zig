@@ -35,4 +35,6 @@ pub fn build(b: *std.Build) void {
     }
     const run_step = b.step("run", "Run mc");
     run_step.dependOn(&mc_run.step);
+
+    @import("minsk_tests/build.zig").build(b, target, optimize, minsk_mod, minsk_runtime_mod);
 }
