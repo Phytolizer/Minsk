@@ -33,7 +33,7 @@ pub fn init(
 
 fn deinit(_: *const SyntaxNode, _: std.mem.Allocator) void {}
 
-fn children(_: *const SyntaxNode, _: std.mem.Allocator) std.mem.Allocator.Error![]const *const SyntaxNode {
+fn children(_: *const SyntaxNode, _: std.mem.Allocator) std.mem.Allocator.Error![]*const SyntaxNode {
     return &.{};
 }
 
