@@ -35,6 +35,12 @@ pub fn main() !void {
         "syntax facts",
         .static,
     );
+    t.runSuite(
+        &state,
+        code_analysis.syntax.evaluatorTestSuite,
+        "evaluator",
+        .static,
+    );
 
     std.debug.print(
         "{d} passed, {d} failed, {d} assertions\n",
