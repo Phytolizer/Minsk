@@ -3,6 +3,7 @@ const t = @import("framework");
 const SyntaxKind = @import("minsk").code_analysis.syntax.SyntaxKind;
 const SyntaxTree = @import("minsk").code_analysis.syntax.SyntaxTree;
 const SyntaxToken = @import("minsk").code_analysis.syntax.SyntaxToken;
+const syntax_facts = @import("minsk").code_analysis.syntax.syntax_facts;
 
 const SimpleToken = struct {
     kind: SyntaxKind,
@@ -34,6 +35,50 @@ fn testToken(
         std.mem.eql(u8, token.text, exp.text),
         "text mismatch: '{s}' != '{s}'",
         .{ token.text, exp.text },
+        out_msg,
+    );
+}
+
+fn testsAllTokens(
+    state: *t.TestState,
+    _: void,
+    out_msg: *[]const u8,
+) t.TestExit!void {
+    const token_kinds = comptime blk: {
+        var result: []const SyntaxKind = &.{};
+        for (std.meta.tags(SyntaxKind)) |kind|
+            if ((std.mem.endsWith(u8, kind.displayName(), "Keyword") or
+                std.mem.endsWith(u8, kind.displayName(), "Token")) and
+                (kind != .bad_token and kind != .end_of_file_token))
+            {
+                result = result ++ &[_]SyntaxKind{kind};
+            };
+        break :blk result;
+    };
+
+    const tested_token_kinds = comptime blk: {
+        var result: []const SyntaxKind = &.{};
+        for (simple_tokens ++ separators) |tok|
+            result = result ++ &[_]SyntaxKind{tok.kind};
+        break :blk result;
+    };
+
+    const messages = comptime blk: {
+        var result: []const []const u8 = &.{};
+        for (token_kinds) |tk| {
+            if (std.mem.indexOfScalar(SyntaxKind, tested_token_kinds, tk) == null) {
+                result = result ++ &[_][]const u8{std.fmt.comptimePrint("missing token kind: {s}", .{tk.displayName()})};
+            }
+        }
+        break :blk result;
+    };
+    const shown_messages = std.mem.join(t.allocator, "\n> ", messages) catch unreachable;
+    defer t.allocator.free(shown_messages);
+    try t.assert(
+        state,
+        messages.len == 0,
+        "\n> {s}",
+        .{shown_messages},
         out_msg,
     );
 }
@@ -116,37 +161,34 @@ fn requiresSeparator(k1: SyntaxKind, k2: SyntaxKind) bool {
         (k1 == .bang_token or k1 == .equals_token) and (k2 == .equals_token or k2 == .equals_equals_token);
 }
 
+const st = SimpleToken.init;
+const fixed_tokens = blk: {
+    var result: []const SimpleToken = &.{};
+    for (std.meta.tags(SyntaxKind)) |kind| {
+        if (syntax_facts.getText(kind)) |text| {
+            result = result ++ &[_]SimpleToken{st(kind, text)};
+        }
+    }
+    break :blk result;
+};
+
+const simple_tokens = fixed_tokens ++ &[_]SimpleToken{
+    st(.identifier_token, "a"),
+    st(.identifier_token, "abc"),
+    st(.number_token, "1"),
+    st(.number_token, "123"),
+};
+
+const separators = &[_]SimpleToken{
+    st(.whitespace_token, " "),
+    st(.whitespace_token, "  "),
+    st(.whitespace_token, "\r"),
+    st(.whitespace_token, "\n"),
+    st(.whitespace_token, "\r\n"),
+};
+
 pub fn lexerTestSuite(state: *t.TestState) void {
-    const st = SimpleToken.init;
-    const simple_tokens = [_]SimpleToken{
-        st(.identifier_token, "a"),
-        st(.identifier_token, "abc"),
-        st(.number_token, "1"),
-        st(.number_token, "123"),
-
-        st(.plus_token, "+"),
-        st(.minus_token, "-"),
-        st(.star_token, "*"),
-        st(.slash_token, "/"),
-        st(.bang_token, "!"),
-        st(.equals_token, "="),
-        st(.ampersand_ampersand_token, "&&"),
-        st(.pipe_pipe_token, "||"),
-        st(.equals_equals_token, "=="),
-        st(.bang_equals_token, "!="),
-        st(.open_parenthesis_token, "("),
-        st(.close_parenthesis_token, ")"),
-        st(.false_keyword, "false"),
-        st(.true_keyword, "true"),
-    };
-
-    const separators = [_]SimpleToken{
-        st(.whitespace_token, " "),
-        st(.whitespace_token, "  "),
-        st(.whitespace_token, "\r"),
-        st(.whitespace_token, "\n"),
-        st(.whitespace_token, "\r\n"),
-    };
+    t.runTest(state, void, testsAllTokens, {}, "tests all tokens", .static);
 
     for (simple_tokens) |tok| {
         t.runTest(
