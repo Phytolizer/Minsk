@@ -25,7 +25,7 @@ pub fn deinit(self: *const Self, allocator: std.mem.Allocator) void {
     self.base.deinit(allocator);
 }
 
-pub fn children(self: *const Self, allocator: std.mem.Allocator) ![]const *const SyntaxNode {
+pub fn children(self: *const Self, allocator: std.mem.Allocator) ![]*const SyntaxNode {
     return try self.base.children(allocator);
 }
 

@@ -33,7 +33,7 @@ fn deinit(node: *const SyntaxNode, allocator: std.mem.Allocator) void {
     allocator.destroy(self);
 }
 
-fn children(node: *const SyntaxNode, allocator: std.mem.Allocator) std.mem.Allocator.Error![]const *const SyntaxNode {
+fn children(node: *const SyntaxNode, allocator: std.mem.Allocator) std.mem.Allocator.Error![]*const SyntaxNode {
     const self = ExpressionSyntax.downcast(node, Self);
     return try allocator.dupe(*const SyntaxNode, &.{ &self.left.base, &self.operator_token.base, &self.right.base });
 }

@@ -4,7 +4,7 @@ const SyntaxToken = @import("SyntaxToken.zig");
 const DowncastedPointer = @import("minsk_meta").DowncastedPointer;
 
 pub const DeinitFn = *const fn (self: *const Self, allocator: std.mem.Allocator) void;
-pub const ChildrenFn = *const fn (self: *const Self, allocator: std.mem.Allocator) std.mem.Allocator.Error![]const *const Self;
+pub const ChildrenFn = *const fn (self: *const Self, allocator: std.mem.Allocator) std.mem.Allocator.Error![]*const Self;
 
 kind: SyntaxKind,
 deinit_fn: DeinitFn,
@@ -20,7 +20,7 @@ pub fn deinit(self: *const Self, allocator: std.mem.Allocator) void {
     self.deinit_fn(self, allocator);
 }
 
-pub fn children(self: *const Self, allocator: std.mem.Allocator) ![]const *const Self {
+pub fn children(self: *const Self, allocator: std.mem.Allocator) ![]*const Self {
     return try self.children_fn(self, allocator);
 }
 

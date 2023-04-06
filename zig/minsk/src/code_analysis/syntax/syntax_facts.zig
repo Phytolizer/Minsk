@@ -31,3 +31,47 @@ pub fn keywordKind(text: []const u8) SyntaxKind {
     else
         .identifier_token;
 }
+
+pub fn getText(kind: SyntaxKind) ?[]const u8 {
+    return switch (kind) {
+        .plus_token => "+",
+        .minus_token => "-",
+        .star_token => "*",
+        .slash_token => "/",
+        .bang_token => "!",
+        .equals_token => "=",
+        .ampersand_ampersand_token => "&&",
+        .pipe_pipe_token => "||",
+        .equals_equals_token => "==",
+        .bang_equals_token => "!=",
+        .open_parenthesis_token => "(",
+        .close_parenthesis_token => ")",
+        .false_keyword => "false",
+        .true_keyword => "true",
+        else => null,
+    };
+}
+
+pub fn binaryOperators() []const SyntaxKind {
+    return comptime blk: {
+        var result: []const SyntaxKind = &.{};
+        for (std.meta.tags(SyntaxKind)) |k| {
+            if (binaryOperatorPrecedence(k) > 0) {
+                result = result ++ &[_]SyntaxKind{k};
+            }
+        }
+        break :blk result;
+    };
+}
+
+pub fn unaryOperators() []const SyntaxKind {
+    return comptime blk: {
+        var result: []const SyntaxKind = &.{};
+        for (std.meta.tags(SyntaxKind)) |k| {
+            if (unaryOperatorPrecedence(k) > 0) {
+                result = result ++ &[_]SyntaxKind{k};
+            }
+        }
+        break :blk result;
+    };
+}
