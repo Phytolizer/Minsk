@@ -23,6 +23,18 @@ pub fn main() !void {
         "lexer",
         .static,
     );
+    t.runSuite(
+        &state,
+        code_analysis.syntax.parser_test_suite,
+        "parser",
+        .static,
+    );
+    t.runSuite(
+        &state,
+        code_analysis.syntax.syntax_facts_test_suite,
+        "syntax facts",
+        .static,
+    );
 
     std.debug.print(
         "{d} passed, {d} failed, {d} assertions\n",

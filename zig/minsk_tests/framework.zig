@@ -78,7 +78,8 @@ pub fn runTest(
             state.failed += 1;
         },
         error.TestSkipped => {
-            std.debug.print("SKIP  {s}\n", .{display_name});
+            if (state.verbose)
+                std.debug.print("SKIP  {s}\n", .{display_name});
             state.skipped += 1;
         },
     }
