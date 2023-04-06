@@ -4,37 +4,27 @@ const SyntaxKind = @import("minsk").code_analysis.syntax.SyntaxKind;
 const SyntaxTree = @import("minsk").code_analysis.syntax.SyntaxTree;
 const SyntaxToken = @import("minsk").code_analysis.syntax.SyntaxToken;
 const syntax_facts = @import("minsk").code_analysis.syntax.syntax_facts;
-
-const SimpleToken = struct {
-    kind: SyntaxKind,
-    text: []const u8,
-    pub fn init(kind: SyntaxKind, text: []const u8) @This() {
-        return .{ .kind = kind, .text = text };
-    }
-
-    pub fn format(self: @This(), comptime _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
-        try writer.print("({s} '{'}')", .{ self.kind.displayName(), std.zig.fmtEscapes(self.text) });
-    }
-};
+const token = @import("token.zig");
+const SimpleToken = token.SimpleToken;
 
 fn testToken(
     state: *t.TestState,
-    token: SyntaxToken,
+    tok: SyntaxToken,
     exp: SimpleToken,
     out_msg: *[]const u8,
 ) t.TestExit!void {
     try t.assert(
         state,
-        token.kind == exp.kind,
+        tok.kind == exp.kind,
         "kind mismatch: {s} != {s}",
-        .{ token.kind.displayName(), exp.kind.displayName() },
+        .{ tok.kind.displayName(), exp.kind.displayName() },
         out_msg,
     );
     try t.assert(
         state,
-        std.mem.eql(u8, token.text, exp.text),
+        std.mem.eql(u8, tok.text, exp.text),
         "text mismatch: '{s}' != '{s}'",
-        .{ token.text, exp.text },
+        .{ tok.text, exp.text },
         out_msg,
     );
 }
@@ -58,7 +48,7 @@ fn testsAllTokens(
 
     const tested_token_kinds = comptime blk: {
         var result: []const SyntaxKind = &.{};
-        for (simple_tokens ++ separators) |tok|
+        for (token.simple ++ token.separators) |tok|
             result = result ++ &[_]SyntaxKind{tok.kind};
         break :blk result;
     };
@@ -91,7 +81,7 @@ fn lexesToken(
     const tokens = SyntaxTree.parseTokens(t.allocator, ctx.text) catch unreachable;
     defer t.allocator.free(tokens);
 
-    const token = try t.assertSingle(
+    const tok = try t.assertSingle(
         state,
         SyntaxToken,
         tokens,
@@ -99,7 +89,7 @@ fn lexesToken(
         .{tokens.len},
         out_msg,
     );
-    try testToken(state, token, ctx, out_msg);
+    try testToken(state, tok, ctx, out_msg);
 }
 
 fn lexesTokenPair(
@@ -161,36 +151,10 @@ fn requiresSeparator(k1: SyntaxKind, k2: SyntaxKind) bool {
         (k1 == .bang_token or k1 == .equals_token) and (k2 == .equals_token or k2 == .equals_equals_token);
 }
 
-const st = SimpleToken.init;
-const fixed_tokens = blk: {
-    var result: []const SimpleToken = &.{};
-    for (std.meta.tags(SyntaxKind)) |kind| {
-        if (syntax_facts.getText(kind)) |text| {
-            result = result ++ &[_]SimpleToken{st(kind, text)};
-        }
-    }
-    break :blk result;
-};
-
-const simple_tokens = fixed_tokens ++ &[_]SimpleToken{
-    st(.identifier_token, "a"),
-    st(.identifier_token, "abc"),
-    st(.number_token, "1"),
-    st(.number_token, "123"),
-};
-
-const separators = &[_]SimpleToken{
-    st(.whitespace_token, " "),
-    st(.whitespace_token, "  "),
-    st(.whitespace_token, "\r"),
-    st(.whitespace_token, "\n"),
-    st(.whitespace_token, "\r\n"),
-};
-
 pub fn lexerTestSuite(state: *t.TestState) void {
     t.runTest(state, void, testsAllTokens, {}, "tests all tokens", .static);
 
-    for (simple_tokens) |tok| {
+    for (token.simple) |tok| {
         t.runTest(
             state,
             SimpleToken,
@@ -201,7 +165,7 @@ pub fn lexerTestSuite(state: *t.TestState) void {
         );
     }
 
-    for (simple_tokens) |t1| for (simple_tokens) |t2|
+    for (token.simple) |t1| for (token.simple) |t2|
         if (!requiresSeparator(t1.kind, t2.kind))
             t.runTest(
                 state,
@@ -216,8 +180,8 @@ pub fn lexerTestSuite(state: *t.TestState) void {
                 .allocated,
             );
 
-    for (simple_tokens) |t1| for (simple_tokens) |t2|
-        if (requiresSeparator(t1.kind, t2.kind)) for (separators) |sep|
+    for (token.simple) |t1| for (token.simple) |t2|
+        if (requiresSeparator(t1.kind, t2.kind)) for (token.separators) |sep|
             t.runTest(
                 state,
                 [3]SimpleToken,
