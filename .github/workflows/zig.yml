@@ -24,3 +24,4 @@ jobs:
       - uses: actions/checkout@v3
       - uses: goto-bus-stop/setup-zig@v2
       - run: zig build --verbose
+      - run: zig build test --verbose
