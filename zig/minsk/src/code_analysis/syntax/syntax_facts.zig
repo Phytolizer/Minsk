@@ -24,12 +24,11 @@ fn streq(a: []const u8, b: []const u8) bool {
 }
 
 pub fn keywordKind(text: []const u8) SyntaxKind {
-    return if (streq(text, "true"))
-        .true_keyword
-    else if (streq(text, "false"))
-        .false_keyword
-    else
-        .identifier_token;
+    const keywords = std.ComptimeStringMap(SyntaxKind, .{
+        .{ "true", .true_keyword },
+        .{ "false", .false_keyword },
+    });
+    return keywords.get(text) orelse .identifier_token;
 }
 
 pub fn getText(kind: SyntaxKind) ?[]const u8 {
