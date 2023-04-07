@@ -141,39 +141,50 @@ fn parseBinaryExpression(self: *Self, parent_precedence: usize) !*ExpressionSynt
 }
 
 fn parsePrimaryExpression(self: *Self) !*ExpressionSyntax {
-    switch (self.current().kind) {
-        .open_parenthesis_token => {
-            const left = self.nextToken();
-            const expression = try self.parseExpression();
-            errdefer expression.deinit(self.allocator);
-            const right = try self.matchToken(.close_parenthesis_token);
-            return try ParenthesizedExpressionSyntax.init(
-                self.allocator,
-                left,
-                expression,
-                right,
-            );
-        },
-        .false_keyword, .true_keyword => {
-            const keyword_token = self.nextToken();
-            const value = keyword_token.kind == .true_keyword;
-            return try LiteralExpressionSyntax.init(
-                self.allocator,
-                keyword_token,
-                .{ .boolean = value },
-            );
-        },
-        .identifier_token => {
-            const identifier_token = self.nextToken();
-            return try NameExpressionSyntax.init(self.allocator, identifier_token);
-        },
-        else => {
-            const number_token = try self.matchToken(.number_token);
-            return try LiteralExpressionSyntax.init(
-                self.allocator,
-                number_token,
-                number_token.value orelse .{ .integer = 0 },
-            );
-        },
-    }
+    return switch (self.current().kind) {
+        .open_parenthesis_token => try self.parseParenthesizedExpression(),
+        .false_keyword, .true_keyword => try self.parseBooleanLiteral(),
+        .number_token => try self.parseNumberLiteral(),
+        else => try self.parseNameExpression(),
+    };
+}
+
+fn parseParenthesizedExpression(self: *Self) !*ExpressionSyntax {
+    const left = try self.matchToken(.open_parenthesis_token);
+    const expression = try self.parseExpression();
+    errdefer expression.deinit(self.allocator);
+    const right = try self.matchToken(.close_parenthesis_token);
+    return try ParenthesizedExpressionSyntax.init(
+        self.allocator,
+        left,
+        expression,
+        right,
+    );
+}
+
+fn parseBooleanLiteral(self: *Self) !*ExpressionSyntax {
+    const value = self.current().kind == .true_keyword;
+    const keyword_token = if (value)
+        self.nextToken()
+    else
+        try self.matchToken(.false_keyword);
+    return try LiteralExpressionSyntax.init(
+        self.allocator,
+        keyword_token,
+        .{ .boolean = value },
+    );
+}
+
+fn parseNameExpression(self: *Self) !*ExpressionSyntax {
+    const identifier_token = try self.matchToken(.identifier_token);
+    return try NameExpressionSyntax.init(self.allocator, identifier_token);
+}
+
+fn parseNumberLiteral(self: *Self) !*ExpressionSyntax {
+    const number_token = try self.matchToken(.number_token);
+    return try LiteralExpressionSyntax.init(
+        self.allocator,
+        number_token,
+        number_token.value orelse .{ .integer = 0 },
+    );
 }
