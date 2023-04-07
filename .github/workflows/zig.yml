@@ -33,4 +33,5 @@ jobs:
           key: ${{ runner.os }}-zig-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-zig-
-      - run: zig build --cache-dir "zig-local-cache" --global-cache-dir "zig-global-cache" test --verbose
+      - run: zig build --cache-dir "$PWD/zig-local-cache" --global-cache-dir "$PWD/zig-global-cache" test --verbose
+        shell: bash
