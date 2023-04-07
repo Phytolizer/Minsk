@@ -41,6 +41,12 @@ pub fn main() !void {
         "evaluator",
         .static,
     );
+    t.runSuite(
+        &state,
+        code_analysis.text.sourceTextSuite,
+        "source text",
+        .static,
+    );
 
     std.debug.print(
         "{d} passed, {d} failed, {d} assertions\n",

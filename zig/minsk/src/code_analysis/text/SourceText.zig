@@ -52,8 +52,10 @@ fn getLineBreakWidth(inout_pos: *std.unicode.Utf8Iterator) ?usize {
     const cp = inout_pos.nextCodepoint() orelse return null;
     if (cp == '\r') {
         const lookahead = inout_pos.peek(1);
-        if (std.mem.eql(u8, lookahead, "\n"))
+        if (std.mem.eql(u8, lookahead, "\n")) {
+            _ = inout_pos.nextCodepoint();
             return 2;
+        }
     }
     return if (cp == '\r' or cp == '\n')
         1
