@@ -26,13 +26,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: goto-bus-stop/setup-zig@v2
-      - uses: tenhaus/get-release-or-tag@v2
-        id: tag
       - uses: actions/cache@v3
         with:
           path: |
-            ${{ github.workspace }}/zig-*
-          key: ${{ runner.os }}-zig-${{ steps.tag.outputs.tag }}
+            zig-*
+          key: ${{ runner.os }}-zig-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-zig-
-      - run: zig build --cache-dir "${{ github.workspace}}/zig-local-cache" --global-cache-dir "${{ github.workspace }}/zig-global-cache" test --verbose
+      - run: zig build --cache-dir "zig-local-cache" --global-cache-dir "zig-global-cache" test --verbose
