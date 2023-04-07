@@ -53,7 +53,9 @@ fn requireTestsAllTokens() void {
         var result: []const []const u8 = &.{};
         for (token_kinds) |tk| {
             if (std.mem.indexOfScalar(SyntaxKind, tested_token_kinds, tk) == null) {
-                result = result ++ &[_][]const u8{std.fmt.comptimePrint("missing token kind: {s}", .{tk.displayName()})};
+                result = result ++ &[_][]const u8{
+                    std.fmt.comptimePrint("missing token kind: {s}", .{tk.displayName()}),
+                };
             }
         }
         break :blk result;
