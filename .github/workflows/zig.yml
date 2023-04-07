@@ -29,7 +29,7 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: |
-            zig-*
+            ${{ github.workspace }}/zig-*
           key: ${{ runner.os }}-zig-${{ github.sha }}
           restore-keys: |
             ${{ runner.os }}-zig-
