@@ -26,4 +26,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: goto-bus-stop/setup-zig@v2
-      - run: zig build test --verbose
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/zig/zig-*
+          key: ${{ runner.os }}-zig-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-zig-
+      - run: zig build --cache-dir "$PWD/zig-local-cache" --global-cache-dir "$PWD/zig-global-cache" test --verbose
+        shell: bash

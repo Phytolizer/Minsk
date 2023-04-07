@@ -4,6 +4,7 @@ const SyntaxTree = @import("minsk").code_analysis.syntax.SyntaxTree;
 const Compilation = @import("minsk").code_analysis.Compilation;
 const Object = @import("minsk_runtime").Object;
 const VariableSymbol = @import("minsk").code_analysis.VariableSymbol;
+const tty_ext = @import("tty_ext");
 
 fn readUntilDelimiterOrEofArrayList(
     writer: anytype,
@@ -32,84 +33,6 @@ fn pickAllocator(normal_alloc: std.mem.Allocator, debug_alloc: std.mem.Allocator
     };
 }
 
-fn clearScreen(tty: std.debug.TTY.Config, writer: anytype) !void {
-    nosuspend switch (tty) {
-        .no_color => return,
-        .escape_codes => {
-            const clear_string = "\x1b[2J\x1b[H";
-            try writer.writeAll(clear_string);
-        },
-        .windows_api => |wapi| if (builtin.os.tag == .windows) {
-            var screen_info: std.os.windows.CONSOLE_SCREEN_BUFFER_INFO = undefined;
-            const kernel32 = std.os.windows.kernel32;
-            if (kernel32.GetConsoleScreenBufferInfo(wapi.handle, &screen_info) == 0) {
-                switch (kernel32.GetLastError()) {
-                    else => |err| return std.os.windows.unexpectedError(err),
-                }
-            }
-            var num_chars: std.os.windows.DWORD = undefined;
-            if (kernel32.FillConsoleOutputCharacterA(
-                wapi.handle,
-                ' ',
-                @intCast(
-                    std.os.windows.DWORD,
-                    screen_info.dwSize.X * screen_info.dwSize.Y,
-                ),
-                std.os.windows.COORD{ .X = 0, .Y = 0 },
-                &num_chars,
-            ) == 0) {
-                switch (kernel32.GetLastError()) {
-                    else => |err| return std.os.windows.unexpectedError(err),
-                }
-            }
-            if (kernel32.SetConsoleCursorPosition(
-                wapi.handle,
-                std.os.windows.COORD{ .X = 0, .Y = 0 },
-            ) == 0) {
-                switch (kernel32.GetLastError()) {
-                    else => |err| return std.os.windows.unexpectedError(err),
-                }
-            }
-        } else unreachable,
-    };
-}
-
-const Color = enum {
-    dim_red,
-    gray,
-    reset,
-};
-
-pub fn setColor(conf: std.debug.TTY.Config, out_stream: anytype, color: Color) !void {
-    nosuspend switch (conf) {
-        .no_color => return,
-        .escape_codes => {
-            const color_string = switch (color) {
-                .dim_red => "\x1b[31;2m",
-                .gray => "\x1b[2m",
-                .reset => "\x1b[0m",
-            };
-            try out_stream.writeAll(color_string);
-        },
-        .windows_api => |ctx| if (builtin.os.tag == .windows) {
-            const windows = std.os.windows;
-            const attributes = switch (color) {
-                .dim_red => windows.FOREGROUND_RED,
-                .gray => windows.FOREGROUND_INTENSITY,
-                .reset => ctx.reset_attributes,
-            };
-            try windows.SetConsoleTextAttribute(ctx.handle, attributes);
-        } else {
-            unreachable;
-        },
-    };
-}
-
-fn resetColor(tty: std.debug.TTY.Config, buf: anytype) void {
-    if (builtin.os.tag == .windows) buf.flush() catch unreachable;
-    setColor(tty, buf.writer(), .reset) catch unreachable;
-}
-
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
@@ -123,6 +46,8 @@ pub fn main() !void {
     const stderr = stderr_buf.writer();
     const tty = std.debug.detectTTYConfig(std.io.getStdErr());
     const stdin = std.io.getStdIn().reader();
+    var text_builder = std.ArrayList(u8).init(line_alloc);
+    defer text_builder.deinit();
 
     var show_tree = false;
     var variables = VariableSymbol.Map.init(allocator);
@@ -146,9 +71,14 @@ pub fn main() !void {
     }
 
     while (true) {
-        stderr.writeAll("> ") catch unreachable;
+        stderr.writeAll(
+            if (text_builder.items.len == 0)
+                "> "
+            else
+                "| ",
+        ) catch unreachable;
         stderr_buf.flush() catch unreachable;
-        const line = blk: {
+        const input_line = blk: {
             var line = try readUntilDelimiterOrEofArrayList(
                 stdin,
                 &line_buf,
@@ -163,50 +93,74 @@ pub fn main() !void {
             break :blk line;
         };
 
-        if (std.mem.eql(u8, line, "#showTree")) {
-            show_tree = !show_tree;
-            stderr.print("{s}\n", .{
-                if (show_tree)
-                    "Showing parse trees."
-                else
-                    "Not showing parse trees.",
-            }) catch unreachable;
-            continue;
-        } else if (std.mem.eql(u8, line, "#cls")) {
-            try clearScreen(tty, stderr);
-            continue;
+        const is_blank = input_line.len == 0;
+
+        if (text_builder.items.len == 0) {
+            if (is_blank) continue;
+            if (std.mem.eql(u8, input_line, "#showTree")) {
+                show_tree = !show_tree;
+                stderr.print("{s}\n", .{
+                    if (show_tree)
+                        "Showing parse trees."
+                    else
+                        "Not showing parse trees.",
+                }) catch unreachable;
+                continue;
+            } else if (std.mem.eql(u8, input_line, "#cls")) {
+                try tty_ext.clearScreen(tty, stderr);
+                continue;
+            }
         }
 
         var parser_arena = std.heap.ArenaAllocator.init(allocator);
         defer parser_arena.deinit();
         const parser_alloc = pickAllocator(parser_arena.allocator(), allocator);
 
-        const tree = try SyntaxTree.parse(parser_alloc, line);
+        try text_builder.appendSlice(input_line);
+        try text_builder.append('\n');
+        const input_text = text_builder.items;
+        const tree = try SyntaxTree.parse(parser_alloc, input_text);
+        if (tree.diagnostics.?.diagnostics.items.len > 0 and !is_blank) {
+            tree.deinit();
+            continue;
+        }
         var compilation = Compilation.init(parser_alloc, tree);
         defer compilation.deinit();
         const result = try compilation.evaluate(&variables);
         defer result.deinit(parser_alloc);
 
         if (show_tree) {
-            setColor(tty, stderr, .gray) catch unreachable;
-            defer resetColor(tty, &stderr_buf);
-            try compilation.syntax_tree.root.base.prettyPrint(parser_alloc, "", true, stderr);
+            try compilation.syntax_tree.root.base.prettyPrint(
+                parser_alloc,
+                "",
+                true,
+                stderr,
+                .colors,
+                tty,
+                &stderr_buf,
+            );
         }
 
         switch (result) {
             .failure => |diagnostics| {
+                const text = tree.source;
                 for (diagnostics) |d| {
-                    setColor(tty, stderr, .dim_red) catch unreachable;
-                    stderr.print("{s}\n", .{d}) catch unreachable;
-                    resetColor(tty, &stderr_buf);
+                    const line_idx = text.getLineIndex(d.span.start) orelse unreachable;
+                    const line_num = line_idx + 1;
+                    const line = text.lines[line_idx];
+                    const col_num = d.span.start - line.start + 1;
 
-                    const prefix = line[0..d.span.start];
-                    const err = line[d.span.start..d.span.end()];
-                    const suffix = line[d.span.end()..];
+                    tty_ext.setColor(tty, stderr, .dim_red) catch unreachable;
+                    stderr.print("({d}, {d}): {s}\n", .{ line_num, col_num, d }) catch unreachable;
+                    tty_ext.resetColor(tty, &stderr_buf);
+
+                    const prefix = text.text[line.start..d.span.start];
+                    const err = text.text[d.span.start..d.span.end()];
+                    const suffix = text.text[d.span.end()..line.end()];
                     stderr.print("    {s}", .{prefix}) catch unreachable;
-                    setColor(tty, stderr, .dim_red) catch unreachable;
+                    tty_ext.setColor(tty, stderr, .dim_red) catch unreachable;
                     stderr.print("{s}", .{err}) catch unreachable;
-                    resetColor(tty, &stderr_buf);
+                    tty_ext.resetColor(tty, &stderr_buf);
                     stderr.print("{s}\n", .{suffix}) catch unreachable;
                 }
             },
@@ -221,5 +175,7 @@ pub fn main() !void {
                 vs.duped = true;
             }
         }
+
+        text_builder.clearRetainingCapacity();
     }
 }

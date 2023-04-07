@@ -46,7 +46,7 @@ pub fn reportInvalidNumber(self: *Self, span: TextSpan, text: []const u8, compti
 }
 
 pub fn reportBadCharacter(self: *Self, position: usize, cp: u21) !void {
-    var unichar_buf: [3]u8 = undefined;
+    var unichar_buf: [8]u8 = undefined;
     const len = std.unicode.utf8Encode(cp, &unichar_buf) catch unreachable;
     const message = try std.fmt.allocPrint(
         self.allocator,

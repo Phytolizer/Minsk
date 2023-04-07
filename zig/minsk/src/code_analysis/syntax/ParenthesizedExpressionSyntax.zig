@@ -18,7 +18,7 @@ pub fn init(
 ) !*ExpressionSyntax {
     const result = try allocator.create(Self);
     result.* = .{
-        .base = ExpressionSyntax.init(.parenthesized_expression, &deinit, &children),
+        .base = ExpressionSyntax.init(.parenthesized_expression, &deinit, &children, null),
         .open_parenthesis_token = open_parenthesis_token,
         .expression = expression,
         .close_parenthesis_token = close_parenthesis_token,

@@ -23,6 +23,7 @@ pub fn init(
             .kind = kind,
             .deinit_fn = &deinit,
             .children_fn = &children,
+            .span_fn = &span_override,
         },
         .kind = kind,
         .position = position,
@@ -42,6 +43,10 @@ pub fn format(self: Self, comptime _: []const u8, _: std.fmt.FormatOptions, writ
     if (self.value) |value| {
         try writer.print(" {}", .{value});
     }
+}
+
+fn span_override(node: *const SyntaxNode, _: std.mem.Allocator) !TextSpan {
+    return SyntaxNode.downcast(node, Self).span();
 }
 
 pub fn span(self: Self) TextSpan {
