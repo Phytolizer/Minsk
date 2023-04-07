@@ -26,4 +26,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: goto-bus-stop/setup-zig@v2
+      - id: cache-zig
+        uses: actions/cache@v3
+        with:
+          path: |
+            zig-cache
+            zig-out
+          key: ${{ runner.os }}-zig
       - run: zig build test --verbose
