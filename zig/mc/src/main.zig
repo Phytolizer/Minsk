@@ -44,6 +44,7 @@ pub fn main() !void {
     defer line_buf.deinit();
     var stderr_buf = std.io.bufferedWriter(std.io.getStdErr().writer());
     const stderr = stderr_buf.writer();
+    try tty_ext.enableAnsiEscapes(std.io.getStdErr());
     const tty = std.debug.detectTTYConfig(std.io.getStdErr());
     const stdin = std.io.getStdIn().reader();
     var text_builder = std.ArrayList(u8).init(line_alloc);
@@ -71,14 +72,14 @@ pub fn main() !void {
     }
 
     while (true) {
-        try tty_ext.setColor(tty, stderr, .green);
+        tty_ext.setColor(tty, stderr, .green) catch unreachable;
         stderr.writeAll(
             if (text_builder.items.len == 0)
                 "» "
             else
                 "· ",
         ) catch unreachable;
-        tty_ext.resetColor(tty, &stderr_buf);
+        tty_ext.setColor(tty, stderr, .reset) catch unreachable;
         stderr_buf.flush() catch unreachable;
         const input_line = blk: {
             var line = try readUntilDelimiterOrEofArrayList(
@@ -139,7 +140,6 @@ pub fn main() !void {
                 stderr,
                 .colors,
                 tty,
-                &stderr_buf,
             );
         }
 
@@ -154,7 +154,7 @@ pub fn main() !void {
 
                     tty_ext.setColor(tty, stderr, .dim_red) catch unreachable;
                     stderr.print("({d}, {d}): {s}\n", .{ line_num, col_num, d }) catch unreachable;
-                    tty_ext.resetColor(tty, &stderr_buf);
+                    tty_ext.setColor(tty, stderr, .reset) catch unreachable;
 
                     const prefix = text.text[line.start..d.span.start];
                     const err = text.text[d.span.start..d.span.end()];
@@ -162,13 +162,13 @@ pub fn main() !void {
                     stderr.print("    {s}", .{prefix}) catch unreachable;
                     tty_ext.setColor(tty, stderr, .dim_red) catch unreachable;
                     stderr.print("{s}", .{err}) catch unreachable;
-                    tty_ext.resetColor(tty, &stderr_buf);
+                    tty_ext.setColor(tty, stderr, .reset) catch unreachable;
                     stderr.print("{s}\n", .{suffix}) catch unreachable;
                 }
             },
             .success => |value| {
                 try tty_ext.setColor(tty, stderr, .magenta);
-                defer tty_ext.resetColor(tty, &stderr_buf);
+                defer tty_ext.setColor(tty, stderr, .reset) catch unreachable;
                 stderr.print("{d}\n", .{value}) catch unreachable;
             },
         }

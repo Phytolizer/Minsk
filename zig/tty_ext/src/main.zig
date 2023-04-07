@@ -56,7 +56,7 @@ pub const Color = enum {
 pub fn setColor(conf: std.debug.TTY.Config, out_stream: anytype, color: Color) !void {
     nosuspend switch (conf) {
         .no_color => return,
-        .escape_codes => {
+        else => {
             const color_string = switch (color) {
                 .dim_red => "\x1b[31;2m",
                 .gray => "\x1b[2m",
@@ -68,25 +68,28 @@ pub fn setColor(conf: std.debug.TTY.Config, out_stream: anytype, color: Color) !
             };
             try out_stream.writeAll(color_string);
         },
-        .windows_api => |ctx| if (builtin.os.tag == .windows) {
-            const windows = std.os.windows;
-            const attributes = switch (color) {
-                .dim_red => windows.FOREGROUND_RED,
-                .gray => windows.FOREGROUND_INTENSITY,
-                .cyan => windows.FOREGROUND_GREEN | windows.FOREGROUND_BLUE,
-                .blue => windows.FOREGROUND_BLUE,
-                .green => windows.FOREGROUND_GREEN,
-                .magenta => windows.FOREGROUND_RED | windows.FOREGROUND_BLUE,
-                .reset => ctx.reset_attributes,
-            };
-            try windows.SetConsoleTextAttribute(ctx.handle, attributes);
-        } else {
-            unreachable;
-        },
     };
 }
 
-pub fn resetColor(tty: std.debug.TTY.Config, buf: anytype) void {
-    if (builtin.os.tag == .windows) buf.flush() catch unreachable;
-    setColor(tty, buf.writer(), .reset) catch unreachable;
+extern "kernel32" fn SetConsoleMode(
+    in_hConsoleHandle: std.os.windows.HANDLE,
+    in_dwMode: std.os.windows.DWORD,
+) callconv(std.os.windows.WINAPI) std.os.windows.BOOL;
+
+pub fn enableAnsiEscapes(f: std.fs.File) !void {
+    if (builtin.os.tag == .windows) {
+        const windows = std.os.windows;
+        var mode: windows.DWORD = undefined;
+        if (windows.kernel32.GetConsoleMode(f.handle, &mode) == 0)
+            switch (windows.kernel32.GetLastError()) {
+                else => |err| return std.os.windows.unexpectedError(err),
+            };
+
+        const ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;
+        mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+        if (SetConsoleMode(f.handle, mode) == 0)
+            switch (windows.kernel32.GetLastError()) {
+                else => |err| return std.os.windows.unexpectedError(err),
+            };
+    }
 }
