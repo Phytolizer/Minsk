@@ -13,6 +13,8 @@ const syntax_facts = @import("syntax_facts.zig");
 const SyntaxTree = @import("SyntaxTree.zig");
 const DiagnosticBag = @import("../DiagnosticBag.zig");
 
+const AllocError = std.mem.Allocator.Error;
+
 allocator: std.mem.Allocator,
 tokens: []SyntaxToken,
 position: usize = 0,
@@ -64,7 +66,7 @@ fn nextToken(self: *Self) SyntaxToken {
     return result;
 }
 
-fn matchToken(self: *Self, kind: SyntaxKind) std.mem.Allocator.Error!SyntaxToken {
+fn matchToken(self: *Self, kind: SyntaxKind) AllocError!SyntaxToken {
     if (self.current().kind == kind) {
         return self.nextToken();
     }
@@ -82,7 +84,7 @@ fn matchToken(self: *Self, kind: SyntaxKind) std.mem.Allocator.Error!SyntaxToken
     );
 }
 
-pub fn parse(self: *Self) std.mem.Allocator.Error!SyntaxTree {
+pub fn parse(self: *Self) AllocError!SyntaxTree {
     const expression = try self.parseExpression();
     const end_of_file_token = try self.matchToken(.end_of_file_token);
     return SyntaxTree.init(
@@ -99,7 +101,7 @@ fn takeDiagnostics(self: *Self) DiagnosticBag {
     return result;
 }
 
-fn parseExpression(self: *Self) std.mem.Allocator.Error!*ExpressionSyntax {
+fn parseExpression(self: *Self) AllocError!*ExpressionSyntax {
     return try self.parseAssignmentExpression();
 }
 
