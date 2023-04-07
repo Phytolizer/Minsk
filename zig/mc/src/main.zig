@@ -46,6 +46,8 @@ pub fn main() !void {
     const stderr = stderr_buf.writer();
     const tty = std.debug.detectTTYConfig(std.io.getStdErr());
     const stdin = std.io.getStdIn().reader();
+    var text_builder = std.ArrayList(u8).init(line_alloc);
+    defer text_builder.deinit();
 
     var show_tree = false;
     var variables = VariableSymbol.Map.init(allocator);
@@ -69,7 +71,12 @@ pub fn main() !void {
     }
 
     while (true) {
-        stderr.writeAll("> ") catch unreachable;
+        stderr.writeAll(
+            if (text_builder.items.len == 0)
+                "> "
+            else
+                "| ",
+        ) catch unreachable;
         stderr_buf.flush() catch unreachable;
         const input_line = blk: {
             var line = try readUntilDelimiterOrEofArrayList(
@@ -86,25 +93,36 @@ pub fn main() !void {
             break :blk line;
         };
 
-        if (std.mem.eql(u8, input_line, "#showTree")) {
-            show_tree = !show_tree;
-            stderr.print("{s}\n", .{
-                if (show_tree)
-                    "Showing parse trees."
-                else
-                    "Not showing parse trees.",
-            }) catch unreachable;
-            continue;
-        } else if (std.mem.eql(u8, input_line, "#cls")) {
-            try tty_ext.clearScreen(tty, stderr);
-            continue;
+        // const is_blank = input_line.len == 0;
+
+        if (text_builder.items.len == 0) {
+            if (std.mem.eql(u8, input_line, "#showTree")) {
+                show_tree = !show_tree;
+                stderr.print("{s}\n", .{
+                    if (show_tree)
+                        "Showing parse trees."
+                    else
+                        "Not showing parse trees.",
+                }) catch unreachable;
+                continue;
+            } else if (std.mem.eql(u8, input_line, "#cls")) {
+                try tty_ext.clearScreen(tty, stderr);
+                continue;
+            }
         }
 
         var parser_arena = std.heap.ArenaAllocator.init(allocator);
         defer parser_arena.deinit();
         const parser_alloc = pickAllocator(parser_arena.allocator(), allocator);
 
-        const tree = try SyntaxTree.parse(parser_alloc, input_line);
+        try text_builder.appendSlice(input_line);
+        try text_builder.append('\n');
+        const input_text = text_builder.items;
+        const tree = try SyntaxTree.parse(parser_alloc, input_text);
+        if (tree.diagnostics.?.diagnostics.items.len > 0) {
+            tree.deinit();
+            continue;
+        }
         var compilation = Compilation.init(parser_alloc, tree);
         defer compilation.deinit();
         const result = try compilation.evaluate(&variables);
@@ -128,17 +146,16 @@ pub fn main() !void {
                 for (diagnostics) |d| {
                     const line_idx = text.getLineIndex(d.span.start) orelse unreachable;
                     const line_num = line_idx + 1;
-                    const text_line = text.lines[line_idx];
-                    const line = text.text[text_line.start..text_line.end()];
-                    const col_num = d.span.start + 1;
+                    const line = text.lines[line_idx];
+                    const col_num = d.span.start - line.start + 1;
 
                     tty_ext.setColor(tty, stderr, .dim_red) catch unreachable;
                     stderr.print("({d}, {d}): {s}\n", .{ line_num, col_num, d }) catch unreachable;
                     tty_ext.resetColor(tty, &stderr_buf);
 
-                    const prefix = line[0..d.span.start];
-                    const err = line[d.span.start..d.span.end()];
-                    const suffix = line[d.span.end()..];
+                    const prefix = text.text[line.start..d.span.start];
+                    const err = text.text[d.span.start..d.span.end()];
+                    const suffix = text.text[d.span.end()..line.end()];
                     stderr.print("    {s}", .{prefix}) catch unreachable;
                     tty_ext.setColor(tty, stderr, .dim_red) catch unreachable;
                     stderr.print("{s}", .{err}) catch unreachable;
@@ -157,5 +174,7 @@ pub fn main() !void {
                 vs.duped = true;
             }
         }
+
+        text_builder.clearRetainingCapacity();
     }
 }

@@ -52,10 +52,12 @@ fn addLine(self: *SourceText, lines: *std.ArrayList(Line), pos: usize, line_star
 
 fn getLineBreakWidth(inout_pos: *std.unicode.Utf8Iterator) ?usize {
     const cp = inout_pos.nextCodepoint() orelse return null;
-    const look = inout_pos.nextCodepoint();
-    return if (cp == '\r' and look != null and look.? == '\n')
-        2
-    else if (cp == '\r' or cp == '\n')
+    if (cp == '\r') {
+        const lookahead = inout_pos.peek(1);
+        if (std.mem.eql(u8, lookahead, "\n"))
+            return 2;
+    }
+    return if (cp == '\r' or cp == '\n')
         1
     else
         0;
@@ -64,12 +66,14 @@ fn getLineBreakWidth(inout_pos: *std.unicode.Utf8Iterator) ?usize {
 pub fn getLineIndex(self: *const SourceText, position: usize) ?usize {
     const compare = struct {
         fn cmp(_: void, key: usize, mid: Line) std.math.Order {
-            return if (mid.start > key)
-                .gt
-            else if (mid.end() < key)
+            const result: std.math.Order = if (mid.start > key)
                 .lt
+            else if (mid.end() <= key)
+                .gt
             else
                 .eq;
+            std.debug.print("{any}\n", .{result});
+            return result;
         }
     }.cmp;
     return std.sort.binarySearch(Line, position, self.lines, {}, compare);
