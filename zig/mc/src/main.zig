@@ -131,12 +131,15 @@ pub fn main() !void {
                     tty_ext.resetColor(tty, &stderr_buf);
 
                     const line_idx = text.getLineIndex(d.span.start) orelse unreachable;
-                    const line = text.text[text.lines[line_idx].start..text.lines[line_idx].end()];
+                    const line_num = line_idx + 1;
+                    const text_line = text.lines[line_idx];
+                    const line = text.text[text_line.start..text_line.end()];
 
                     const prefix = line[0..d.span.start];
                     const err = line[d.span.start..d.span.end()];
                     const suffix = line[d.span.end()..];
-                    stderr.print("    {s}", .{prefix}) catch unreachable;
+                    const col_num = d.span.start + 1;
+                    stderr.print("({d}, {d}):    {s}", .{ line_num, col_num, prefix }) catch unreachable;
                     tty_ext.setColor(tty, stderr, .dim_red) catch unreachable;
                     stderr.print("{s}", .{err}) catch unreachable;
                     tty_ext.resetColor(tty, &stderr_buf);
