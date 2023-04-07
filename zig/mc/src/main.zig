@@ -96,6 +96,7 @@ pub fn main() !void {
         const is_blank = input_line.len == 0;
 
         if (text_builder.items.len == 0) {
+            if (is_blank) continue;
             if (std.mem.eql(u8, input_line, "#showTree")) {
                 show_tree = !show_tree;
                 stderr.print("{s}\n", .{
