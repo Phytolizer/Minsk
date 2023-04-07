@@ -102,13 +102,8 @@ pub fn lex(self: *Self) AllocError!?SyntaxToken {
 
     if (self.was_eof) {
         return null;
-    } else if (glyph.isAsciiDigit(try self.current())) {
-        try self.readNumber();
-    } else if (glyph.isWhiteSpace(try self.current())) {
-        try self.readWhitespace();
-    } else if (glyph.derived_core_properties.isXidStart(try self.current())) {
-        try self.readIdentifierOrKeyword();
-    } else switch (try self.current()) {
+    }
+    switch (try self.current()) {
         0 => {
             self.was_eof = true;
             self.kind = .end_of_file_token;
@@ -163,7 +158,16 @@ pub fn lex(self: *Self) AllocError!?SyntaxToken {
             self.next();
             self.kind = .equals_token;
         },
-        else => {},
+        '0'...'9' => try self.readNumber(),
+        ' ', '\r', '\t', '\n' => try self.readWhitespace(),
+        'a'...'z', 'A'...'Z' => try self.readIdentifierOrKeyword(),
+        else => if (glyph.isAsciiDigit(try self.current())) {
+            try self.readNumber();
+        } else if (glyph.isWhiteSpace(try self.current())) {
+            try self.readWhitespace();
+        } else if (glyph.derived_core_properties.isXidStart(try self.current())) {
+            try self.readIdentifierOrKeyword();
+        },
     }
     if (self.kind == .bad_token) {
         try self.diagnostics.reportBadCharacter(self.position, try self.current());
