@@ -71,12 +71,14 @@ pub fn main() !void {
     }
 
     while (true) {
+        try tty_ext.setColor(tty, stderr, .green);
         stderr.writeAll(
             if (text_builder.items.len == 0)
-                "> "
+                "» "
             else
-                "| ",
+                "· ",
         ) catch unreachable;
+        tty_ext.resetColor(tty, &stderr_buf);
         stderr_buf.flush() catch unreachable;
         const input_line = blk: {
             var line = try readUntilDelimiterOrEofArrayList(
@@ -165,6 +167,8 @@ pub fn main() !void {
                 }
             },
             .success => |value| {
+                try tty_ext.setColor(tty, stderr, .magenta);
+                defer tty_ext.resetColor(tty, &stderr_buf);
                 stderr.print("{d}\n", .{value}) catch unreachable;
             },
         }

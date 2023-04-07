@@ -48,6 +48,7 @@ pub const Color = enum {
     gray,
     cyan,
     blue,
+    green,
     magenta,
     reset,
 };
@@ -61,6 +62,7 @@ pub fn setColor(conf: std.debug.TTY.Config, out_stream: anytype, color: Color) !
                 .gray => "\x1b[2m",
                 .cyan => "\x1b[0;36m",
                 .blue => "\x1b[0;34m",
+                .green => "\x1b[0;32m",
                 .magenta => "\x1b[0;35m",
                 .reset => "\x1b[0m",
             };
@@ -73,6 +75,7 @@ pub fn setColor(conf: std.debug.TTY.Config, out_stream: anytype, color: Color) !
                 .gray => windows.FOREGROUND_INTENSITY,
                 .cyan => windows.FOREGROUND_GREEN | windows.FOREGROUND_BLUE,
                 .blue => windows.FOREGROUND_BLUE,
+                .green => windows.FOREGROUND_GREEN,
                 .magenta => windows.FOREGROUND_RED | windows.FOREGROUND_BLUE,
                 .reset => ctx.reset_attributes,
             };
