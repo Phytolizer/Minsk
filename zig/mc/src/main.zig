@@ -126,20 +126,20 @@ pub fn main() !void {
             .failure => |diagnostics| {
                 const text = tree.source;
                 for (diagnostics) |d| {
-                    tty_ext.setColor(tty, stderr, .dim_red) catch unreachable;
-                    stderr.print("{s}\n", .{d}) catch unreachable;
-                    tty_ext.resetColor(tty, &stderr_buf);
-
                     const line_idx = text.getLineIndex(d.span.start) orelse unreachable;
                     const line_num = line_idx + 1;
                     const text_line = text.lines[line_idx];
                     const line = text.text[text_line.start..text_line.end()];
+                    const col_num = d.span.start + 1;
+
+                    tty_ext.setColor(tty, stderr, .dim_red) catch unreachable;
+                    stderr.print("({d}, {d}): {s}\n", .{ line_num, col_num, d }) catch unreachable;
+                    tty_ext.resetColor(tty, &stderr_buf);
 
                     const prefix = line[0..d.span.start];
                     const err = line[d.span.start..d.span.end()];
                     const suffix = line[d.span.end()..];
-                    const col_num = d.span.start + 1;
-                    stderr.print("({d}, {d}):    {s}", .{ line_num, col_num, prefix }) catch unreachable;
+                    stderr.print("    {s}", .{prefix}) catch unreachable;
                     tty_ext.setColor(tty, stderr, .dim_red) catch unreachable;
                     stderr.print("{s}", .{err}) catch unreachable;
                     tty_ext.resetColor(tty, &stderr_buf);
