@@ -10,7 +10,7 @@ const AssignmentExpressionSyntax = @import("AssignmentExpressionSyntax.zig");
 const NameExpressionSyntax = @import("NameExpressionSyntax.zig");
 const SyntaxKind = @import("syntax_kind.zig").SyntaxKind;
 const syntax_facts = @import("syntax_facts.zig");
-const SyntaxTree = @import("SyntaxTree.zig");
+const CompilationUnitSyntax = @import("CompilationUnitSyntax.zig");
 const DiagnosticBag = @import("../DiagnosticBag.zig");
 const SourceText = @import("../text/SourceText.zig");
 
@@ -87,13 +87,11 @@ fn matchToken(self: *Self, kind: SyntaxKind) AllocError!SyntaxToken {
     );
 }
 
-pub fn parse(self: *Self) AllocError!SyntaxTree {
+pub fn parseCompilationUnit(self: *Self) AllocError!*CompilationUnitSyntax {
     const expression = try self.parseExpression();
     const end_of_file_token = try self.matchToken(.end_of_file_token);
-    return SyntaxTree.init(
+    return try CompilationUnitSyntax.init(
         self.allocator,
-        self.source,
-        self.takeDiagnostics(),
         expression,
         end_of_file_token,
     );

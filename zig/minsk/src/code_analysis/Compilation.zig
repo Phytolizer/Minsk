@@ -41,7 +41,7 @@ pub const EvaluationResult = union(enum) {
 
 pub fn evaluate(self: *Self, variables: *VariableSymbol.Map) !EvaluationResult {
     var binder = Binder.init(self.allocator, variables);
-    const bound_expression = try binder.bindExpression(self.syntax_tree.root);
+    const bound_expression = try binder.bindExpression(self.syntax_tree.root.expression);
     defer bound_expression.deinit(self.allocator);
     const diagnostics = blk: {
         var diagnostics = self.syntax_tree.takeDiagnostics();

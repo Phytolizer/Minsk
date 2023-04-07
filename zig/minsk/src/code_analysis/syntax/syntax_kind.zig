@@ -32,6 +32,8 @@ pub const SyntaxKind = enum(usize) {
     name_expression,
     assignment_expression,
 
+    compilation_unit,
+
     const Self = @This();
 
     const display_names = blk: {

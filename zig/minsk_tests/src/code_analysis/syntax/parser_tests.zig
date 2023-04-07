@@ -15,11 +15,12 @@ fn binaryExpressionHonorsPrecedence(state: *t.TestState, ops: [2]SyntaxKind, out
     const text = std.fmt.allocPrint(t.allocator, "a {s} b {s} c", .{ text1, text2 }) catch unreachable;
     defer t.allocator.free(text);
 
-    const expression = SyntaxTree.parse(t.allocator, text) catch unreachable;
-    defer expression.deinit();
+    const tree = SyntaxTree.parse(t.allocator, text) catch unreachable;
+    defer tree.deinit();
+    const expression = tree.root.expression;
 
     if (prec1 >= prec2) {
-        var e = AssertingEnumerator.init(t.allocator, &expression.root.base) catch unreachable;
+        var e = AssertingEnumerator.init(t.allocator, &expression.base) catch unreachable;
         defer e.deinit();
 
         try e.assertNode(state, .binary_expression, out_msg);
@@ -34,7 +35,7 @@ fn binaryExpressionHonorsPrecedence(state: *t.TestState, ops: [2]SyntaxKind, out
         try e.assertToken(state, .identifier_token, "c", out_msg);
         try e.assertEnd(state, out_msg);
     } else {
-        var e = AssertingEnumerator.init(t.allocator, &expression.root.base) catch unreachable;
+        var e = AssertingEnumerator.init(t.allocator, &expression.base) catch unreachable;
         defer e.deinit();
 
         try e.assertNode(state, .binary_expression, out_msg);
@@ -59,11 +60,12 @@ fn unaryExpressionHonorsPrecedence(state: *t.TestState, ops: [2]SyntaxKind, out_
     const text = std.fmt.allocPrint(t.allocator, "{s} a {s} b", .{ text1, text2 }) catch unreachable;
     defer t.allocator.free(text);
 
-    const expression = SyntaxTree.parse(t.allocator, text) catch unreachable;
-    defer expression.deinit();
+    const tree = SyntaxTree.parse(t.allocator, text) catch unreachable;
+    defer tree.deinit();
+    const expression = tree.root.expression;
 
     if (prec1 >= prec2) {
-        var e = AssertingEnumerator.init(t.allocator, &expression.root.base) catch unreachable;
+        var e = AssertingEnumerator.init(t.allocator, &expression.base) catch unreachable;
         defer e.deinit();
 
         try e.assertNode(state, .binary_expression, out_msg);
@@ -76,7 +78,7 @@ fn unaryExpressionHonorsPrecedence(state: *t.TestState, ops: [2]SyntaxKind, out_
         try e.assertToken(state, .identifier_token, "b", out_msg);
         try e.assertEnd(state, out_msg);
     } else {
-        var e = AssertingEnumerator.init(t.allocator, &expression.root.base) catch unreachable;
+        var e = AssertingEnumerator.init(t.allocator, &expression.base) catch unreachable;
         defer e.deinit();
 
         try e.assertNode(state, .unary_expression, out_msg);
