@@ -32,4 +32,4 @@ jobs:
           path: |
             ${{ github.workspace }}/zig-*
           key: ${{ runner.os }}-zig
-      - run: zig build --cache-dir "${{ github.workspace}}/zig-local-cache" test --verbose
+      - run: zig build --cache-dir "${{ github.workspace}}/zig-local-cache" --global-cache-dir "${{ github.workspace }}/zig-global-cache" test --verbose
