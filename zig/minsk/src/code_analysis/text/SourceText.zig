@@ -64,7 +64,12 @@ fn getLineBreakWidth(inout_pos: *std.unicode.Utf8Iterator) ?usize {
 pub fn getLineIndex(self: *const SourceText, position: usize) ?usize {
     const compare = struct {
         fn cmp(_: void, key: usize, mid: Line) std.math.Order {
-            return mid.start <= key and mid.end() > key;
+            return if (mid.start > key)
+                .gt
+            else if (mid.end() < key)
+                .lt
+            else
+                .eq;
         }
     }.cmp;
     return std.sort.binarySearch(Line, position, self.lines, {}, compare);

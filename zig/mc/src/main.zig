@@ -71,7 +71,7 @@ pub fn main() !void {
     while (true) {
         stderr.writeAll("> ") catch unreachable;
         stderr_buf.flush() catch unreachable;
-        const line = blk: {
+        const input_line = blk: {
             var line = try readUntilDelimiterOrEofArrayList(
                 stdin,
                 &line_buf,
@@ -86,7 +86,7 @@ pub fn main() !void {
             break :blk line;
         };
 
-        if (std.mem.eql(u8, line, "#showTree")) {
+        if (std.mem.eql(u8, input_line, "#showTree")) {
             show_tree = !show_tree;
             stderr.print("{s}\n", .{
                 if (show_tree)
@@ -95,7 +95,7 @@ pub fn main() !void {
                     "Not showing parse trees.",
             }) catch unreachable;
             continue;
-        } else if (std.mem.eql(u8, line, "#cls")) {
+        } else if (std.mem.eql(u8, input_line, "#cls")) {
             try tty_ext.clearScreen(tty, stderr);
             continue;
         }
@@ -104,7 +104,7 @@ pub fn main() !void {
         defer parser_arena.deinit();
         const parser_alloc = pickAllocator(parser_arena.allocator(), allocator);
 
-        const tree = try SyntaxTree.parse(parser_alloc, line);
+        const tree = try SyntaxTree.parse(parser_alloc, input_line);
         var compilation = Compilation.init(parser_alloc, tree);
         defer compilation.deinit();
         const result = try compilation.evaluate(&variables);
@@ -124,10 +124,14 @@ pub fn main() !void {
 
         switch (result) {
             .failure => |diagnostics| {
+                const text = tree.source;
                 for (diagnostics) |d| {
                     tty_ext.setColor(tty, stderr, .dim_red) catch unreachable;
                     stderr.print("{s}\n", .{d}) catch unreachable;
                     tty_ext.resetColor(tty, &stderr_buf);
+
+                    const line_idx = text.getLineIndex(d.span.start) orelse unreachable;
+                    const line = text.text[text.lines[line_idx].start..text.lines[line_idx].end()];
 
                     const prefix = line[0..d.span.start];
                     const err = line[d.span.start..d.span.end()];

@@ -17,6 +17,7 @@ const SourceText = @import("../text/SourceText.zig");
 const AllocError = std.mem.Allocator.Error;
 
 allocator: std.mem.Allocator,
+source: *const SourceText,
 tokens: []SyntaxToken,
 position: usize = 0,
 diagnostics: DiagnosticBag,
@@ -39,6 +40,7 @@ pub fn init(allocator: std.mem.Allocator, source: *const SourceText) !Self {
 
     return .{
         .allocator = allocator,
+        .source = source,
         .tokens = try tokens.toOwnedSlice(),
         .diagnostics = diagnostics,
     };
@@ -90,6 +92,7 @@ pub fn parse(self: *Self) AllocError!SyntaxTree {
     const end_of_file_token = try self.matchToken(.end_of_file_token);
     return SyntaxTree.init(
         self.allocator,
+        self.source,
         self.takeDiagnostics(),
         expression,
         end_of_file_token,

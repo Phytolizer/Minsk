@@ -7,6 +7,7 @@ const DiagnosticBag = @import("../DiagnosticBag.zig");
 const SourceText = @import("../text/SourceText.zig");
 
 allocator: std.mem.Allocator,
+source: *const SourceText,
 diagnostics: ?DiagnosticBag,
 root: *ExpressionSyntax,
 end_of_file_token: SyntaxToken,
@@ -15,12 +16,14 @@ const Self = @This();
 
 pub fn init(
     allocator: std.mem.Allocator,
+    source: *const SourceText,
     diagnostics: DiagnosticBag,
     root: *ExpressionSyntax,
     end_of_file_token: SyntaxToken,
 ) Self {
     return .{
         .allocator = allocator,
+        .source = source,
         .diagnostics = diagnostics,
         .root = root,
         .end_of_file_token = end_of_file_token,
@@ -28,6 +31,7 @@ pub fn init(
 }
 
 pub fn deinit(self: Self) void {
+    self.source.deinit();
     if (self.diagnostics) |diagnostics| {
         diagnostics.deinit();
     }
@@ -45,6 +49,7 @@ pub fn parse(allocator: std.mem.Allocator, text: []const u8) !Self {
 }
 
 fn parseTokensSource(allocator: std.mem.Allocator, source: *const SourceText) ![]SyntaxToken {
+    defer source.deinit();
     var lexer = try Lexer.init(allocator, source);
     defer lexer.deinit();
     var tokens = std.ArrayList(SyntaxToken).init(allocator);

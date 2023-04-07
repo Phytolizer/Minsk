@@ -35,7 +35,6 @@ pub fn init(allocator: std.mem.Allocator, source: *const SourceText) !Self {
 }
 
 pub fn deinit(self: Self) void {
-    self.source.deinit();
     self.peek_deq.deinit();
     self.diagnostics.deinit();
 }
