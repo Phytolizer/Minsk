@@ -18,7 +18,7 @@ pub fn init(
 ) !*ExpressionSyntax {
     const result = try allocator.create(Self);
     result.* = .{
-        .base = ExpressionSyntax.init(.binary_expression, &deinit, &children),
+        .base = ExpressionSyntax.init(.binary_expression, &deinit, &children, null),
         .left = left,
         .operator_token = operator_token,
         .right = right,
