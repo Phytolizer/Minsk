@@ -3,6 +3,7 @@ const SyntaxKind = @import("syntax_kind.zig").SyntaxKind;
 const SyntaxToken = @import("SyntaxToken.zig");
 const DowncastedPointer = @import("minsk_meta").DowncastedPointer;
 const TextSpan = @import("../text/TextSpan.zig");
+const tty_ext = @import("tty_ext");
 
 const AllocError = std.mem.Allocator.Error;
 
@@ -46,20 +47,39 @@ pub fn prettyPrint(
     indent: []const u8,
     is_last: bool,
     writer: anytype,
+    comptime colors: enum { colors, no_colors },
+    tty: ?std.debug.TTY.Config,
+    buf_writer: anytype,
 ) !void {
-    try writer.print("{s}{s}{s}", .{
+    if (colors == .colors) {
+        try tty_ext.setColor(tty.?, writer, .gray);
+    }
+    try writer.print("{s}{s}", .{
         indent,
         if (is_last)
             "└───"
         else
             "├───",
-        self.kind.displayName(),
     });
-    if (std.mem.endsWith(u8, self.kind.displayName(), "Token")) {
+    const is_token = std.mem.endsWith(u8, self.kind.displayName(), "Token");
+    if (colors == .colors) {
+        try tty_ext.setColor(tty.?, writer, if (is_token)
+            .cyan
+        else
+            .blue);
+    }
+    try writer.writeAll(self.kind.displayName());
+    if (is_token) {
         const token = self.downcast(SyntaxToken);
         if (token.value) |value| {
+            if (colors == .colors) {
+                try tty_ext.setColor(tty.?, writer, .magenta);
+            }
             try writer.print(" {}", .{value});
         }
+    }
+    if (colors == .colors) {
+        tty_ext.resetColor(tty.?, buf_writer);
     }
     try writer.writeAll("\n");
     const new_indent = try std.mem.concat(allocator, u8, &.{
@@ -73,6 +93,14 @@ pub fn prettyPrint(
     const cs = try self.children(allocator);
     defer allocator.free(cs);
     for (cs, 0..) |c, i| {
-        try c.prettyPrint(allocator, new_indent, i == cs.len - 1, writer);
+        try c.prettyPrint(
+            allocator,
+            new_indent,
+            i == cs.len - 1,
+            writer,
+            colors,
+            tty,
+            buf_writer,
+        );
     }
 }
