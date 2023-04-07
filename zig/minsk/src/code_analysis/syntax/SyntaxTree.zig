@@ -4,6 +4,7 @@ const SyntaxToken = @import("SyntaxToken.zig");
 const Parser = @import("Parser.zig");
 const Lexer = @import("Lexer.zig");
 const DiagnosticBag = @import("../DiagnosticBag.zig");
+const SourceText = @import("../text/SourceText.zig");
 
 allocator: std.mem.Allocator,
 diagnostics: ?DiagnosticBag,
@@ -33,14 +34,18 @@ pub fn deinit(self: Self) void {
     self.root.deinit(self.allocator);
 }
 
-pub fn parse(allocator: std.mem.Allocator, text: []const u8) !Self {
-    var parser = try Parser.init(allocator, text);
+fn parseSource(allocator: std.mem.Allocator, source: *const SourceText) !Self {
+    var parser = try Parser.init(allocator, source);
     defer parser.deinit();
     return try parser.parse();
 }
 
-pub fn parseTokens(allocator: std.mem.Allocator, text: []const u8) ![]SyntaxToken {
-    var lexer = try Lexer.init(allocator, text);
+pub fn parse(allocator: std.mem.Allocator, text: []const u8) !Self {
+    return try parseSource(allocator, try SourceText.from(allocator, text));
+}
+
+fn parseTokensSource(allocator: std.mem.Allocator, source: *const SourceText) ![]SyntaxToken {
+    var lexer = try Lexer.init(allocator, source);
     defer lexer.deinit();
     var tokens = std.ArrayList(SyntaxToken).init(allocator);
     while (try lexer.lex()) |tok| {
@@ -49,6 +54,10 @@ pub fn parseTokens(allocator: std.mem.Allocator, text: []const u8) ![]SyntaxToke
         try tokens.append(tok);
     }
     return try tokens.toOwnedSlice();
+}
+
+pub fn parseTokens(allocator: std.mem.Allocator, text: []const u8) ![]SyntaxToken {
+    return try parseTokensSource(allocator, try SourceText.from(allocator, text));
 }
 
 pub fn takeDiagnostics(self: *Self) DiagnosticBag {

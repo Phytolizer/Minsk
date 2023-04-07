@@ -6,11 +6,12 @@ const glyph = @import("ziglyph");
 const Object = @import("minsk_runtime").Object;
 const syntax_facts = @import("syntax_facts.zig");
 const DiagnosticBag = @import("../DiagnosticBag.zig");
+const SourceText = @import("../text/SourceText.zig");
 
 const AllocError = std.mem.Allocator.Error;
 
 allocator: std.mem.Allocator,
-source: []const u8,
+source: *const SourceText,
 position: usize = 0,
 start: usize = 0,
 kind: SyntaxKind = .bad_token,
@@ -23,17 +24,18 @@ diagnostics: DiagnosticBag,
 
 const Self = @This();
 
-pub fn init(allocator: std.mem.Allocator, text: []const u8) !Self {
+pub fn init(allocator: std.mem.Allocator, source: *const SourceText) !Self {
     return .{
         .allocator = allocator,
-        .source = text,
-        .it = (try std.unicode.Utf8View.init(text)).iterator(),
+        .source = source,
+        .it = (std.unicode.Utf8View.init(source.text) catch unreachable).iterator(),
         .peek_deq = ArrayDeque(u21).init(allocator),
         .diagnostics = DiagnosticBag.init(allocator),
     };
 }
 
 pub fn deinit(self: Self) void {
+    self.source.deinit();
     self.peek_deq.deinit();
     self.diagnostics.deinit();
 }
@@ -67,7 +69,7 @@ fn readNumber(self: *Self) AllocError!void {
     while (glyph.isAsciiDigit(try self.current())) {
         self.next();
     }
-    self.text = self.source[self.start..self.position];
+    self.text = self.source.text[self.start..self.position];
     const raw_val = std.fmt.parseInt(u63, self.text.?, 10) catch blk: {
         try self.diagnostics.reportInvalidNumber(.{
             .start = self.position,
@@ -90,7 +92,7 @@ fn readIdentifierOrKeyword(self: *Self) AllocError!void {
     while (glyph.derived_core_properties.isXidContinue(try self.current())) {
         self.next();
     }
-    self.text = self.source[self.start..self.position];
+    self.text = self.source.text[self.start..self.position];
     self.kind = syntax_facts.keywordKind(self.text.?);
 }
 
@@ -177,7 +179,7 @@ pub fn lex(self: *Self) AllocError!?SyntaxToken {
         self.start,
         self.text orelse
             syntax_facts.getText(self.kind) orelse
-            self.source[self.start..self.position],
+            self.source.text[self.start..self.position],
         self.value,
     );
 }

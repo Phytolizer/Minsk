@@ -12,6 +12,7 @@ const SyntaxKind = @import("syntax_kind.zig").SyntaxKind;
 const syntax_facts = @import("syntax_facts.zig");
 const SyntaxTree = @import("SyntaxTree.zig");
 const DiagnosticBag = @import("../DiagnosticBag.zig");
+const SourceText = @import("../text/SourceText.zig");
 
 const AllocError = std.mem.Allocator.Error;
 
@@ -22,8 +23,8 @@ diagnostics: DiagnosticBag,
 
 const Self = @This();
 
-pub fn init(allocator: std.mem.Allocator, text: []const u8) !Self {
-    var lexer = try Lexer.init(allocator, text);
+pub fn init(allocator: std.mem.Allocator, source: *const SourceText) !Self {
+    var lexer = try Lexer.init(allocator, source);
     defer lexer.deinit();
     var tokens = std.ArrayList(SyntaxToken).init(allocator);
     defer tokens.deinit();
