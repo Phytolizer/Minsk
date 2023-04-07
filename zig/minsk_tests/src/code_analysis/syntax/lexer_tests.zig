@@ -29,11 +29,7 @@ fn testToken(
     );
 }
 
-fn testsAllTokens(
-    state: *t.TestState,
-    _: void,
-    out_msg: *[]const u8,
-) t.TestExit!void {
+fn requireTestsAllTokens() void {
     const token_kinds = comptime blk: {
         var result: []const SyntaxKind = &.{};
         for (std.meta.tags(SyntaxKind)) |kind|
@@ -62,15 +58,13 @@ fn testsAllTokens(
         }
         break :blk result;
     };
-    const shown_messages = std.mem.join(t.allocator, "\n> ", messages) catch unreachable;
-    defer t.allocator.free(shown_messages);
-    try t.assert(
-        state,
-        messages.len == 0,
-        "\n> {s}",
-        .{shown_messages},
-        out_msg,
-    );
+    if (messages.len > 0) {
+        var errmsg: []const u8 = "ERROR: not all token types are tested:";
+        for (messages) |msg| {
+            errmsg = errmsg ++ "\n> " ++ msg;
+        }
+        @compileError(errmsg);
+    }
 }
 
 fn lexesToken(
@@ -151,9 +145,11 @@ fn requiresSeparator(k1: SyntaxKind, k2: SyntaxKind) bool {
         (k1 == .bang_token or k1 == .equals_token) and (k2 == .equals_token or k2 == .equals_equals_token);
 }
 
-pub fn lexerTestSuite(state: *t.TestState) void {
-    t.runTest(state, void, testsAllTokens, {}, "tests all tokens", .static);
+comptime {
+    requireTestsAllTokens();
+}
 
+pub fn lexerTestSuite(state: *t.TestState) void {
     for (token.simple) |tok| {
         t.runTest(
             state,
