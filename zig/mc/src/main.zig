@@ -93,7 +93,7 @@ pub fn main() !void {
             break :blk line;
         };
 
-        // const is_blank = input_line.len == 0;
+        const is_blank = input_line.len == 0;
 
         if (text_builder.items.len == 0) {
             if (std.mem.eql(u8, input_line, "#showTree")) {
@@ -119,7 +119,7 @@ pub fn main() !void {
         try text_builder.append('\n');
         const input_text = text_builder.items;
         const tree = try SyntaxTree.parse(parser_alloc, input_text);
-        if (tree.diagnostics.?.diagnostics.items.len > 0) {
+        if (tree.diagnostics.?.diagnostics.items.len > 0 and !is_blank) {
             tree.deinit();
             continue;
         }

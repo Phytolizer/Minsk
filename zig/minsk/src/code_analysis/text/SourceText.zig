@@ -35,9 +35,7 @@ fn parseLines(self: *SourceText, allocator: std.mem.Allocator, text: []const u8)
             line_start = it.i;
         }
     }
-    if (it.i > line_start) {
-        try self.addLine(&result, it.i, line_start, 0);
-    }
+    try self.addLine(&result, it.i, line_start, 0);
     return try result.toOwnedSlice();
 }
 
@@ -66,14 +64,12 @@ fn getLineBreakWidth(inout_pos: *std.unicode.Utf8Iterator) ?usize {
 pub fn getLineIndex(self: *const SourceText, position: usize) ?usize {
     const compare = struct {
         fn cmp(_: void, key: usize, mid: Line) std.math.Order {
-            const result: std.math.Order = if (mid.start > key)
+            return if (mid.start > key)
                 .lt
-            else if (mid.end() <= key)
+            else if (mid.end() < key)
                 .gt
             else
                 .eq;
-            std.debug.print("{any}\n", .{result});
-            return result;
         }
     }.cmp;
     return std.sort.binarySearch(Line, position, self.lines, {}, compare);
