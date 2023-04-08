@@ -27,4 +27,4 @@ Episode 6.
 Episode 5.
 
 ## zig (Zig)
-Episode 4.
+Episode 6.
