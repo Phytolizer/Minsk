@@ -115,13 +115,22 @@ pub fn bindExpression(self: *Self, syntax: *ExpressionSyntax) std.mem.Allocator.
 fn bindAssignmentExpression(self: *Self, syntax: *AssignmentExpressionSyntax) !*BoundExpression {
     const name = syntax.identifier_token.text;
     const expression = try self.bindExpression(syntax.expression);
-    const variable = VariableSymbol{
-        .name = name,
-        .ty = expression.type(),
+    const variable = self.scope.tryLookup(name) orelse blk: {
+        const variable = VariableSymbol{
+            .name = name,
+            .ty = expression.type(),
+        };
+        _ = try self.scope.tryDeclare(variable);
+        break :blk variable;
     };
 
-    if (!try self.scope.tryDeclare(variable)) {
-        try self.diagnostics.reportVariableAlreadyDeclared(syntax.identifier_token.span(), name);
+    if (expression.type() != variable.ty) {
+        try self.diagnostics.reportCannotConvert(
+            try syntax.expression.span(self.allocator),
+            expression.type(),
+            variable.ty,
+        );
+        return expression;
     }
 
     return try BoundAssignmentExpression.init(self.allocator, variable, expression);
