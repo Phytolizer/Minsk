@@ -114,6 +114,12 @@ pub fn main() !void {
             } else if (std.mem.eql(u8, input_line, "#cls")) {
                 try tty_ext.clearScreen(tty, stderr);
                 continue;
+            } else if (std.mem.eql(u8, input_line, "#reset")) {
+                if (previous) |p| {
+                    p.deinit(.with_parents);
+                    previous = null;
+                }
+                continue;
             }
         }
 
