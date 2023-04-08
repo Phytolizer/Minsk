@@ -34,7 +34,7 @@ fn pickAllocator(normal_alloc: std.mem.Allocator, debug_alloc: std.mem.Allocator
 }
 
 pub fn main() !void {
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    var gpa = std.heap.GeneralPurposeAllocator(.{ .stack_trace_frames = 10 }){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
     var line_arena = std.heap.ArenaAllocator.init(allocator);
