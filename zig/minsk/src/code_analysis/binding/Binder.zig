@@ -39,8 +39,29 @@ pub fn init(
     };
 }
 
-pub fn bindGlobalScope(allocator: std.mem.Allocator, syntax: *CompilationUnitSyntax) !*BoundGlobalScope {
-    var binder = try init(allocator, null);
+fn createParentScopes(allocator: std.mem.Allocator, previous: ?*const BoundGlobalScope) !?*BoundScope {
+    var prev = previous;
+    var stack = std.ArrayList(*const BoundGlobalScope).init(allocator);
+    defer stack.deinit();
+    while (prev) |p| {
+        try stack.append(p);
+        prev = p.previous;
+    }
+
+    var parent: ?*BoundScope = null;
+    while (stack.popOrNull()) |gs| {
+        const scope = try BoundScope.init(allocator, parent);
+        for (gs.variables) |v| {
+            _ = try scope.tryDeclare(v);
+        }
+        parent = scope;
+    }
+    return parent;
+}
+
+pub fn bindGlobalScope(allocator: std.mem.Allocator, previous: ?*BoundGlobalScope, syntax: *CompilationUnitSyntax) !*BoundGlobalScope {
+    const parent_scope = try createParentScopes(allocator, previous);
+    var binder = try init(allocator, parent_scope);
     defer binder.deinit();
     const expression = try binder.bindExpression(syntax.expression);
     errdefer expression.deinit(allocator);

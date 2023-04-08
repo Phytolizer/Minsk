@@ -49,6 +49,8 @@ pub fn main() !void {
     const stdin = std.io.getStdIn().reader();
     var text_builder = std.ArrayList(u8).init(line_alloc);
     defer text_builder.deinit();
+    var previous: ?*Compilation = null;
+    defer if (previous) |p| p.deinit(.with_parents);
 
     var show_tree = false;
     var variables = VariableSymbol.Map.init(allocator);
@@ -127,8 +129,10 @@ pub fn main() !void {
             tree.deinit();
             continue;
         }
-        var compilation = Compilation.init(parser_alloc, tree);
-        defer compilation.deinit();
+        const compilation = if (previous) |p|
+            try p.continueWith(tree)
+        else
+            try Compilation.init(parser_alloc, tree);
         const result = try compilation.evaluate(&variables);
         defer result.deinit(parser_alloc);
 
@@ -165,11 +169,13 @@ pub fn main() !void {
                     tty_ext.setColor(tty, stderr, .reset) catch unreachable;
                     stderr.print("{s}\n", .{suffix}) catch unreachable;
                 }
+                compilation.deinit(.without_parents);
             },
             .success => |value| {
                 try tty_ext.setColor(tty, stderr, .magenta);
                 defer tty_ext.setColor(tty, stderr, .reset) catch unreachable;
                 stderr.print("{d}\n", .{value}) catch unreachable;
+                previous = compilation;
             },
         }
 

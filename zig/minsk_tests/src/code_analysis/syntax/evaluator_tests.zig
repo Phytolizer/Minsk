@@ -16,7 +16,7 @@ const EvaluatorTest = struct {
 
 fn correctEvaluation(state: *t.TestState, tt: EvaluatorTest, out_msg: *[]const u8) t.TestExit!void {
     const syntax_tree = SyntaxTree.parse(t.allocator, tt.text) catch unreachable;
-    var compilation = Compilation.init(t.allocator, syntax_tree);
+    var compilation = Compilation.init(t.allocator, syntax_tree) catch unreachable;
     defer compilation.deinit();
     var variables = VariableSymbol.Map.init(t.allocator);
     defer variables.deinit();
