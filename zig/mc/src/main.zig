@@ -121,15 +121,9 @@ pub fn main() !void {
             tree.deinit();
             continue;
         }
-        const compilation = if (previous) |p|
-            try p.continueWith(tree)
-        else
-            try Compilation.init(parser_alloc, tree);
-        const result = try compilation.evaluate(&variables);
-        defer result.deinit(parser_alloc);
 
         if (show_tree) {
-            try compilation.syntax_tree.root.base.prettyPrint(
+            try tree.root.base.prettyPrint(
                 parser_alloc,
                 "",
                 true,
@@ -137,7 +131,15 @@ pub fn main() !void {
                 .colors,
                 tty,
             );
+            stderr_buf.flush() catch unreachable;
         }
+
+        const compilation = if (previous) |p|
+            try p.continueWith(tree)
+        else
+            try Compilation.init(parser_alloc, tree);
+        const result = try compilation.evaluate(&variables);
+        defer result.deinit(parser_alloc);
 
         switch (result) {
             .failure => |diagnostics| {

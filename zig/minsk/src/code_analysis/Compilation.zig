@@ -90,6 +90,6 @@ pub fn evaluate(self: *Self, variables: *VariableSymbol.Map) !EvaluationResult {
         return .{ .failure = diagnostics };
     }
 
-    var evaluator = Evaluator.init(global_scope.expression, variables);
+    var evaluator = Evaluator.init(global_scope.statement, variables);
     return .{ .success = try evaluator.evaluate() };
 }

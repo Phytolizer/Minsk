@@ -1,5 +1,6 @@
 const std = @import("std");
 const CompilationUnitSyntax = @import("../syntax/CompilationUnitSyntax.zig");
+
 const ExpressionSyntax = @import("../syntax/ExpressionSyntax.zig");
 const AssignmentExpressionSyntax = @import("../syntax/AssignmentExpressionSyntax.zig");
 const BinaryExpressionSyntax = @import("../syntax/BinaryExpressionSyntax.zig");
@@ -7,6 +8,10 @@ const LiteralExpressionSyntax = @import("../syntax/LiteralExpressionSyntax.zig")
 const NameExpressionSyntax = @import("../syntax/NameExpressionSyntax.zig");
 const ParenthesizedExpressionSyntax = @import("../syntax/ParenthesizedExpressionSyntax.zig");
 const UnaryExpressionSyntax = @import("../syntax/UnaryExpressionSyntax.zig");
+
+const StatementSyntax = @import("../syntax/StatementSyntax.zig");
+const BlockStatementSyntax = @import("../syntax/BlockStatementSyntax.zig");
+const ExpressionStatementSyntax = @import("../syntax/ExpressionStatementSyntax.zig");
 
 const BoundExpression = @import("BoundExpression.zig");
 const BoundScope = @import("BoundScope.zig");
@@ -16,6 +21,10 @@ const BoundBinaryExpression = @import("BoundBinaryExpression.zig");
 const BoundLiteralExpression = @import("BoundLiteralExpression.zig");
 const BoundUnaryExpression = @import("BoundUnaryExpression.zig");
 const BoundVariableExpression = @import("BoundVariableExpression.zig");
+
+const BoundStatement = @import("BoundStatement.zig");
+const BoundBlockStatement = @import("BoundBlockStatement.zig");
+const BoundExpressionStatement = @import("BoundExpressionStatement.zig");
 
 const Object = @import("minsk_runtime").Object;
 
@@ -63,8 +72,8 @@ pub fn bindGlobalScope(allocator: std.mem.Allocator, previous: ?*BoundGlobalScop
     const parent_scope = try createParentScopes(allocator, previous);
     var binder = try init(allocator, parent_scope);
     defer binder.deinit();
-    const expression = try binder.bindExpression(syntax.expression);
-    errdefer expression.deinit(allocator);
+    const statement = try binder.bindStatement(syntax.statement);
+    errdefer statement.deinit(allocator);
     const variables = try binder.scope.getDeclaredVariables();
     errdefer {
         for (variables) |v| {
@@ -79,7 +88,7 @@ pub fn bindGlobalScope(allocator: std.mem.Allocator, previous: ?*BoundGlobalScop
         null,
         diagnostics,
         variables,
-        expression,
+        statement,
     );
 }
 
@@ -88,7 +97,36 @@ pub fn deinit(self: Self) void {
     self.diagnostics.deinit();
 }
 
-pub fn bindExpression(self: *Self, syntax: *ExpressionSyntax) std.mem.Allocator.Error!*BoundExpression {
+const AllocError = std.mem.Allocator.Error;
+
+fn bindStatement(self: *Self, syntax: *StatementSyntax) AllocError!*BoundStatement {
+    return switch (syntax.base.kind) {
+        .expression_statement => try self.bindExpressionStatement(
+            StatementSyntax.downcast(syntax, ExpressionStatementSyntax),
+        ),
+        .block_statement => try self.bindBlockStatement(
+            StatementSyntax.downcast(syntax, BlockStatementSyntax),
+        ),
+        else => unreachable,
+    };
+}
+
+fn bindBlockStatement(self: *Self, syntax: *BlockStatementSyntax) !*BoundStatement {
+    var statements = std.ArrayList(*BoundStatement).init(self.allocator);
+    try statements.resize(syntax.statements.len);
+    for (syntax.statements, statements.items) |stmt, *out| {
+        out.* = try self.bindStatement(stmt);
+    }
+
+    return try BoundBlockStatement.init(self.allocator, try statements.toOwnedSlice());
+}
+
+fn bindExpressionStatement(self: *Self, syntax: *ExpressionStatementSyntax) !*BoundStatement {
+    const expression = try self.bindExpression(syntax.expression);
+    return try BoundExpressionStatement.init(self.allocator, expression);
+}
+
+fn bindExpression(self: *Self, syntax: *ExpressionSyntax) AllocError!*BoundExpression {
     return switch (syntax.base.kind) {
         .assignment_expression => try self.bindAssignmentExpression(
             ExpressionSyntax.downcast(&syntax.base, AssignmentExpressionSyntax),

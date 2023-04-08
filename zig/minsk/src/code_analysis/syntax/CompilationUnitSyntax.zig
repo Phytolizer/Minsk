@@ -1,17 +1,17 @@
 const std = @import("std");
 const SyntaxNode = @import("SyntaxNode.zig");
-const ExpressionSyntax = @import("ExpressionSyntax.zig");
+const StatementSyntax = @import("StatementSyntax.zig");
 const SyntaxToken = @import("SyntaxToken.zig");
 
 base: SyntaxNode,
-expression: *ExpressionSyntax,
+statement: *StatementSyntax,
 end_of_file_token: SyntaxToken,
 
 const CompilationUnitSyntax = @This();
 
 pub fn init(
     allocator: std.mem.Allocator,
-    expression: *ExpressionSyntax,
+    statement: *StatementSyntax,
     end_of_file_token: SyntaxToken,
 ) !*CompilationUnitSyntax {
     const result = try allocator.create(CompilationUnitSyntax);
@@ -22,7 +22,7 @@ pub fn init(
             .children_fn = &children,
             .span_fn = null,
         },
-        .expression = expression,
+        .statement = statement,
         .end_of_file_token = end_of_file_token,
     };
     return result;
@@ -30,7 +30,7 @@ pub fn init(
 
 fn deinit(node: *const SyntaxNode, allocator: std.mem.Allocator) void {
     const self = SyntaxNode.downcast(node, CompilationUnitSyntax);
-    self.expression.deinit(allocator);
+    self.statement.deinit(allocator);
     allocator.destroy(self);
 }
 
@@ -39,7 +39,7 @@ const AllocError = std.mem.Allocator.Error;
 fn children(node: *const SyntaxNode, allocator: std.mem.Allocator) AllocError![]*const SyntaxNode {
     const self = SyntaxNode.downcast(node, CompilationUnitSyntax);
     return try allocator.dupe(*const SyntaxNode, &.{
-        &self.expression.base,
+        &self.statement.base,
         &self.end_of_file_token.base,
     });
 }

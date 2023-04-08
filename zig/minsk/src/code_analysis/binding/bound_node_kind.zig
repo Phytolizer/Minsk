@@ -4,4 +4,7 @@ pub const BoundNodeKind = enum {
     literal_expression,
     unary_expression,
     variable_expression,
+
+    block_statement,
+    expression_statement,
 };

@@ -45,6 +45,8 @@ pub fn getText(kind: SyntaxKind) ?[]const u8 {
         .bang_equals_token => "!=",
         .open_parenthesis_token => "(",
         .close_parenthesis_token => ")",
+        .open_brace_token => "{",
+        .close_brace_token => "}",
         .false_keyword => "false",
         .true_keyword => "true",
         else => null,

@@ -4,8 +4,22 @@ const t = @import("framework");
 const syntax_facts = @import("minsk").code_analysis.syntax.syntax_facts;
 const SyntaxKind = @import("minsk").code_analysis.syntax.SyntaxKind;
 const SyntaxTree = @import("minsk").code_analysis.syntax.SyntaxTree;
+const ExpressionSyntax = @import("minsk").code_analysis.syntax.ExpressionSyntax;
+const StatementSyntax = @import("minsk").code_analysis.syntax.StatementSyntax;
+const ExpressionStatementSyntax = @import("minsk").code_analysis.syntax.ExpressionStatementSyntax;
 
 const AssertingEnumerator = @import("AssertingEnumerator.zig");
+
+fn extractExpression(state: *t.TestState, statement: *StatementSyntax, out_msg: *[]const u8) t.TestExit!*ExpressionSyntax {
+    try t.assert(
+        state,
+        statement.base.kind == .expression_statement,
+        "wrong statement kind ({s} != {s})",
+        .{ statement.base.kind.displayName(), SyntaxKind.expression_statement.displayName() },
+        out_msg,
+    );
+    return StatementSyntax.downcastNode(&statement.base, ExpressionStatementSyntax).expression;
+}
 
 fn binaryExpressionHonorsPrecedence(state: *t.TestState, ops: [2]SyntaxKind, out_msg: *[]const u8) t.TestExit!void {
     const prec1 = syntax_facts.binaryOperatorPrecedence(ops[0]);
@@ -17,7 +31,7 @@ fn binaryExpressionHonorsPrecedence(state: *t.TestState, ops: [2]SyntaxKind, out
 
     const tree = SyntaxTree.parse(t.allocator, text) catch unreachable;
     defer tree.deinit();
-    const expression = tree.root.expression;
+    const expression = try extractExpression(state, tree.root.statement, out_msg);
 
     if (prec1 >= prec2) {
         var e = AssertingEnumerator.init(t.allocator, &expression.base) catch unreachable;
@@ -62,7 +76,7 @@ fn unaryExpressionHonorsPrecedence(state: *t.TestState, ops: [2]SyntaxKind, out_
 
     const tree = SyntaxTree.parse(t.allocator, text) catch unreachable;
     defer tree.deinit();
-    const expression = tree.root.expression;
+    const expression = try extractExpression(state, tree.root.statement, out_msg);
 
     if (prec1 >= prec2) {
         var e = AssertingEnumerator.init(t.allocator, &expression.base) catch unreachable;

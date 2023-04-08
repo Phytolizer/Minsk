@@ -1,6 +1,6 @@
 const std = @import("std");
 const BoundScope = @import("BoundScope.zig");
-const BoundExpression = @import("BoundExpression.zig");
+const BoundStatement = @import("BoundStatement.zig");
 const DiagnosticBag = @import("../DiagnosticBag.zig");
 const VariableSymbol = @import("../VariableSymbol.zig");
 
@@ -8,7 +8,7 @@ allocator: std.mem.Allocator,
 previous: ?*const BoundGlobalScope,
 diagnostics: DiagnosticBag,
 variables: []const VariableSymbol,
-expression: *BoundExpression,
+statement: *BoundStatement,
 
 const BoundGlobalScope = @This();
 
@@ -17,7 +17,7 @@ pub fn init(
     previous: ?*const BoundGlobalScope,
     diagnostics: DiagnosticBag,
     variables: []const VariableSymbol,
-    expression: *BoundExpression,
+    statement: *BoundStatement,
 ) !*BoundGlobalScope {
     const result = try allocator.create(BoundGlobalScope);
     result.* = .{
@@ -25,7 +25,7 @@ pub fn init(
         .previous = previous,
         .diagnostics = diagnostics,
         .variables = variables,
-        .expression = expression,
+        .statement = statement,
     };
     return result;
 }
@@ -34,7 +34,7 @@ pub fn deinit(self: *const BoundGlobalScope) void {
     if (self.previous) |p| p.deinit();
 
     self.diagnostics.deinit();
-    self.expression.deinit(self.allocator);
+    self.statement.deinit(self.allocator);
     for (self.variables) |v| {
         v.deinit(self.allocator);
     }

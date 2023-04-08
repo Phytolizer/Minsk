@@ -15,6 +15,8 @@ pub const SyntaxKind = enum(usize) {
     slash_token,
     open_parenthesis_token,
     close_parenthesis_token,
+    open_brace_token,
+    close_brace_token,
     bang_token,
     ampersand_ampersand_token,
     pipe_pipe_token,
@@ -31,6 +33,9 @@ pub const SyntaxKind = enum(usize) {
     unary_expression,
     name_expression,
     assignment_expression,
+
+    block_statement,
+    expression_statement,
 
     compilation_unit,
 
