@@ -54,7 +54,7 @@ pub fn main() !void {
     var variables = VariableSymbol.Map.init(allocator);
     defer {
         for (variables.keys()) |vs| {
-            allocator.free(vs.name);
+            vs.deinit(allocator);
         }
         variables.deinit();
     }

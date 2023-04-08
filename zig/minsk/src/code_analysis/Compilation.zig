@@ -4,6 +4,7 @@ const Object = @import("minsk_runtime").Object;
 const Binder = @import("binding/Binder.zig");
 const Evaluator = @import("Evaluator.zig");
 const Diagnostic = @import("Diagnostic.zig");
+const DiagnosticBag = @import("DiagnosticBag.zig");
 const VariableSymbol = @import("VariableSymbol.zig");
 
 allocator: std.mem.Allocator,
@@ -40,19 +41,19 @@ pub const EvaluationResult = union(enum) {
 };
 
 pub fn evaluate(self: *Self, variables: *VariableSymbol.Map) !EvaluationResult {
-    var binder = Binder.init(self.allocator, variables);
-    const bound_expression = try binder.bindExpression(self.syntax_tree.root.expression);
-    defer bound_expression.deinit(self.allocator);
+    const global_scope = try Binder.bindGlobalScope(self.allocator, self.syntax_tree.root);
+    defer global_scope.deinit();
     const diagnostics = blk: {
         var diagnostics = self.syntax_tree.takeDiagnostics();
-        try diagnostics.extend(&binder.diagnostics);
-        binder.diagnostics.clear();
+        var global_scope_diagnostics = DiagnosticBag.init(self.allocator);
+        std.mem.swap(DiagnosticBag, &global_scope.diagnostics, &global_scope_diagnostics);
+        try diagnostics.extend(&global_scope_diagnostics);
         break :blk try diagnostics.diagnostics.toOwnedSlice();
     };
     if (diagnostics.len > 0) {
         return .{ .failure = diagnostics };
     }
 
-    var evaluator = Evaluator.init(bound_expression, variables);
+    var evaluator = Evaluator.init(global_scope.expression, variables);
     return .{ .success = try evaluator.evaluate() };
 }

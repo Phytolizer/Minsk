@@ -7,6 +7,10 @@ duped: bool = false,
 
 const VariableSymbol = @This();
 
+pub fn deinit(self: VariableSymbol, allocator: std.mem.Allocator) void {
+    if (self.duped) allocator.free(self.name);
+}
+
 pub const Map = std.ArrayHashMap(
     VariableSymbol,
     ?Object,

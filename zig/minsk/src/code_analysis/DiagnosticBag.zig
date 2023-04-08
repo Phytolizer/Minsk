@@ -114,3 +114,12 @@ pub fn reportUndefinedName(self: *Self, span: TextSpan, name: []const u8) !void 
     );
     try self.report(span, message);
 }
+
+pub fn reportVariableAlreadyDeclared(self: *Self, span: TextSpan, name: []const u8) !void {
+    const message = try std.fmt.allocPrint(
+        self.allocator,
+        "Variable '{s}' has already been declared.",
+        .{name},
+    );
+    try self.report(span, message);
+}
