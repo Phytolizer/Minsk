@@ -54,21 +54,27 @@ pub const Color = enum {
     reset,
 };
 
+pub fn colorString(conf: std.debug.TTY.Config, color: Color) []const u8 {
+    return switch (conf) {
+        .no_color => "",
+        else => switch (color) {
+            .dim_red => "\x1b[31;2m",
+            .red => "\x1b[0;31m",
+            .gray => "\x1b[2m",
+            .cyan => "\x1b[0;36m",
+            .blue => "\x1b[0;34m",
+            .green => "\x1b[0;32m",
+            .magenta => "\x1b[0;35m",
+            .reset => "\x1b[0m",
+        },
+    };
+}
+
 pub fn setColor(conf: std.debug.TTY.Config, out_stream: anytype, color: Color) !void {
     nosuspend switch (conf) {
         .no_color => return,
         else => {
-            const color_string = switch (color) {
-                .dim_red => "\x1b[31;2m",
-                .red => "\x1b[0;31m",
-                .gray => "\x1b[2m",
-                .cyan => "\x1b[0;36m",
-                .blue => "\x1b[0;34m",
-                .green => "\x1b[0;32m",
-                .magenta => "\x1b[0;35m",
-                .reset => "\x1b[0m",
-            };
-            try out_stream.writeAll(color_string);
+            try out_stream.writeAll(colorString(conf, color));
         },
     };
 }

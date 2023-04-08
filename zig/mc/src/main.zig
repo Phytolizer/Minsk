@@ -5,6 +5,10 @@ const Compilation = @import("minsk").code_analysis.Compilation;
 const Object = @import("minsk_runtime").Object;
 const VariableSymbol = @import("minsk").code_analysis.VariableSymbol;
 const tty_ext = @import("tty_ext");
+const c = @cImport({
+    @cInclude("stdlib.h");
+    @cInclude("linenoise.h");
+});
 
 fn readUntilDelimiterOrEofArrayList(
     writer: anytype,
@@ -40,17 +44,21 @@ pub fn main() !void {
     var line_arena = std.heap.ArenaAllocator.init(allocator);
     defer line_arena.deinit();
     const line_alloc = pickAllocator(line_arena.allocator(), allocator);
-    var line_buf = std.ArrayList(u8).init(line_alloc);
-    defer line_buf.deinit();
     var stderr_buf = std.io.bufferedWriter(std.io.getStdErr().writer());
     const stderr = stderr_buf.writer();
     try tty_ext.enableAnsiEscapes(std.io.getStdErr());
     const tty = std.debug.detectTTYConfig(std.io.getStdErr());
-    const stdin = std.io.getStdIn().reader();
     var text_builder = std.ArrayList(u8).init(line_alloc);
     defer text_builder.deinit();
     var previous: ?*Compilation = null;
     defer if (previous) |p| p.deinit(.with_parents);
+
+    const histfile_name = ".minsk-history";
+    _ = c.linenoiseHistoryLoad(histfile_name);
+    defer {
+        _ = c.linenoiseHistorySave(histfile_name);
+        c.linenoiseHistoryFree();
+    }
 
     var show_tree = false;
     var variables = VariableSymbol.Map.init(allocator);
@@ -73,30 +81,28 @@ pub fn main() !void {
         }
     }
 
-    while (true) {
-        tty_ext.setColor(tty, stderr, .green) catch unreachable;
-        stderr.writeAll(
-            if (text_builder.items.len == 0)
-                "» "
-            else
-                "· ",
-        ) catch unreachable;
-        tty_ext.setColor(tty, stderr, .reset) catch unreachable;
-        stderr_buf.flush() catch unreachable;
-        const input_line = blk: {
-            var line = try readUntilDelimiterOrEofArrayList(
-                stdin,
-                &line_buf,
-                '\n',
-                std.math.maxInt(usize),
-            ) orelse {
-                stderr.writeByte('\n') catch unreachable;
-                stderr_buf.flush() catch unreachable;
-                break;
-            };
-            line = std.mem.trimRight(u8, line, "\r");
-            break :blk line;
+    mainLoop: while (true) {
+        const raw_line = blk: {
+            const begin_prompt = "» ";
+            const continue_prompt = "· ";
+            const buf_len =
+                "\x1b[0;32m".len +
+                comptime std.math.max(begin_prompt.len, continue_prompt.len) +
+                "\x1b[0m".len +
+                1;
+            var prompt_buf: [buf_len]u8 = undefined;
+
+            const prompt = std.fmt.bufPrintZ(&prompt_buf, "{s}{s}{s}", .{
+                tty_ext.colorString(tty, .green),
+                if (text_builder.items.len == 0) begin_prompt else continue_prompt,
+                tty_ext.colorString(tty, .reset),
+            }) catch unreachable;
+            break :blk c.linenoise(prompt.ptr) orelse break :mainLoop;
         };
+        _ = c.linenoiseHistoryAdd(raw_line);
+        defer c.free(raw_line);
+        const input_line = raw_line[0..std.mem.indexOfSentinel(u8, 0, raw_line)];
+        defer stderr_buf.flush() catch unreachable;
 
         const is_blank = input_line.len == 0;
 

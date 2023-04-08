@@ -9,6 +9,7 @@ pub fn build(b: *std.Build) void {
     const tty_ext_mod = @import("tty_ext/build.zig").build(b);
     const minsk_runtime_mod = @import("minsk_runtime/build.zig").build(b);
     const minsk_meta_mod = @import("minsk_meta/build.zig").build(b);
+    const linenoise_lib = @import("linenoise/build.zig").build(b, target, optimize);
 
     minsk_runtime_mod.dependencies.put("minsk_meta", minsk_meta_mod) catch unreachable;
 
@@ -30,6 +31,7 @@ pub fn build(b: *std.Build) void {
     mc_exe.addModule("minsk", minsk_mod);
     mc_exe.addModule("minsk_runtime", minsk_runtime_mod);
     mc_exe.addModule("tty_ext", tty_ext_mod);
+    mc_exe.linkLibrary(linenoise_lib);
     mc_exe.install();
 
     const mc_run = b.addRunArtifact(mc_exe);
