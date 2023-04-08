@@ -1,6 +1,5 @@
 const std = @import("std");
 const TextSpan = @import("TextSpan.zig");
-const glyph = @import("ziglyph");
 
 allocator: std.mem.Allocator,
 text: []const u8,
@@ -25,17 +24,14 @@ fn parseLines(self: *SourceText, allocator: std.mem.Allocator, text: []const u8)
     var result = std.ArrayList(Line).init(allocator);
     defer result.deinit();
 
-    const view = try std.unicode.Utf8View.init(text);
-    var it = view.iterator();
-    var line_start = it.i;
+    var line_start: usize = 0;
     while (true) {
-        const line_break_width = getLineBreakWidth(&it) orelse break;
-        if (line_break_width > 0) {
-            try self.addLine(&result, it.i, line_start, line_break_width);
-            line_start = it.i;
-        }
+        const line_break = std.mem.indexOfAnyPos(u8, text, line_start, "\r\n") orelse break;
+        const line_break_width = getLineBreakWidth(text, line_break);
+        try self.addLine(&result, line_break, line_start, line_break_width);
+        line_start = line_break + line_break_width;
     }
-    try self.addLine(&result, it.i, line_start, 0);
+    try self.addLine(&result, text.len, line_start, 0);
     return try result.toOwnedSlice();
 }
 
@@ -43,24 +39,19 @@ fn addLine(self: *SourceText, lines: *std.ArrayList(Line), pos: usize, line_star
     try lines.append(.{
         .source = self,
         .start = line_start,
-        .length = pos - line_break_width - line_start,
-        .length_including_line_break = pos - line_start,
+        .length = pos - line_start,
+        .length_including_line_break = pos + line_break_width - line_start,
     });
 }
 
-fn getLineBreakWidth(inout_pos: *std.unicode.Utf8Iterator) ?usize {
-    const cp = inout_pos.nextCodepoint() orelse return null;
-    if (cp == '\r') {
-        const lookahead = inout_pos.peek(1);
-        if (std.mem.eql(u8, lookahead, "\n")) {
-            _ = inout_pos.nextCodepoint();
-            return 2;
-        }
-    }
-    return if (cp == '\r' or cp == '\n')
+fn getLineBreakWidth(text: []const u8, pos: usize) usize {
+    const cp = text[pos];
+    return if (cp == '\r' and pos + 1 < text.len and text[pos + 1] == '\n')
+        2
+    else if (cp == '\r' or cp == '\n')
         1
     else
-        0;
+        unreachable;
 }
 
 pub fn getLineIndex(self: *const SourceText, position: usize) ?usize {
