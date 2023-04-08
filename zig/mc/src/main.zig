@@ -162,7 +162,7 @@ pub fn main() !void {
                     const line = text.lines[line_idx];
                     const col_num = d.span.start - line.start + 1;
 
-                    tty_ext.setColor(tty, stderr, .dim_red) catch unreachable;
+                    tty_ext.setColor(tty, stderr, .red) catch unreachable;
                     stderr.print("({d}, {d}): {s}\n", .{ line_num, col_num, d }) catch unreachable;
                     tty_ext.setColor(tty, stderr, .reset) catch unreachable;
 
@@ -170,7 +170,7 @@ pub fn main() !void {
                     const err = text.text[d.span.start..d.span.end()];
                     const suffix = text.text[d.span.end()..line.end()];
                     stderr.print("    {s}", .{prefix}) catch unreachable;
-                    tty_ext.setColor(tty, stderr, .dim_red) catch unreachable;
+                    tty_ext.setColor(tty, stderr, .red) catch unreachable;
                     stderr.print("{s}", .{err}) catch unreachable;
                     tty_ext.setColor(tty, stderr, .reset) catch unreachable;
                     stderr.print("{s}\n", .{suffix}) catch unreachable;

@@ -45,6 +45,7 @@ pub fn clearScreen(tty: std.debug.TTY.Config, writer: anytype) !void {
 
 pub const Color = enum {
     dim_red,
+    red,
     gray,
     cyan,
     blue,
@@ -59,6 +60,7 @@ pub fn setColor(conf: std.debug.TTY.Config, out_stream: anytype, color: Color) !
         else => {
             const color_string = switch (color) {
                 .dim_red => "\x1b[31;2m",
+                .red => "\x1b[0;31m",
                 .gray => "\x1b[2m",
                 .cyan => "\x1b[0;36m",
                 .blue => "\x1b[0;34m",
