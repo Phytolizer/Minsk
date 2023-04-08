@@ -10,26 +10,6 @@ const c = @cImport({
     @cInclude("linenoise.h");
 });
 
-fn readUntilDelimiterOrEofArrayList(
-    writer: anytype,
-    array_list: *std.ArrayList(u8),
-    delimiter: u8,
-    max_size: usize,
-) !?[]const u8 {
-    writer.readUntilDelimiterArrayList(
-        array_list,
-        delimiter,
-        max_size,
-    ) catch |e| switch (e) {
-        error.EndOfStream => return if (array_list.items.len > 0)
-            array_list.items
-        else
-            null,
-        else => return e,
-    };
-    return array_list.items;
-}
-
 fn pickAllocator(normal_alloc: std.mem.Allocator, debug_alloc: std.mem.Allocator) std.mem.Allocator {
     return switch (builtin.mode) {
         .Debug => debug_alloc,
