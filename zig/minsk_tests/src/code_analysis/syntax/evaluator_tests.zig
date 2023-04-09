@@ -80,7 +80,12 @@ pub fn evaluatorTestSuite(state: *t.TestState) void {
         et("false", .{ .boolean = false }),
         et("!true", .{ .boolean = false }),
         et("!false", .{ .boolean = true }),
-        et("(a = 10) * a", .{ .integer = 100 }),
+        et(
+            \\{
+            \\  var a = 0
+            \\  (a = 10) * a
+            \\}
+        , .{ .integer = 100 }),
     }) |tt|
         t.runTest(
             state,
