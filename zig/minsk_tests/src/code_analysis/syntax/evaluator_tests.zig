@@ -4,6 +4,7 @@ const Object = @import("minsk_runtime").Object;
 const Compilation = @import("minsk").code_analysis.Compilation;
 const SyntaxTree = @import("minsk").code_analysis.syntax.SyntaxTree;
 const VariableSymbol = @import("minsk").code_analysis.VariableSymbol;
+const AnnotatedText = @import("AnnotatedText.zig");
 
 const EvaluatorTest = struct {
     text: []const u8,
@@ -58,6 +59,106 @@ fn correctEvaluation(state: *t.TestState, tt: EvaluatorTest, out_msg: *[]const u
     }
 }
 
+fn assertHasDiagnostics(
+    state: *t.TestState,
+    comptime text: []const u8,
+    comptime diagnostic_text: []const u8,
+    out_msg: *[]const u8,
+) t.TestExit!void {
+    const annotated_text = comptime AnnotatedText.parse(text);
+    const syntax_tree = SyntaxTree.parse(t.allocator, annotated_text.text) catch unreachable;
+    const compilation = Compilation.init(t.allocator, syntax_tree) catch unreachable;
+    defer compilation.deinit(.with_parents);
+    var variables = VariableSymbol.Map.init(t.allocator);
+    defer variables.deinit();
+    const result = compilation.evaluate(&variables) catch unreachable;
+    defer result.deinit(t.allocator);
+
+    const diagnostics = comptime AnnotatedText.unindentLines(diagnostic_text);
+    if (annotated_text.spans.len != diagnostics.len) {
+        @compileError(std.fmt.comptimePrint(
+            "must mark as many spans as there are diagnostics ({d} != {d})",
+            .{ annotated_text.spans.len, diagnostics.len },
+        ));
+    }
+
+    const actual_diagnostics = switch (result) {
+        .success => |val| return t.assert(state, false, "expected failure, got {}", .{val}, out_msg),
+        .failure => |d| d,
+    };
+
+    if (actual_diagnostics.len != diagnostics.len) {
+        const diagnostic_strings = blk: {
+            var strings = std.ArrayList([]const u8).init(t.allocator);
+            defer {
+                for (strings.items) |s|
+                    t.allocator.free(s);
+                strings.deinit();
+            }
+            for (actual_diagnostics) |ad| {
+                strings.append(
+                    std.fmt.allocPrint(t.allocator, "{d}: {s}", .{ ad.span.start, ad.message }) catch unreachable,
+                ) catch unreachable;
+            }
+            break :blk std.mem.join(t.allocator, "\n", strings.items) catch unreachable;
+        };
+        try t.assert(
+            state,
+            false,
+            "actual diagnostics do not match:\n{s}",
+            .{diagnostic_strings},
+            out_msg,
+        );
+    }
+
+    for (annotated_text.spans, diagnostics, actual_diagnostics) |
+        expected_span,
+        expected_message,
+        actual_diagnostic,
+    | {
+        try t.assert(
+            state,
+            std.mem.eql(u8, expected_message, actual_diagnostic.message),
+            \\diagnostic mismatch
+            \\expected: {s}
+            \\actually: {s}
+        ,
+            .{ expected_message, actual_diagnostic.message },
+            out_msg,
+        );
+
+        try t.assert(
+            state,
+            std.meta.eql(expected_span, actual_diagnostic.span),
+            "expected span {d}..{d}, got {d}..{d}",
+            .{
+                expected_span.start,
+                expected_span.end(),
+                actual_diagnostic.span.start,
+                actual_diagnostic.span.end(),
+            },
+            out_msg,
+        );
+    }
+}
+
+fn variableDeclarationReportsRedeclaration(state: *t.TestState, _: void, out_msg: *[]const u8) t.TestExit!void {
+    const text =
+        \\{
+        \\  var x = 10
+        \\  var y = 100
+        \\  {
+        \\    var x = 10
+        \\  }
+        \\  var [x] = 5
+        \\}
+    ;
+    const diagnostics =
+        \\Variable 'x' has already been declared.
+    ;
+    try assertHasDiagnostics(state, text, diagnostics, out_msg);
+}
+
 pub fn evaluatorTestSuite(state: *t.TestState) void {
     const et = EvaluatorTest.init;
     for ([_]EvaluatorTest{
@@ -95,4 +196,13 @@ pub fn evaluatorTestSuite(state: *t.TestState) void {
             std.fmt.allocPrint(t.allocator, "correct evaluation ({s} => {})", .{ tt.text, tt.expected_value }) catch unreachable,
             .allocated,
         );
+
+    t.runTest(
+        state,
+        void,
+        variableDeclarationReportsRedeclaration,
+        {},
+        "variable declaration reports redeclaration",
+        .static,
+    );
 }
