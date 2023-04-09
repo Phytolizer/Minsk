@@ -3,7 +3,11 @@ const t = @import("framework");
 const code_analysis = @import("code_analysis.zig");
 
 pub fn main() !void {
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    std.process.exit(try run());
+}
+
+fn run() !u8 {
+    var gpa = std.heap.GeneralPurposeAllocator(.{ .stack_trace_frames = 10 }){};
     defer _ = gpa.deinit();
     t.allocator = gpa.allocator();
 
@@ -52,4 +56,5 @@ pub fn main() !void {
         "{d} passed, {d} failed, {d} assertions\n",
         .{ state.passed, state.failed, state.assertions },
     );
+    return if (state.failed > 0) 1 else 0;
 }

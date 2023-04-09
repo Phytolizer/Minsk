@@ -9,6 +9,8 @@ const BoundVariableExpression = @import("binding/BoundVariableExpression.zig");
 const BoundStatement = @import("binding/BoundStatement.zig");
 const BoundBlockStatement = @import("binding/BoundBlockStatement.zig");
 const BoundExpressionStatement = @import("binding/BoundExpressionStatement.zig");
+const BoundVariableDeclaration = @import("binding/BoundVariableDeclaration.zig");
+
 const Object = @import("minsk_runtime").Object;
 const VariableSymbol = @import("VariableSymbol.zig");
 
@@ -41,6 +43,9 @@ fn evaluateStatement(self: *Self, node: *const BoundStatement) std.mem.Allocator
         .expression_statement => try self.evaluateExpressionStatement(
             BoundStatement.downcast(node, BoundExpressionStatement),
         ),
+        .variable_declaration => try self.evaluateVariableDeclaration(
+            BoundStatement.downcast(node, BoundVariableDeclaration),
+        ),
         else => unreachable,
     }
 }
@@ -53,6 +58,12 @@ fn evaluateBlockStatement(self: *Self, node: *const BoundBlockStatement) !void {
 
 fn evaluateExpressionStatement(self: *Self, node: *const BoundExpressionStatement) !void {
     self.last_value = try self.evaluateExpression(node.expression);
+}
+
+fn evaluateVariableDeclaration(self: *Self, node: *const BoundVariableDeclaration) !void {
+    const value = try self.evaluateExpression(node.initializer);
+    try self.variables.put(node.variable, value);
+    self.last_value = value;
 }
 
 fn evaluateExpression(self: *Self, node: *const BoundExpression) std.mem.Allocator.Error!Object {

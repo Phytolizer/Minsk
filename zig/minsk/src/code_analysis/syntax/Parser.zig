@@ -12,6 +12,7 @@ const NameExpressionSyntax = @import("NameExpressionSyntax.zig");
 const StatementSyntax = @import("StatementSyntax.zig");
 const BlockStatementSyntax = @import("BlockStatementSyntax.zig");
 const ExpressionStatementSyntax = @import("ExpressionStatementSyntax.zig");
+const VariableDeclarationSyntax = @import("VariableDeclarationSyntax.zig");
 
 const SyntaxKind = @import("syntax_kind.zig").SyntaxKind;
 const syntax_facts = @import("syntax_facts.zig");
@@ -109,10 +110,11 @@ fn takeDiagnostics(self: *Self) DiagnosticBag {
 }
 
 fn parseStatement(self: *Self) AllocError!*StatementSyntax {
-    if (self.current().kind == .open_brace_token) {
-        return try self.parseBlockStatement();
-    }
-    return try self.parseExpressionStatement();
+    return switch (self.current().kind) {
+        .open_brace_token => try self.parseBlockStatement(),
+        .let_keyword, .var_keyword => try self.parseVariableDeclaration(),
+        else => try self.parseExpressionStatement(),
+    };
 }
 
 fn parseBlockStatement(self: *Self) AllocError!*StatementSyntax {
@@ -131,6 +133,24 @@ fn parseBlockStatement(self: *Self) AllocError!*StatementSyntax {
         open_brace_token,
         try statements.toOwnedSlice(),
         close_brace_token,
+    );
+}
+
+fn parseVariableDeclaration(self: *Self) AllocError!*StatementSyntax {
+    const expected: SyntaxKind = switch (self.current().kind) {
+        .let_keyword => .let_keyword,
+        else => .var_keyword,
+    };
+    const keyword_token = try self.matchToken(expected);
+    const identifier_token = try self.matchToken(.identifier_token);
+    const equals_token = try self.matchToken(.equals_token);
+    const initializer = try self.parseExpression();
+    return try VariableDeclarationSyntax.init(
+        self.allocator,
+        keyword_token,
+        identifier_token,
+        equals_token,
+        initializer,
     );
 }
 

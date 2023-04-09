@@ -3,6 +3,7 @@ const Object = @import("minsk_runtime").Object;
 
 name: []const u8,
 ty: Object.Type,
+is_read_only: bool,
 duped: bool = false,
 
 const VariableSymbol = @This();

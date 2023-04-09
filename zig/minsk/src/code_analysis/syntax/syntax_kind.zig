@@ -26,6 +26,8 @@ pub const SyntaxKind = enum(usize) {
 
     true_keyword,
     false_keyword,
+    let_keyword,
+    var_keyword,
 
     literal_expression,
     binary_expression,
@@ -36,6 +38,7 @@ pub const SyntaxKind = enum(usize) {
 
     block_statement,
     expression_statement,
+    variable_declaration,
 
     compilation_unit,
 

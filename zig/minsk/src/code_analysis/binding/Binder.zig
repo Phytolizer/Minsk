@@ -12,6 +12,7 @@ const UnaryExpressionSyntax = @import("../syntax/UnaryExpressionSyntax.zig");
 const StatementSyntax = @import("../syntax/StatementSyntax.zig");
 const BlockStatementSyntax = @import("../syntax/BlockStatementSyntax.zig");
 const ExpressionStatementSyntax = @import("../syntax/ExpressionStatementSyntax.zig");
+const VariableDeclarationSyntax = @import("../syntax/VariableDeclarationSyntax.zig");
 
 const BoundExpression = @import("BoundExpression.zig");
 const BoundScope = @import("BoundScope.zig");
@@ -25,6 +26,7 @@ const BoundVariableExpression = @import("BoundVariableExpression.zig");
 const BoundStatement = @import("BoundStatement.zig");
 const BoundBlockStatement = @import("BoundBlockStatement.zig");
 const BoundExpressionStatement = @import("BoundExpressionStatement.zig");
+const BoundVariableDeclaration = @import("BoundVariableDeclaration.zig");
 
 const Object = @import("minsk_runtime").Object;
 
@@ -93,7 +95,7 @@ pub fn bindGlobalScope(allocator: std.mem.Allocator, previous: ?*BoundGlobalScop
 }
 
 pub fn deinit(self: Self) void {
-    self.scope.deinit();
+    self.scope.deinit(.with_parents);
     self.diagnostics.deinit();
 }
 
@@ -107,6 +109,9 @@ fn bindStatement(self: *Self, syntax: *StatementSyntax) AllocError!*BoundStateme
         .block_statement => try self.bindBlockStatement(
             StatementSyntax.downcast(syntax, BlockStatementSyntax),
         ),
+        .variable_declaration => try self.bindVariableDeclaration(
+            StatementSyntax.downcast(syntax, VariableDeclarationSyntax),
+        ),
         else => unreachable,
     };
 }
@@ -114,6 +119,13 @@ fn bindStatement(self: *Self, syntax: *StatementSyntax) AllocError!*BoundStateme
 fn bindBlockStatement(self: *Self, syntax: *BlockStatementSyntax) !*BoundStatement {
     var statements = std.ArrayList(*BoundStatement).init(self.allocator);
     try statements.resize(syntax.statements.len);
+
+    const scope = try BoundScope.init(self.allocator, self.scope);
+    defer scope.deinit(.without_parents);
+    const old_scope = self.scope;
+    self.scope = scope;
+    defer self.scope = old_scope;
+
     for (syntax.statements, statements.items) |stmt, *out| {
         out.* = try self.bindStatement(stmt);
     }
@@ -124,6 +136,22 @@ fn bindBlockStatement(self: *Self, syntax: *BlockStatementSyntax) !*BoundStateme
 fn bindExpressionStatement(self: *Self, syntax: *ExpressionStatementSyntax) !*BoundStatement {
     const expression = try self.bindExpression(syntax.expression);
     return try BoundExpressionStatement.init(self.allocator, expression);
+}
+
+fn bindVariableDeclaration(self: *Self, syntax: *VariableDeclarationSyntax) !*BoundStatement {
+    const name = syntax.identifier_token.text;
+    const initializer = try self.bindExpression(syntax.initializer);
+    const is_read_only = syntax.keyword_token.kind == .let_keyword;
+    const variable = VariableSymbol{
+        .name = name,
+        .ty = initializer.type(),
+        .is_read_only = is_read_only,
+    };
+
+    if (!try self.scope.tryDeclare(variable)) {
+        try self.diagnostics.reportVariableAlreadyDeclared(syntax.identifier_token.span(), name);
+    }
+    return try BoundVariableDeclaration.init(self.allocator, variable, initializer);
 }
 
 fn bindExpression(self: *Self, syntax: *ExpressionSyntax) AllocError!*BoundExpression {
@@ -153,14 +181,14 @@ fn bindExpression(self: *Self, syntax: *ExpressionSyntax) AllocError!*BoundExpre
 fn bindAssignmentExpression(self: *Self, syntax: *AssignmentExpressionSyntax) !*BoundExpression {
     const name = syntax.identifier_token.text;
     const expression = try self.bindExpression(syntax.expression);
-    const variable = self.scope.tryLookup(name) orelse blk: {
-        const variable = VariableSymbol{
-            .name = name,
-            .ty = expression.type(),
-        };
-        _ = try self.scope.tryDeclare(variable);
-        break :blk variable;
+    const variable = self.scope.tryLookup(name) orelse {
+        try self.diagnostics.reportUndefinedName(syntax.identifier_token.span(), name);
+        return expression;
     };
+
+    if (variable.is_read_only) {
+        try self.diagnostics.reportCannotAssign(syntax.equals_token.span(), name);
+    }
 
     if (expression.type() != variable.ty) {
         try self.diagnostics.reportCannotConvert(

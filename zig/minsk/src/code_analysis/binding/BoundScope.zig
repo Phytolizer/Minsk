@@ -18,8 +18,11 @@ pub fn init(allocator: std.mem.Allocator, parent: ?*BoundScope) !*BoundScope {
     return result;
 }
 
-pub fn deinit(self: *BoundScope) void {
-    if (self.parent) |p| p.deinit();
+pub fn deinit(
+    self: *BoundScope,
+    comptime with_parents: enum { with_parents, without_parents },
+) void {
+    if (with_parents == .with_parents) if (self.parent) |p| p.deinit(.with_parents);
 
     for (self.variables.keys()) |k| {
         self.allocator.free(k);
@@ -50,6 +53,7 @@ pub fn getDeclaredVariables(self: BoundScope) ![]const VariableSymbol {
             .duped = true,
             .name = try self.allocator.dupe(u8, v.name),
             .ty = v.ty,
+            .is_read_only = v.is_read_only,
         };
     }
     return result;

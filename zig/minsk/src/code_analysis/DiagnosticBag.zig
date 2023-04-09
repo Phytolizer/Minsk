@@ -132,3 +132,12 @@ pub fn reportCannotConvert(self: *Self, span: TextSpan, from_type: Object.Type, 
     );
     try self.report(span, message);
 }
+
+pub fn reportCannotAssign(self: *Self, span: TextSpan, name: []const u8) !void {
+    const message = try std.fmt.allocPrint(
+        self.allocator,
+        "Variable '{s}' is read-only and cannot be assigned to.",
+        .{name},
+    );
+    try self.report(span, message);
+}

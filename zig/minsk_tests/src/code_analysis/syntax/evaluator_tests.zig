@@ -31,7 +31,10 @@ fn correctEvaluation(state: *t.TestState, tt: EvaluatorTest, out_msg: *[]const u
             out_msg,
         ),
         .failure => |diagnostics| {
-            defer t.allocator.free(diagnostics);
+            defer {
+                for (diagnostics) |d| d.deinit(t.allocator);
+                t.allocator.free(diagnostics);
+            }
             const diagnostic_strings = t.allocator.alloc([]const u8, diagnostics.len) catch unreachable;
             for (diagnostics, diagnostic_strings) |d, *s| {
                 s.* = std.fmt.allocPrint(t.allocator, "{s}", .{d}) catch unreachable;
@@ -42,11 +45,13 @@ fn correctEvaluation(state: *t.TestState, tt: EvaluatorTest, out_msg: *[]const u
                 }
                 t.allocator.free(diagnostic_strings);
             }
+            const msgs = std.mem.join(t.allocator, "\n", diagnostic_strings) catch unreachable;
+            defer t.allocator.free(msgs);
             try t.assert(
                 state,
                 false,
                 "failed with diagnostics:\n{s}\n",
-                .{std.mem.join(t.allocator, "\n", diagnostic_strings) catch unreachable},
+                .{msgs},
                 out_msg,
             );
         },
