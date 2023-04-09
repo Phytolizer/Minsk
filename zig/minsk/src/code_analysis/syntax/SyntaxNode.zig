@@ -49,7 +49,6 @@ pub fn prettyPrint(
     writer: anytype,
     comptime colors: enum { colors, no_colors },
     tty: ?std.debug.TTY.Config,
-    buf_writer: anytype,
 ) !void {
     if (colors == .colors) {
         try tty_ext.setColor(tty.?, writer, .gray);
@@ -79,7 +78,7 @@ pub fn prettyPrint(
         }
     }
     if (colors == .colors) {
-        tty_ext.resetColor(tty.?, buf_writer);
+        try tty_ext.setColor(tty.?, writer, .reset);
     }
     try writer.writeAll("\n");
     const new_indent = try std.mem.concat(allocator, u8, &.{
@@ -100,7 +99,6 @@ pub fn prettyPrint(
             writer,
             colors,
             tty,
-            buf_writer,
         );
     }
 }

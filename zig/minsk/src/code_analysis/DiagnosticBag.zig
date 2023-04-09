@@ -114,3 +114,30 @@ pub fn reportUndefinedName(self: *Self, span: TextSpan, name: []const u8) !void 
     );
     try self.report(span, message);
 }
+
+pub fn reportVariableAlreadyDeclared(self: *Self, span: TextSpan, name: []const u8) !void {
+    const message = try std.fmt.allocPrint(
+        self.allocator,
+        "Variable '{s}' has already been declared.",
+        .{name},
+    );
+    try self.report(span, message);
+}
+
+pub fn reportCannotConvert(self: *Self, span: TextSpan, from_type: Object.Type, to_type: Object.Type) !void {
+    const message = try std.fmt.allocPrint(
+        self.allocator,
+        "Cannot convert type {s} to type {s}.",
+        .{ from_type.displayName(), to_type.displayName() },
+    );
+    try self.report(span, message);
+}
+
+pub fn reportCannotAssign(self: *Self, span: TextSpan, name: []const u8) !void {
+    const message = try std.fmt.allocPrint(
+        self.allocator,
+        "Variable '{s}' is read-only and cannot be assigned to.",
+        .{name},
+    );
+    try self.report(span, message);
+}

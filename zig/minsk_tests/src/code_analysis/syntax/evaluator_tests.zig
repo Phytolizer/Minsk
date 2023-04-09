@@ -16,8 +16,8 @@ const EvaluatorTest = struct {
 
 fn correctEvaluation(state: *t.TestState, tt: EvaluatorTest, out_msg: *[]const u8) t.TestExit!void {
     const syntax_tree = SyntaxTree.parse(t.allocator, tt.text) catch unreachable;
-    var compilation = Compilation.init(t.allocator, syntax_tree);
-    defer compilation.deinit();
+    var compilation = Compilation.init(t.allocator, syntax_tree) catch unreachable;
+    defer compilation.deinit(.with_parents);
     var variables = VariableSymbol.Map.init(t.allocator);
     defer variables.deinit();
     const actual_result = compilation.evaluate(&variables) catch unreachable;
@@ -31,7 +31,10 @@ fn correctEvaluation(state: *t.TestState, tt: EvaluatorTest, out_msg: *[]const u
             out_msg,
         ),
         .failure => |diagnostics| {
-            defer t.allocator.free(diagnostics);
+            defer {
+                for (diagnostics) |d| d.deinit(t.allocator);
+                t.allocator.free(diagnostics);
+            }
             const diagnostic_strings = t.allocator.alloc([]const u8, diagnostics.len) catch unreachable;
             for (diagnostics, diagnostic_strings) |d, *s| {
                 s.* = std.fmt.allocPrint(t.allocator, "{s}", .{d}) catch unreachable;
@@ -42,11 +45,13 @@ fn correctEvaluation(state: *t.TestState, tt: EvaluatorTest, out_msg: *[]const u
                 }
                 t.allocator.free(diagnostic_strings);
             }
+            const msgs = std.mem.join(t.allocator, "\n", diagnostic_strings) catch unreachable;
+            defer t.allocator.free(msgs);
             try t.assert(
                 state,
                 false,
                 "failed with diagnostics:\n{s}\n",
-                .{std.mem.join(t.allocator, "\n", diagnostic_strings) catch unreachable},
+                .{msgs},
                 out_msg,
             );
         },
@@ -75,7 +80,12 @@ pub fn evaluatorTestSuite(state: *t.TestState) void {
         et("false", .{ .boolean = false }),
         et("!true", .{ .boolean = false }),
         et("!false", .{ .boolean = true }),
-        et("(a = 10) * a", .{ .integer = 100 }),
+        et(
+            \\{
+            \\  var a = 0
+            \\  (a = 10) * a
+            \\}
+        , .{ .integer = 100 }),
     }) |tt|
         t.runTest(
             state,

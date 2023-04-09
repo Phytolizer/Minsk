@@ -133,6 +133,14 @@ pub fn lex(self: *Self) AllocError!?SyntaxToken {
             self.next();
             self.kind = .close_parenthesis_token;
         },
+        '{' => {
+            self.next();
+            self.kind = .open_brace_token;
+        },
+        '}' => {
+            self.next();
+            self.kind = .close_brace_token;
+        },
         '!' => if (try self.look(1) == '=') {
             self.next();
             self.next();

@@ -4,22 +4,60 @@ const Object = @import("minsk_runtime").Object;
 const Binder = @import("binding/Binder.zig");
 const Evaluator = @import("Evaluator.zig");
 const Diagnostic = @import("Diagnostic.zig");
+const DiagnosticBag = @import("DiagnosticBag.zig");
 const VariableSymbol = @import("VariableSymbol.zig");
+const BoundGlobalScope = @import("binding/BoundGlobalScope.zig");
+const Atomic = std.atomic.Atomic;
 
 allocator: std.mem.Allocator,
+previous: ?*Self = null,
 syntax_tree: SyntaxTree,
+global_scope: Atomic(?*BoundGlobalScope) = Atomic(?*BoundGlobalScope).init(null),
 
 const Self = @This();
 
-pub fn init(allocator: std.mem.Allocator, syntax_tree: SyntaxTree) Self {
-    return .{
-        .allocator = allocator,
-        .syntax_tree = syntax_tree,
-    };
+pub fn init(allocator: std.mem.Allocator, syntax_tree: SyntaxTree) !*Self {
+    return try initPrev(allocator, null, syntax_tree);
 }
 
-pub fn deinit(self: Self) void {
+fn initPrev(allocator: std.mem.Allocator, previous: ?*Self, syntax_tree: SyntaxTree) !*Self {
+    const result = try allocator.create(Self);
+    result.* = .{
+        .allocator = allocator,
+        .previous = previous,
+        .syntax_tree = syntax_tree,
+    };
+    return result;
+}
+
+pub fn deinit(
+    self: *Self,
+    comptime with_parents: enum { with_parents, without_parents },
+) void {
+    if (with_parents == .with_parents) if (self.previous) |p| p.deinit(.with_parents);
     self.syntax_tree.deinit();
+    if (self.global_scope.load(.SeqCst)) |gs| gs.deinit();
+    self.allocator.destroy(self);
+}
+
+fn globalScope(self: *Self) !*BoundGlobalScope {
+    if (self.global_scope.load(.SeqCst)) |gs| return gs;
+
+    const new_gs = try Binder.bindGlobalScope(
+        self.allocator,
+        if (self.previous) |p| try p.globalScope() else null,
+        self.syntax_tree.root,
+    );
+    if (self.global_scope.compareAndSwap(null, new_gs, .SeqCst, .SeqCst)) |old_gs| {
+        new_gs.deinit();
+        // not null, compareAndSwap would not give anything if it was
+        return old_gs.?;
+    }
+    return new_gs;
+}
+
+pub fn continueWith(self: *Self, syntax_tree: SyntaxTree) !*Self {
+    return try initPrev(self.allocator, self, syntax_tree);
 }
 
 pub const EvaluationResult = union(enum) {
@@ -40,19 +78,18 @@ pub const EvaluationResult = union(enum) {
 };
 
 pub fn evaluate(self: *Self, variables: *VariableSymbol.Map) !EvaluationResult {
-    var binder = Binder.init(self.allocator, variables);
-    const bound_expression = try binder.bindExpression(self.syntax_tree.root);
-    defer bound_expression.deinit(self.allocator);
+    const global_scope = try self.globalScope();
     const diagnostics = blk: {
         var diagnostics = self.syntax_tree.takeDiagnostics();
-        try diagnostics.extend(&binder.diagnostics);
-        binder.diagnostics.clear();
+        var global_scope_diagnostics = DiagnosticBag.init(self.allocator);
+        std.mem.swap(DiagnosticBag, &global_scope.diagnostics, &global_scope_diagnostics);
+        try diagnostics.extend(&global_scope_diagnostics);
         break :blk try diagnostics.diagnostics.toOwnedSlice();
     };
     if (diagnostics.len > 0) {
         return .{ .failure = diagnostics };
     }
 
-    var evaluator = Evaluator.init(bound_expression, variables);
+    var evaluator = Evaluator.init(global_scope.statement, variables);
     return .{ .success = try evaluator.evaluate() };
 }

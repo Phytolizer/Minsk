@@ -1,4 +1,6 @@
 const std = @import("std");
+const CompilationUnitSyntax = @import("../syntax/CompilationUnitSyntax.zig");
+
 const ExpressionSyntax = @import("../syntax/ExpressionSyntax.zig");
 const AssignmentExpressionSyntax = @import("../syntax/AssignmentExpressionSyntax.zig");
 const BinaryExpressionSyntax = @import("../syntax/BinaryExpressionSyntax.zig");
@@ -7,12 +9,24 @@ const NameExpressionSyntax = @import("../syntax/NameExpressionSyntax.zig");
 const ParenthesizedExpressionSyntax = @import("../syntax/ParenthesizedExpressionSyntax.zig");
 const UnaryExpressionSyntax = @import("../syntax/UnaryExpressionSyntax.zig");
 
+const StatementSyntax = @import("../syntax/StatementSyntax.zig");
+const BlockStatementSyntax = @import("../syntax/BlockStatementSyntax.zig");
+const ExpressionStatementSyntax = @import("../syntax/ExpressionStatementSyntax.zig");
+const VariableDeclarationSyntax = @import("../syntax/VariableDeclarationSyntax.zig");
+
 const BoundExpression = @import("BoundExpression.zig");
+const BoundScope = @import("BoundScope.zig");
+const BoundGlobalScope = @import("BoundGlobalScope.zig");
 const BoundAssignmentExpression = @import("BoundAssignmentExpression.zig");
 const BoundBinaryExpression = @import("BoundBinaryExpression.zig");
 const BoundLiteralExpression = @import("BoundLiteralExpression.zig");
 const BoundUnaryExpression = @import("BoundUnaryExpression.zig");
 const BoundVariableExpression = @import("BoundVariableExpression.zig");
+
+const BoundStatement = @import("BoundStatement.zig");
+const BoundBlockStatement = @import("BoundBlockStatement.zig");
+const BoundExpressionStatement = @import("BoundExpressionStatement.zig");
+const BoundVariableDeclaration = @import("BoundVariableDeclaration.zig");
 
 const Object = @import("minsk_runtime").Object;
 
@@ -21,26 +35,126 @@ const VariableSymbol = @import("../VariableSymbol.zig");
 
 allocator: std.mem.Allocator,
 diagnostics: DiagnosticBag,
-variables: *VariableSymbol.Map,
+scope: *BoundScope,
 
 const Self = @This();
 
 pub fn init(
     allocator: std.mem.Allocator,
-    variables: *VariableSymbol.Map,
-) Self {
+    parent: ?*BoundScope,
+) !Self {
     return .{
         .allocator = allocator,
         .diagnostics = DiagnosticBag.init(allocator),
-        .variables = variables,
+        .scope = try BoundScope.init(allocator, parent),
     };
 }
 
+fn createParentScopes(allocator: std.mem.Allocator, previous: ?*const BoundGlobalScope) !?*BoundScope {
+    var prev = previous;
+    var stack = std.ArrayList(*const BoundGlobalScope).init(allocator);
+    defer stack.deinit();
+    while (prev) |p| {
+        try stack.append(p);
+        prev = p.previous;
+    }
+
+    var parent: ?*BoundScope = null;
+    while (stack.popOrNull()) |gs| {
+        const scope = try BoundScope.init(allocator, parent);
+        for (gs.variables) |v| {
+            _ = try scope.tryDeclare(v);
+        }
+        parent = scope;
+    }
+    return parent;
+}
+
+pub fn bindGlobalScope(allocator: std.mem.Allocator, previous: ?*BoundGlobalScope, syntax: *CompilationUnitSyntax) !*BoundGlobalScope {
+    const parent_scope = try createParentScopes(allocator, previous);
+    var binder = try init(allocator, parent_scope);
+    defer binder.deinit();
+    const statement = try binder.bindStatement(syntax.statement);
+    errdefer statement.deinit(allocator);
+    const variables = try binder.scope.getDeclaredVariables();
+    errdefer {
+        for (variables) |v| {
+            v.deinit(allocator);
+        }
+        allocator.free(variables);
+    }
+    var diagnostics = DiagnosticBag.init(allocator);
+    std.mem.swap(DiagnosticBag, &diagnostics, &binder.diagnostics);
+    return try BoundGlobalScope.init(
+        allocator,
+        null,
+        diagnostics,
+        variables,
+        statement,
+    );
+}
+
 pub fn deinit(self: Self) void {
+    self.scope.deinit(.with_parents);
     self.diagnostics.deinit();
 }
 
-pub fn bindExpression(self: *Self, syntax: *ExpressionSyntax) std.mem.Allocator.Error!*BoundExpression {
+const AllocError = std.mem.Allocator.Error;
+
+fn bindStatement(self: *Self, syntax: *StatementSyntax) AllocError!*BoundStatement {
+    return switch (syntax.base.kind) {
+        .expression_statement => try self.bindExpressionStatement(
+            StatementSyntax.downcast(syntax, ExpressionStatementSyntax),
+        ),
+        .block_statement => try self.bindBlockStatement(
+            StatementSyntax.downcast(syntax, BlockStatementSyntax),
+        ),
+        .variable_declaration => try self.bindVariableDeclaration(
+            StatementSyntax.downcast(syntax, VariableDeclarationSyntax),
+        ),
+        else => unreachable,
+    };
+}
+
+fn bindBlockStatement(self: *Self, syntax: *BlockStatementSyntax) !*BoundStatement {
+    var statements = std.ArrayList(*BoundStatement).init(self.allocator);
+    try statements.resize(syntax.statements.len);
+
+    const scope = try BoundScope.init(self.allocator, self.scope);
+    defer scope.deinit(.without_parents);
+    const old_scope = self.scope;
+    self.scope = scope;
+    defer self.scope = old_scope;
+
+    for (syntax.statements, statements.items) |stmt, *out| {
+        out.* = try self.bindStatement(stmt);
+    }
+
+    return try BoundBlockStatement.init(self.allocator, try statements.toOwnedSlice());
+}
+
+fn bindExpressionStatement(self: *Self, syntax: *ExpressionStatementSyntax) !*BoundStatement {
+    const expression = try self.bindExpression(syntax.expression);
+    return try BoundExpressionStatement.init(self.allocator, expression);
+}
+
+fn bindVariableDeclaration(self: *Self, syntax: *VariableDeclarationSyntax) !*BoundStatement {
+    const name = syntax.identifier_token.text;
+    const initializer = try self.bindExpression(syntax.initializer);
+    const is_read_only = syntax.keyword_token.kind == .let_keyword;
+    const variable = VariableSymbol{
+        .name = name,
+        .ty = initializer.type(),
+        .is_read_only = is_read_only,
+    };
+
+    if (!try self.scope.tryDeclare(variable)) {
+        try self.diagnostics.reportVariableAlreadyDeclared(syntax.identifier_token.span(), name);
+    }
+    return try BoundVariableDeclaration.init(self.allocator, variable, initializer);
+}
+
+fn bindExpression(self: *Self, syntax: *ExpressionSyntax) AllocError!*BoundExpression {
     return switch (syntax.base.kind) {
         .assignment_expression => try self.bindAssignmentExpression(
             ExpressionSyntax.downcast(&syntax.base, AssignmentExpressionSyntax),
@@ -67,17 +181,24 @@ pub fn bindExpression(self: *Self, syntax: *ExpressionSyntax) std.mem.Allocator.
 fn bindAssignmentExpression(self: *Self, syntax: *AssignmentExpressionSyntax) !*BoundExpression {
     const name = syntax.identifier_token.text;
     const expression = try self.bindExpression(syntax.expression);
+    const variable = self.scope.tryLookup(name) orelse {
+        try self.diagnostics.reportUndefinedName(syntax.identifier_token.span(), name);
+        return expression;
+    };
 
-    if (VariableSymbol.MapExt.matchName(self.variables, name)) |vs| {
-        self.allocator.free(vs.name);
-        _ = self.variables.swapRemove(vs);
+    if (variable.is_read_only) {
+        try self.diagnostics.reportCannotAssign(syntax.equals_token.span(), name);
     }
 
-    const variable = VariableSymbol{
-        .name = name,
-        .ty = expression.type(),
-    };
-    try self.variables.put(variable, null);
+    if (expression.type() != variable.ty) {
+        try self.diagnostics.reportCannotConvert(
+            try syntax.expression.span(self.allocator),
+            expression.type(),
+            variable.ty,
+        );
+        return expression;
+    }
+
     return try BoundAssignmentExpression.init(self.allocator, variable, expression);
 }
 
@@ -108,7 +229,7 @@ fn bindLiteralExpression(self: *Self, syntax: *LiteralExpressionSyntax) !*BoundE
 
 fn bindNameExpression(self: *Self, syntax: *NameExpressionSyntax) !*BoundExpression {
     const name = syntax.identifier_token.text;
-    const variable = VariableSymbol.MapExt.matchName(self.variables, name) orelse {
+    const variable = self.scope.tryLookup(name) orelse {
         try self.diagnostics.reportUndefinedName(syntax.identifier_token.span(), name);
         return try BoundLiteralExpression.init(self.allocator, .{ .integer = 0 });
     };

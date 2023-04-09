@@ -8,9 +8,15 @@ const LiteralExpressionSyntax = @import("LiteralExpressionSyntax.zig");
 const ParenthesizedExpressionSyntax = @import("ParenthesizedExpressionSyntax.zig");
 const AssignmentExpressionSyntax = @import("AssignmentExpressionSyntax.zig");
 const NameExpressionSyntax = @import("NameExpressionSyntax.zig");
+
+const StatementSyntax = @import("StatementSyntax.zig");
+const BlockStatementSyntax = @import("BlockStatementSyntax.zig");
+const ExpressionStatementSyntax = @import("ExpressionStatementSyntax.zig");
+const VariableDeclarationSyntax = @import("VariableDeclarationSyntax.zig");
+
 const SyntaxKind = @import("syntax_kind.zig").SyntaxKind;
 const syntax_facts = @import("syntax_facts.zig");
-const SyntaxTree = @import("SyntaxTree.zig");
+const CompilationUnitSyntax = @import("CompilationUnitSyntax.zig");
 const DiagnosticBag = @import("../DiagnosticBag.zig");
 const SourceText = @import("../text/SourceText.zig");
 
@@ -87,14 +93,12 @@ fn matchToken(self: *Self, kind: SyntaxKind) AllocError!SyntaxToken {
     );
 }
 
-pub fn parse(self: *Self) AllocError!SyntaxTree {
-    const expression = try self.parseExpression();
+pub fn parseCompilationUnit(self: *Self) AllocError!*CompilationUnitSyntax {
+    const statement = try self.parseStatement();
     const end_of_file_token = try self.matchToken(.end_of_file_token);
-    return SyntaxTree.init(
+    return try CompilationUnitSyntax.init(
         self.allocator,
-        self.source,
-        self.takeDiagnostics(),
-        expression,
+        statement,
         end_of_file_token,
     );
 }
@@ -103,6 +107,56 @@ fn takeDiagnostics(self: *Self) DiagnosticBag {
     const result = self.diagnostics;
     self.diagnostics = DiagnosticBag.init(self.allocator);
     return result;
+}
+
+fn parseStatement(self: *Self) AllocError!*StatementSyntax {
+    return switch (self.current().kind) {
+        .open_brace_token => try self.parseBlockStatement(),
+        .let_keyword, .var_keyword => try self.parseVariableDeclaration(),
+        else => try self.parseExpressionStatement(),
+    };
+}
+
+fn parseBlockStatement(self: *Self) AllocError!*StatementSyntax {
+    var statements = std.ArrayList(*StatementSyntax).init(self.allocator);
+
+    const open_brace_token = try self.matchToken(.open_brace_token);
+    while (self.current().kind != .end_of_file_token and
+        self.current().kind != .close_brace_token)
+    {
+        const statement = try self.parseStatement();
+        try statements.append(statement);
+    }
+    const close_brace_token = try self.matchToken(.close_brace_token);
+    return try BlockStatementSyntax.init(
+        self.allocator,
+        open_brace_token,
+        try statements.toOwnedSlice(),
+        close_brace_token,
+    );
+}
+
+fn parseVariableDeclaration(self: *Self) AllocError!*StatementSyntax {
+    const expected: SyntaxKind = switch (self.current().kind) {
+        .let_keyword => .let_keyword,
+        else => .var_keyword,
+    };
+    const keyword_token = try self.matchToken(expected);
+    const identifier_token = try self.matchToken(.identifier_token);
+    const equals_token = try self.matchToken(.equals_token);
+    const initializer = try self.parseExpression();
+    return try VariableDeclarationSyntax.init(
+        self.allocator,
+        keyword_token,
+        identifier_token,
+        equals_token,
+        initializer,
+    );
+}
+
+fn parseExpressionStatement(self: *Self) AllocError!*StatementSyntax {
+    const expression = try self.parseExpression();
+    return try ExpressionStatementSyntax.init(self.allocator, expression);
 }
 
 fn parseExpression(self: *Self) AllocError!*ExpressionSyntax {

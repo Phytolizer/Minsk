@@ -1,5 +1,5 @@
 const std = @import("std");
-const ExpressionSyntax = @import("ExpressionSyntax.zig");
+const CompilationUnitSyntax = @import("CompilationUnitSyntax.zig");
 const SyntaxToken = @import("SyntaxToken.zig");
 const Parser = @import("Parser.zig");
 const Lexer = @import("Lexer.zig");
@@ -9,24 +9,25 @@ const SourceText = @import("../text/SourceText.zig");
 allocator: std.mem.Allocator,
 source: *const SourceText,
 diagnostics: ?DiagnosticBag,
-root: *ExpressionSyntax,
-end_of_file_token: SyntaxToken,
+root: *CompilationUnitSyntax,
 
 const Self = @This();
 
-pub fn init(
+fn init(
     allocator: std.mem.Allocator,
     source: *const SourceText,
-    diagnostics: DiagnosticBag,
-    root: *ExpressionSyntax,
-    end_of_file_token: SyntaxToken,
-) Self {
+) !Self {
+    var parser = try Parser.init(allocator, source);
+    defer parser.deinit();
+    const root = try parser.parseCompilationUnit();
+
+    var diagnostics = DiagnosticBag.init(allocator);
+    std.mem.swap(DiagnosticBag, &diagnostics, &parser.diagnostics);
     return .{
         .allocator = allocator,
         .source = source,
         .diagnostics = diagnostics,
         .root = root,
-        .end_of_file_token = end_of_file_token,
     };
 }
 
@@ -35,17 +36,11 @@ pub fn deinit(self: Self) void {
     if (self.diagnostics) |diagnostics| {
         diagnostics.deinit();
     }
-    self.root.deinit(self.allocator);
-}
-
-fn parseSource(allocator: std.mem.Allocator, source: *const SourceText) !Self {
-    var parser = try Parser.init(allocator, source);
-    defer parser.deinit();
-    return try parser.parse();
+    self.root.base.deinit(self.allocator);
 }
 
 pub fn parse(allocator: std.mem.Allocator, text: []const u8) !Self {
-    return try parseSource(allocator, try SourceText.from(allocator, text));
+    return try init(allocator, try SourceText.from(allocator, text));
 }
 
 fn parseTokensSource(allocator: std.mem.Allocator, source: *const SourceText) ![]SyntaxToken {

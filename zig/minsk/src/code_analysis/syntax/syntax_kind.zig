@@ -15,6 +15,8 @@ pub const SyntaxKind = enum(usize) {
     slash_token,
     open_parenthesis_token,
     close_parenthesis_token,
+    open_brace_token,
+    close_brace_token,
     bang_token,
     ampersand_ampersand_token,
     pipe_pipe_token,
@@ -24,6 +26,8 @@ pub const SyntaxKind = enum(usize) {
 
     true_keyword,
     false_keyword,
+    let_keyword,
+    var_keyword,
 
     literal_expression,
     binary_expression,
@@ -31,6 +35,12 @@ pub const SyntaxKind = enum(usize) {
     unary_expression,
     name_expression,
     assignment_expression,
+
+    block_statement,
+    expression_statement,
+    variable_declaration,
+
+    compilation_unit,
 
     const Self = @This();
 

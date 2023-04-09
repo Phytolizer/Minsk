@@ -45,45 +45,59 @@ pub fn clearScreen(tty: std.debug.TTY.Config, writer: anytype) !void {
 
 pub const Color = enum {
     dim_red,
+    red,
     gray,
     cyan,
     blue,
+    green,
     magenta,
     reset,
 };
 
-pub fn setColor(conf: std.debug.TTY.Config, out_stream: anytype, color: Color) !void {
-    nosuspend switch (conf) {
-        .no_color => return,
-        .escape_codes => {
-            const color_string = switch (color) {
-                .dim_red => "\x1b[31;2m",
-                .gray => "\x1b[2m",
-                .cyan => "\x1b[0;36m",
-                .blue => "\x1b[0;34m",
-                .magenta => "\x1b[0;35m",
-                .reset => "\x1b[0m",
-            };
-            try out_stream.writeAll(color_string);
-        },
-        .windows_api => |ctx| if (builtin.os.tag == .windows) {
-            const windows = std.os.windows;
-            const attributes = switch (color) {
-                .dim_red => windows.FOREGROUND_RED,
-                .gray => windows.FOREGROUND_INTENSITY,
-                .cyan => windows.FOREGROUND_GREEN | windows.FOREGROUND_BLUE,
-                .blue => windows.FOREGROUND_BLUE,
-                .magenta => windows.FOREGROUND_RED | windows.FOREGROUND_BLUE,
-                .reset => ctx.reset_attributes,
-            };
-            try windows.SetConsoleTextAttribute(ctx.handle, attributes);
-        } else {
-            unreachable;
+pub fn colorString(conf: std.debug.TTY.Config, color: Color) []const u8 {
+    return switch (conf) {
+        .no_color => "",
+        else => switch (color) {
+            .dim_red => "\x1b[31;2m",
+            .red => "\x1b[0;31m",
+            .gray => "\x1b[2m",
+            .cyan => "\x1b[0;36m",
+            .blue => "\x1b[0;34m",
+            .green => "\x1b[0;32m",
+            .magenta => "\x1b[0;35m",
+            .reset => "\x1b[0m",
         },
     };
 }
 
-pub fn resetColor(tty: std.debug.TTY.Config, buf: anytype) void {
-    if (builtin.os.tag == .windows) buf.flush() catch unreachable;
-    setColor(tty, buf.writer(), .reset) catch unreachable;
+pub fn setColor(conf: std.debug.TTY.Config, out_stream: anytype, color: Color) !void {
+    nosuspend switch (conf) {
+        .no_color => return,
+        else => {
+            try out_stream.writeAll(colorString(conf, color));
+        },
+    };
+}
+
+extern "kernel32" fn SetConsoleMode(
+    in_hConsoleHandle: std.os.windows.HANDLE,
+    in_dwMode: std.os.windows.DWORD,
+) callconv(std.os.windows.WINAPI) std.os.windows.BOOL;
+
+pub fn enableAnsiEscapes(f: std.fs.File) !void {
+    if (builtin.os.tag == .windows) {
+        const windows = std.os.windows;
+        var mode: windows.DWORD = undefined;
+        if (windows.kernel32.GetConsoleMode(f.handle, &mode) == 0)
+            switch (windows.kernel32.GetLastError()) {
+                else => |err| return std.os.windows.unexpectedError(err),
+            };
+
+        const ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004;
+        mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+        if (SetConsoleMode(f.handle, mode) == 0)
+            switch (windows.kernel32.GetLastError()) {
+                else => |err| return std.os.windows.unexpectedError(err),
+            };
+    }
 }

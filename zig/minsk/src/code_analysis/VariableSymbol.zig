@@ -3,9 +3,14 @@ const Object = @import("minsk_runtime").Object;
 
 name: []const u8,
 ty: Object.Type,
+is_read_only: bool,
 duped: bool = false,
 
 const VariableSymbol = @This();
+
+pub fn deinit(self: VariableSymbol, allocator: std.mem.Allocator) void {
+    if (self.duped) allocator.free(self.name);
+}
 
 pub const Map = std.ArrayHashMap(
     VariableSymbol,

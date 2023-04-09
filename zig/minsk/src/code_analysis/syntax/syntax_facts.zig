@@ -27,6 +27,8 @@ pub fn keywordKind(text: []const u8) SyntaxKind {
     const keywords = std.ComptimeStringMap(SyntaxKind, .{
         .{ "true", .true_keyword },
         .{ "false", .false_keyword },
+        .{ "let", .let_keyword },
+        .{ "var", .var_keyword },
     });
     return keywords.get(text) orelse .identifier_token;
 }
@@ -45,8 +47,12 @@ pub fn getText(kind: SyntaxKind) ?[]const u8 {
         .bang_equals_token => "!=",
         .open_parenthesis_token => "(",
         .close_parenthesis_token => ")",
+        .open_brace_token => "{",
+        .close_brace_token => "}",
         .false_keyword => "false",
         .true_keyword => "true",
+        .let_keyword => "let",
+        .var_keyword => "var",
         else => null,
     };
 }
