@@ -181,7 +181,7 @@ fn evaluateUnaryExpression(self: *Self, node: *const BoundUnaryExpression) !Obje
         .identity => .{ .integer = operand.integer },
         .negation => .{ .integer = -operand.integer },
         .logical_negation => .{ .boolean = !operand.boolean },
-        .bitwise_negation => .{ .integer = @bitReverse(operand.integer) },
+        .bitwise_negation => .{ .integer = ~operand.integer },
     };
 }
 

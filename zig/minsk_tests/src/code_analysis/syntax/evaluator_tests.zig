@@ -303,7 +303,7 @@ pub fn evaluatorTestSuite(state: *t.TestState) void {
         et("1", .{ .integer = 1 }),
         et("+1", .{ .integer = 1 }),
         et("-1", .{ .integer = -1 }),
-        et("~1", .{ .integer = -9223372036854775808 }),
+        et("~1", .{ .integer = -2 }),
         et("1 + 2", .{ .integer = 3 }),
         et("1 - 2", .{ .integer = -1 }),
         et("3 * 3", .{ .integer = 9 }),
