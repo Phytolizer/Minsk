@@ -269,6 +269,34 @@ pub fn evaluatorTestSuite(state: *t.TestState) void {
             \\  a
             \\}
         , .{ .integer = 10 }),
+        et(
+            \\{
+            \\  var a = 0
+            \\  if a == 4
+            \\    a = 10
+            \\  a
+            \\}
+        , .{ .integer = 0 }),
+        et(
+            \\{
+            \\  var a = 0
+            \\  if a == 0
+            \\    a = 10
+            \\  else
+            \\    a = 5
+            \\  a
+            \\}
+        , .{ .integer = 10 }),
+        et(
+            \\{
+            \\  var a = 0
+            \\  if a == 4
+            \\    a = 10
+            \\  else
+            \\    a = 5
+            \\  a
+            \\}
+        , .{ .integer = 5 }),
     }) |tt|
         t.runTest(
             state,
