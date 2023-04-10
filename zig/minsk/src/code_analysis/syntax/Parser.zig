@@ -131,8 +131,15 @@ fn parseBlockStatement(self: *Self) AllocError!*StatementSyntax {
     while (self.current().kind != .end_of_file_token and
         self.current().kind != .close_brace_token)
     {
+        const start_token = self.current();
         const statement = try self.parseStatement();
         try statements.append(statement);
+
+        // check if 0 tokens were consumed
+        // if so, just forcibly move on. there were errors anyway.
+        if (std.meta.eql(self.current(), start_token)) {
+            _ = self.nextToken();
+        }
     }
     const close_brace_token = try self.matchToken(.close_brace_token);
     return try BlockStatementSyntax.init(

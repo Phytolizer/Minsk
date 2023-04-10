@@ -11,8 +11,10 @@ pub fn parse(comptime text: []const u8) AnnotatedText {
         const unindented = blk: {
             const lines = unindentLines(text);
             var result: []const u8 = "";
-            for (lines) |line| {
-                result = result ++ line ++ "\n";
+            for (lines, 0..) |line, i| {
+                if (i > 0)
+                    result = result ++ "\n";
+                result = result ++ line;
             }
             break :blk result;
         };
@@ -78,7 +80,7 @@ pub fn unindentLines(comptime text: []const u8) []const []const u8 {
                     break :blk i;
             }
             // no lines whatsoever
-            return "";
+            return &.{""};
         };
 
         const end = blk: {

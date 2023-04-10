@@ -40,7 +40,7 @@ fn assertHasValue(state: *t.TestState, text: []const u8, expected_value: Object,
         .failure => |diagnostics| {
             const diagnostic_strings = t.allocator.alloc([]const u8, diagnostics.len) catch unreachable;
             for (diagnostics, diagnostic_strings) |d, *s| {
-                s.* = std.fmt.allocPrint(t.allocator, "{s}", .{d}) catch unreachable;
+                s.* = std.fmt.allocPrint(t.allocator, "{s}", .{d.message}) catch unreachable;
             }
             defer {
                 for (diagnostic_strings) |s| {
@@ -104,6 +104,7 @@ fn assertHasDiagnostics(
             }
             break :blk std.mem.join(t.allocator, "\n", strings.items) catch unreachable;
         };
+        defer t.allocator.free(diagnostic_strings);
         try t.assert(
             state,
             false,
@@ -139,7 +140,7 @@ fn assertHasDiagnostics(
     }
 }
 
-const diagnostic_tests = struct {
+const one_shot_tests = struct {
     pub fn variableDeclarationReportsRedeclaration(state: *t.TestState, _: void, out_msg: *[]const u8) t.TestExit!void {
         const text =
             \\{
@@ -153,6 +154,26 @@ const diagnostic_tests = struct {
         ;
         const diagnostics =
             \\Variable 'x' has already been declared.
+        ;
+        try assertHasDiagnostics(state, text, diagnostics, out_msg);
+    }
+
+    pub fn blockStatementNoInfiniteLoop(state: *t.TestState, _: void, out_msg: *[]const u8) t.TestExit!void {
+        const text =
+            \\{
+            \\[)][]
+        ;
+        const diagnostics =
+            \\Unexpected token <CloseParenthesisToken>, expected <IdentifierToken>.
+            \\Unexpected token <EndOfFileToken>, expected <CloseBraceToken>.
+        ;
+        try assertHasDiagnostics(state, text, diagnostics, out_msg);
+    }
+
+    pub fn nameExpressionNoErrorForInsertedToken(state: *t.TestState, _: void, out_msg: *[]const u8) t.TestExit!void {
+        const text = "[]";
+        const diagnostics =
+            \\Unexpected token <EndOfFileToken>, expected <IdentifierToken>.
         ;
         try assertHasDiagnostics(state, text, diagnostics, out_msg);
     }
@@ -379,11 +400,11 @@ pub fn evaluatorTestSuite(state: *t.TestState) void {
             .allocated,
         );
 
-    inline for (@typeInfo(diagnostic_tests).Struct.decls) |decl| {
+    inline for (@typeInfo(one_shot_tests).Struct.decls) |decl| {
         t.runTest(
             state,
             void,
-            @field(diagnostic_tests, decl.name),
+            @field(one_shot_tests, decl.name),
             {},
             comptime camelToDisplay(decl.name),
             .static,

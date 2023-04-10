@@ -304,6 +304,10 @@ fn bindLiteralExpression(self: *Self, syntax: *LiteralExpressionSyntax) !*BoundE
 
 fn bindNameExpression(self: *Self, syntax: *NameExpressionSyntax) !*BoundExpression {
     const name = syntax.identifier_token.text;
+    if (name.len == 0) {
+        // inserted token, don't report any error here
+        return try BoundLiteralExpression.init(self.allocator, .{ .integer = 0 });
+    }
     const variable = self.scope.tryLookup(name) orelse {
         try self.diagnostics.reportUndefinedName(syntax.identifier_token.span(), name);
         return try BoundLiteralExpression.init(self.allocator, .{ .integer = 0 });
