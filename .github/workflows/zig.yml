@@ -2,13 +2,15 @@ name: Zig
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, staging, trying ]
     paths:
       - 'zig/**'
+      - '.github/workflows/**'
   pull_request:
-    branches: [ main ]
+    branches: [ main, staging, trying ]
     paths:
       - 'zig/**'
+      - '.github/workflows/**'
   schedule:
     - cron: '0 0 * * 5'
 
@@ -35,3 +37,12 @@ jobs:
             ${{ runner.os }}-zig-
       - run: zig build --cache-dir "$PWD/zig-local-cache" --global-cache-dir "$PWD/zig-global-cache" test --verbose
         shell: bash
+  ci-success:
+    name: ci
+    if: ${{ success() }}
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - name: CI succeeded
+        run: exit 0
