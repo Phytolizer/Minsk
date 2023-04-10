@@ -149,6 +149,22 @@ pub fn lex(self: *Self) AllocError!?SyntaxToken {
             self.next();
             self.kind = .bang_token;
         },
+        '<' => if (try self.look(1) == '=') {
+            self.next();
+            self.next();
+            self.kind = .less_equals_token;
+        } else {
+            self.next();
+            self.kind = .less_token;
+        },
+        '>' => if (try self.look(1) == '=') {
+            self.next();
+            self.next();
+            self.kind = .greater_equals_token;
+        } else {
+            self.next();
+            self.kind = .greater_token;
+        },
         '&' => if (try self.look(1) == '&') {
             self.next();
             self.next();

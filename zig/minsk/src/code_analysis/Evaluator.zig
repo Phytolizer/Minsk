@@ -106,6 +106,10 @@ fn evaluateBinaryExpression(self: *Self, node: *const BoundBinaryExpression) !Ob
         .logical_or => .{ .boolean = left.boolean or right.boolean },
         .equality => .{ .boolean = left.eq(right) },
         .inequality => .{ .boolean = !left.eq(right) },
+        .less_than => .{ .boolean = left.integer < right.integer },
+        .less_than_or_equal => .{ .boolean = left.integer <= right.integer },
+        .greater_than => .{ .boolean = left.integer > right.integer },
+        .greater_than_or_equal => .{ .boolean = left.integer >= right.integer },
     };
 }
 

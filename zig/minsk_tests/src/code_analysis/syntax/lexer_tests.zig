@@ -144,7 +144,8 @@ fn requiresSeparator(k1: SyntaxKind, k2: SyntaxKind) bool {
         (k1 == .identifier_token or k1_kw) and (k2 == .number_token) or
         (k1 == .whitespace_token) and (k2 == .whitespace_token) or
         (k1 == .number_token) and (k2 == .number_token) or
-        (k1 == .bang_token or k1 == .equals_token) and (k2 == .equals_token or k2 == .equals_equals_token);
+        ((k1 == .bang_token or k1 == .equals_token or k1 == .less_token or k1 == .greater_token) and
+        (k2 == .equals_token or k2 == .equals_equals_token));
 }
 
 comptime {
