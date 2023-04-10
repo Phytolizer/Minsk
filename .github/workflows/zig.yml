@@ -5,10 +5,12 @@ on:
     branches: [ main ]
     paths:
       - 'zig/**'
+      - '.github/workflows/**'
   pull_request:
     branches: [ main ]
     paths:
       - 'zig/**'
+      - '.github/workflows/**'
   schedule:
     - cron: '0 0 * * 5'
 
