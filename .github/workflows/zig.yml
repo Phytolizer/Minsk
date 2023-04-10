@@ -2,12 +2,12 @@ name: Zig
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, staging, trying ]
     paths:
       - 'zig/**'
       - '.github/workflows/**'
   pull_request:
-    branches: [ main ]
+    branches: [ main, staging, trying ]
     paths:
       - 'zig/**'
       - '.github/workflows/**'
