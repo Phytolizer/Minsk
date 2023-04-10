@@ -10,6 +10,9 @@ const BoundStatement = @import("binding/BoundStatement.zig");
 const BoundBlockStatement = @import("binding/BoundBlockStatement.zig");
 const BoundExpressionStatement = @import("binding/BoundExpressionStatement.zig");
 const BoundVariableDeclaration = @import("binding/BoundVariableDeclaration.zig");
+const BoundIfStatement = @import("binding/BoundIfStatement.zig");
+const BoundWhileStatement = @import("binding/BoundWhileStatement.zig");
+const BoundForStatement = @import("binding/BoundForStatement.zig");
 
 const Object = @import("minsk_runtime").Object;
 const VariableSymbol = @import("VariableSymbol.zig");
@@ -43,6 +46,15 @@ fn evaluateStatement(self: *Self, node: *const BoundStatement) std.mem.Allocator
         .expression_statement => try self.evaluateExpressionStatement(
             BoundStatement.downcast(node, BoundExpressionStatement),
         ),
+        .for_statement => try self.evaluateForStatement(
+            BoundStatement.downcast(node, BoundForStatement),
+        ),
+        .if_statement => try self.evaluateIfStatement(
+            BoundStatement.downcast(node, BoundIfStatement),
+        ),
+        .while_statement => try self.evaluateWhileStatement(
+            BoundStatement.downcast(node, BoundWhileStatement),
+        ),
         .variable_declaration => try self.evaluateVariableDeclaration(
             BoundStatement.downcast(node, BoundVariableDeclaration),
         ),
@@ -53,6 +65,39 @@ fn evaluateStatement(self: *Self, node: *const BoundStatement) std.mem.Allocator
 fn evaluateBlockStatement(self: *Self, node: *const BoundBlockStatement) !void {
     for (node.statements) |stmt| {
         try self.evaluateStatement(stmt);
+    }
+}
+
+fn evaluateIfStatement(self: *Self, node: *const BoundIfStatement) !void {
+    const condition = (try self.evaluateExpression(node.condition)).boolean;
+    if (condition) {
+        try self.evaluateStatement(node.then_statement);
+    } else if (node.else_statement) |es| {
+        try self.evaluateStatement(es);
+    }
+}
+
+fn evaluateForStatement(self: *Self, node: *const BoundForStatement) !void {
+    const lower_bound = (try self.evaluateExpression(node.lower_bound)).integer;
+
+    try self.variables.put(node.variable, .{ .integer = lower_bound });
+    while (true) {
+        const upper_bound = (try self.evaluateExpression(node.upper_bound)).integer;
+        if (self.variables.get(node.variable).?.integer > upper_bound) break;
+
+        try self.evaluateStatement(node.body);
+        self.variables.putAssumeCapacity(
+            node.variable,
+            .{ .integer = self.variables.get(node.variable).?.integer + 1 },
+        );
+    }
+}
+
+fn evaluateWhileStatement(self: *Self, node: *const BoundWhileStatement) !void {
+    while (true) {
+        const condition = (try self.evaluateExpression(node.condition)).boolean;
+        if (!condition) break;
+        try self.evaluateStatement(node.body);
     }
 }
 
@@ -106,6 +151,10 @@ fn evaluateBinaryExpression(self: *Self, node: *const BoundBinaryExpression) !Ob
         .logical_or => .{ .boolean = left.boolean or right.boolean },
         .equality => .{ .boolean = left.eq(right) },
         .inequality => .{ .boolean = !left.eq(right) },
+        .less_than => .{ .boolean = left.integer < right.integer },
+        .less_than_or_equal => .{ .boolean = left.integer <= right.integer },
+        .greater_than => .{ .boolean = left.integer > right.integer },
+        .greater_than_or_equal => .{ .boolean = left.integer >= right.integer },
     };
 }
 
@@ -124,5 +173,5 @@ fn evaluateUnaryExpression(self: *Self, node: *const BoundUnaryExpression) !Obje
 }
 
 fn evaluateVariableExpression(self: *Self, node: *const BoundVariableExpression) !Object {
-    return self.variables.get(node.variable).?.?;
+    return self.variables.get(node.variable).?;
 }

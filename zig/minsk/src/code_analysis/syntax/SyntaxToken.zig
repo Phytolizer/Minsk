@@ -38,13 +38,6 @@ fn children(_: *const SyntaxNode, _: std.mem.Allocator) std.mem.Allocator.Error!
     return &.{};
 }
 
-pub fn format(self: Self, comptime _: []const u8, _: std.fmt.FormatOptions, writer: anytype) !void {
-    try writer.print("{s}: '{s}'", .{ self.kind.displayName(), self.text });
-    if (self.value) |value| {
-        try writer.print(" {}", .{value});
-    }
-}
-
 fn span_override(node: *const SyntaxNode, _: std.mem.Allocator) !TextSpan {
     return SyntaxNode.downcast(node, Self).span();
 }

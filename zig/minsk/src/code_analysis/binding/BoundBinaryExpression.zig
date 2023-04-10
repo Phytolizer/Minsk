@@ -25,6 +25,10 @@ pub const Operator = struct {
         logical_or,
         equality,
         inequality,
+        less_than,
+        less_than_or_equal,
+        greater_than,
+        greater_than_or_equal,
     };
 
     fn init(
@@ -63,6 +67,11 @@ pub const Operator = struct {
 
         initMatching(.equals_equals_token, .equality, .boolean),
         Operator.init(.equals_equals_token, .equality, .integer, .integer, .boolean),
+
+        Operator.init(.less_token, .less_than, .integer, .integer, .boolean),
+        Operator.init(.less_equals_token, .less_than_or_equal, .integer, .integer, .boolean),
+        Operator.init(.greater_token, .greater_than, .integer, .integer, .boolean),
+        Operator.init(.greater_equals_token, .greater_than_or_equal, .integer, .integer, .boolean),
 
         initMatching(.bang_equals_token, .inequality, .boolean),
         Operator.init(.bang_equals_token, .inequality, .integer, .integer, .boolean),

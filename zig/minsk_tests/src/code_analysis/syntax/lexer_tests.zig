@@ -52,6 +52,7 @@ fn requireTestsAllTokens() void {
     const messages = comptime blk: {
         var result: []const []const u8 = &.{};
         for (token_kinds) |tk| {
+            @setEvalBranchQuota(10000);
             if (std.mem.indexOfScalar(SyntaxKind, tested_token_kinds, tk) == null) {
                 result = result ++ &[_][]const u8{
                     std.fmt.comptimePrint("missing token kind: {s}", .{tk.displayName()}),
@@ -144,7 +145,8 @@ fn requiresSeparator(k1: SyntaxKind, k2: SyntaxKind) bool {
         (k1 == .identifier_token or k1_kw) and (k2 == .number_token) or
         (k1 == .whitespace_token) and (k2 == .whitespace_token) or
         (k1 == .number_token) and (k2 == .number_token) or
-        (k1 == .bang_token or k1 == .equals_token) and (k2 == .equals_token or k2 == .equals_equals_token);
+        ((k1 == .bang_token or k1 == .equals_token or k1 == .less_token or k1 == .greater_token) and
+        (k2 == .equals_token or k2 == .equals_equals_token));
 }
 
 comptime {

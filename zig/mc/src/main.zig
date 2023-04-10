@@ -151,7 +151,7 @@ pub fn main() !void {
                     const col_num = d.span.start - line.start + 1;
 
                     tty_ext.setColor(tty, stderr, .red) catch unreachable;
-                    stderr.print("({d}, {d}): {s}\n", .{ line_num, col_num, d }) catch unreachable;
+                    stderr.print("({d}, {d}): {s}\n", .{ line_num, col_num, d.message }) catch unreachable;
                     tty_ext.setColor(tty, stderr, .reset) catch unreachable;
 
                     const prefix = text.text[line.start..d.span.start];

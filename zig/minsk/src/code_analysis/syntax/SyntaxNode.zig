@@ -63,9 +63,9 @@ pub fn prettyPrint(
     const is_token = std.mem.endsWith(u8, self.kind.displayName(), "Token");
     if (colors == .colors) {
         try tty_ext.setColor(tty.?, writer, if (is_token)
-            .cyan
+            .blue
         else
-            .blue);
+            .cyan);
     }
     try writer.writeAll(self.kind.displayName());
     if (is_token) {

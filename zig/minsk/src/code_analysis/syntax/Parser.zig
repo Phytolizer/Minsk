@@ -13,6 +13,10 @@ const StatementSyntax = @import("StatementSyntax.zig");
 const BlockStatementSyntax = @import("BlockStatementSyntax.zig");
 const ExpressionStatementSyntax = @import("ExpressionStatementSyntax.zig");
 const VariableDeclarationSyntax = @import("VariableDeclarationSyntax.zig");
+const IfStatementSyntax = @import("IfStatementSyntax.zig");
+const ElseClauseSyntax = @import("ElseClauseSyntax.zig");
+const WhileStatementSyntax = @import("WhileStatementSyntax.zig");
+const ForStatementSyntax = @import("ForStatementSyntax.zig");
 
 const SyntaxKind = @import("syntax_kind.zig").SyntaxKind;
 const syntax_facts = @import("syntax_facts.zig");
@@ -113,6 +117,9 @@ fn parseStatement(self: *Self) AllocError!*StatementSyntax {
     return switch (self.current().kind) {
         .open_brace_token => try self.parseBlockStatement(),
         .let_keyword, .var_keyword => try self.parseVariableDeclaration(),
+        .if_keyword => try self.parseIfStatement(),
+        .while_keyword => try self.parseWhileStatement(),
+        .for_keyword => try self.parseForStatement(),
         else => try self.parseExpressionStatement(),
     };
 }
@@ -124,8 +131,15 @@ fn parseBlockStatement(self: *Self) AllocError!*StatementSyntax {
     while (self.current().kind != .end_of_file_token and
         self.current().kind != .close_brace_token)
     {
+        const start_token = self.current();
         const statement = try self.parseStatement();
         try statements.append(statement);
+
+        // check if 0 tokens were consumed
+        // if so, just forcibly move on. there were errors anyway.
+        if (std.meta.eql(self.current(), start_token)) {
+            _ = self.nextToken();
+        }
     }
     const close_brace_token = try self.matchToken(.close_brace_token);
     return try BlockStatementSyntax.init(
@@ -133,6 +147,61 @@ fn parseBlockStatement(self: *Self) AllocError!*StatementSyntax {
         open_brace_token,
         try statements.toOwnedSlice(),
         close_brace_token,
+    );
+}
+
+fn parseIfStatement(self: *Self) AllocError!*StatementSyntax {
+    const keyword_token = try self.matchToken(.if_keyword);
+    const condition = try self.parseExpression();
+    const then_statement = try self.parseStatement();
+    const else_clause = try self.parseOptionalElseClause();
+    return try IfStatementSyntax.init(
+        self.allocator,
+        keyword_token,
+        condition,
+        then_statement,
+        else_clause,
+    );
+}
+
+fn parseOptionalElseClause(self: *Self) AllocError!?*ElseClauseSyntax {
+    if (self.current().kind != .else_keyword)
+        return null;
+
+    const keyword_token = self.nextToken();
+    const statement = try self.parseStatement();
+    return try ElseClauseSyntax.init(self.allocator, keyword_token, statement);
+}
+
+fn parseWhileStatement(self: *Self) AllocError!*StatementSyntax {
+    const keyword_token = try self.matchToken(.while_keyword);
+    const condition = try self.parseExpression();
+    const body = try self.parseStatement();
+    return try WhileStatementSyntax.init(
+        self.allocator,
+        keyword_token,
+        condition,
+        body,
+    );
+}
+
+fn parseForStatement(self: *Self) AllocError!*StatementSyntax {
+    const for_keyword = try self.matchToken(.for_keyword);
+    const identifier_token = try self.matchToken(.identifier_token);
+    const equals_token = try self.matchToken(.equals_token);
+    const lower_bound = try self.parseExpression();
+    const to_keyword = try self.matchToken(.to_keyword);
+    const upper_bound = try self.parseExpression();
+    const body = try self.parseStatement();
+    return try ForStatementSyntax.init(
+        self.allocator,
+        for_keyword,
+        identifier_token,
+        equals_token,
+        lower_bound,
+        to_keyword,
+        upper_bound,
+        body,
     );
 }
 

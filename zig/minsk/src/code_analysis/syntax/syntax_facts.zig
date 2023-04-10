@@ -5,7 +5,13 @@ pub fn binaryOperatorPrecedence(kind: SyntaxKind) usize {
     return switch (kind) {
         .pipe_pipe_token => 1,
         .ampersand_ampersand_token => 2,
-        .equals_equals_token, .bang_equals_token => 3,
+        .equals_equals_token,
+        .bang_equals_token,
+        .less_token,
+        .less_equals_token,
+        .greater_token,
+        .greater_equals_token,
+        => 3,
         .plus_token, .minus_token => 4,
         .star_token, .slash_token => 5,
         else => 0,
@@ -29,6 +35,11 @@ pub fn keywordKind(text: []const u8) SyntaxKind {
         .{ "false", .false_keyword },
         .{ "let", .let_keyword },
         .{ "var", .var_keyword },
+        .{ "if", .if_keyword },
+        .{ "else", .else_keyword },
+        .{ "while", .while_keyword },
+        .{ "for", .for_keyword },
+        .{ "to", .to_keyword },
     });
     return keywords.get(text) orelse .identifier_token;
 }
@@ -41,6 +52,10 @@ pub fn getText(kind: SyntaxKind) ?[]const u8 {
         .slash_token => "/",
         .bang_token => "!",
         .equals_token => "=",
+        .less_token => "<",
+        .less_equals_token => "<=",
+        .greater_token => ">",
+        .greater_equals_token => ">=",
         .ampersand_ampersand_token => "&&",
         .pipe_pipe_token => "||",
         .equals_equals_token => "==",
@@ -53,6 +68,11 @@ pub fn getText(kind: SyntaxKind) ?[]const u8 {
         .true_keyword => "true",
         .let_keyword => "let",
         .var_keyword => "var",
+        .if_keyword => "if",
+        .else_keyword => "else",
+        .while_keyword => "while",
+        .for_keyword => "for",
+        .to_keyword => "to",
         else => null,
     };
 }

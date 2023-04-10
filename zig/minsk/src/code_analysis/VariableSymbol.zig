@@ -14,7 +14,7 @@ pub fn deinit(self: VariableSymbol, allocator: std.mem.Allocator) void {
 
 pub const Map = std.ArrayHashMap(
     VariableSymbol,
-    ?Object,
+    Object,
     struct {
         pub fn hash(ctx: @This(), key: VariableSymbol) u32 {
             _ = ctx;

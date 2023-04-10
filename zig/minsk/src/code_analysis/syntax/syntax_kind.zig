@@ -18,6 +18,10 @@ pub const SyntaxKind = enum(usize) {
     open_brace_token,
     close_brace_token,
     bang_token,
+    less_token,
+    less_equals_token,
+    greater_token,
+    greater_equals_token,
     ampersand_ampersand_token,
     pipe_pipe_token,
     equals_equals_token,
@@ -28,6 +32,11 @@ pub const SyntaxKind = enum(usize) {
     false_keyword,
     let_keyword,
     var_keyword,
+    if_keyword,
+    else_keyword,
+    while_keyword,
+    for_keyword,
+    to_keyword,
 
     literal_expression,
     binary_expression,
@@ -39,8 +48,12 @@ pub const SyntaxKind = enum(usize) {
     block_statement,
     expression_statement,
     variable_declaration,
+    if_statement,
+    while_statement,
+    for_statement,
 
     compilation_unit,
+    else_clause,
 
     const Self = @This();
 
