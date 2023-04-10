@@ -110,7 +110,7 @@ pub fn init(
 ) !*BoundExpression {
     const result = try allocator.create(Self);
     result.* = .{
-        .base = BoundExpression.init(.binary_expression, &deinit, &@"type"),
+        .base = BoundExpression.init(.binary_expression, &deinit, &children, &@"type"),
         .left = left,
         .operator = operator,
         .right = right,
@@ -123,6 +123,14 @@ fn deinit(node: *const BoundNode, allocator: std.mem.Allocator) void {
     self.left.deinit(allocator);
     self.right.deinit(allocator);
     allocator.destroy(self);
+}
+
+fn children(node: *const BoundNode, allocator: std.mem.Allocator) ![]*const BoundNode {
+    const self = BoundExpression.downcastNode(node, Self);
+    return try allocator.dupe(*const BoundNode, &.{
+        &self.left.base,
+        &self.right.base,
+    });
 }
 
 fn @"type"(node: *const BoundExpression) Object.Type {

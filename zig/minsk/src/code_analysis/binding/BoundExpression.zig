@@ -14,12 +14,14 @@ const Self = @This();
 pub fn init(
     kind: BoundNodeKind,
     deinit_fn: BoundNode.DeinitFn,
+    children_fn: BoundNode.ChildrenFn,
     type_fn: TypeFn,
 ) Self {
     return .{
         .base = .{
             .kind = kind,
             .deinit_fn = deinit_fn,
+            .children_fn = children_fn,
         },
         .type_fn = type_fn,
     };
@@ -27,6 +29,10 @@ pub fn init(
 
 pub fn deinit(self: *const Self, allocator: std.mem.Allocator) void {
     self.base.deinit(allocator);
+}
+
+pub fn children(self: *const Self, allocator: std.mem.Allocator) ![]*const Self {
+    return try self.base.children(allocator);
 }
 
 pub fn @"type"(self: *const Self) Object.Type {

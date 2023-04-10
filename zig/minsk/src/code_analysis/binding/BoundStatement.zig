@@ -11,11 +11,13 @@ const Self = @This();
 pub fn init(
     kind: BoundNodeKind,
     deinit_fn: BoundNode.DeinitFn,
+    children_fn: BoundNode.ChildrenFn,
 ) Self {
     return .{
         .base = .{
             .kind = kind,
             .deinit_fn = deinit_fn,
+            .children_fn = children_fn,
         },
     };
 }

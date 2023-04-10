@@ -16,7 +16,7 @@ pub fn init(
 ) !*BoundStatement {
     const result = try allocator.create(Self);
     result.* = .{
-        .base = BoundStatement.init(.while_statement, &deinit),
+        .base = BoundStatement.init(.while_statement, &deinit, &children),
         .condition = condition,
         .body = body,
     };
@@ -28,4 +28,12 @@ fn deinit(node: *const BoundNode, allocator: std.mem.Allocator) void {
     self.condition.deinit(allocator);
     self.body.deinit(allocator);
     allocator.destroy(self);
+}
+
+fn children(node: *const BoundNode, allocator: std.mem.Allocator) ![]*const BoundNode {
+    const self = BoundStatement.downcastNode(node, Self);
+    return try allocator.dupe(*const BoundNode, &.{
+        &self.condition.base,
+        &self.body.base,
+    });
 }
