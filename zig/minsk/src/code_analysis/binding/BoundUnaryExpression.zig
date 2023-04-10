@@ -18,6 +18,7 @@ pub const Operator = struct {
         identity,
         negation,
         logical_negation,
+        bitwise_negation,
     };
 
     fn initMatching(syntax_kind: SyntaxKind, kind: Kind, matching_type: Object.Type) Operator {
@@ -33,6 +34,7 @@ pub const Operator = struct {
         initMatching(.plus_token, .identity, .integer),
         initMatching(.minus_token, .negation, .integer),
         initMatching(.bang_token, .logical_negation, .boolean),
+        initMatching(.tilde_token, .bitwise_negation, .integer),
     };
 
     pub fn bind(syntax_kind: SyntaxKind, operand_type: Object.Type) ?Operator {

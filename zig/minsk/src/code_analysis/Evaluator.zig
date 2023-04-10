@@ -143,8 +143,8 @@ fn evaluateBinaryExpression(self: *Self, node: *const BoundBinaryExpression) !Ob
     const right = try self.evaluateExpression(node.right);
 
     return switch (node.operator.kind) {
-        .addition => .{ .integer = left.integer + right.integer },
-        .subtraction => .{ .integer = left.integer - right.integer },
+        .addition => .{ .integer = left.integer +% right.integer },
+        .subtraction => .{ .integer = left.integer -% right.integer },
         .multiplication => .{ .integer = left.integer *% right.integer },
         .division => .{ .integer = @divTrunc(left.integer, right.integer) },
         .logical_and => .{ .boolean = left.boolean and right.boolean },
@@ -155,6 +155,18 @@ fn evaluateBinaryExpression(self: *Self, node: *const BoundBinaryExpression) !Ob
         .less_than_or_equal => .{ .boolean = left.integer <= right.integer },
         .greater_than => .{ .boolean = left.integer > right.integer },
         .greater_than_or_equal => .{ .boolean = left.integer >= right.integer },
+        .bitwise_and => switch (left) {
+            .integer => |li| .{ .integer = li & right.integer },
+            .boolean => |lb| .{ .boolean = lb and right.boolean },
+        },
+        .bitwise_or => switch (left) {
+            .integer => |li| .{ .integer = li | right.integer },
+            .boolean => |lb| .{ .boolean = lb or right.boolean },
+        },
+        .bitwise_xor => switch (left) {
+            .integer => |li| .{ .integer = li ^ right.integer },
+            .boolean => |lb| .{ .boolean = lb != right.boolean },
+        },
     };
 }
 
@@ -169,6 +181,7 @@ fn evaluateUnaryExpression(self: *Self, node: *const BoundUnaryExpression) !Obje
         .identity => .{ .integer = operand.integer },
         .negation => .{ .integer = -operand.integer },
         .logical_negation => .{ .boolean = !operand.boolean },
+        .bitwise_negation => .{ .integer = @bitReverse(operand.integer) },
     };
 }
 

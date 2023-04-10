@@ -29,6 +29,9 @@ pub const Operator = struct {
         less_than_or_equal,
         greater_than,
         greater_than_or_equal,
+        bitwise_and,
+        bitwise_or,
+        bitwise_xor,
     };
 
     fn init(
@@ -75,6 +78,13 @@ pub const Operator = struct {
 
         initMatching(.bang_equals_token, .inequality, .boolean),
         Operator.init(.bang_equals_token, .inequality, .integer, .integer, .boolean),
+
+        initMatching(.ampersand_token, .bitwise_and, .integer),
+        initMatching(.ampersand_token, .bitwise_and, .boolean),
+        initMatching(.pipe_token, .bitwise_or, .integer),
+        initMatching(.pipe_token, .bitwise_or, .boolean),
+        initMatching(.hat_token, .bitwise_xor, .integer),
+        initMatching(.hat_token, .bitwise_xor, .boolean),
     };
 
     pub fn bind(syntax_kind: SyntaxKind, left_type: Object.Type, right_type: Object.Type) ?Operator {
