@@ -203,6 +203,58 @@ const diagnostic_tests = struct {
         try assertHasDiagnostics(state, text, diagnostics, out_msg);
     }
 
+    pub fn ifStatementReportsCannotConvert(state: *t.TestState, _: void, out_msg: *[]const u8) t.TestExit!void {
+        const text =
+            \\{
+            \\  if [10]
+            \\    var x = true
+            \\}
+        ;
+        const diagnostics =
+            \\Cannot convert type Integer to type Boolean.
+        ;
+        try assertHasDiagnostics(state, text, diagnostics, out_msg);
+    }
+
+    pub fn whileStatementReportsCannotConvert(state: *t.TestState, _: void, out_msg: *[]const u8) t.TestExit!void {
+        const text =
+            \\{
+            \\  while [10]
+            \\    var x = true
+            \\}
+        ;
+        const diagnostics =
+            \\Cannot convert type Integer to type Boolean.
+        ;
+        try assertHasDiagnostics(state, text, diagnostics, out_msg);
+    }
+
+    pub fn forStatementReportsCannotConvertLowerBound(state: *t.TestState, _: void, out_msg: *[]const u8) t.TestExit!void {
+        const text =
+            \\{
+            \\  for i = [true] to 10
+            \\    var x = true
+            \\}
+        ;
+        const diagnostics =
+            \\Cannot convert type Boolean to type Integer.
+        ;
+        try assertHasDiagnostics(state, text, diagnostics, out_msg);
+    }
+
+    pub fn forStatementReportsCannotConvertUpperBound(state: *t.TestState, _: void, out_msg: *[]const u8) t.TestExit!void {
+        const text =
+            \\{
+            \\  for i = 1 to [false]
+            \\    var x = true
+            \\}
+        ;
+        const diagnostics =
+            \\Cannot convert type Boolean to type Integer.
+        ;
+        try assertHasDiagnostics(state, text, diagnostics, out_msg);
+    }
+
     pub fn unaryReportsUndefined(state: *t.TestState, _: void, out_msg: *[]const u8) t.TestExit!void {
         const text =
             \\[+]true
