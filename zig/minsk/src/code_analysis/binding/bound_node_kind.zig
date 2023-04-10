@@ -10,4 +10,5 @@ pub const BoundNodeKind = enum {
     variable_declaration,
     if_statement,
     while_statement,
+    for_statement,
 };

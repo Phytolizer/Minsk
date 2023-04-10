@@ -12,6 +12,7 @@ const BoundExpressionStatement = @import("binding/BoundExpressionStatement.zig")
 const BoundVariableDeclaration = @import("binding/BoundVariableDeclaration.zig");
 const BoundIfStatement = @import("binding/BoundIfStatement.zig");
 const BoundWhileStatement = @import("binding/BoundWhileStatement.zig");
+const BoundForStatement = @import("binding/BoundForStatement.zig");
 
 const Object = @import("minsk_runtime").Object;
 const VariableSymbol = @import("VariableSymbol.zig");
@@ -45,6 +46,9 @@ fn evaluateStatement(self: *Self, node: *const BoundStatement) std.mem.Allocator
         .expression_statement => try self.evaluateExpressionStatement(
             BoundStatement.downcast(node, BoundExpressionStatement),
         ),
+        .for_statement => try self.evaluateForStatement(
+            BoundStatement.downcast(node, BoundForStatement),
+        ),
         .if_statement => try self.evaluateIfStatement(
             BoundStatement.downcast(node, BoundIfStatement),
         ),
@@ -70,6 +74,22 @@ fn evaluateIfStatement(self: *Self, node: *const BoundIfStatement) !void {
         try self.evaluateStatement(node.then_statement);
     } else if (node.else_statement) |es| {
         try self.evaluateStatement(es);
+    }
+}
+
+fn evaluateForStatement(self: *Self, node: *const BoundForStatement) !void {
+    const lower_bound = (try self.evaluateExpression(node.lower_bound)).integer;
+
+    try self.variables.put(node.variable, .{ .integer = lower_bound });
+    while (true) {
+        const upper_bound = (try self.evaluateExpression(node.upper_bound)).integer;
+        if (self.variables.get(node.variable).?.integer > upper_bound) break;
+
+        try self.evaluateStatement(node.body);
+        self.variables.putAssumeCapacity(
+            node.variable,
+            .{ .integer = self.variables.get(node.variable).?.integer + 1 },
+        );
     }
 }
 
@@ -153,5 +173,5 @@ fn evaluateUnaryExpression(self: *Self, node: *const BoundUnaryExpression) !Obje
 }
 
 fn evaluateVariableExpression(self: *Self, node: *const BoundVariableExpression) !Object {
-    return self.variables.get(node.variable).?.?;
+    return self.variables.get(node.variable).?;
 }

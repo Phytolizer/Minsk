@@ -16,6 +16,7 @@ const VariableDeclarationSyntax = @import("../syntax/VariableDeclarationSyntax.z
 const IfStatementSyntax = @import("../syntax/IfStatementSyntax.zig");
 const ElseClauseSyntax = @import("../syntax/ElseClauseSyntax.zig");
 const WhileStatementSyntax = @import("../syntax/WhileStatementSyntax.zig");
+const ForStatementSyntax = @import("../syntax/ForStatementSyntax.zig");
 
 const BoundExpression = @import("BoundExpression.zig");
 const BoundScope = @import("BoundScope.zig");
@@ -32,6 +33,7 @@ const BoundExpressionStatement = @import("BoundExpressionStatement.zig");
 const BoundVariableDeclaration = @import("BoundVariableDeclaration.zig");
 const BoundIfStatement = @import("BoundIfStatement.zig");
 const BoundWhileStatement = @import("BoundWhileStatement.zig");
+const BoundForStatement = @import("BoundForStatement.zig");
 
 const Object = @import("minsk_runtime").Object;
 
@@ -114,6 +116,9 @@ fn bindStatement(self: *Self, syntax: *StatementSyntax) AllocError!*BoundStateme
         .block_statement => try self.bindBlockStatement(
             StatementSyntax.downcast(syntax, BlockStatementSyntax),
         ),
+        .for_statement => try self.bindForStatement(
+            StatementSyntax.downcast(syntax, ForStatementSyntax),
+        ),
         .if_statement => try self.bindIfStatement(
             StatementSyntax.downcast(syntax, IfStatementSyntax),
         ),
@@ -152,6 +157,36 @@ fn bindIfStatement(self: *Self, syntax: *IfStatementSyntax) !*BoundStatement {
     else
         null;
     return try BoundIfStatement.init(self.allocator, condition, then_statement, else_statement);
+}
+
+fn bindForStatement(self: *Self, syntax: *ForStatementSyntax) !*BoundStatement {
+    const lower_bound = try self.bindExpression(syntax.lower_bound, .{ .ty = .integer });
+    const upper_bound = try self.bindExpression(syntax.upper_bound, .{ .ty = .integer });
+
+    const scope = try BoundScope.init(self.allocator, self.scope);
+    defer scope.deinit(.without_parents);
+    const old_scope = self.scope;
+    self.scope = scope;
+    defer self.scope = old_scope;
+
+    const name = syntax.identifier_token.text;
+    const variable = VariableSymbol{
+        .name = name,
+        .ty = .integer,
+        .is_read_only = true,
+    };
+    // new scope, this should never fail
+    std.debug.assert(try self.scope.tryDeclare(variable));
+
+    const body = try self.bindStatement(syntax.body);
+
+    return try BoundForStatement.init(
+        self.allocator,
+        variable,
+        lower_bound,
+        upper_bound,
+        body,
+    );
 }
 
 fn bindWhileStatement(self: *Self, syntax: *WhileStatementSyntax) !*BoundStatement {

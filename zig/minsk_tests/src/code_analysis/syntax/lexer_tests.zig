@@ -52,6 +52,7 @@ fn requireTestsAllTokens() void {
     const messages = comptime blk: {
         var result: []const []const u8 = &.{};
         for (token_kinds) |tk| {
+            @setEvalBranchQuota(10000);
             if (std.mem.indexOfScalar(SyntaxKind, tested_token_kinds, tk) == null) {
                 result = result ++ &[_][]const u8{
                     std.fmt.comptimePrint("missing token kind: {s}", .{tk.displayName()}),
