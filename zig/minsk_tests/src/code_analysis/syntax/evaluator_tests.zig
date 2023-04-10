@@ -5,6 +5,7 @@ const Compilation = @import("minsk").code_analysis.Compilation;
 const SyntaxTree = @import("minsk").code_analysis.syntax.SyntaxTree;
 const VariableSymbol = @import("minsk").code_analysis.VariableSymbol;
 const AnnotatedText = @import("AnnotatedText.zig");
+const camelToDisplay = @import("../../camel_to_display.zig").camelToDisplay;
 
 const EvaluatorTest = struct {
     text: []const u8,
@@ -15,27 +16,28 @@ const EvaluatorTest = struct {
     }
 };
 
-fn correctEvaluation(state: *t.TestState, tt: EvaluatorTest, out_msg: *[]const u8) t.TestExit!void {
-    const syntax_tree = SyntaxTree.parse(t.allocator, tt.text) catch unreachable;
+fn correctEvaluation(state: *t.TestState, ctx: EvaluatorTest, out_msg: *[]const u8) t.TestExit!void {
+    try assertHasValue(state, ctx.text, ctx.expected_value, out_msg);
+}
+
+fn assertHasValue(state: *t.TestState, text: []const u8, expected_value: Object, out_msg: *[]const u8) t.TestExit!void {
+    const syntax_tree = SyntaxTree.parse(t.allocator, text) catch unreachable;
     var compilation = Compilation.init(t.allocator, syntax_tree) catch unreachable;
     defer compilation.deinit(.with_parents);
     var variables = VariableSymbol.Map.init(t.allocator);
     defer variables.deinit();
     const actual_result = compilation.evaluate(&variables) catch unreachable;
+    defer actual_result.deinit(t.allocator);
 
     switch (actual_result) {
         .success => |value| try t.assert(
             state,
-            value.eq(tt.expected_value),
+            value.eq(expected_value),
             "value mismatch ({} != {})",
-            .{ value, tt.expected_value },
+            .{ value, expected_value },
             out_msg,
         ),
         .failure => |diagnostics| {
-            defer {
-                for (diagnostics) |d| d.deinit(t.allocator);
-                t.allocator.free(diagnostics);
-            }
             const diagnostic_strings = t.allocator.alloc([]const u8, diagnostics.len) catch unreachable;
             for (diagnostics, diagnostic_strings) |d, *s| {
                 s.* = std.fmt.allocPrint(t.allocator, "{s}", .{d}) catch unreachable;
@@ -130,34 +132,97 @@ fn assertHasDiagnostics(
         try t.assert(
             state,
             std.meta.eql(expected_span, actual_diagnostic.span),
-            "expected span {d}..{d}, got {d}..{d}",
-            .{
-                expected_span.start,
-                expected_span.end(),
-                actual_diagnostic.span.start,
-                actual_diagnostic.span.end(),
-            },
+            "expected span {}, got {}",
+            .{ expected_span, actual_diagnostic.span },
             out_msg,
         );
     }
 }
 
-fn variableDeclarationReportsRedeclaration(state: *t.TestState, _: void, out_msg: *[]const u8) t.TestExit!void {
-    const text =
-        \\{
-        \\  var x = 10
-        \\  var y = 100
-        \\  {
-        \\    var x = 10
-        \\  }
-        \\  var [x] = 5
-        \\}
-    ;
-    const diagnostics =
-        \\Variable 'x' has already been declared.
-    ;
-    try assertHasDiagnostics(state, text, diagnostics, out_msg);
-}
+const diagnostic_tests = struct {
+    pub fn variableDeclarationReportsRedeclaration(state: *t.TestState, _: void, out_msg: *[]const u8) t.TestExit!void {
+        const text =
+            \\{
+            \\  var x = 10
+            \\  var y = 100
+            \\  {
+            \\    var x = 10
+            \\  }
+            \\  var [x] = 5
+            \\}
+        ;
+        const diagnostics =
+            \\Variable 'x' has already been declared.
+        ;
+        try assertHasDiagnostics(state, text, diagnostics, out_msg);
+    }
+
+    pub fn nameExpressionReportsUndefined(state: *t.TestState, _: void, out_msg: *[]const u8) t.TestExit!void {
+        const text =
+            \\[x] * 10
+        ;
+        const diagnostics =
+            \\Variable 'x' doesn't exist.
+        ;
+        try assertHasDiagnostics(state, text, diagnostics, out_msg);
+    }
+
+    pub fn assignmentExpressionReportsUndefined(state: *t.TestState, _: void, out_msg: *[]const u8) t.TestExit!void {
+        const text =
+            \\[x] = 10
+        ;
+        const diagnostics =
+            \\Variable 'x' doesn't exist.
+        ;
+        try assertHasDiagnostics(state, text, diagnostics, out_msg);
+    }
+
+    pub fn assignmentReportsCannotAssign(state: *t.TestState, _: void, out_msg: *[]const u8) t.TestExit!void {
+        const text =
+            \\{
+            \\  let x = 10
+            \\  x [=] 0
+            \\}
+        ;
+        const diagnostics =
+            \\Variable 'x' is read-only and cannot be assigned to.
+        ;
+        try assertHasDiagnostics(state, text, diagnostics, out_msg);
+    }
+
+    pub fn assignmentReportsCannotConvert(state: *t.TestState, _: void, out_msg: *[]const u8) t.TestExit!void {
+        const text =
+            \\{
+            \\  var x = 10
+            \\  x = [true]
+            \\}
+        ;
+        const diagnostics =
+            \\Cannot convert type Boolean to type Integer.
+        ;
+        try assertHasDiagnostics(state, text, diagnostics, out_msg);
+    }
+
+    pub fn unaryReportsUndefined(state: *t.TestState, _: void, out_msg: *[]const u8) t.TestExit!void {
+        const text =
+            \\[+]true
+        ;
+        const diagnostics =
+            \\Unary operator '+' is not defined for type Boolean.
+        ;
+        try assertHasDiagnostics(state, text, diagnostics, out_msg);
+    }
+
+    pub fn binaryReportsUndefined(state: *t.TestState, _: void, out_msg: *[]const u8) t.TestExit!void {
+        const text =
+            \\10 [&&] false
+        ;
+        const diagnostics =
+            \\Binary operator '&&' is not defined for types Integer and Boolean.
+        ;
+        try assertHasDiagnostics(state, text, diagnostics, out_msg);
+    }
+};
 
 pub fn evaluatorTestSuite(state: *t.TestState) void {
     const et = EvaluatorTest.init;
@@ -197,12 +262,14 @@ pub fn evaluatorTestSuite(state: *t.TestState) void {
             .allocated,
         );
 
-    t.runTest(
-        state,
-        void,
-        variableDeclarationReportsRedeclaration,
-        {},
-        "variable declaration reports redeclaration",
-        .static,
-    );
+    inline for (@typeInfo(diagnostic_tests).Struct.decls) |decl| {
+        t.runTest(
+            state,
+            void,
+            @field(diagnostic_tests, decl.name),
+            {},
+            comptime camelToDisplay(decl.name),
+            .static,
+        );
+    }
 }
