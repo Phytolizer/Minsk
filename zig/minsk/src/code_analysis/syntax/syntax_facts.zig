@@ -35,6 +35,8 @@ pub fn keywordKind(text: []const u8) SyntaxKind {
         .{ "false", .false_keyword },
         .{ "let", .let_keyword },
         .{ "var", .var_keyword },
+        .{ "if", .if_keyword },
+        .{ "else", .else_keyword },
     });
     return keywords.get(text) orelse .identifier_token;
 }
@@ -63,6 +65,8 @@ pub fn getText(kind: SyntaxKind) ?[]const u8 {
         .true_keyword => "true",
         .let_keyword => "let",
         .var_keyword => "var",
+        .if_keyword => "if",
+        .else_keyword => "else",
         else => null,
     };
 }

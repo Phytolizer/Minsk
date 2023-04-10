@@ -8,4 +8,5 @@ pub const BoundNodeKind = enum {
     block_statement,
     expression_statement,
     variable_declaration,
+    if_statement,
 };

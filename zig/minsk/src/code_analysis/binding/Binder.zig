@@ -8,6 +8,8 @@ const LiteralExpressionSyntax = @import("../syntax/LiteralExpressionSyntax.zig")
 const NameExpressionSyntax = @import("../syntax/NameExpressionSyntax.zig");
 const ParenthesizedExpressionSyntax = @import("../syntax/ParenthesizedExpressionSyntax.zig");
 const UnaryExpressionSyntax = @import("../syntax/UnaryExpressionSyntax.zig");
+const IfStatementSyntax = @import("../syntax/IfStatementSyntax.zig");
+const ElseClauseSyntax = @import("../syntax/ElseClauseSyntax.zig");
 
 const StatementSyntax = @import("../syntax/StatementSyntax.zig");
 const BlockStatementSyntax = @import("../syntax/BlockStatementSyntax.zig");
@@ -27,6 +29,7 @@ const BoundStatement = @import("BoundStatement.zig");
 const BoundBlockStatement = @import("BoundBlockStatement.zig");
 const BoundExpressionStatement = @import("BoundExpressionStatement.zig");
 const BoundVariableDeclaration = @import("BoundVariableDeclaration.zig");
+const BoundIfStatement = @import("BoundIfStatement.zig");
 
 const Object = @import("minsk_runtime").Object;
 
@@ -109,6 +112,9 @@ fn bindStatement(self: *Self, syntax: *StatementSyntax) AllocError!*BoundStateme
         .block_statement => try self.bindBlockStatement(
             StatementSyntax.downcast(syntax, BlockStatementSyntax),
         ),
+        .if_statement => try self.bindIfStatement(
+            StatementSyntax.downcast(syntax, IfStatementSyntax),
+        ),
         .variable_declaration => try self.bindVariableDeclaration(
             StatementSyntax.downcast(syntax, VariableDeclarationSyntax),
         ),
@@ -133,14 +139,24 @@ fn bindBlockStatement(self: *Self, syntax: *BlockStatementSyntax) !*BoundStateme
     return try BoundBlockStatement.init(self.allocator, try statements.toOwnedSlice());
 }
 
+fn bindIfStatement(self: *Self, syntax: *IfStatementSyntax) !*BoundStatement {
+    const condition = try self.bindExpression(syntax.condition, .{ .ty = .boolean });
+    const then_statement = try self.bindStatement(syntax.then_statement);
+    const else_statement = if (syntax.else_clause) |ec|
+        try self.bindStatement(ec.else_statement)
+    else
+        null;
+    return try BoundIfStatement.init(self.allocator, condition, then_statement, else_statement);
+}
+
 fn bindExpressionStatement(self: *Self, syntax: *ExpressionStatementSyntax) !*BoundStatement {
-    const expression = try self.bindExpression(syntax.expression);
+    const expression = try self.bindExpression(syntax.expression, .{});
     return try BoundExpressionStatement.init(self.allocator, expression);
 }
 
 fn bindVariableDeclaration(self: *Self, syntax: *VariableDeclarationSyntax) !*BoundStatement {
     const name = syntax.identifier_token.text;
-    const initializer = try self.bindExpression(syntax.initializer);
+    const initializer = try self.bindExpression(syntax.initializer, .{});
     const is_read_only = syntax.keyword_token.kind == .let_keyword;
     const variable = VariableSymbol{
         .name = name,
@@ -154,8 +170,12 @@ fn bindVariableDeclaration(self: *Self, syntax: *VariableDeclarationSyntax) !*Bo
     return try BoundVariableDeclaration.init(self.allocator, variable, initializer);
 }
 
-fn bindExpression(self: *Self, syntax: *ExpressionSyntax) AllocError!*BoundExpression {
-    return switch (syntax.base.kind) {
+fn bindExpression(
+    self: *Self,
+    syntax: *ExpressionSyntax,
+    comptime opts: struct { ty: ?Object.Type = null },
+) AllocError!*BoundExpression {
+    const result = switch (syntax.base.kind) {
         .assignment_expression => try self.bindAssignmentExpression(
             ExpressionSyntax.downcast(&syntax.base, AssignmentExpressionSyntax),
         ),
@@ -176,11 +196,20 @@ fn bindExpression(self: *Self, syntax: *ExpressionSyntax) AllocError!*BoundExpre
         ),
         else => unreachable,
     };
+    if (opts.ty) |ty| if (result.type() != ty) {
+        try self.diagnostics.reportCannotConvert(
+            try syntax.span(self.allocator),
+            result.type(),
+            ty,
+        );
+    };
+
+    return result;
 }
 
 fn bindAssignmentExpression(self: *Self, syntax: *AssignmentExpressionSyntax) !*BoundExpression {
     const name = syntax.identifier_token.text;
-    const expression = try self.bindExpression(syntax.expression);
+    const expression = try self.bindExpression(syntax.expression, .{});
     const variable = self.scope.tryLookup(name) orelse {
         try self.diagnostics.reportUndefinedName(syntax.identifier_token.span(), name);
         return expression;
@@ -203,8 +232,8 @@ fn bindAssignmentExpression(self: *Self, syntax: *AssignmentExpressionSyntax) !*
 }
 
 fn bindBinaryExpression(self: *Self, syntax: *BinaryExpressionSyntax) !*BoundExpression {
-    const left = try self.bindExpression(syntax.left);
-    const right = try self.bindExpression(syntax.right);
+    const left = try self.bindExpression(syntax.left, .{});
+    const right = try self.bindExpression(syntax.right, .{});
     const operator = BoundBinaryExpression.Operator.bind(
         syntax.operator_token.kind,
         left.type(),
@@ -238,11 +267,11 @@ fn bindNameExpression(self: *Self, syntax: *NameExpressionSyntax) !*BoundExpress
 }
 
 fn bindParenthesizedExpression(self: *Self, syntax: *ParenthesizedExpressionSyntax) !*BoundExpression {
-    return try self.bindExpression(syntax.expression);
+    return try self.bindExpression(syntax.expression, .{});
 }
 
 fn bindUnaryExpression(self: *Self, syntax: *UnaryExpressionSyntax) !*BoundExpression {
-    const operand = try self.bindExpression(syntax.operand);
+    const operand = try self.bindExpression(syntax.operand, .{});
     const operator = BoundUnaryExpression.Operator.bind(
         syntax.operator_token.kind,
         operand.type(),

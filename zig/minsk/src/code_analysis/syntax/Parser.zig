@@ -8,6 +8,8 @@ const LiteralExpressionSyntax = @import("LiteralExpressionSyntax.zig");
 const ParenthesizedExpressionSyntax = @import("ParenthesizedExpressionSyntax.zig");
 const AssignmentExpressionSyntax = @import("AssignmentExpressionSyntax.zig");
 const NameExpressionSyntax = @import("NameExpressionSyntax.zig");
+const IfStatementSyntax = @import("IfStatementSyntax.zig");
+const ElseClauseSyntax = @import("ElseClauseSyntax.zig");
 
 const StatementSyntax = @import("StatementSyntax.zig");
 const BlockStatementSyntax = @import("BlockStatementSyntax.zig");
@@ -113,6 +115,7 @@ fn parseStatement(self: *Self) AllocError!*StatementSyntax {
     return switch (self.current().kind) {
         .open_brace_token => try self.parseBlockStatement(),
         .let_keyword, .var_keyword => try self.parseVariableDeclaration(),
+        .if_keyword => try self.parseIfStatement(),
         else => try self.parseExpressionStatement(),
     };
 }
@@ -134,6 +137,29 @@ fn parseBlockStatement(self: *Self) AllocError!*StatementSyntax {
         try statements.toOwnedSlice(),
         close_brace_token,
     );
+}
+
+fn parseIfStatement(self: *Self) AllocError!*StatementSyntax {
+    const keyword_token = try self.matchToken(.if_keyword);
+    const condition = try self.parseExpression();
+    const then_statement = try self.parseStatement();
+    const else_clause = try self.parseOptionalElseClause();
+    return try IfStatementSyntax.init(
+        self.allocator,
+        keyword_token,
+        condition,
+        then_statement,
+        else_clause,
+    );
+}
+
+fn parseOptionalElseClause(self: *Self) AllocError!?*ElseClauseSyntax {
+    if (self.current().kind != .else_keyword)
+        return null;
+
+    const keyword_token = self.nextToken();
+    const statement = try self.parseStatement();
+    return try ElseClauseSyntax.init(self.allocator, keyword_token, statement);
 }
 
 fn parseVariableDeclaration(self: *Self) AllocError!*StatementSyntax {
