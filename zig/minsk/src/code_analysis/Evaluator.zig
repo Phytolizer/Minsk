@@ -11,6 +11,7 @@ const BoundBlockStatement = @import("binding/BoundBlockStatement.zig");
 const BoundExpressionStatement = @import("binding/BoundExpressionStatement.zig");
 const BoundVariableDeclaration = @import("binding/BoundVariableDeclaration.zig");
 const BoundIfStatement = @import("binding/BoundIfStatement.zig");
+const BoundWhileStatement = @import("binding/BoundWhileStatement.zig");
 
 const Object = @import("minsk_runtime").Object;
 const VariableSymbol = @import("VariableSymbol.zig");
@@ -47,6 +48,9 @@ fn evaluateStatement(self: *Self, node: *const BoundStatement) std.mem.Allocator
         .if_statement => try self.evaluateIfStatement(
             BoundStatement.downcast(node, BoundIfStatement),
         ),
+        .while_statement => try self.evaluateWhileStatement(
+            BoundStatement.downcast(node, BoundWhileStatement),
+        ),
         .variable_declaration => try self.evaluateVariableDeclaration(
             BoundStatement.downcast(node, BoundVariableDeclaration),
         ),
@@ -66,6 +70,14 @@ fn evaluateIfStatement(self: *Self, node: *const BoundIfStatement) !void {
         try self.evaluateStatement(node.then_statement);
     } else if (node.else_statement) |es| {
         try self.evaluateStatement(es);
+    }
+}
+
+fn evaluateWhileStatement(self: *Self, node: *const BoundWhileStatement) !void {
+    while (true) {
+        const condition = (try self.evaluateExpression(node.condition)).boolean;
+        if (!condition) break;
+        try self.evaluateStatement(node.body);
     }
 }
 

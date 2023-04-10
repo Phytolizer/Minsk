@@ -10,6 +10,7 @@ const AssignmentExpressionSyntax = @import("AssignmentExpressionSyntax.zig");
 const NameExpressionSyntax = @import("NameExpressionSyntax.zig");
 const IfStatementSyntax = @import("IfStatementSyntax.zig");
 const ElseClauseSyntax = @import("ElseClauseSyntax.zig");
+const WhileStatementSyntax = @import("WhileStatementSyntax.zig");
 
 const StatementSyntax = @import("StatementSyntax.zig");
 const BlockStatementSyntax = @import("BlockStatementSyntax.zig");
@@ -116,6 +117,7 @@ fn parseStatement(self: *Self) AllocError!*StatementSyntax {
         .open_brace_token => try self.parseBlockStatement(),
         .let_keyword, .var_keyword => try self.parseVariableDeclaration(),
         .if_keyword => try self.parseIfStatement(),
+        .while_keyword => try self.parseWhileStatement(),
         else => try self.parseExpressionStatement(),
     };
 }
@@ -150,6 +152,18 @@ fn parseIfStatement(self: *Self) AllocError!*StatementSyntax {
         condition,
         then_statement,
         else_clause,
+    );
+}
+
+fn parseWhileStatement(self: *Self) AllocError!*StatementSyntax {
+    const keyword_token = try self.matchToken(.while_keyword);
+    const condition = try self.parseExpression();
+    const body = try self.parseStatement();
+    return try WhileStatementSyntax.init(
+        self.allocator,
+        keyword_token,
+        condition,
+        body,
     );
 }
 

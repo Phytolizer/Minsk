@@ -34,6 +34,7 @@ pub const SyntaxKind = enum(usize) {
     var_keyword,
     if_keyword,
     else_keyword,
+    while_keyword,
 
     literal_expression,
     binary_expression,
@@ -46,6 +47,7 @@ pub const SyntaxKind = enum(usize) {
     expression_statement,
     variable_declaration,
     if_statement,
+    while_statement,
 
     compilation_unit,
     else_clause,

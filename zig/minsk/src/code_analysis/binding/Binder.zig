@@ -8,13 +8,14 @@ const LiteralExpressionSyntax = @import("../syntax/LiteralExpressionSyntax.zig")
 const NameExpressionSyntax = @import("../syntax/NameExpressionSyntax.zig");
 const ParenthesizedExpressionSyntax = @import("../syntax/ParenthesizedExpressionSyntax.zig");
 const UnaryExpressionSyntax = @import("../syntax/UnaryExpressionSyntax.zig");
-const IfStatementSyntax = @import("../syntax/IfStatementSyntax.zig");
-const ElseClauseSyntax = @import("../syntax/ElseClauseSyntax.zig");
 
 const StatementSyntax = @import("../syntax/StatementSyntax.zig");
 const BlockStatementSyntax = @import("../syntax/BlockStatementSyntax.zig");
 const ExpressionStatementSyntax = @import("../syntax/ExpressionStatementSyntax.zig");
 const VariableDeclarationSyntax = @import("../syntax/VariableDeclarationSyntax.zig");
+const IfStatementSyntax = @import("../syntax/IfStatementSyntax.zig");
+const ElseClauseSyntax = @import("../syntax/ElseClauseSyntax.zig");
+const WhileStatementSyntax = @import("../syntax/WhileStatementSyntax.zig");
 
 const BoundExpression = @import("BoundExpression.zig");
 const BoundScope = @import("BoundScope.zig");
@@ -30,6 +31,7 @@ const BoundBlockStatement = @import("BoundBlockStatement.zig");
 const BoundExpressionStatement = @import("BoundExpressionStatement.zig");
 const BoundVariableDeclaration = @import("BoundVariableDeclaration.zig");
 const BoundIfStatement = @import("BoundIfStatement.zig");
+const BoundWhileStatement = @import("BoundWhileStatement.zig");
 
 const Object = @import("minsk_runtime").Object;
 
@@ -115,6 +117,9 @@ fn bindStatement(self: *Self, syntax: *StatementSyntax) AllocError!*BoundStateme
         .if_statement => try self.bindIfStatement(
             StatementSyntax.downcast(syntax, IfStatementSyntax),
         ),
+        .while_statement => try self.bindWhileStatement(
+            StatementSyntax.downcast(syntax, WhileStatementSyntax),
+        ),
         .variable_declaration => try self.bindVariableDeclaration(
             StatementSyntax.downcast(syntax, VariableDeclarationSyntax),
         ),
@@ -147,6 +152,12 @@ fn bindIfStatement(self: *Self, syntax: *IfStatementSyntax) !*BoundStatement {
     else
         null;
     return try BoundIfStatement.init(self.allocator, condition, then_statement, else_statement);
+}
+
+fn bindWhileStatement(self: *Self, syntax: *WhileStatementSyntax) !*BoundStatement {
+    const condition = try self.bindExpression(syntax.condition, .{ .ty = .boolean });
+    const body = try self.bindStatement(syntax.body);
+    return try BoundWhileStatement.init(self.allocator, condition, body);
 }
 
 fn bindExpressionStatement(self: *Self, syntax: *ExpressionStatementSyntax) !*BoundStatement {

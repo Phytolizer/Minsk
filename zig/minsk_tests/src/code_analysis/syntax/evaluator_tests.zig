@@ -297,6 +297,18 @@ pub fn evaluatorTestSuite(state: *t.TestState) void {
             \\  a
             \\}
         , .{ .integer = 5 }),
+        et(
+            \\{
+            \\  var i = 10
+            \\  var result = 0
+            \\  while i > 0
+            \\  {
+            \\    result = result + i
+            \\    i = i - 1
+            \\  }
+            \\  result
+            \\}
+        , .{ .integer = 55 }),
     }) |tt|
         t.runTest(
             state,
