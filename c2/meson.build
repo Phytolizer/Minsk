@@ -29,8 +29,7 @@ arena_hdr_dep = dependency(
     default_options: ['warning_level=0'],
 )
 
-utf8proc_proj = cmake.subproject('utf8proc')
-utf8proc_dep = utf8proc_proj.dependency('utf8proc')
+utf8proc_dep = dependency('libutf8proc')
 
 subdir('arena')
 subdir('string')
