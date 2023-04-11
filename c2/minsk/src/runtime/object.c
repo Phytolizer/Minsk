@@ -1,10 +1,11 @@
 #include "minsk/runtime/object.h"
 
+#include <arena.h>
 #include <ctype.h>
 #include <inttypes.h>
+#include <minsk-platform/debugger.h>
+#include <minsk-string/string.h>
 #include <stdbool.h>
-
-#include "minsk-platform/debugger.h"
 
 static string_t prettify(Arena* arena, string_t str)
 {

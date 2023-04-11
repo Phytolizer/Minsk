@@ -2,10 +2,10 @@
 
 #include <arena.h>
 #include <stdbool.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stddef.h>  // IWYU pragma: keep
+#include <stdio.h>   // IWYU pragma: keep
+#include <stdlib.h>  // IWYU pragma: keep
+#include <string.h>  // IWYU pragma: keep
 
 typedef struct
 {

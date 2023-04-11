@@ -1,6 +1,10 @@
+#include <arena.h>
 #include <linenoise.h>
 #include <minsk-string/string.h>
+#include <minsk/code_analysis/syntax/kind.h>
 #include <minsk/code_analysis/syntax/lexer.h>
+#include <minsk/code_analysis/syntax/token.h>
+#include <minsk/runtime/object.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
