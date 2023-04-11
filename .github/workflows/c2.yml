@@ -35,4 +35,13 @@ jobs:
       run: 'meson setup build -Dbuildtype=release'
     - name: Build project
       run: 'meson compile -C build'
+  ci-success:
+    name: ci
+    if: ${{ success() }}
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - name: CI succeeded
+        run: exit 0
 
