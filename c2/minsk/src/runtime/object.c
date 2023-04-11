@@ -9,9 +9,11 @@ static bstring prettify(const_bstring str) {
   ballocmin(result, blength(str));
 
   bool next_upper = true;
-  for (int i = 0; i < blength(str); i++) {
+  for (size_t i = 0;; i++) {
     char c = bchar(str, i);
-    if (c == '_') {
+    if (c == '\0') {
+      break;
+    } else if (c == '_') {
       next_upper = true;
     } else if (next_upper) {
       next_upper = false;
