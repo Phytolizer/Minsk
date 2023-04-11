@@ -1,0 +1,4 @@
+/.cache
+/subprojects/*/
+!/subprojects/packagefiles
+/.minsk-history

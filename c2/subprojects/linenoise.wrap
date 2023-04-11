@@ -1,0 +1,7 @@
+[wrap-git]
+url = https://github.com/msteveb/linenoise.git
+revision = 137a3d42e4d55a98b3f6d3e66cde3424f68dcfb2
+patch_directory = linenoise
+
+[provide]
+linenoise = linenoise_dep

@@ -1,0 +1,14 @@
+---
+BasedOnStyle: Google
+PointerAlignment: Left
+AlignAfterOpenBracket: BlockIndent
+BreakBeforeBraces: Allman
+BinPackArguments: false
+BinPackParameters: false
+ColumnLimit: 80
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+ContinuationIndentWidth: 2
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortCaseLabelsOnASingleLine: true
+...

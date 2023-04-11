@@ -1,0 +1,7 @@
+[wrap-git]
+url = https://github.com/tsoding/arena.git
+revision = f9a0db39b2e4124db3e95427957e362a9b3a153f
+patch_directory = arena
+
+[provide]
+arena = arena_dep

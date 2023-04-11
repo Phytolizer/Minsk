@@ -1,0 +1,47 @@
+name: C (2)
+
+on:
+  push:
+    branches: [ main, staging, trying ]
+    paths:
+      - 'c2/**'
+      - '.github/workflows/c2.yml'
+  pull_request:
+    branches: [ main, staging, trying ]
+    paths:
+      - 'c2/**'
+      - '.github/workflows/c2.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: c2
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install Ninja
+      uses: seanmiddleditch/gha-setup-ninja@master
+
+    - uses: actions/setup-python@v3
+      with:
+        python-version: '3.10'
+    - name: Install Meson
+      run: 'pip install meson'
+    - name: Configure project
+      run: 'meson setup build -Dbuildtype=release'
+    - name: Build project
+      run: 'meson compile -C build'
+  ci-success:
+    name: ci
+    if: ${{ success() }}
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - name: CI succeeded
+        run: exit 0
+
