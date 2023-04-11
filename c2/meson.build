@@ -10,6 +10,8 @@ project(
     ],
 )
 
+cmake = import('cmake')
+
 linenoise_dep = dependency(
     'linenoise',
     fallback: [
@@ -34,6 +36,8 @@ arena_dep = dependency(
     ],
     default_options: ['warning_level=0'],
 )
+utf8proc_proj = cmake.subproject('utf8proc')
+utf8proc_dep = utf8proc_proj.dependency('utf8proc')
 
 subdir('platform')
 subdir('minsk')

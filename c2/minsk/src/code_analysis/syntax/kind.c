@@ -1,6 +1,5 @@
-#include "minsk/runtime/object.h"
+#include "minsk/code_analysis/syntax/kind.h"
 
-#include <inttypes.h>
 #include <stdbool.h>
 
 #include "minsk-platform/debugger.h"
@@ -36,32 +35,20 @@ static bstring prettify(const_bstring str)
   return result;
 }
 
-extern bstring minsk_object_type_display_name(minsk_object_type_t type)
+extern bstring minsk_syntax_kind_display_name(minsk_syntax_kind_t kind)
 {
-  switch (type)
+  switch (kind)
   {
 #define X(x)                          \
-  case MINSK_OBJECT_TYPE_##x:         \
+  case MINSK_SYNTAX_KIND_##x:         \
   {                                   \
     struct tagbstring t;              \
     blk2tbstr(t, #x, sizeof(#x) - 1); \
     return prettify(&t);              \
   }
-#include "minsk/runtime/private/object_types.xmacro"
+#include "minsk/code_analysis/syntax/private/kinds.xmacro"
 #undef X
   }
 
-  DEBUGGER_FATAL("invalid object type %d", type);
-}
-
-extern int minsk_object_show(minsk_object_t object, FILE* stream)
-{
-  switch (object.type)
-  {
-    case MINSK_OBJECT_TYPE_NIL: return fprintf(stream, "nil");
-    case MINSK_OBJECT_TYPE_INTEGER:
-      return fprintf(stream, "%" PRId64, object.integer);
-  }
-
-  DEBUGGER_FATAL("invalid object type %d", object.type);
+  DEBUGGER_FATAL("invalid syntax kind %d", kind);
 }

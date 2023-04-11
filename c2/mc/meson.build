@@ -4,6 +4,7 @@ mc_exe = executable(
     'app' / 'main.c',
     dependencies: [
         linenoise_dep,
+        minsk_dep,
         platform_dep,
         bstr_dep,
     ],

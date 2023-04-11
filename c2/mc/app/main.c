@@ -1,5 +1,6 @@
 #include <bstrlib.h>
 #include <linenoise.h>
+#include <minsk/code_analysis/syntax/lexer.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,14 +30,32 @@ extern int main(int argc, char** argv)
     struct tagbstring line;
     cstr2tbstr(line, raw_line);
 
-    if (biseqStatic(&line, "1 + 2 * 3"))
+    minsk_syntax_lexer_t lexer = minsk_syntax_lexer_new(&line);
+    while (true)
     {
-      fputs("7\n", stderr);
+      minsk_syntax_token_t tok = minsk_syntax_lexer_lex(&lexer);
+      bstring kind_name = minsk_syntax_kind_display_name(tok.kind);
+      printf(
+        "%.*s '%.*s'",
+        blength(kind_name),
+        bdata(kind_name),
+        blength(tok.text),
+        bdata(tok.text)
+      );
+      if (tok.value.type != MINSK_OBJECT_TYPE_NIL)
+      {
+        printf(" ");
+        minsk_object_show(tok.value, stdout);
+      }
+      printf("\n");
+      bdestroy(kind_name);
+      bdestroy(tok.text);
+      if (tok.kind == MINSK_SYNTAX_KIND_END_OF_FILE_TOKEN)
+      {
+        break;
+      }
     }
-    else
-    {
-      fputs("ERROR: Invalid expression!\n", stderr);
-    }
+
     free(raw_line);
   }
 
