@@ -1,0 +1,7 @@
+[wrap-git]
+url = https://github.com/websnarf/bstrlib.git
+revision = f0ff1e808102a42cdc7204a4bb6fe231a24c4546
+patch_directory = bstrlib
+
+[provide]
+bstrlib = bstr_dep
