@@ -23,6 +23,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Install Ninja
+      uses: seanmiddleditch/gha-setup-ninja@master
+
     - uses: actions/setup-python@v3
       with:
         python-version: '3.10'
