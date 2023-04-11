@@ -6,7 +6,7 @@ mc_exe = executable(
         linenoise_dep,
         minsk_dep,
         platform_dep,
-        bstr_dep,
+        string_dep,
     ],
     install: true,
     c_args: '-DNO_COMPLETION',

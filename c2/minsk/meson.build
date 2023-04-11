@@ -9,7 +9,7 @@ minsk_lib = static_library(
     minsk_src,
     include_directories: minsk_inc,
     dependencies: [
-        bstr_dep,
+        string_dep,
         platform_dep,
         utf8proc_dep,
     ],
@@ -19,7 +19,7 @@ minsk_dep = declare_dependency(
     link_with: minsk_lib,
     include_directories: minsk_inc,
     dependencies: [
-        bstr_dep,
+        string_dep,
         utf8proc_dep,
     ],
 )

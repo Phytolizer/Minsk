@@ -1,6 +1,7 @@
 #pragma once
 
-#include <bstrlib.h>
+#include <arena.h>
+#include <minsk-string/string.h>
 
 #include "minsk/meta/concat.h"
 
@@ -13,4 +14,5 @@ typedef enum
 #undef X
 } minsk_syntax_kind_t;
 
-extern bstring minsk_syntax_kind_display_name(minsk_syntax_kind_t kind);
+extern string_t
+minsk_syntax_kind_display_name(Arena* arena, minsk_syntax_kind_t kind);

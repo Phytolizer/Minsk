@@ -1,7 +1,7 @@
 #pragma once
 
-#include <bstrlib.h>
+#include <minsk-string/string.h>
 
 #include "minsk-platform/errno.h"
 
-extern minsk_errno_t minsk_chdir(const_bstring path);
+extern minsk_errno_t minsk_chdir(string_t path);

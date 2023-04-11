@@ -1,5 +1,5 @@
-#include <bstrlib.h>
 #include <linenoise.h>
+#include <minsk-string/string.h>
 #include <minsk/code_analysis/syntax/lexer.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -27,35 +27,35 @@ extern int main(int argc, char** argv)
       break;
     }
     linenoiseHistoryAdd(raw_line);
-    struct tagbstring line;
-    cstr2tbstr(line, raw_line);
+    string_t line = STRING_REF_FROM_C(raw_line);
+    Arena a = {0};
 
-    minsk_syntax_lexer_t lexer = minsk_syntax_lexer_new(&line);
+    minsk_syntax_lexer_t lexer = minsk_syntax_lexer_new(line);
     while (true)
     {
       minsk_syntax_token_t tok = minsk_syntax_lexer_lex(&lexer);
-      bstring kind_name = minsk_syntax_kind_display_name(tok.kind);
+      if (tok.kind == MINSK_SYNTAX_KIND_END_OF_FILE_TOKEN)
+      {
+        string_free(tok.text);
+        break;
+      }
+      string_t kind_name = minsk_syntax_kind_display_name(&a, tok.kind);
       printf(
-        "%.*s '%.*s'",
-        blength(kind_name),
-        bdata(kind_name),
-        blength(tok.text),
-        bdata(tok.text)
+        STRING_FMT ": '" STRING_FMT "'",
+        STRING_ARG(kind_name),
+        STRING_ARG(tok.text)
       );
+      string_free_arena(&a, kind_name);
+      string_free(tok.text);
       if (tok.value.type != MINSK_OBJECT_TYPE_NIL)
       {
         printf(" ");
         minsk_object_show(tok.value, stdout);
       }
       printf("\n");
-      bdestroy(kind_name);
-      bdestroy(tok.text);
-      if (tok.kind == MINSK_SYNTAX_KIND_END_OF_FILE_TOKEN)
-      {
-        break;
-      }
     }
 
+    arena_free(&a);
     free(raw_line);
   }
 

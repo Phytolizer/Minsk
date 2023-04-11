@@ -1,51 +1,47 @@
 #include "minsk/runtime/object.h"
 
+#include <ctype.h>
 #include <inttypes.h>
 #include <stdbool.h>
 
 #include "minsk-platform/debugger.h"
 
-static bstring prettify(const_bstring str)
+static string_t prettify(Arena* arena, string_t str)
 {
-  bstring result = blk2bstr("", 0);
-  ballocmin(result, blength(str));
+  string_t result = EMPTY_STRING;
+  string_reserve_arena(arena, &result, str.length);
 
   bool next_upper = true;
-  for (size_t i = 0;; i++)
+  for (size_t i = 0; i < str.length; i++)
   {
-    char c = bchar(str, i);
-    if (c == '\0')
-    {
-      break;
-    }
-    else if (c == '_')
+    if (str.data[i] == '_')
     {
       next_upper = true;
     }
     else if (next_upper)
     {
       next_upper = false;
-      bconchar(result, c);
+      string_append_arena(arena, &result, STRING_REF_DATA(&str.data[i], 1));
     }
     else
     {
-      bconchar(result, tolower(c));
+      char c = tolower(str.data[i]);
+      string_append_arena(arena, &result, STRING_REF_DATA(&c, 1));
     }
   }
 
   return result;
 }
 
-extern bstring minsk_object_type_display_name(minsk_object_type_t type)
+extern string_t
+minsk_object_type_display_name(Arena* arena, minsk_object_type_t type)
 {
   switch (type)
   {
-#define X(x)                          \
-  case MINSK_OBJECT_TYPE_##x:         \
-  {                                   \
-    struct tagbstring t;              \
-    blk2tbstr(t, #x, sizeof(#x) - 1); \
-    return prettify(&t);              \
+#define X(x)                                \
+  case MINSK_OBJECT_TYPE_##x:               \
+  {                                         \
+    return prettify(arena, STRING_REF(#x)); \
   }
 #include "minsk/runtime/private/object_types.xmacro"
 #undef X

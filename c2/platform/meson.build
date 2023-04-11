@@ -6,7 +6,7 @@ platform_lib = static_library(
     'src' / 'errno.c',
     include_directories: platform_inc,
     dependencies: [
-        bstr_dep,
+        string_dep,
     ],
 )
 

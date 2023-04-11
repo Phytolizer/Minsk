@@ -43,17 +43,13 @@ static overflow_t mul_overflow(uint64_t a, uint64_t b)
   };
 }
 
-static overflow_t parse_number(const_bstring str)
+static overflow_t parse_number(string_t str)
 {
   uint64_t result = 0;
-  for (size_t i = 0;; i++)
+  for (size_t i = 0; i < str.length; i++)
   {
     // not parsing UTF8 here, only valid chars are ASCII anyway
-    char c = bchar(str, i);
-    if (c == 0)
-    {
-      break;
-    }
+    char c = str.data[i];
 
     DEBUGGER_ASSERT(is_digit(c), "bad digit %d", c);
     overflow_t ov = mul_overflow(result, 10);
@@ -156,17 +152,17 @@ static void scan_digits(minsk_syntax_lexer_t* lexer)
   }
 }
 
-static bstring
-copy_current_text(minsk_syntax_lexer_t const* lexer, utf8proc_ssize_t start)
+static string_t
+ref_current_text(minsk_syntax_lexer_t const* lexer, utf8proc_ssize_t start)
 {
-  return blk2bstr(lexer->_text + start, lexer->_position - start);
+  return STRING_REF_DATA(lexer->_text + start, lexer->_position - start);
 }
 
-extern minsk_syntax_lexer_t minsk_syntax_lexer_new(const_bstring text)
+extern minsk_syntax_lexer_t minsk_syntax_lexer_new(string_t text)
 {
   return (minsk_syntax_lexer_t){
-    ._text = (utf8proc_uint8_t const*)bdata(text),
-    ._text_len = blength(text),
+    ._text = (utf8proc_uint8_t const*)text.data,
+    ._text_len = text.length,
     ._position = 0,
     ._peek_count = 0,
   };
@@ -176,7 +172,7 @@ extern minsk_syntax_token_t minsk_syntax_lexer_lex(minsk_syntax_lexer_t* lexer)
 {
   minsk_syntax_kind_t kind = MINSK_SYNTAX_KIND_BAD_TOKEN;
   utf8proc_ssize_t start = lexer->_position;
-  bstring text = NULL;
+  string_t text = EMPTY_STRING;
   minsk_object_t value = MINSK_OBJECT_NIL;
 
 #define TOK(n, k)   \
@@ -206,7 +202,7 @@ extern minsk_syntax_token_t minsk_syntax_lexer_lex(minsk_syntax_lexer_t* lexer)
       {
         scan_digits(lexer);
         kind = MINSK_SYNTAX_KIND_NUMBER_TOKEN;
-        text = copy_current_text(lexer, start);
+        text = ref_current_text(lexer, start);
         overflow_t parse_result = parse_number(text);
         if (parse_result.did_overflow)
         {
@@ -226,9 +222,9 @@ extern minsk_syntax_token_t minsk_syntax_lexer_lex(minsk_syntax_lexer_t* lexer)
     next(lexer, 1);
   }
 
-  if (text == NULL)
+  if (text.length == 0)
   {
-    text = copy_current_text(lexer, start);
+    text = ref_current_text(lexer, start);
   }
   return (minsk_syntax_token_t){
     .kind = kind,

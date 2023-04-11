@@ -1,6 +1,6 @@
 #pragma once
 
-#include <bstrlib.h>
+#include <minsk-string/string.h>
 #include <utf8proc.h>
 
 #include "./token.h"
@@ -26,5 +26,5 @@ typedef struct
   utf8proc_ssize_t _peek_count;
 } minsk_syntax_lexer_t;
 
-extern minsk_syntax_lexer_t minsk_syntax_lexer_new(const_bstring text);
+extern minsk_syntax_lexer_t minsk_syntax_lexer_new(string_t text);
 extern minsk_syntax_token_t minsk_syntax_lexer_lex(minsk_syntax_lexer_t* lexer);

@@ -1,6 +1,7 @@
 #pragma once
 
-#include <bstrlib.h>
+#include <arena.h>
+#include <minsk-string/string.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -28,5 +29,6 @@ typedef struct
   ((minsk_object_t){.type = MINSK_OBJECT_TYPE_INTEGER, .integer = (i)})
 #define MINSK_OBJECT_NIL ((minsk_object_t){.type = MINSK_OBJECT_TYPE_NIL})
 
-extern bstring minsk_object_type_display_name(minsk_object_type_t type);
+extern string_t
+minsk_object_type_display_name(Arena* arena, minsk_object_type_t type);
 extern int minsk_object_show(minsk_object_t object, FILE* stream);
