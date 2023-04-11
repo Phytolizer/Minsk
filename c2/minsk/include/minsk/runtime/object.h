@@ -3,15 +3,18 @@
 #include <bstrlib.h>
 #include <stdint.h>
 
-typedef enum {
+typedef enum
+{
 #define X(x) MINSK_OBJECT_TYPE_##x,
 #include "./private/object_types.xmacro"
 #undef X
 } minsk_object_type_t;
 
-typedef struct {
+typedef struct
+{
   minsk_object_type_t type;
-  union {
+  union
+  {
     int64_t integer;
   };
 } minsk_object_t;

@@ -5,7 +5,8 @@
 #include "./kind.h"
 #include "minsk/runtime/object.h"
 
-typedef struct {
+typedef struct
+{
   minsk_syntax_kind_t kind;
   int position;
   bstring text;

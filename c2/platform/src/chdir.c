@@ -10,19 +10,22 @@
 #include <unistd.h>
 #endif
 
-extern minsk_errno_t minsk_chdir(const_bstring path) {
+extern minsk_errno_t minsk_chdir(const_bstring path)
+{
   char* temp_cstr = bstr2cstr(path, 0);
 #ifdef _WIN32
   DWORD ret = SetCurrentDirectory(temp_cstr);
   bcstrfree(temp_cstr);
-  if (ret == 0) {
+  if (ret == 0)
+  {
     return GetLastError();
   }
   return MINSK_NO_ERROR;
 #else
   int ret = chdir(temp_cstr);
   bcstrfree(temp_cstr);
-  if (ret != 0) {
+  if (ret != 0)
+  {
     return errno;
   }
   return MINSK_NO_ERROR;

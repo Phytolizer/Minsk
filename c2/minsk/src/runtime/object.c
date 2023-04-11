@@ -4,21 +4,30 @@
 
 #include "minsk-platform/debugger.h"
 
-static bstring prettify(const_bstring str) {
+static bstring prettify(const_bstring str)
+{
   bstring result = blk2bstr("", 0);
   ballocmin(result, blength(str));
 
   bool next_upper = true;
-  for (size_t i = 0;; i++) {
+  for (size_t i = 0;; i++)
+  {
     char c = bchar(str, i);
-    if (c == '\0') {
+    if (c == '\0')
+    {
       break;
-    } else if (c == '_') {
+    }
+    else if (c == '_')
+    {
       next_upper = true;
-    } else if (next_upper) {
+    }
+    else if (next_upper)
+    {
       next_upper = false;
       bconchar(result, c);
-    } else {
+    }
+    else
+    {
       bconchar(result, tolower(c));
     }
   }
@@ -26,10 +35,13 @@ static bstring prettify(const_bstring str) {
   return result;
 }
 
-extern bstring minsk_object_type_display_name(minsk_object_type_t type) {
-  switch (type) {
+extern bstring minsk_object_type_display_name(minsk_object_type_t type)
+{
+  switch (type)
+  {
 #define X(x)                          \
-  case MINSK_OBJECT_TYPE_##x: {       \
+  case MINSK_OBJECT_TYPE_##x:         \
+  {                                   \
     struct tagbstring t;              \
     blk2tbstr(t, #x, sizeof(#x) - 1); \
     return prettify(&t);              \

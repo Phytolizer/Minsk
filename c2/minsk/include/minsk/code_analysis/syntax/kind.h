@@ -2,7 +2,8 @@
 
 #define MINSK_PREFIX_SYNTAX_KIND MINSK_SYNTAX_KIND
 
-typedef enum {
+typedef enum
+{
 #define X(x) MINSK_PREFIX_SYNTAX_KIND##_##x,
 #include "./private/kinds.xmacro"
 #undef X
