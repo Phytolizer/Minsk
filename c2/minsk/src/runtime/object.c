@@ -2,6 +2,8 @@
 
 #include <stdbool.h>
 
+#include "minsk-platform/debugger.h"
+
 static bstring prettify(const_bstring str) {
   bstring result = blk2bstr("", 0);
   ballocmin(result, blength(str));
@@ -33,4 +35,6 @@ extern bstring minsk_object_type_display_name(minsk_object_type_t type) {
 #include "minsk/runtime/private/object_types.xmacro"
 #undef X
   }
+
+  DEBUGGER_FATAL("invalid object type %d", type);
 }

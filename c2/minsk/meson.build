@@ -9,6 +9,7 @@ minsk_lib = static_library(
     minsk_src,
     include_directories: minsk_inc,
     dependencies: [
+        platform_dep,
         bstr_dep,
     ],
 )
