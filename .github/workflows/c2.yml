@@ -25,7 +25,8 @@ jobs:
 
     - uses: actions/setup-python@v1
     - uses: BSFishy/meson-build@v1.0.3
-      working-directory: c2
+      defaults:
+        working-directory: c2
       with:
         setup-options: -Dbuildtype=release
         action: build
