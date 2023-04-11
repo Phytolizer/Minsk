@@ -10,8 +10,6 @@ project(
     ],
 )
 
-cmake = import('cmake')
-
 linenoise_dep = dependency(
     'linenoise',
     fallback: [
