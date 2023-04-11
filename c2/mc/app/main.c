@@ -2,7 +2,7 @@
 #include <linenoise.h>
 #include <minsk-string/string.h>
 #include <minsk/code_analysis/syntax/kind.h>
-#include <minsk/code_analysis/syntax/lexer.h>
+#include <minsk/code_analysis/syntax/parser.h>
 #include <minsk/code_analysis/syntax/token.h>
 #include <minsk/runtime/object.h>
 #include <stdbool.h>
@@ -34,30 +34,9 @@ extern int main(int argc, char** argv)
     string_t line = STRING_REF_FROM_C(raw_line);
     Arena a = {0};
 
-    minsk_syntax_lexer_t lexer = minsk_syntax_lexer_new(line);
-    while (true)
-    {
-      minsk_syntax_token_t tok = minsk_syntax_lexer_lex(&lexer);
-      if (tok.kind == MINSK_SYNTAX_KIND_END_OF_FILE_TOKEN)
-      {
-        string_free(tok.text);
-        break;
-      }
-      string_t kind_name = minsk_syntax_kind_display_name(&a, tok.kind);
-      printf(
-        STRING_FMT ": '" STRING_FMT "'",
-        STRING_ARG(kind_name),
-        STRING_ARG(tok.text)
-      );
-      string_free_arena(&a, kind_name);
-      string_free(tok.text);
-      if (tok.value.type != MINSK_OBJECT_TYPE_NIL)
-      {
-        printf(" ");
-        minsk_object_show(tok.value, stdout);
-      }
-      printf("\n");
-    }
+    minsk_syntax_parser_t parser = minsk_syntax_parser_new(&a, line);
+    minsk_syntax_node_t exp = minsk_syntax_parser_parse(&parser);
+    minsk_syntax_node_pretty_print(exp, stdout);
 
     arena_free(&a);
     free(raw_line);

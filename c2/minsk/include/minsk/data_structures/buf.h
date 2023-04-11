@@ -42,7 +42,7 @@
         (buf)->ptr = arena_realloc(                                         \
           arena,                                                            \
           (buf)->ptr,                                                       \
-          0,                                                                \
+          (buf)->len * sizeof(*(buf)->ptr),                                 \
           (buf)->cap * sizeof(*(buf)->ptr)                                  \
         );                                                                  \
       }                                                                     \
@@ -50,8 +50,8 @@
       {                                                                     \
         (buf)->ptr = realloc((buf)->ptr, (buf)->cap * sizeof(*(buf)->ptr)); \
       }                                                                     \
-      (buf)->ptr[(buf)->len++] = (val);                                     \
     }                                                                       \
+    (buf)->ptr[(buf)->len++] = (val);                                       \
   } while (false)
 
 #define BUF_PUSH(buf, val) BUF_PUSH_ARENA(NULL, buf, val)
