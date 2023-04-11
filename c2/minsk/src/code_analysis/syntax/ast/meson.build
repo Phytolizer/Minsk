@@ -1,4 +1,4 @@
 minsk_src += files(
-    'node_type.c',
     'node.c',
+    'node_type.c',
 )
