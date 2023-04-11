@@ -31,6 +31,8 @@ jobs:
         python-version: '3.10'
     - name: Install Meson
       run: 'pip install meson'
-    - name: Build project
+    - name: Configure project
       run: 'meson setup build -Dbuildtype=release'
+    - name: Build project
+      run: 'meson compile -C build'
 
