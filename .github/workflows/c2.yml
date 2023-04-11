@@ -5,12 +5,12 @@ on:
     branches: [ main, staging, trying ]
     paths:
       - 'c2/**'
-      - '.github/workflows/**'
+      - '.github/workflows/c2.yml'
   pull_request:
     branches: [ main, staging, trying ]
     paths:
       - 'c2/**'
-      - '.github/workflows/**'
+      - '.github/workflows/c2.yml'
 
 jobs:
   build:
