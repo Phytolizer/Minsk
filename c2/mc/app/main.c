@@ -15,6 +15,8 @@
 
 extern int main(int argc, char** argv)
 {
+  (void)argc;
+  (void)argv;
   if (!mc_set_cwd_from_meson())
   {
     return 1;
