@@ -2,6 +2,15 @@
 
 #include <minsk-platform/debugger.h>
 
+#include "minsk/code_analysis/syntax/ast/expression.h"
+#include "minsk/code_analysis/syntax/ast/expressions/binary.h"
+#include "minsk/code_analysis/syntax/ast/expressions/literal.h"
+#include "minsk/code_analysis/syntax/ast/expressions/parenthesized.h"
+#include "minsk/code_analysis/syntax/ast/node.h"
+#include "minsk/code_analysis/syntax/ast/node_type.h"
+#include "minsk/code_analysis/syntax/kind.h"
+#include "minsk/code_analysis/syntax/token.h"
+
 static minsk_object_t evaluate_expression(minsk_syntax_node_t const* root);
 static minsk_object_t evaluate_literal_expression(
   minsk_syntax_expression_literal_t syntax

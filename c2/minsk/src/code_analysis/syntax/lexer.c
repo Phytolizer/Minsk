@@ -1,5 +1,6 @@
 #include "minsk/code_analysis/syntax/lexer.h"
 
+#include <arena.h>
 #include <minsk-platform/debugger.h>
 #include <minsk-string/string.h>
 #include <stdbool.h>
@@ -9,6 +10,7 @@
 
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/code_analysis/syntax/token.h"
+#include "minsk/data_structures/buf.h"
 #include "minsk/runtime/object.h"
 
 typedef utf8proc_int32_t codepoint_t;

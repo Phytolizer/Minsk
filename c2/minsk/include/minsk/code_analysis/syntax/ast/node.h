@@ -1,9 +1,11 @@
 #pragma once
 
 #include <arena.h>
+#include <stdio.h>
 
 #include "./expression.h"
 #include "./node_type.h"
+#include "minsk/code_analysis/syntax/token.h"
 #include "minsk/data_structures/buf.h"
 
 typedef struct minsk_syntax_node

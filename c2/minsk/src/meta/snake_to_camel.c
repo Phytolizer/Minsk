@@ -1,6 +1,10 @@
 #include "minsk/meta/snake_to_camel.h"
 
+#include <arena.h>
 #include <ctype.h>
+#include <minsk-string/string.h>
+#include <stdbool.h>
+#include <stddef.h>
 
 extern string_t snake_to_camel(Arena* arena, string_t str)
 {

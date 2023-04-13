@@ -2,10 +2,15 @@
 
 #include <arena.h>
 #include <minsk-string/string.h>
-#include <minsk/code_analysis/syntax/kind.h>
-#include <minsk/code_analysis/syntax/lexer.h>
-#include <minsk/code_analysis/syntax/token.h>
 #include <stdbool.h>
+
+#include "minsk/code_analysis/syntax/ast/expression.h"
+#include "minsk/code_analysis/syntax/ast/node.h"
+#include "minsk/code_analysis/syntax/kind.h"
+#include "minsk/code_analysis/syntax/lexer.h"
+#include "minsk/code_analysis/syntax/token.h"
+#include "minsk/code_analysis/syntax/tree.h"
+#include "minsk/runtime/object.h"
 
 static minsk_syntax_token_t
 peek(minsk_syntax_parser_t const* parser, int offset)

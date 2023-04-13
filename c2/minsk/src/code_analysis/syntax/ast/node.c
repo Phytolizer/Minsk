@@ -1,9 +1,18 @@
 #include "minsk/code_analysis/syntax/ast/node.h"
 
+#include <arena.h>
 #include <minsk-platform/debugger.h>
 #include <minsk-string/string.h>
 #include <stdbool.h>
 #include <stdio.h>
+
+#include "minsk/code_analysis/syntax/ast/expression.h"
+#include "minsk/code_analysis/syntax/ast/expressions/binary.h"
+#include "minsk/code_analysis/syntax/ast/expressions/literal.h"
+#include "minsk/code_analysis/syntax/ast/expressions/parenthesized.h"
+#include "minsk/code_analysis/syntax/ast/node_type.h"
+#include "minsk/code_analysis/syntax/kind.h"
+#include "minsk/runtime/object.h"
 
 extern minsk_syntax_node_t*
 minsk_syntax_node_promote(Arena* arena, minsk_syntax_node_t node)

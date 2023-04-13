@@ -1,11 +1,8 @@
 #include "minsk/code_analysis/syntax/kind.h"
 
 #include <arena.h>
-#include <ctype.h>
 #include <minsk-platform/debugger.h>
 #include <minsk-string/string.h>
-#include <stdbool.h>
-#include <stddef.h>
 
 #include "minsk/meta/snake_to_camel.h"
 
