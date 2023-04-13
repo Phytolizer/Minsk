@@ -9,6 +9,6 @@ ColumnLimit: 80
 AllowAllArgumentsOnNextLine: false
 AllowAllParametersOfDeclarationOnNextLine: false
 ContinuationIndentWidth: 2
-AllowShortFunctionsOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: None
 AllowShortCaseLabelsOnASingleLine: true
 ...
