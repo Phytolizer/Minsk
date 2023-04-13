@@ -52,6 +52,14 @@ extern int main(int argc, char** argv)
       );
       continue;
     }
+    if (STRING_EQUAL(line, STRING_REF("#cls")))
+    {
+      free(raw_line);
+
+      printf("\x1b[2J\x1b[H");
+      fflush(stdout);
+      continue;
+    }
 
     Arena a = {0};
 
