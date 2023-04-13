@@ -1,12 +1,12 @@
 #include <arena.h>
 #include <linenoise.h>
 #include <minsk-string/string.h>
-#include <minsk/code_analysis/binding/binder.h>
-#include <minsk/code_analysis/diagnostic_buf.h>
-#include <minsk/code_analysis/evaluator.h>
+#include <minsk/code_analysis/compilation.h>
+#include <minsk/code_analysis/diagnostic_bag.h>
 #include <minsk/code_analysis/syntax/ast/node.h>
 #include <minsk/code_analysis/syntax/facts.h>
 #include <minsk/code_analysis/syntax/tree.h>
+#include <minsk/code_analysis/variable_map.h>
 #include <minsk/runtime/object.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -16,7 +16,8 @@
 
 #define HISTORY_PATH ".minsk-history"
 
-extern int main(int argc, char ** argv)
+extern int
+main(int argc, char ** argv)
 {
   (void)argc;
   (void)argv;
@@ -28,6 +29,8 @@ extern int main(int argc, char ** argv)
   linenoiseHistoryLoad(HISTORY_PATH);
 
   bool show_tree = false;
+  Arena var_arena = {0};
+  minsk_variable_map_t variables = minsk_variable_map_new(&var_arena);
 
   while (true)
   {
@@ -70,28 +73,38 @@ extern int main(int argc, char ** argv)
     {
       minsk_syntax_node_pretty_print(syntax_tree.root, stdout);
     }
-    minsk_diagnostic_buf_t diagnostics = syntax_tree.diagnostics;
-    minsk_binder_t binder = minsk_binder_new(&a);
-    minsk_bound_node_t bound_expression =
-      minsk_binder_bind_expression(&binder, syntax_tree.root);
+    minsk_compilation_t compilation = minsk_compilation_new(&a, syntax_tree);
+    minsk_evaluation_result_t result =
+      minsk_compilation_evaluate(&compilation, &variables);
 
-    BUF_APPEND_ARENA(&a, &diagnostics, binder.diagnostics);
-
-    if (diagnostics.len > 0)
+    if (!result.success)
     {
-      printf("\x1b[0;31m");
-      for (size_t i = 0; i < diagnostics.len; i++)
+      for (size_t i = 0; i < result.diagnostics.len; i++)
       {
-        printf(STRING_FMT "\n", STRING_ARG(diagnostics.ptr[i]));
+        minsk_diagnostic_t diagnostic = result.diagnostics.ptr[i];
+
+        printf("\n");
+        printf("\x1b[0;31m");
+        printf(STRING_FMT "\n", STRING_ARG(diagnostic.message));
+        printf("\x1b[0m");
+        string_t prefix = STRING_SUB(line, 0, diagnostic.span.start);
+        string_t error =
+          STRING_SUB_LEN(line, diagnostic.span.start, diagnostic.span.length);
+        string_t suffix =
+          STRING_SUB_AFTER(line, minsk_text_span_end(diagnostic.span));
+
+        printf("    " STRING_FMT, STRING_ARG(prefix));
+        printf("\x1b[0;31m");
+        printf(STRING_FMT, STRING_ARG(error));
+        printf("\x1b[0m");
+        printf(STRING_FMT "\n", STRING_ARG(suffix));
       }
-      printf("\x1b[0m");
+      printf("\n");
     }
     else
     {
-      minsk_evaluator_t e = minsk_evaluator_new(bound_expression);
-      minsk_object_t result = minsk_evaluator_evaluate(&e);
       printf("\x1b[0;35m");
-      minsk_object_show(result, stdout);
+      minsk_object_show(result.value, stdout);
       printf("\x1b[0m\n");
     }
 
@@ -99,6 +112,7 @@ extern int main(int argc, char ** argv)
     free(raw_line);
   }
 
+  arena_free(&var_arena);
   minsk_syntax_facts_free_keyword_table();
 
   linenoiseHistorySave(HISTORY_PATH);

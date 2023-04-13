@@ -7,8 +7,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <unicode/uchar.h>
-#include <unicode/utf8.h>
-#include <unicode/utypes.h>
+#include <unicode/urename.h>
+#include <unicode/utf.h>
 
 #include "minsk/code_analysis/syntax/facts.h"
 #include "minsk/code_analysis/syntax/kind.h"
@@ -18,7 +18,8 @@
 
 typedef UChar32 codepoint_t;
 
-static bool is_digit(codepoint_t cp)
+static bool
+is_digit(codepoint_t cp)
 {
   return cp >= '0' && cp <= '9';
 }
@@ -31,10 +32,11 @@ typedef struct
 
 enum
 {
-  UINT63_MAX = UINT64_MAX >> 1U,
+  UINT63_MAX = UINT64_MAX >> 1U
 };
 
-static overflow_t add_overflow(uint64_t a, uint64_t b)
+static overflow_t
+add_overflow(uint64_t a, uint64_t b)
 {
   uint64_t result = (a + b) & UINT63_MAX;
   return (overflow_t){
@@ -43,7 +45,8 @@ static overflow_t add_overflow(uint64_t a, uint64_t b)
   };
 }
 
-static overflow_t mul_overflow(uint64_t a, uint64_t b)
+static overflow_t
+mul_overflow(uint64_t a, uint64_t b)
 {
   return (overflow_t){
     .value = a * b,
@@ -51,7 +54,8 @@ static overflow_t mul_overflow(uint64_t a, uint64_t b)
   };
 }
 
-static overflow_t parse_number(string_t str)
+static overflow_t
+parse_number(string_t str)
 {
   uint64_t result = 0;
   for (size_t i = 0; i < str.length; i++)
@@ -75,7 +79,8 @@ static overflow_t parse_number(string_t str)
   return (overflow_t){.value = result};
 }
 
-static int64_t peek_pos(minsk_syntax_lexer_t const * lexer)
+static int64_t
+peek_pos(minsk_syntax_lexer_t const * lexer)
 {
   if (lexer->_peek_count > 0)
   {
@@ -86,7 +91,8 @@ static int64_t peek_pos(minsk_syntax_lexer_t const * lexer)
   return lexer->_position;
 }
 
-static codepoint_t peek(minsk_syntax_lexer_t * lexer, int64_t offset)
+static codepoint_t
+peek(minsk_syntax_lexer_t * lexer, int64_t offset)
 {
   DEBUGGER_ASSERT(offset < MINSK_SYNTAX_LEXER_MAX_PEEK, "offset too large");
   int64_t position = peek_pos(lexer);
@@ -118,19 +124,23 @@ static codepoint_t peek(minsk_syntax_lexer_t * lexer, int64_t offset)
   return lexer->_peek_buf[offset].cp;
 }
 
-static inline codepoint_t current(minsk_syntax_lexer_t * lexer)
+static inline codepoint_t
+current(minsk_syntax_lexer_t * lexer)
 {
   return peek(lexer, 0);
 }
 
 /// Set lexer->_position to reflect a call to `next`.
-static void move(minsk_syntax_lexer_t * lexer, int amount)
+static void
+move(minsk_syntax_lexer_t * lexer, int amount)
 {
   minsk_syntax_lexer_peek_char_t const * last = &lexer->_peek_buf[amount - 1];
   lexer->_position = last->position + last->size;
+  lexer->_char_position += amount;
 }
 
-static void next(minsk_syntax_lexer_t * lexer, int amount)
+static void
+next(minsk_syntax_lexer_t * lexer, int amount)
 {
   if (amount == 0)
   {
@@ -154,7 +164,8 @@ static void next(minsk_syntax_lexer_t * lexer, int amount)
   lexer->_peek_count -= amount;
 }
 
-static void scan_whitespace(minsk_syntax_lexer_t * lexer)
+static void
+scan_whitespace(minsk_syntax_lexer_t * lexer)
 {
   while (u_isUWhiteSpace(current(lexer)))
   {
@@ -162,7 +173,8 @@ static void scan_whitespace(minsk_syntax_lexer_t * lexer)
   }
 }
 
-static void scan_digits(minsk_syntax_lexer_t * lexer)
+static void
+scan_digits(minsk_syntax_lexer_t * lexer)
 {
   while (is_digit(current(lexer)))
   {
@@ -170,7 +182,8 @@ static void scan_digits(minsk_syntax_lexer_t * lexer)
   }
 }
 
-static void scan_identifier_or_keyword(minsk_syntax_lexer_t * lexer)
+static void
+scan_identifier_or_keyword(minsk_syntax_lexer_t * lexer)
 {
   while (u_hasBinaryProperty(current(lexer), UCHAR_XID_CONTINUE))
   {
@@ -184,28 +197,33 @@ ref_current_text(minsk_syntax_lexer_t const * lexer, int64_t start)
   return STRING_REF_DATA(lexer->_text + start, lexer->_position - start);
 }
 
-extern minsk_syntax_lexer_t minsk_syntax_lexer_new(Arena * arena, string_t text)
+extern minsk_syntax_lexer_t
+minsk_syntax_lexer_new(Arena * arena, string_t text)
 {
   return (minsk_syntax_lexer_t){
     ._arena = arena,
     ._text = (uint8_t const *)text.data,
     ._text_len = text.length,
     ._position = 0,
+    ._char_position = 0,
     ._peek_count = 0,
+    .diagnostics = minsk_diagnostic_bag_new(arena),
   };
 }
 
-extern minsk_syntax_token_t minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer)
+extern minsk_syntax_token_t
+minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer)
 {
   minsk_syntax_kind_t kind = MINSK_SYNTAX_KIND_BAD_TOKEN;
   int64_t start = lexer->_position;
+  int64_t start_char = lexer->_char_position;
   string_t text = EMPTY_STRING;
   minsk_object_t value = MINSK_OBJECT_NIL;
 
-#define TOK(n, k)   \
-  next(lexer, (n)); \
-  kind = (k);       \
-  break
+#define TOK(n, k)  \
+ next(lexer, (n)); \
+ kind = (k);       \
+ break
 
   codepoint_t cp = current(lexer);
   switch (cp)
@@ -231,7 +249,10 @@ extern minsk_syntax_token_t minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer)
       {
         TOK(2, MINSK_SYNTAX_KIND_EQUALS_EQUALS_TOKEN);
       }
-      break;
+      else
+      {
+        TOK(1, MINSK_SYNTAX_KIND_EQUALS_TOKEN);
+      }
     case '&':
       if (peek(lexer, 1) == '&')
       {
@@ -266,14 +287,13 @@ extern minsk_syntax_token_t minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer)
         overflow_t parse_result = parse_number(text);
         if (parse_result.did_overflow)
         {
-          BUF_PUSH_ARENA(
-            lexer->_arena,
+          minsk_text_span_t span =
+            minsk_text_span_from_bounds(start_char, lexer->_char_position);
+          minsk_diagnostic_bag_report_invalid_number(
             &lexer->diagnostics,
-            string_printf_arena(
-              lexer->_arena,
-              "The number literal '" STRING_FMT "' is too large.",
-              STRING_ARG(text)
-            )
+            span,
+            text,
+            STRING_REF("uint63")
           );
         }
         else
@@ -290,17 +310,10 @@ extern minsk_syntax_token_t minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer)
 
   if (kind == MINSK_SYNTAX_KIND_BAD_TOKEN)
   {
-    uint8_t charbuf[U8_MAX_LENGTH];
-    int64_t nbytes = 0;
-    U8_APPEND_UNSAFE(charbuf, nbytes, current(lexer));
-    BUF_PUSH_ARENA(
-      lexer->_arena,
+    minsk_diagnostic_bag_report_bad_character(
       &lexer->diagnostics,
-      string_printf_arena(
-        lexer->_arena,
-        "Bad character in input: '" STRING_FMT "'",
-        STRING_ARG(STRING_REF_DATA(charbuf, nbytes))
-      )
+      lexer->_char_position,
+      current(lexer)
     );
     next(lexer, 1);
   }

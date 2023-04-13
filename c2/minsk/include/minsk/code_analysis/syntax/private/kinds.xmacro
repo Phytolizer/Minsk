@@ -1,3 +1,5 @@
+// IWYU pragma: private, include "minsk/code_analysis/syntax/kind.h"
+
 X(BAD_TOKEN)
 X(END_OF_FILE_TOKEN)
 
@@ -18,6 +20,8 @@ X(PIPE_PIPE_TOKEN)
 
 X(BANG_EQUALS_TOKEN)
 X(EQUALS_EQUALS_TOKEN)
+
+X(EQUALS_TOKEN)
 
 X(FALSE_KEYWORD)
 X(TRUE_KEYWORD)

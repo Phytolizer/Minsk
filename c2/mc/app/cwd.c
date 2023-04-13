@@ -5,7 +5,8 @@
 #include <minsk-string/string.h>
 #include <stdlib.h>
 
-extern bool mc_set_cwd_from_meson(void)
+extern bool
+mc_set_cwd_from_meson(void)
 {
   const char * srcdir = getenv("MESON_SOURCE_ROOT");
   if (srcdir != NULL)

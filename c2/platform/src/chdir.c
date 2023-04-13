@@ -4,13 +4,14 @@
 
 // platform-specific includes
 #ifdef _WIN32
-#include <windows.h>
+ #include <windows.h>
 #else
-#include <errno.h>
-#include <unistd.h>
+ #include <errno.h>
+ #include <unistd.h>
 #endif
 
-extern minsk_errno_t minsk_chdir(string_t path)
+extern minsk_errno_t
+minsk_chdir(string_t path)
 {
   string_t temp = string_term(path, 0);
 #ifdef _WIN32

@@ -10,6 +10,7 @@
 #include "minsk/code_analysis/syntax/ast/expressions/binary.h"
 #include "minsk/code_analysis/syntax/ast/expressions/literal.h"
 #include "minsk/code_analysis/syntax/ast/expressions/parenthesized.h"
+#include "minsk/code_analysis/syntax/ast/expressions/unary.h"
 #include "minsk/code_analysis/syntax/ast/node_type.h"
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/runtime/object.h"
@@ -22,7 +23,8 @@ minsk_syntax_node_promote(Arena * arena, minsk_syntax_node_t node)
   return new_node;
 }
 
-static void pretty_print(
+static void
+pretty_print(
   Arena * arena,
   minsk_syntax_node_t node,
   FILE * stream,
@@ -109,6 +111,17 @@ minsk_syntax_node_children(Arena * arena, minsk_syntax_node_t node)
 {
   switch (node.type)
   {
+    case MINSK_SYNTAX_NODE_TYPE_ASSIGNMENT_EXPRESSION:
+    {
+      minsk_syntax_expression_assignment_t a = node.expression.assignment;
+      return BUF_LIT_ARENA(
+        arena,
+        minsk_syntax_node_buf_t,
+        MINSK_SYNTAX_NODE_TOKEN(a.identifier_token),
+        MINSK_SYNTAX_NODE_TOKEN(a.equals_token),
+        *a.expression
+      );
+    }
     case MINSK_SYNTAX_NODE_TYPE_BINARY_EXPRESSION:
     {
       minsk_syntax_expression_binary_t b = node.expression.binary;
@@ -127,6 +140,15 @@ minsk_syntax_node_children(Arena * arena, minsk_syntax_node_t node)
         arena,
         minsk_syntax_node_buf_t,
         MINSK_SYNTAX_NODE_TOKEN(l.literal_token)
+      );
+    }
+    case MINSK_SYNTAX_NODE_TYPE_NAME_EXPRESSION:
+    {
+      minsk_syntax_expression_name_t n = node.expression.name;
+      return BUF_LIT_ARENA(
+        arena,
+        minsk_syntax_node_buf_t,
+        MINSK_SYNTAX_NODE_TOKEN(n.identifier_token)
       );
     }
     case MINSK_SYNTAX_NODE_TYPE_PARENTHESIZED_EXPRESSION:

@@ -4,11 +4,12 @@
 #include <string.h>
 
 #ifdef _WIN32
-#include <windows.h>
+ #include <windows.h>
 #else
 #endif
 
-extern void minsk_report_error(minsk_errno_t error)
+extern void
+minsk_report_error(minsk_errno_t error)
 {
 #ifdef _WIN32
   char * buffer;

@@ -22,5 +22,6 @@ minsk_dep = declare_dependency(
     dependencies: [
         icuuc_dep,
         string_dep,
+        uthash_dep,
     ],
 )

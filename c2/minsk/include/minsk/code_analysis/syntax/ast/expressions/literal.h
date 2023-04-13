@@ -8,8 +8,8 @@ typedef struct
   minsk_object_t value;
 } minsk_syntax_expression_literal_t;
 
-#define MINSK_SYNTAX_EXPRESSION_LITERAL(...)   \
-  MINSK_SYNTAX_EXPRESSION(                     \
-    MINSK_SYNTAX_NODE_TYPE_LITERAL_EXPRESSION, \
-    .literal = {__VA_ARGS__}                   \
-  )
+#define MINSK_SYNTAX_EXPRESSION_LITERAL(...)  \
+ MINSK_SYNTAX_EXPRESSION(                     \
+   MINSK_SYNTAX_NODE_TYPE_LITERAL_EXPRESSION, \
+   .literal = {__VA_ARGS__}                   \
+ )

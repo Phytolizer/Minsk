@@ -1,6 +1,10 @@
 #include "minsk/code_analysis/syntax/facts.h"
 
+#include <stdlib.h>
 #include <uthash.h>
+
+#include "minsk-string/string.h"
+#include "minsk/code_analysis/syntax/kind.h"
 
 extern minsk_syntax_facts_precedence_t
 minsk_syntax_facts_binary_operator_precedence(minsk_syntax_kind_t kind)
@@ -30,6 +34,7 @@ minsk_syntax_facts_unary_operator_precedence(minsk_syntax_kind_t kind)
     default: return 0;
   }
 }
+
 typedef struct
 {
   string_t text;
@@ -39,7 +44,8 @@ typedef struct
 
 static keyword_t * g_keywords;
 
-static void add_keyword(string_t text, minsk_syntax_kind_t kind)
+static void
+add_keyword(string_t text, minsk_syntax_kind_t kind)
 {
   keyword_t * kw = malloc(sizeof(*kw));
   kw->text = text;
@@ -47,13 +53,15 @@ static void add_keyword(string_t text, minsk_syntax_kind_t kind)
   HASH_ADD_KEYPTR(hh, g_keywords, kw->text.data, kw->text.length, kw);
 }
 
-static void init_keywords(void)
+static void
+init_keywords(void)
 {
   add_keyword(STRING_REF("true"), MINSK_SYNTAX_KIND_TRUE_KEYWORD);
   add_keyword(STRING_REF("false"), MINSK_SYNTAX_KIND_FALSE_KEYWORD);
 }
 
-extern void minsk_syntax_facts_free_keyword_table(void)
+extern void
+minsk_syntax_facts_free_keyword_table(void)
 {
   keyword_t * kw;
   keyword_t * tmp;
@@ -64,7 +72,8 @@ extern void minsk_syntax_facts_free_keyword_table(void)
   }
 }
 
-extern minsk_syntax_kind_t minsk_syntax_facts_keyword_kind(string_t text)
+extern minsk_syntax_kind_t
+minsk_syntax_facts_keyword_kind(string_t text)
 {
   if (g_keywords == NULL)
   {

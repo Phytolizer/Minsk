@@ -3,14 +3,14 @@
 #include <arena.h>
 #include <minsk-string/string.h>
 #include <stdint.h>
-#include <unicode/utypes.h>
+#include <unicode/umachine.h>
 
-#include "./token.h"
-#include "minsk/code_analysis/diagnostic_buf.h"
+#include "minsk/code_analysis/diagnostic_bag.h"
+#include "minsk/code_analysis/syntax/token.h"
 
 enum
 {
-  MINSK_SYNTAX_LEXER_MAX_PEEK = 4,
+  MINSK_SYNTAX_LEXER_MAX_PEEK = 4
 };
 
 typedef struct
@@ -26,12 +26,14 @@ typedef struct
   uint8_t const * _text;
   int64_t _text_len;
   int64_t _position;
+  // text spans do NOT care about utf8 char length, they are user facing
+  int64_t _char_position;
   minsk_syntax_lexer_peek_char_t _peek_buf[MINSK_SYNTAX_LEXER_MAX_PEEK];
   int64_t _peek_count;
-  minsk_diagnostic_buf_t diagnostics;
+  minsk_diagnostic_bag_t diagnostics;
 } minsk_syntax_lexer_t;
 
 extern minsk_syntax_lexer_t
 minsk_syntax_lexer_new(Arena * arena, string_t text);
-extern minsk_syntax_token_t minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer
-);
+extern minsk_syntax_token_t
+minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer);

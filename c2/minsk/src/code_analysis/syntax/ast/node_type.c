@@ -6,16 +6,17 @@
 
 #include "minsk/meta/snake_to_camel.h"
 
-extern string_t minsk_syntax_node_type_display_name(
+extern string_t
+minsk_syntax_node_type_display_name(
   Arena * arena,
   minsk_syntax_node_type_t type
 )
 {
   switch (type)
   {
-#define X(x)                                      \
-  case MINSK_CONCAT(MINSK_PREFIX_SYNTAX_NODE, x): \
-    return snake_to_camel(arena, STRING_REF(#x));
+#define X(x)                                     \
+ case MINSK_CONCAT(MINSK_PREFIX_SYNTAX_NODE, x): \
+  return snake_to_camel(arena, STRING_REF(#x));
 #include "minsk/code_analysis/syntax/ast/private/node_types.xmacro"
 #undef X
   }
