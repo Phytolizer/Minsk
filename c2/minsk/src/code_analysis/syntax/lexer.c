@@ -6,20 +6,16 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
-#include <utf8proc.h>
+#include <unicode/uchar.h>
+#include <unicode/utf8.h>
+#include <unicode/utypes.h>
 
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/code_analysis/syntax/token.h"
 #include "minsk/data_structures/buf.h"
 #include "minsk/runtime/object.h"
 
-typedef utf8proc_int32_t codepoint_t;
-
-static bool category_is_space(utf8proc_category_t cat)
-{
-  return cat == UTF8PROC_CATEGORY_ZS || cat == UTF8PROC_CATEGORY_ZL ||
-         cat == UTF8PROC_CATEGORY_ZP;
-}
+typedef UChar32 codepoint_t;
 
 static bool is_digit(codepoint_t cp)
 {
@@ -78,10 +74,10 @@ static overflow_t parse_number(string_t str)
   return (overflow_t){.value = result};
 }
 
-static codepoint_t peek(minsk_syntax_lexer_t * lexer, utf8proc_ssize_t offset)
+static codepoint_t peek(minsk_syntax_lexer_t * lexer, int64_t offset)
 {
   DEBUGGER_ASSERT(offset < MINSK_SYNTAX_LEXER_MAX_PEEK, "offset too large");
-  utf8proc_ssize_t position = lexer->_position;
+  int64_t position = lexer->_position;
   while (lexer->_peek_count < offset + 1)
   {
     if (position >= lexer->_text_len)
@@ -89,16 +85,15 @@ static codepoint_t peek(minsk_syntax_lexer_t * lexer, utf8proc_ssize_t offset)
       return '\0';
     }
 
-    utf8proc_ssize_t byte_count = utf8proc_iterate(
-      lexer->_text + lexer->_position,
-      lexer->_text_len,
-      &lexer->_peek_buf[lexer->_peek_count].cp
-    );
-    if (byte_count > 0)
+    codepoint_t cp;
+    int64_t next_position = position;
+    U8_NEXT(lexer->_text, next_position, lexer->_text_len, cp);
+    if (cp >= 0)
     {
+      lexer->_peek_buf[lexer->_peek_count].cp = cp;
       lexer->_peek_buf[lexer->_peek_count].position = position;
-      lexer->_peek_buf[lexer->_peek_count].size = byte_count;
-      position += byte_count;
+      lexer->_peek_buf[lexer->_peek_count].size = U8_LENGTH(cp);
+      position = next_position;
     }
     else
     {
@@ -111,7 +106,7 @@ static codepoint_t peek(minsk_syntax_lexer_t * lexer, utf8proc_ssize_t offset)
   return lexer->_peek_buf[offset].cp;
 }
 
-static inline utf8proc_int32_t current(minsk_syntax_lexer_t * lexer)
+static inline codepoint_t current(minsk_syntax_lexer_t * lexer)
 {
   return peek(lexer, 0);
 }
@@ -149,7 +144,7 @@ static void next(minsk_syntax_lexer_t * lexer, int amount)
 
 static void scan_whitespace(minsk_syntax_lexer_t * lexer)
 {
-  while (category_is_space(utf8proc_category(current(lexer))))
+  while (u_isUWhiteSpace(current(lexer)))
   {
     next(lexer, 1);
   }
@@ -164,7 +159,7 @@ static void scan_digits(minsk_syntax_lexer_t * lexer)
 }
 
 static string_t
-ref_current_text(minsk_syntax_lexer_t const * lexer, utf8proc_ssize_t start)
+ref_current_text(minsk_syntax_lexer_t const * lexer, int64_t start)
 {
   return STRING_REF_DATA(lexer->_text + start, lexer->_position - start);
 }
@@ -173,7 +168,7 @@ extern minsk_syntax_lexer_t minsk_syntax_lexer_new(Arena * arena, string_t text)
 {
   return (minsk_syntax_lexer_t){
     ._arena = arena,
-    ._text = (utf8proc_uint8_t const *)text.data,
+    ._text = (uint8_t const *)text.data,
     ._text_len = text.length,
     ._position = 0,
     ._peek_count = 0,
@@ -183,7 +178,7 @@ extern minsk_syntax_lexer_t minsk_syntax_lexer_new(Arena * arena, string_t text)
 extern minsk_syntax_token_t minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer)
 {
   minsk_syntax_kind_t kind = MINSK_SYNTAX_KIND_BAD_TOKEN;
-  utf8proc_ssize_t start = lexer->_position;
+  int64_t start = lexer->_position;
   string_t text = EMPTY_STRING;
   minsk_object_t value = MINSK_OBJECT_NIL;
 
@@ -204,8 +199,7 @@ extern minsk_syntax_token_t minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer)
     case ')': TOK(1, MINSK_SYNTAX_KIND_CLOSE_PARENTHESIS_TOKEN);
     default:
     {
-      utf8proc_category_t cat = utf8proc_category(cp);
-      if (category_is_space(cat))
+      if (u_isUWhiteSpace(cp))
       {
         scan_whitespace(lexer);
         kind = MINSK_SYNTAX_KIND_WHITESPACE_TOKEN;
@@ -242,8 +236,9 @@ extern minsk_syntax_token_t minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer)
 
   if (kind == MINSK_SYNTAX_KIND_BAD_TOKEN)
   {
-    utf8proc_uint8_t charbuf[4];
-    utf8proc_ssize_t nbytes = utf8proc_encode_char(current(lexer), charbuf);
+    uint8_t charbuf[U8_MAX_LENGTH];
+    int64_t nbytes = 0;
+    U8_APPEND_UNSAFE(charbuf, nbytes, current(lexer));
     BUF_PUSH_ARENA(
       lexer->_arena,
       &lexer->diagnostics,

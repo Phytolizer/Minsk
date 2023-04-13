@@ -2,7 +2,8 @@
 
 #include <arena.h>
 #include <minsk-string/string.h>
-#include <utf8proc.h>
+#include <stdint.h>
+#include <unicode/utypes.h>
 
 #include "./token.h"
 #include "minsk/code_analysis/diagnostic_buf.h"
@@ -14,19 +15,19 @@ enum
 
 typedef struct
 {
-  utf8proc_int32_t cp;
-  utf8proc_ssize_t position;
+  UChar32 cp;
+  int64_t position;
   int size;
 } minsk_syntax_lexer_peek_char_t;
 
 typedef struct
 {
   Arena * _arena;
-  utf8proc_uint8_t const * _text;
-  utf8proc_ssize_t _text_len;
-  utf8proc_ssize_t _position;
+  uint8_t const * _text;
+  int64_t _text_len;
+  int64_t _position;
   minsk_syntax_lexer_peek_char_t _peek_buf[MINSK_SYNTAX_LEXER_MAX_PEEK];
-  utf8proc_ssize_t _peek_count;
+  int64_t _peek_count;
   minsk_diagnostic_buf_t diagnostics;
 } minsk_syntax_lexer_t;
 

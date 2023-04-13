@@ -27,7 +27,7 @@ arena_hdr_dep = dependency(
     default_options: ['warning_level=0'],
 )
 
-utf8proc_dep = dependency('libutf8proc')
+icuuc_dep = dependency('icu-uc')
 
 subdir('arena')
 subdir('string')
