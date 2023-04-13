@@ -37,8 +37,7 @@ extern int main(int argc, char** argv)
     string_t line = STRING_REF_FROM_C(raw_line);
     Arena a = {0};
 
-    minsk_syntax_parser_t parser = minsk_syntax_parser_new(&a, line);
-    minsk_syntax_tree_t syntax_tree = minsk_syntax_parser_parse(&parser);
+    minsk_syntax_tree_t syntax_tree = minsk_syntax_tree_parse(&a, line);
     minsk_syntax_node_pretty_print(syntax_tree.root, stdout);
 
     if (syntax_tree.diagnostics.len > 0)

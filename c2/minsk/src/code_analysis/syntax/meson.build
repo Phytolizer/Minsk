@@ -5,4 +5,5 @@ minsk_src += files(
     'lexer.c',
     'parser.c',
     'token.c',
+    'tree.c',
 )
