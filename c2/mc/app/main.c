@@ -5,6 +5,7 @@
 #include <minsk/code_analysis/diagnostic_buf.h>
 #include <minsk/code_analysis/evaluator.h>
 #include <minsk/code_analysis/syntax/ast/node.h>
+#include <minsk/code_analysis/syntax/facts.h>
 #include <minsk/code_analysis/syntax/tree.h>
 #include <minsk/runtime/object.h>
 #include <stdbool.h>
@@ -97,6 +98,8 @@ extern int main(int argc, char ** argv)
     arena_free(&a);
     free(raw_line);
   }
+
+  minsk_syntax_facts_free_keyword_table();
 
   linenoiseHistorySave(HISTORY_PATH);
   linenoiseHistoryFree();
