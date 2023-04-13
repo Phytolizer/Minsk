@@ -1,3 +1,5 @@
+subdir('expressions')
+
 minsk_src += files(
     'expression.c',
     'node.c',
