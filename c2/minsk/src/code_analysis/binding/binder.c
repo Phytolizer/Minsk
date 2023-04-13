@@ -95,25 +95,23 @@ bind_assignment_expression(
   minsk_bound_node_t expression =
     minsk_binder_bind_expression(binder, *syntax.expression);
 
-  minsk_object_t default_value;
-  switch (minsk_bound_expression_get_resolved_type(expression.expression))
+  minsk_variable_symbol_t existing_variable;
+  if (minsk_variable_map_find_by_name(
+        binder->_variables,
+        name,
+        &existing_variable
+      ))
   {
-    case MINSK_OBJECT_TYPE_INTEGER:
-      default_value = MINSK_OBJECT_INTEGER(0);
-      break;
-    case MINSK_OBJECT_TYPE_BOOLEAN:
-      default_value = MINSK_OBJECT_BOOLEAN(false);
-      break;
-    default:
-      DEBUGGER_FATAL(
-        "invalid variable type %d",
-        minsk_bound_expression_get_resolved_type(expression.expression)
-      );
+    minsk_variable_map_del(binder->_variables, existing_variable);
   }
 
-  minsk_variable_map_put(binder->_variables, name, default_value);
+  minsk_variable_symbol_t variable = {
+    name,
+    minsk_bound_expression_get_resolved_type(expression.expression),
+  };
+  minsk_variable_map_put(binder->_variables, variable, MINSK_OBJECT_NIL);
   return MINSK_BOUND_EXPRESSION_ASSIGNMENT(
-      .name = name,
+      .variable = variable,
       .expression = minsk_bound_node_promote(binder->_arena, expression)
   );
 }
@@ -169,8 +167,8 @@ bind_name_expression(
 )
 {
   string_t name = syntax.identifier_token.text;
-  minsk_object_t value;
-  if (!minsk_variable_map_try_get_value(binder->_variables, name, &value))
+  minsk_variable_symbol_t variable;
+  if (!minsk_variable_map_find_by_name(binder->_variables, name, &variable))
   {
     minsk_diagnostic_bag_report_undefined_name(
       &binder->diagnostics,
@@ -180,7 +178,7 @@ bind_name_expression(
     return MINSK_BOUND_EXPRESSION_LITERAL(MINSK_OBJECT_INTEGER(0));
   }
 
-  return MINSK_BOUND_EXPRESSION_VARIABLE(.name = name, .type = value.type);
+  return MINSK_BOUND_EXPRESSION_VARIABLE(.variable = variable);
 }
 
 static minsk_bound_node_t

@@ -34,7 +34,7 @@ minsk_bound_expression_get_resolved_type(minsk_bound_expression_t expression)
     case MINSK_BOUND_NODE_TYPE_VARIABLE_EXPRESSION:
     {
       minsk_bound_expression_variable_t v = expression.variable;
-      return v.type;
+      return v.variable.type;
     }
   }
 

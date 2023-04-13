@@ -86,7 +86,7 @@ evaluate_assignment_expression(
 )
 {
   minsk_object_t value = evaluate_expression(evaluator, node.expression);
-  minsk_variable_map_put(evaluator->_variables, node.name, value);
+  minsk_variable_map_put(evaluator->_variables, node.variable, value);
   return value;
 }
 
@@ -167,8 +167,11 @@ evaluate_variable_expression(
 )
 {
   minsk_object_t value;
-  bool got =
-    minsk_variable_map_try_get_value(evaluator->_variables, node.name, &value);
+  bool got = minsk_variable_map_try_get_value(
+    evaluator->_variables,
+    node.variable,
+    &value
+  );
   DEBUGGER_ASSERT(got, "fetched null value");
   return value;
 }

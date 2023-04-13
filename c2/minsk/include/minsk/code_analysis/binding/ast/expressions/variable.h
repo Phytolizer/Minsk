@@ -2,12 +2,12 @@
 
 #include <minsk-string/string.h>
 
+#include "minsk/code_analysis/variable_symbol.h"
 #include "minsk/runtime/object.h"
 
 typedef struct
 {
-  string_t name;
-  minsk_object_type_t type;
+  minsk_variable_symbol_t variable;
 } minsk_bound_expression_variable_t;
 
 #define MINSK_BOUND_EXPRESSION_VARIABLE(...)  \

@@ -2,9 +2,11 @@
 
 #include <minsk-string/string.h>
 
+#include "minsk/code_analysis/variable_symbol.h"
+
 typedef struct
 {
-  string_t name;
+  minsk_variable_symbol_t variable;
   struct minsk_bound_node * expression;
 } minsk_bound_expression_assignment_t;
 
