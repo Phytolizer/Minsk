@@ -2,7 +2,7 @@
 
 #include <arena.h>
 
-#include "minsk/code_analysis/diagnostic_buf.h"
+#include "minsk/code_analysis/diagnostic_bag.h"
 #include "minsk/code_analysis/syntax/tree.h"
 #include "minsk/runtime/object.h"
 
@@ -18,7 +18,7 @@ typedef struct
 
   union
   {
-    minsk_diagnostic_buf_t diagnostics;
+    minsk_diagnostic_bag_buf_t diagnostics;
     minsk_object_t value;
   };
 } minsk_evaluation_result_t;

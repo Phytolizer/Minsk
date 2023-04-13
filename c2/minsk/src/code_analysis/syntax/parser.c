@@ -46,17 +46,11 @@ match_token(minsk_syntax_parser_t * parser, minsk_syntax_kind_t kind)
     return next_token(parser);
   }
 
-  BUF_PUSH_ARENA(
-    parser->_arena,
+  minsk_diagnostic_bag_report_unexpected_token(
     &parser->diagnostics,
-    string_printf_arena(
-      parser->_arena,
-      "Unexpected token <" STRING_FMT ">, expected <" STRING_FMT ">.",
-      STRING_ARG(
-        minsk_syntax_kind_display_name(parser->_arena, current(parser).kind)
-      ),
-      STRING_ARG(minsk_syntax_kind_display_name(parser->_arena, kind))
-    )
+    minsk_syntax_token_span(current(parser)),
+    current(parser).kind,
+    kind
   );
   return (minsk_syntax_token_t){
     .kind = kind,

@@ -23,6 +23,7 @@ minsk_binder_new(Arena * arena)
 {
   return (minsk_binder_t){
     ._arena = arena,
+    .diagnostics = minsk_diagnostic_bag_new(arena),
   };
 }
 
@@ -85,23 +86,12 @@ bind_binary_expression(
     );
   if (op == NULL)
   {
-    BUF_PUSH_ARENA(
-      binder->_arena,
+    minsk_diagnostic_bag_report_undefined_binary_operator(
       &binder->diagnostics,
-      string_printf_arena(
-        binder->_arena,
-        "Binary operator '" STRING_FMT "' is not defined for types " STRING_FMT
-        " and " STRING_FMT ".",
-        STRING_ARG(syntax.op.text),
-        STRING_ARG(minsk_object_type_display_name(
-          binder->_arena,
-          minsk_bound_expression_get_resolved_type(left.expression)
-        )),
-        STRING_ARG(minsk_object_type_display_name(
-          binder->_arena,
-          minsk_bound_expression_get_resolved_type(right.expression)
-        ))
-      )
+      minsk_syntax_token_span(syntax.op),
+      syntax.op.text,
+      minsk_bound_expression_get_resolved_type(left.expression),
+      minsk_bound_expression_get_resolved_type(right.expression)
     );
     return left;
   }
@@ -147,19 +137,11 @@ bind_unary_expression(
     );
   if (op == NULL)
   {
-    BUF_PUSH_ARENA(
-      binder->_arena,
+    minsk_diagnostic_bag_report_undefined_unary_operator(
       &binder->diagnostics,
-      string_printf_arena(
-        binder->_arena,
-        "Unary operator '" STRING_FMT "' is not defined for type " STRING_FMT
-        ".",
-        STRING_ARG(syntax.op.text),
-        STRING_ARG(minsk_object_type_display_name(
-          binder->_arena,
-          minsk_bound_expression_get_resolved_type(operand.expression)
-        ))
-      )
+      minsk_syntax_token_span(syntax.op),
+      syntax.op.text,
+      minsk_bound_expression_get_resolved_type(operand.expression)
     );
     return operand;
   }

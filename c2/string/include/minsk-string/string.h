@@ -38,6 +38,10 @@ typedef struct
 
 #define STRING_AS_REF(str) STRING_REF_DATA((str).data, (str).length)
 
+#define STRING_SUB(str, a, b) STRING_REF_DATA((str).data + (a), (b) - (a))
+#define STRING_SUB_LEN(str, a, len) STRING_REF_DATA((str).data + (a), (len))
+#define STRING_SUB_AFTER(str, a) STRING_SUB((str), (a), (str).length)
+
 #define STRING_OWN_DATA(str, length, alloc_length) \
  (string_t)                                        \
  {                                                 \

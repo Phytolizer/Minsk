@@ -19,8 +19,13 @@ minsk_compilation_evaluate(minsk_compilation_t * compilation)
   minsk_bound_node_t bound_expression =
     minsk_binder_bind_expression(&binder, compilation->syntax_tree.root);
 
-  minsk_diagnostic_buf_t diagnostics = compilation->syntax_tree.diagnostics;
-  BUF_APPEND_ARENA(compilation->_arena, &diagnostics, binder.diagnostics);
+  minsk_diagnostic_bag_buf_t diagnostics =
+    compilation->syntax_tree.diagnostics.diagnostics;
+  BUF_APPEND_ARENA(
+    compilation->_arena,
+    &diagnostics,
+    binder.diagnostics.diagnostics
+  );
   if (diagnostics.len > 0)
   {
     return (minsk_evaluation_result_t){

@@ -3,13 +3,13 @@
 #include <arena.h>
 
 #include "minsk/code_analysis/binding/ast/node.h"
-#include "minsk/code_analysis/diagnostic_buf.h"
+#include "minsk/code_analysis/diagnostic_bag.h"
 #include "minsk/code_analysis/syntax/ast/node.h"
 
 typedef struct
 {
   Arena * _arena;
-  minsk_diagnostic_buf_t diagnostics;
+  minsk_diagnostic_bag_t diagnostics;
 } minsk_binder_t;
 
 extern minsk_binder_t

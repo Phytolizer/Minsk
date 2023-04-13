@@ -2,7 +2,7 @@
 #include <linenoise.h>
 #include <minsk-string/string.h>
 #include <minsk/code_analysis/compilation.h>
-#include <minsk/code_analysis/diagnostic_buf.h>
+#include <minsk/code_analysis/diagnostic_bag.h>
 #include <minsk/code_analysis/syntax/ast/node.h>
 #include <minsk/code_analysis/syntax/facts.h>
 #include <minsk/code_analysis/syntax/tree.h>
@@ -75,12 +75,27 @@ main(int argc, char ** argv)
 
     if (!result.success)
     {
-      printf("\x1b[0;31m");
       for (size_t i = 0; i < result.diagnostics.len; i++)
       {
-        printf(STRING_FMT "\n", STRING_ARG(result.diagnostics.ptr[i]));
+        minsk_diagnostic_t diagnostic = result.diagnostics.ptr[i];
+
+        printf("\n");
+        printf("\x1b[0;31m");
+        printf(STRING_FMT "\n", STRING_ARG(diagnostic.message));
+        printf("\x1b[0m");
+        string_t prefix = STRING_SUB(line, 0, diagnostic.span.start);
+        string_t error =
+          STRING_SUB_LEN(line, diagnostic.span.start, diagnostic.span.length);
+        string_t suffix =
+          STRING_SUB_AFTER(line, minsk_text_span_end(diagnostic.span));
+
+        printf("    " STRING_FMT, STRING_ARG(prefix));
+        printf("\x1b[0;31m");
+        printf(STRING_FMT, STRING_ARG(error));
+        printf("\x1b[0m");
+        printf(STRING_FMT "\n", STRING_ARG(suffix));
       }
-      printf("\x1b[0m");
+      printf("\n");
     }
     else
     {

@@ -136,6 +136,7 @@ move(minsk_syntax_lexer_t * lexer, int amount)
 {
   minsk_syntax_lexer_peek_char_t const * last = &lexer->_peek_buf[amount - 1];
   lexer->_position = last->position + last->size;
+  lexer->_char_position += amount;
 }
 
 static void
@@ -204,7 +205,9 @@ minsk_syntax_lexer_new(Arena * arena, string_t text)
     ._text = (uint8_t const *)text.data,
     ._text_len = text.length,
     ._position = 0,
+    ._char_position = 0,
     ._peek_count = 0,
+    .diagnostics = minsk_diagnostic_bag_new(arena),
   };
 }
 
@@ -213,6 +216,7 @@ minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer)
 {
   minsk_syntax_kind_t kind = MINSK_SYNTAX_KIND_BAD_TOKEN;
   int64_t start = lexer->_position;
+  int64_t start_char = lexer->_char_position;
   string_t text = EMPTY_STRING;
   minsk_object_t value = MINSK_OBJECT_NIL;
 
@@ -280,14 +284,13 @@ minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer)
         overflow_t parse_result = parse_number(text);
         if (parse_result.did_overflow)
         {
-          BUF_PUSH_ARENA(
-            lexer->_arena,
+          minsk_text_span_t span =
+            minsk_text_span_from_bounds(start_char, lexer->_char_position);
+          minsk_diagnostic_bag_report_invalid_number(
             &lexer->diagnostics,
-            string_printf_arena(
-              lexer->_arena,
-              "The number literal '" STRING_FMT "' is too large.",
-              STRING_ARG(text)
-            )
+            span,
+            text,
+            STRING_REF("uint63")
           );
         }
         else
@@ -304,17 +307,10 @@ minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer)
 
   if (kind == MINSK_SYNTAX_KIND_BAD_TOKEN)
   {
-    uint8_t charbuf[U8_MAX_LENGTH];
-    int64_t nbytes = 0;
-    U8_APPEND_UNSAFE(charbuf, nbytes, current(lexer));
-    BUF_PUSH_ARENA(
-      lexer->_arena,
+    minsk_diagnostic_bag_report_bad_character(
       &lexer->diagnostics,
-      string_printf_arena(
-        lexer->_arena,
-        "Bad character in input: '" STRING_FMT "'",
-        STRING_ARG(STRING_REF_DATA(charbuf, nbytes))
-      )
+      lexer->_char_position,
+      current(lexer)
     );
     next(lexer, 1);
   }
