@@ -5,6 +5,9 @@ Progress for each language implementation is detailed below.
 ## c (C)
 Episode 5.
 
+## c2 (C)
+Episode 3.
+
 ## cpp (C++)
 Episode 7.
 
