@@ -1,22 +1,31 @@
 #include "minsk/code_analysis/syntax/ast/node.h"
 
+#include <arena.h>
 #include <minsk-platform/debugger.h>
 #include <minsk-string/string.h>
 #include <stdbool.h>
 #include <stdio.h>
 
-extern minsk_syntax_node_t*
-minsk_syntax_node_promote(Arena* arena, minsk_syntax_node_t node)
+#include "minsk/code_analysis/syntax/ast/expression.h"
+#include "minsk/code_analysis/syntax/ast/expressions/binary.h"
+#include "minsk/code_analysis/syntax/ast/expressions/literal.h"
+#include "minsk/code_analysis/syntax/ast/expressions/parenthesized.h"
+#include "minsk/code_analysis/syntax/ast/node_type.h"
+#include "minsk/code_analysis/syntax/kind.h"
+#include "minsk/runtime/object.h"
+
+extern minsk_syntax_node_t *
+minsk_syntax_node_promote(Arena * arena, minsk_syntax_node_t node)
 {
-  minsk_syntax_node_t* new_node = arena_alloc(arena, sizeof(*new_node));
+  minsk_syntax_node_t * new_node = arena_alloc(arena, sizeof(*new_node));
   *new_node = node;
   return new_node;
 }
 
 static void pretty_print(
-  Arena* arena,
+  Arena * arena,
   minsk_syntax_node_t node,
-  FILE* stream,
+  FILE * stream,
   string_t indent,
   bool is_last,
   bool do_colors
@@ -88,7 +97,7 @@ static void pretty_print(
 }
 
 extern void
-minsk_syntax_node_pretty_print(minsk_syntax_node_t node, FILE* stream)
+minsk_syntax_node_pretty_print(minsk_syntax_node_t node, FILE * stream)
 {
   Arena arena = {0};
   pretty_print(&arena, node, stream, EMPTY_STRING, true, true);
@@ -96,7 +105,7 @@ minsk_syntax_node_pretty_print(minsk_syntax_node_t node, FILE* stream)
 }
 
 extern minsk_syntax_node_buf_t
-minsk_syntax_node_children(Arena* arena, minsk_syntax_node_t node)
+minsk_syntax_node_children(Arena * arena, minsk_syntax_node_t node)
 {
   switch (node.type)
   {
@@ -129,6 +138,16 @@ minsk_syntax_node_children(Arena* arena, minsk_syntax_node_t node)
         MINSK_SYNTAX_NODE_TOKEN(p.open_parenthesis_token),
         *p.expression,
         MINSK_SYNTAX_NODE_TOKEN(p.close_parenthesis_token)
+      );
+    }
+    case MINSK_SYNTAX_NODE_TYPE_UNARY_EXPRESSION:
+    {
+      minsk_syntax_expression_unary_t u = node.expression.unary;
+      return BUF_LIT_ARENA(
+        arena,
+        minsk_syntax_node_buf_t,
+        MINSK_SYNTAX_NODE_TOKEN(u.op),
+        *u.operand
       );
     }
     case MINSK_SYNTAX_NODE_TYPE_TOKEN:

@@ -7,7 +7,7 @@
 
 extern bool mc_set_cwd_from_meson(void)
 {
-  const char* srcdir = getenv("MESON_SOURCE_ROOT");
+  const char * srcdir = getenv("MESON_SOURCE_ROOT");
   if (srcdir != NULL)
   {
     minsk_errno_t error = minsk_chdir(STRING_REF_FROM_C(srcdir));

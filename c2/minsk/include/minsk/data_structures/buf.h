@@ -7,7 +7,7 @@
 #define BUF_T(T, name) \
   struct name##_buf    \
   {                    \
-    T* ptr;            \
+    T * ptr;           \
     size_t len;        \
     size_t cap;        \
     bool is_ref;       \
@@ -62,12 +62,12 @@
     if ((buf)->cap < (size))                                                \
     {                                                                       \
       (buf)->cap = (size);                                                  \
-      if (arena)                                                            \
+      if (arena != NULL)                                                    \
       {                                                                     \
         (buf)->ptr = arena_realloc(                                         \
           arena,                                                            \
           (buf)->ptr,                                                       \
-          0,                                                                \
+          (buf)->len * sizeof(*(buf)->ptr),                                 \
           (buf)->cap * sizeof(*(buf)->ptr)                                  \
         );                                                                  \
       }                                                                     \
@@ -84,6 +84,10 @@
   do                                                          \
   {                                                           \
     __auto_type other_ = (other);                             \
+    if (other_.len == 0)                                      \
+    {                                                         \
+      break;                                                  \
+    }                                                         \
     BUF_RESERVE_ARENA(arena, buf, (buf)->len + (other_).len); \
     memcpy(                                                   \
       (buf)->ptr + (buf)->len,                                \
@@ -111,7 +115,7 @@
   ({                                                                     \
     typeof(*((T){0}.ptr)) arr_[] = {__VA_ARGS__};                        \
     size_t arrlen_ = sizeof(arr_) / sizeof(*arr_);                       \
-    void* newbuf =                                                       \
+    void * newbuf =                                                      \
       arena ? arena_alloc(arena, sizeof(arr_)) : malloc(sizeof(arr_));   \
     memcpy(newbuf, arr_, sizeof(arr_));                                  \
     (T){.ptr = newbuf, .len = arrlen_, .cap = arrlen_, .is_ref = false}; \

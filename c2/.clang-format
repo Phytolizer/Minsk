@@ -1,6 +1,7 @@
 ---
 BasedOnStyle: Google
-PointerAlignment: Left
+PointerAlignment: Middle
+DerivePointerAlignment: false
 AlignAfterOpenBracket: BlockIndent
 BreakBeforeBraces: Allman
 BinPackArguments: false
@@ -9,6 +10,6 @@ ColumnLimit: 80
 AllowAllArgumentsOnNextLine: false
 AllowAllParametersOfDeclarationOnNextLine: false
 ContinuationIndentWidth: 2
-AllowShortFunctionsOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: None
 AllowShortCaseLabelsOnASingleLine: true
 ...

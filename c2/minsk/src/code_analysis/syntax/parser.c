@@ -2,13 +2,19 @@
 
 #include <arena.h>
 #include <minsk-string/string.h>
-#include <minsk/code_analysis/syntax/kind.h>
-#include <minsk/code_analysis/syntax/lexer.h>
-#include <minsk/code_analysis/syntax/token.h>
 #include <stdbool.h>
 
+#include "minsk/code_analysis/syntax/ast/expression.h"
+#include "minsk/code_analysis/syntax/ast/node.h"
+#include "minsk/code_analysis/syntax/facts.h"
+#include "minsk/code_analysis/syntax/kind.h"
+#include "minsk/code_analysis/syntax/lexer.h"
+#include "minsk/code_analysis/syntax/token.h"
+#include "minsk/code_analysis/syntax/tree.h"
+#include "minsk/runtime/object.h"
+
 static minsk_syntax_token_t
-peek(minsk_syntax_parser_t const* parser, int offset)
+peek(minsk_syntax_parser_t const * parser, int offset)
 {
   size_t index = parser->_position + offset;
   if (index >= parser->_tokens.len)
@@ -18,12 +24,12 @@ peek(minsk_syntax_parser_t const* parser, int offset)
   return parser->_tokens.ptr[index];
 }
 
-static inline minsk_syntax_token_t current(minsk_syntax_parser_t const* parser)
+static inline minsk_syntax_token_t current(minsk_syntax_parser_t const * parser)
 {
   return peek(parser, 0);
 }
 
-static minsk_syntax_token_t next_token(minsk_syntax_parser_t* parser)
+static minsk_syntax_token_t next_token(minsk_syntax_parser_t * parser)
 {
   minsk_syntax_token_t tok = current(parser);
   ++parser->_position;
@@ -31,7 +37,7 @@ static minsk_syntax_token_t next_token(minsk_syntax_parser_t* parser)
 }
 
 static minsk_syntax_token_t
-match_token(minsk_syntax_parser_t* parser, minsk_syntax_kind_t kind)
+match_token(minsk_syntax_parser_t * parser, minsk_syntax_kind_t kind)
 {
   if (current(parser).kind == kind)
   {
@@ -59,7 +65,7 @@ match_token(minsk_syntax_parser_t* parser, minsk_syntax_kind_t kind)
 }
 
 extern minsk_syntax_parser_t
-minsk_syntax_parser_new(Arena* arena, string_t text)
+minsk_syntax_parser_new(Arena * arena, string_t text)
 {
   minsk_syntax_lexer_t lexer = minsk_syntax_lexer_new(arena, text);
   minsk_syntax_parser_token_buf_t tokens = {0};
@@ -85,15 +91,17 @@ minsk_syntax_parser_new(Arena* arena, string_t text)
   };
 }
 
-static minsk_syntax_node_t parse_expression(minsk_syntax_parser_t* parser);
-static minsk_syntax_node_t parse_term(minsk_syntax_parser_t* parser);
-static minsk_syntax_node_t parse_factor(minsk_syntax_parser_t* parser);
+static minsk_syntax_node_t parse_expression(minsk_syntax_parser_t * parser);
+static minsk_syntax_node_t parse_binary_expression(
+  minsk_syntax_parser_t * parser,
+  minsk_syntax_facts_precedence_t precedence
+);
 static minsk_syntax_node_t parse_primary_expression(
-  minsk_syntax_parser_t* parser
+  minsk_syntax_parser_t * parser
 );
 
 extern minsk_syntax_tree_t minsk_syntax_parser_parse(
-  minsk_syntax_parser_t* parser
+  minsk_syntax_parser_t * parser
 )
 {
   minsk_syntax_node_t expression = parse_expression(parser);
@@ -106,68 +114,83 @@ extern minsk_syntax_tree_t minsk_syntax_parser_parse(
   };
 }
 
-static minsk_syntax_node_t parse_expression(minsk_syntax_parser_t* parser)
+static minsk_syntax_node_t parse_expression(minsk_syntax_parser_t * parser)
 {
-  return parse_term(parser);
+  return parse_binary_expression(parser, 0);
 }
 
-static minsk_syntax_node_t parse_term(minsk_syntax_parser_t* parser)
+static minsk_syntax_node_t parse_binary_expression(
+  minsk_syntax_parser_t * parser,
+  minsk_syntax_facts_precedence_t parent_precedence
+)
 {
-  minsk_syntax_node_t left = parse_factor(parser);
-
-  while (current(parser).kind == MINSK_SYNTAX_KIND_PLUS_TOKEN ||
-         current(parser).kind == MINSK_SYNTAX_KIND_MINUS_TOKEN)
+  minsk_syntax_node_t left;
+  minsk_syntax_facts_precedence_t unary_precedence =
+    minsk_syntax_facts_unary_operator_precedence(current(parser).kind);
+  if (unary_precedence != 0 && unary_precedence >= parent_precedence)
   {
     minsk_syntax_token_t op = next_token(parser);
-    minsk_syntax_node_t* right =
-      minsk_syntax_node_promote(parser->_arena, parse_factor(parser));
-    minsk_syntax_node_t* left_alloc =
-      minsk_syntax_node_promote(parser->_arena, left);
-    left = MINSK_SYNTAX_EXPRESSION_BINARY(left_alloc, op, right);
+    minsk_syntax_node_t operand =
+      parse_binary_expression(parser, unary_precedence);
+    left = MINSK_SYNTAX_EXPRESSION_UNARY(
+        .op = op,
+        .operand = minsk_syntax_node_promote(parser->_arena, operand)
+    );
+  }
+  else
+  {
+    left = parse_primary_expression(parser);
   }
 
-  return left;
-}
-
-static minsk_syntax_node_t parse_factor(minsk_syntax_parser_t* parser)
-{
-  minsk_syntax_node_t left = parse_primary_expression(parser);
-
-  while (current(parser).kind == MINSK_SYNTAX_KIND_STAR_TOKEN ||
-         current(parser).kind == MINSK_SYNTAX_KIND_SLASH_TOKEN)
+  while (true)
   {
+    minsk_syntax_facts_precedence_t precedence =
+      minsk_syntax_facts_binary_operator_precedence(current(parser).kind);
+    if (precedence == 0 || precedence <= parent_precedence)
+    {
+      break;
+    }
+
     minsk_syntax_token_t op = next_token(parser);
-    minsk_syntax_node_t* right = minsk_syntax_node_promote(
+    minsk_syntax_node_t * right = minsk_syntax_node_promote(
       parser->_arena,
-      parse_primary_expression(parser)
+      parse_binary_expression(parser, precedence)
     );
-    minsk_syntax_node_t* left_alloc =
+    minsk_syntax_node_t * left_alloc =
       minsk_syntax_node_promote(parser->_arena, left);
-    left = MINSK_SYNTAX_EXPRESSION_BINARY(left_alloc, op, right);
+    left = MINSK_SYNTAX_EXPRESSION_BINARY(
+        .left = left_alloc,
+        .op = op,
+        .right = right
+    );
   }
 
   return left;
 }
 
 static minsk_syntax_node_t parse_parenthesized_expression(
-  minsk_syntax_parser_t* parser
+  minsk_syntax_parser_t * parser
 );
-static minsk_syntax_node_t parse_number_literal(minsk_syntax_parser_t* parser);
+static minsk_syntax_node_t parse_boolean_literal(minsk_syntax_parser_t * parser
+);
+static minsk_syntax_node_t parse_number_literal(minsk_syntax_parser_t * parser);
 
 static minsk_syntax_node_t parse_primary_expression(
-  minsk_syntax_parser_t* parser
+  minsk_syntax_parser_t * parser
 )
 {
   switch (current(parser).kind)
   {
     case MINSK_SYNTAX_KIND_OPEN_PARENTHESIS_TOKEN:
       return parse_parenthesized_expression(parser);
+    case MINSK_SYNTAX_KIND_TRUE_KEYWORD:
+    case MINSK_SYNTAX_KIND_FALSE_KEYWORD: return parse_boolean_literal(parser);
     default: return parse_number_literal(parser);
   }
 }
 
 static minsk_syntax_node_t parse_parenthesized_expression(
-  minsk_syntax_parser_t* parser
+  minsk_syntax_parser_t * parser
 )
 {
   minsk_syntax_token_t open_parenthesis_token =
@@ -176,15 +199,30 @@ static minsk_syntax_node_t parse_parenthesized_expression(
   minsk_syntax_token_t close_parenthesis_token =
     match_token(parser, MINSK_SYNTAX_KIND_CLOSE_PARENTHESIS_TOKEN);
   return MINSK_SYNTAX_EXPRESSION_PARENTHESIZED(
-    open_parenthesis_token,
-    minsk_syntax_node_promote(parser->_arena, expression),
-    close_parenthesis_token
+      .open_parenthesis_token = open_parenthesis_token,
+      .expression = minsk_syntax_node_promote(parser->_arena, expression),
+      .close_parenthesis_token = close_parenthesis_token
   );
 }
 
-static minsk_syntax_node_t parse_number_literal(minsk_syntax_parser_t* parser)
+static minsk_syntax_node_t parse_boolean_literal(minsk_syntax_parser_t * parser)
+{
+  bool value = current(parser).kind == MINSK_SYNTAX_KIND_TRUE_KEYWORD;
+  minsk_syntax_token_t keyword_token =
+    value ? next_token(parser)
+          : match_token(parser, MINSK_SYNTAX_KIND_FALSE_KEYWORD);
+  return MINSK_SYNTAX_EXPRESSION_LITERAL(
+      .literal_token = keyword_token,
+      .value = MINSK_OBJECT_BOOLEAN(value)
+  );
+}
+
+static minsk_syntax_node_t parse_number_literal(minsk_syntax_parser_t * parser)
 {
   minsk_syntax_token_t literal_token =
     match_token(parser, MINSK_SYNTAX_KIND_NUMBER_TOKEN);
-  return MINSK_SYNTAX_EXPRESSION_LITERAL(literal_token);
+  return MINSK_SYNTAX_EXPRESSION_LITERAL(
+      .literal_token = literal_token,
+      .value = literal_token.value
+  );
 }
