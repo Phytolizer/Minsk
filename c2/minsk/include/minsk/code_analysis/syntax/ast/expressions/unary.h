@@ -8,8 +8,8 @@ typedef struct
   struct minsk_syntax_node* operand;
 } minsk_syntax_expression_unary_t;
 
-#define MINSK_SYNTAX_EXPRESSION_UNARY(op_, operand_) \
+#define MINSK_SYNTAX_EXPRESSION_UNARY(...) \
   MINSK_SYNTAX_EXPRESSION(                            \
     MINSK_SYNTAX_NODE_TYPE_UNARY_EXPRESSION,          \
-    .unary = {.op = (op_), .operand = (operand_)}     \
+    .unary = {__VA_ARGS__}     \
   )

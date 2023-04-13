@@ -133,8 +133,8 @@ static minsk_syntax_node_t parse_binary_expression(
     minsk_syntax_node_t operand =
       parse_binary_expression(parser, unary_precedence);
     left = MINSK_SYNTAX_EXPRESSION_UNARY(
-      op,
-      minsk_syntax_node_promote(parser->_arena, operand)
+        .op = op,
+        .operand = minsk_syntax_node_promote(parser->_arena, operand)
     );
   }
   else
