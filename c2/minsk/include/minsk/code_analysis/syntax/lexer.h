@@ -3,11 +3,10 @@
 #include <arena.h>
 #include <minsk-string/string.h>
 #include <stdint.h>
-#include <unicode/utypes.h>
+#include <unicode/umachine.h>
 
 #include "minsk/code_analysis/diagnostic_buf.h"
-
-#include "./token.h"
+#include "minsk/code_analysis/syntax/token.h"
 
 enum
 {

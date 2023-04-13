@@ -3,7 +3,7 @@
 #include <minsk-string/string.h>
 #include <stdint.h>
 
-#include "./kind.h"
+#include "minsk/code_analysis/syntax/kind.h"
 
 typedef int_fast8_t minsk_syntax_facts_precedence_t;
 

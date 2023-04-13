@@ -1,3 +1,5 @@
+// IWYU pragma: private, include "minsk/code_analysis/syntax/ast/node_type.h"
+
 X(BINARY_EXPRESSION)
 X(LITERAL_EXPRESSION)
 X(PARENTHESIZED_EXPRESSION)

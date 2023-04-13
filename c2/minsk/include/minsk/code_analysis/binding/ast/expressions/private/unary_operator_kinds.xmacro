@@ -1,3 +1,5 @@
+// IWYU pragma: private, include "minsk/code_analysis/binding/ast/expressions/unary_operator.h"
+
 X(IDENTITY)
 X(NEGATION)
 X(LOGICAL_NEGATION)

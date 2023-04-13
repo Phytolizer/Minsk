@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./binary_operator.h"
+#include "minsk/code_analysis/binding/ast/expressions/binary_operator.h"
 
 typedef struct
 {

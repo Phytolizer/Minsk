@@ -2,6 +2,7 @@
 
 #include <arena.h>
 #include <minsk-string/string.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -13,7 +14,7 @@ typedef enum
 {
 
 #define X(x) MINSK_CONCAT(MINSK_PREFIX_OBJECT_TYPE, x),
-#include "./private/object_types.xmacro"
+#include "minsk/runtime/private/object_types.xmacro"
 #undef X
 } minsk_object_type_t;
 

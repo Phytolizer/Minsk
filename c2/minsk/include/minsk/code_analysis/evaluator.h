@@ -1,8 +1,7 @@
 #pragma once
 
+#include "minsk/code_analysis/binding/ast/node.h"
 #include "minsk/runtime/object.h"
-
-#include "./binding/ast/node.h"
 
 typedef struct
 {

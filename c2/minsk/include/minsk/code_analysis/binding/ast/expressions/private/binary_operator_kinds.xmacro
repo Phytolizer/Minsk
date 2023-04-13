@@ -1,3 +1,5 @@
+// IWYU pragma: private, include "minsk/code_analysis/binding/ast/expressions/binary_operator.h"
+
 X(ADDITION)
 X(SUBTRACTION)
 X(MULTIPLICATION)

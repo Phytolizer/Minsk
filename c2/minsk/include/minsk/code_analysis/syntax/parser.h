@@ -5,10 +5,9 @@
 #include <stddef.h>
 
 #include "minsk/code_analysis/diagnostic_buf.h"
+#include "minsk/code_analysis/syntax/token.h"
+#include "minsk/code_analysis/syntax/tree.h"
 #include "minsk/data_structures/buf.h"
-
-#include "./token.h"
-#include "./tree.h"
 
 typedef BUF_T(minsk_syntax_token_t, parser_token)
   minsk_syntax_parser_token_buf_t;

@@ -1,11 +1,10 @@
 #pragma once
 
+#include "minsk/code_analysis/binding/ast/expressions/binary.h"
+#include "minsk/code_analysis/binding/ast/expressions/literal.h"
+#include "minsk/code_analysis/binding/ast/expressions/unary.h"
+#include "minsk/code_analysis/binding/ast/node_type.h"
 #include "minsk/runtime/object.h"
-
-#include "./expressions/binary.h"
-#include "./expressions/literal.h"
-#include "./expressions/unary.h"
-#include "./node_type.h"
 
 typedef struct
 {

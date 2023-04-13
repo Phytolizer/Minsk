@@ -1,7 +1,9 @@
 #pragma once
 
-#include "./expression.h"
-#include "./node_type.h"
+#include <arena.h>
+
+#include "minsk/code_analysis/binding/ast/expression.h"
+#include "minsk/code_analysis/binding/ast/node_type.h"
 
 typedef struct minsk_bound_node
 {

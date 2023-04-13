@@ -1,12 +1,14 @@
 #include <arena.h>
 #include <linenoise.h>
 #include <minsk-string/string.h>
+#include <minsk/code_analysis/binding/ast/node.h>
 #include <minsk/code_analysis/binding/binder.h>
 #include <minsk/code_analysis/diagnostic_buf.h>
 #include <minsk/code_analysis/evaluator.h>
 #include <minsk/code_analysis/syntax/ast/node.h>
 #include <minsk/code_analysis/syntax/facts.h>
 #include <minsk/code_analysis/syntax/tree.h>
+#include <minsk/data_structures/buf.h>
 #include <minsk/runtime/object.h>
 #include <stdbool.h>
 #include <stdio.h>

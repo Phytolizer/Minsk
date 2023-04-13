@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./unary_operator.h"
+#include "minsk/code_analysis/binding/ast/expressions/unary_operator.h"
 
 typedef struct
 {

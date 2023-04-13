@@ -7,8 +7,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <unicode/uchar.h>
-#include <unicode/utf8.h>
-#include <unicode/utypes.h>
+#include <unicode/urename.h>
+#include <unicode/utf.h>
 
 #include "minsk/code_analysis/syntax/facts.h"
 #include "minsk/code_analysis/syntax/kind.h"

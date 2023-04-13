@@ -1,5 +1,7 @@
 #include "minsk/code_analysis/binding/ast/expressions/unary_operator.h"
 
+#include <stddef.h>
+
 #include "minsk/data_structures/buf.h"
 
 #define UNIFORM(sk, k, t)                                            \

@@ -10,6 +10,7 @@
 #include "minsk/code_analysis/syntax/ast/expressions/binary.h"
 #include "minsk/code_analysis/syntax/ast/expressions/literal.h"
 #include "minsk/code_analysis/syntax/ast/expressions/parenthesized.h"
+#include "minsk/code_analysis/syntax/ast/expressions/unary.h"
 #include "minsk/code_analysis/syntax/ast/node_type.h"
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/runtime/object.h"

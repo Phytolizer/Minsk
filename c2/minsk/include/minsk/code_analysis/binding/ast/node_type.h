@@ -11,7 +11,7 @@ typedef enum
 {
 
 #define X(x) MINSK_CONCAT(MINSK_PREFIX_BOUND_NODE, x),
-#include "./private/node_types.xmacro"
+#include "minsk/code_analysis/binding/ast/private/node_types.xmacro"
 #undef X
 } minsk_bound_node_type_t;
 

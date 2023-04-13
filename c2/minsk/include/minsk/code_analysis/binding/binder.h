@@ -2,10 +2,9 @@
 
 #include <arena.h>
 
+#include "minsk/code_analysis/binding/ast/node.h"
 #include "minsk/code_analysis/diagnostic_buf.h"
 #include "minsk/code_analysis/syntax/ast/node.h"
-
-#include "./ast/node.h"
 
 typedef struct
 {

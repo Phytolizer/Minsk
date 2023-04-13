@@ -2,7 +2,8 @@
 
 #include <minsk-platform/debugger.h>
 
-#include "minsk/code_analysis/binding/ast/node.h"
+#include "minsk/code_analysis/binding/ast/expressions/binary_operator.h"
+#include "minsk/code_analysis/binding/ast/expressions/unary_operator.h"
 
 extern minsk_object_type_t
 minsk_bound_expression_get_resolved_type(minsk_bound_expression_t expression)
