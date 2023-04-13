@@ -25,6 +25,7 @@ extern minsk_evaluator_t minsk_evaluator_new(minsk_bound_node_t root)
     ._root = root,
   };
 }
+
 extern minsk_object_t minsk_evaluator_evaluate(minsk_evaluator_t * evaluator)
 {
   return evaluate_expression(&evaluator->_root);

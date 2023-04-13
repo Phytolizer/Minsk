@@ -11,6 +11,7 @@
 
 typedef enum
 {
+
 #define X(x) MINSK_CONCAT(MINSK_PREFIX_OBJECT_TYPE, x),
 #include "./private/object_types.xmacro"
 #undef X
@@ -19,6 +20,7 @@ typedef enum
 typedef struct
 {
   minsk_object_type_t type;
+
   union
   {
     int64_t integer;

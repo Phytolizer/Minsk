@@ -9,6 +9,7 @@
 
 typedef enum
 {
+
 #define X(x) MINSK_CONCAT(MINSK_PREFIX_SYNTAX_KIND, x),
 #include "./private/kinds.xmacro"
 #undef X

@@ -6,6 +6,7 @@
 typedef struct minsk_bound_node
 {
   minsk_bound_node_type_t type;
+
   union
   {
     minsk_bound_expression_t expression;

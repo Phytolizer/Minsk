@@ -9,6 +9,7 @@
 typedef struct
 {
   minsk_syntax_node_type_t type;
+
   union
   {
     minsk_syntax_expression_binary_t binary;

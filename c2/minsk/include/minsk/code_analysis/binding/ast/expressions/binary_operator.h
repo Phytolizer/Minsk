@@ -9,6 +9,7 @@
 
 typedef enum
 {
+
 #define X(x) \
   MINSK_CONCAT(MINSK_PREFIX_BOUND_EXPRESSION_BINARY_OPERATOR_KIND, x),
 #include "./private/binary_operator_kinds.xmacro"

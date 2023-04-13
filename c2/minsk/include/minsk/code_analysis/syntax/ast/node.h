@@ -11,6 +11,7 @@
 typedef struct minsk_syntax_node
 {
   minsk_syntax_node_type_t type;
+
   union
   {
     minsk_syntax_token_t token;

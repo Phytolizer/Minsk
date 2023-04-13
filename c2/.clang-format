@@ -12,4 +12,5 @@ AllowAllParametersOfDeclarationOnNextLine: false
 ContinuationIndentWidth: 2
 AllowShortFunctionsOnASingleLine: None
 AllowShortCaseLabelsOnASingleLine: true
+SeparateDefinitionBlocks: Always
 ...

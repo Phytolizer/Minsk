@@ -9,6 +9,7 @@
 
 typedef enum
 {
+
 #define X(x) MINSK_CONCAT(MINSK_PREFIX_BOUND_NODE, x),
 #include "./private/node_types.xmacro"
 #undef X

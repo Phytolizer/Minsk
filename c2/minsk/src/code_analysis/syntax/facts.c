@@ -30,6 +30,7 @@ minsk_syntax_facts_unary_operator_precedence(minsk_syntax_kind_t kind)
     default: return 0;
   }
 }
+
 typedef struct
 {
   string_t text;
