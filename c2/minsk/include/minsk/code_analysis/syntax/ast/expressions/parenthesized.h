@@ -9,8 +9,8 @@ typedef struct
   minsk_syntax_token_t close_parenthesis_token;
 } minsk_syntax_expression_parenthesized_t;
 
-#define MINSK_SYNTAX_EXPRESSION_PARENTHESIZED(...)   \
-  MINSK_SYNTAX_EXPRESSION(                           \
-    MINSK_SYNTAX_NODE_TYPE_PARENTHESIZED_EXPRESSION, \
-    .parenthesized = {__VA_ARGS__}                   \
-  )
+#define MINSK_SYNTAX_EXPRESSION_PARENTHESIZED(...)  \
+ MINSK_SYNTAX_EXPRESSION(                           \
+   MINSK_SYNTAX_NODE_TYPE_PARENTHESIZED_EXPRESSION, \
+   .parenthesized = {__VA_ARGS__}                   \
+ )

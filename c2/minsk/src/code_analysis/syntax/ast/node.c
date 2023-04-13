@@ -22,7 +22,8 @@ minsk_syntax_node_promote(Arena * arena, minsk_syntax_node_t node)
   return new_node;
 }
 
-static void pretty_print(
+static void
+pretty_print(
   Arena * arena,
   minsk_syntax_node_t node,
   FILE * stream,

@@ -12,11 +12,11 @@ minsk_object_type_display_name(Arena * arena, minsk_object_type_t type)
 {
   switch (type)
   {
-#define X(x)                                      \
-  case MINSK_OBJECT_TYPE_##x:                     \
-  {                                               \
-    return snake_to_camel(arena, STRING_REF(#x)); \
-  }
+#define X(x)                                    \
+ case MINSK_OBJECT_TYPE_##x:                    \
+ {                                              \
+  return snake_to_camel(arena, STRING_REF(#x)); \
+ }
 #include "minsk/runtime/private/object_types.xmacro"
 #undef X
   }
@@ -24,7 +24,8 @@ minsk_object_type_display_name(Arena * arena, minsk_object_type_t type)
   DEBUGGER_FATAL("invalid object type %d", type);
 }
 
-extern int minsk_object_show(minsk_object_t object, FILE * stream)
+extern int
+minsk_object_show(minsk_object_t object, FILE * stream)
 {
   switch (object.type)
   {

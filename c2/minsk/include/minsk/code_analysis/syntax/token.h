@@ -2,8 +2,9 @@
 
 #include <minsk-string/string.h>
 
-#include "./kind.h"
 #include "minsk/runtime/object.h"
+
+#include "./kind.h"
 
 typedef struct
 {

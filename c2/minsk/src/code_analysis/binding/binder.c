@@ -2,30 +2,34 @@
 
 #include <minsk-platform/debugger.h>
 
-extern minsk_binder_t minsk_binder_new(Arena * arena)
+extern minsk_binder_t
+minsk_binder_new(Arena * arena)
 {
   return (minsk_binder_t){
     ._arena = arena,
   };
 }
 
-static minsk_bound_node_t bind_binary_expression(
+static minsk_bound_node_t
+bind_binary_expression(
   minsk_binder_t * binder,
   minsk_syntax_expression_binary_t syntax
 );
-static minsk_bound_node_t bind_literal_expression(
-  minsk_syntax_expression_literal_t syntax
-);
-static minsk_bound_node_t bind_parenthesized_expression(
+static minsk_bound_node_t
+bind_literal_expression(minsk_syntax_expression_literal_t syntax);
+static minsk_bound_node_t
+bind_parenthesized_expression(
   minsk_binder_t * binder,
   minsk_syntax_expression_parenthesized_t syntax
 );
-static minsk_bound_node_t bind_unary_expression(
+static minsk_bound_node_t
+bind_unary_expression(
   minsk_binder_t * binder,
   minsk_syntax_expression_unary_t syntax
 );
 
-extern minsk_bound_node_t minsk_binder_bind_expression(
+extern minsk_bound_node_t
+minsk_binder_bind_expression(
   minsk_binder_t * binder,
   minsk_syntax_node_t syntax
 )
@@ -48,7 +52,8 @@ extern minsk_bound_node_t minsk_binder_bind_expression(
   }
 }
 
-static minsk_bound_node_t bind_binary_expression(
+static minsk_bound_node_t
+bind_binary_expression(
   minsk_binder_t * binder,
   minsk_syntax_expression_binary_t syntax
 )
@@ -91,9 +96,8 @@ static minsk_bound_node_t bind_binary_expression(
   );
 }
 
-static minsk_bound_node_t bind_literal_expression(
-  minsk_syntax_expression_literal_t syntax
-)
+static minsk_bound_node_t
+bind_literal_expression(minsk_syntax_expression_literal_t syntax)
 {
   minsk_object_t value = syntax.value;
   if (value.type == MINSK_OBJECT_TYPE_NIL)
@@ -103,7 +107,8 @@ static minsk_bound_node_t bind_literal_expression(
   return MINSK_BOUND_EXPRESSION_LITERAL(.value = value);
 }
 
-static minsk_bound_node_t bind_parenthesized_expression(
+static minsk_bound_node_t
+bind_parenthesized_expression(
   minsk_binder_t * binder,
   minsk_syntax_expression_parenthesized_t syntax
 )
@@ -111,7 +116,8 @@ static minsk_bound_node_t bind_parenthesized_expression(
   return minsk_binder_bind_expression(binder, *syntax.expression);
 }
 
-static minsk_bound_node_t bind_unary_expression(
+static minsk_bound_node_t
+bind_unary_expression(
   minsk_binder_t * binder,
   minsk_syntax_expression_unary_t syntax
 )

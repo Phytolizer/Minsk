@@ -29,11 +29,12 @@ typedef struct
 } minsk_object_t;
 
 #define MINSK_OBJECT_INTEGER(i) \
-  ((minsk_object_t){.type = MINSK_OBJECT_TYPE_INTEGER, .integer = (i)})
+ ((minsk_object_t){.type = MINSK_OBJECT_TYPE_INTEGER, .integer = (i)})
 #define MINSK_OBJECT_BOOLEAN(b) \
-  ((minsk_object_t){.type = MINSK_OBJECT_TYPE_BOOLEAN, .boolean = (b)})
+ ((minsk_object_t){.type = MINSK_OBJECT_TYPE_BOOLEAN, .boolean = (b)})
 #define MINSK_OBJECT_NIL ((minsk_object_t){.type = MINSK_OBJECT_TYPE_NIL})
 
 extern string_t
 minsk_object_type_display_name(Arena * arena, minsk_object_type_t type);
-extern int minsk_object_show(minsk_object_t object, FILE * stream);
+extern int
+minsk_object_show(minsk_object_t object, FILE * stream);

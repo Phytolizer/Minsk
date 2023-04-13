@@ -5,12 +5,13 @@
 #include <stdint.h>
 #include <unicode/utypes.h>
 
-#include "./token.h"
 #include "minsk/code_analysis/diagnostic_buf.h"
+
+#include "./token.h"
 
 enum
 {
-  MINSK_SYNTAX_LEXER_MAX_PEEK = 4,
+  MINSK_SYNTAX_LEXER_MAX_PEEK = 4
 };
 
 typedef struct
@@ -33,5 +34,5 @@ typedef struct
 
 extern minsk_syntax_lexer_t
 minsk_syntax_lexer_new(Arena * arena, string_t text);
-extern minsk_syntax_token_t minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer
-);
+extern minsk_syntax_token_t
+minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer);

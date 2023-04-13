@@ -19,8 +19,8 @@ typedef struct
   };
 } minsk_syntax_expression_t;
 
-#define MINSK_SYNTAX_EXPRESSION(ty, ...)       \
-  ((minsk_syntax_node_t){                      \
-    .type = (ty),                              \
-    .expression = {.type = (ty), __VA_ARGS__}, \
-  })
+#define MINSK_SYNTAX_EXPRESSION(ty, ...)      \
+ ((minsk_syntax_node_t){                      \
+   .type = (ty),                              \
+   .expression = {.type = (ty), __VA_ARGS__}, \
+ })

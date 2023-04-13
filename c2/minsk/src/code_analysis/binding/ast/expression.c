@@ -4,9 +4,8 @@
 
 #include "minsk/code_analysis/binding/ast/node.h"
 
-extern minsk_object_type_t minsk_bound_expression_get_resolved_type(
-  minsk_bound_expression_t expression
-)
+extern minsk_object_type_t
+minsk_bound_expression_get_resolved_type(minsk_bound_expression_t expression)
 {
   switch (expression.type)
   {

@@ -2,10 +2,10 @@
 
 #include "minsk/data_structures/buf.h"
 
-#define UNIFORM(sk, k, t)                                              \
-  {                                                                    \
-    .syntax_kind = sk, .kind = k, .operand_type = t, .result_type = t, \
-  }
+#define UNIFORM(sk, k, t)                                            \
+ {                                                                   \
+  .syntax_kind = sk, .kind = k, .operand_type = t, .result_type = t, \
+ }
 
 static minsk_bound_expression_unary_operator_t const ops[] = {
   UNIFORM(

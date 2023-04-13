@@ -3,9 +3,10 @@
 #include <arena.h>
 #include <minsk-string/string.h>
 
-#include "./ast/node.h"
 #include "minsk/code_analysis/diagnostic_buf.h"
 #include "minsk/code_analysis/syntax/token.h"
+
+#include "./ast/node.h"
 
 typedef struct
 {

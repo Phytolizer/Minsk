@@ -8,30 +8,31 @@
 #include "minsk/code_analysis/binding/ast/node.h"
 #include "minsk/code_analysis/binding/ast/node_type.h"
 
-static minsk_object_t evaluate_expression(minsk_bound_node_t const * node);
-static minsk_object_t evaluate_binary_expression(
-  minsk_bound_expression_binary_t node
-);
-static minsk_object_t evaluate_literal_expression(
-  minsk_bound_expression_literal_t node
-);
-static minsk_object_t evaluate_unary_expression(
-  minsk_bound_expression_unary_t node
-);
+static minsk_object_t
+evaluate_expression(minsk_bound_node_t const * node);
+static minsk_object_t
+evaluate_binary_expression(minsk_bound_expression_binary_t node);
+static minsk_object_t
+evaluate_literal_expression(minsk_bound_expression_literal_t node);
+static minsk_object_t
+evaluate_unary_expression(minsk_bound_expression_unary_t node);
 
-extern minsk_evaluator_t minsk_evaluator_new(minsk_bound_node_t root)
+extern minsk_evaluator_t
+minsk_evaluator_new(minsk_bound_node_t root)
 {
   return (minsk_evaluator_t){
     ._root = root,
   };
 }
 
-extern minsk_object_t minsk_evaluator_evaluate(minsk_evaluator_t * evaluator)
+extern minsk_object_t
+minsk_evaluator_evaluate(minsk_evaluator_t * evaluator)
 {
   return evaluate_expression(&evaluator->_root);
 }
 
-static minsk_object_t evaluate_expression(minsk_bound_node_t const * node)
+static minsk_object_t
+evaluate_expression(minsk_bound_node_t const * node)
 {
   switch (node->type)
   {
@@ -45,9 +46,8 @@ static minsk_object_t evaluate_expression(minsk_bound_node_t const * node)
   DEBUGGER_FATAL("invalid bound node type %d", node->type);
 }
 
-static minsk_object_t evaluate_binary_expression(
-  minsk_bound_expression_binary_t node
-)
+static minsk_object_t
+evaluate_binary_expression(minsk_bound_expression_binary_t node)
 {
   minsk_object_t left = evaluate_expression(node.left);
   minsk_object_t right = evaluate_expression(node.right);
@@ -88,16 +88,14 @@ static minsk_object_t evaluate_binary_expression(
   }
 }
 
-static minsk_object_t evaluate_literal_expression(
-  minsk_bound_expression_literal_t node
-)
+static minsk_object_t
+evaluate_literal_expression(minsk_bound_expression_literal_t node)
 {
   return node.value;
 }
 
-static minsk_object_t evaluate_unary_expression(
-  minsk_bound_expression_unary_t node
-)
+static minsk_object_t
+evaluate_unary_expression(minsk_bound_expression_unary_t node)
 {
   minsk_object_t operand = evaluate_expression(node.operand);
 

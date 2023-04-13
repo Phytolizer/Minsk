@@ -9,8 +9,8 @@ typedef struct
   struct minsk_syntax_node * right;
 } minsk_syntax_expression_binary_t;
 
-#define MINSK_SYNTAX_EXPRESSION_BINARY(...)   \
-  MINSK_SYNTAX_EXPRESSION(                    \
-    MINSK_SYNTAX_NODE_TYPE_BINARY_EXPRESSION, \
-    .binary = {__VA_ARGS__}                   \
-  )
+#define MINSK_SYNTAX_EXPRESSION_BINARY(...)  \
+ MINSK_SYNTAX_EXPRESSION(                    \
+   MINSK_SYNTAX_NODE_TYPE_BINARY_EXPRESSION, \
+   .binary = {__VA_ARGS__}                   \
+ )

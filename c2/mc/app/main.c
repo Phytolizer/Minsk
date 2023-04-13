@@ -16,7 +16,8 @@
 
 #define HISTORY_PATH ".minsk-history"
 
-extern int main(int argc, char ** argv)
+extern int
+main(int argc, char ** argv)
 {
   (void)argc;
   (void)argv;

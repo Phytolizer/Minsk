@@ -15,7 +15,8 @@ typedef enum
 #undef X
 } minsk_syntax_node_type_t;
 
-extern string_t minsk_syntax_node_type_display_name(
+extern string_t
+minsk_syntax_node_type_display_name(
   Arena * arena,
   minsk_syntax_node_type_t type
 );

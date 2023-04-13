@@ -18,7 +18,8 @@
 
 typedef UChar32 codepoint_t;
 
-static bool is_digit(codepoint_t cp)
+static bool
+is_digit(codepoint_t cp)
 {
   return cp >= '0' && cp <= '9';
 }
@@ -31,10 +32,11 @@ typedef struct
 
 enum
 {
-  UINT63_MAX = UINT64_MAX >> 1U,
+  UINT63_MAX = UINT64_MAX >> 1U
 };
 
-static overflow_t add_overflow(uint64_t a, uint64_t b)
+static overflow_t
+add_overflow(uint64_t a, uint64_t b)
 {
   uint64_t result = (a + b) & UINT63_MAX;
   return (overflow_t){
@@ -43,7 +45,8 @@ static overflow_t add_overflow(uint64_t a, uint64_t b)
   };
 }
 
-static overflow_t mul_overflow(uint64_t a, uint64_t b)
+static overflow_t
+mul_overflow(uint64_t a, uint64_t b)
 {
   return (overflow_t){
     .value = a * b,
@@ -51,7 +54,8 @@ static overflow_t mul_overflow(uint64_t a, uint64_t b)
   };
 }
 
-static overflow_t parse_number(string_t str)
+static overflow_t
+parse_number(string_t str)
 {
   uint64_t result = 0;
   for (size_t i = 0; i < str.length; i++)
@@ -75,7 +79,8 @@ static overflow_t parse_number(string_t str)
   return (overflow_t){.value = result};
 }
 
-static int64_t peek_pos(minsk_syntax_lexer_t const * lexer)
+static int64_t
+peek_pos(minsk_syntax_lexer_t const * lexer)
 {
   if (lexer->_peek_count > 0)
   {
@@ -86,7 +91,8 @@ static int64_t peek_pos(minsk_syntax_lexer_t const * lexer)
   return lexer->_position;
 }
 
-static codepoint_t peek(minsk_syntax_lexer_t * lexer, int64_t offset)
+static codepoint_t
+peek(minsk_syntax_lexer_t * lexer, int64_t offset)
 {
   DEBUGGER_ASSERT(offset < MINSK_SYNTAX_LEXER_MAX_PEEK, "offset too large");
   int64_t position = peek_pos(lexer);
@@ -118,19 +124,22 @@ static codepoint_t peek(minsk_syntax_lexer_t * lexer, int64_t offset)
   return lexer->_peek_buf[offset].cp;
 }
 
-static inline codepoint_t current(minsk_syntax_lexer_t * lexer)
+static inline codepoint_t
+current(minsk_syntax_lexer_t * lexer)
 {
   return peek(lexer, 0);
 }
 
 /// Set lexer->_position to reflect a call to `next`.
-static void move(minsk_syntax_lexer_t * lexer, int amount)
+static void
+move(minsk_syntax_lexer_t * lexer, int amount)
 {
   minsk_syntax_lexer_peek_char_t const * last = &lexer->_peek_buf[amount - 1];
   lexer->_position = last->position + last->size;
 }
 
-static void next(minsk_syntax_lexer_t * lexer, int amount)
+static void
+next(minsk_syntax_lexer_t * lexer, int amount)
 {
   if (amount == 0)
   {
@@ -154,7 +163,8 @@ static void next(minsk_syntax_lexer_t * lexer, int amount)
   lexer->_peek_count -= amount;
 }
 
-static void scan_whitespace(minsk_syntax_lexer_t * lexer)
+static void
+scan_whitespace(minsk_syntax_lexer_t * lexer)
 {
   while (u_isUWhiteSpace(current(lexer)))
   {
@@ -162,7 +172,8 @@ static void scan_whitespace(minsk_syntax_lexer_t * lexer)
   }
 }
 
-static void scan_digits(minsk_syntax_lexer_t * lexer)
+static void
+scan_digits(minsk_syntax_lexer_t * lexer)
 {
   while (is_digit(current(lexer)))
   {
@@ -170,7 +181,8 @@ static void scan_digits(minsk_syntax_lexer_t * lexer)
   }
 }
 
-static void scan_identifier_or_keyword(minsk_syntax_lexer_t * lexer)
+static void
+scan_identifier_or_keyword(minsk_syntax_lexer_t * lexer)
 {
   while (u_hasBinaryProperty(current(lexer), UCHAR_XID_CONTINUE))
   {
@@ -184,7 +196,8 @@ ref_current_text(minsk_syntax_lexer_t const * lexer, int64_t start)
   return STRING_REF_DATA(lexer->_text + start, lexer->_position - start);
 }
 
-extern minsk_syntax_lexer_t minsk_syntax_lexer_new(Arena * arena, string_t text)
+extern minsk_syntax_lexer_t
+minsk_syntax_lexer_new(Arena * arena, string_t text)
 {
   return (minsk_syntax_lexer_t){
     ._arena = arena,
@@ -195,17 +208,18 @@ extern minsk_syntax_lexer_t minsk_syntax_lexer_new(Arena * arena, string_t text)
   };
 }
 
-extern minsk_syntax_token_t minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer)
+extern minsk_syntax_token_t
+minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer)
 {
   minsk_syntax_kind_t kind = MINSK_SYNTAX_KIND_BAD_TOKEN;
   int64_t start = lexer->_position;
   string_t text = EMPTY_STRING;
   minsk_object_t value = MINSK_OBJECT_NIL;
 
-#define TOK(n, k)   \
-  next(lexer, (n)); \
-  kind = (k);       \
-  break
+#define TOK(n, k)  \
+ next(lexer, (n)); \
+ kind = (k);       \
+ break
 
   codepoint_t cp = current(lexer);
   switch (cp)

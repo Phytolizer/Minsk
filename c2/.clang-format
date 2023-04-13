@@ -3,6 +3,7 @@ BasedOnStyle: Google
 PointerAlignment: Middle
 DerivePointerAlignment: false
 AlignAfterOpenBracket: BlockIndent
+AlignTrailingComments: false
 BreakBeforeBraces: Allman
 BinPackArguments: false
 BinPackParameters: false
@@ -10,7 +11,27 @@ ColumnLimit: 80
 AllowAllArgumentsOnNextLine: false
 AllowAllParametersOfDeclarationOnNextLine: false
 ContinuationIndentWidth: 2
+AllowShortBlocksOnASingleLine: Never
+AllowShortEnumsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
 AllowShortCaseLabelsOnASingleLine: true
+AlwaysBreakAfterReturnType: All
+AlwaysBreakBeforeMultilineStrings: true
+BreakBeforeTernaryOperators: true
 SeparateDefinitionBlocks: Always
+IndentPPDirectives: BeforeHash
+PPIndentWidth: 1
+InsertBraces: true
+TypenameMacros:
+  - BUF_T
+CommentPragmas: 'IWYU pragma:'
+IncludeCategories:
+  - Regex: '^<'
+    Priority: 1
+  - Regex: '^"\./'
+    Priority: 3
+  - Regex: '^"'
+    Priority: 2
 ...

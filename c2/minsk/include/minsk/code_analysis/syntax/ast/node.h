@@ -3,10 +3,11 @@
 #include <arena.h>
 #include <stdio.h>
 
-#include "./expression.h"
-#include "./node_type.h"
 #include "minsk/code_analysis/syntax/token.h"
 #include "minsk/data_structures/buf.h"
+
+#include "./expression.h"
+#include "./node_type.h"
 
 typedef struct minsk_syntax_node
 {
@@ -20,7 +21,7 @@ typedef struct minsk_syntax_node
 } minsk_syntax_node_t;
 
 #define MINSK_SYNTAX_NODE_TOKEN(tok) \
-  ((minsk_syntax_node_t){.type = MINSK_SYNTAX_NODE_TYPE_TOKEN, .token = (tok)})
+ ((minsk_syntax_node_t){.type = MINSK_SYNTAX_NODE_TYPE_TOKEN, .token = (tok)})
 
 typedef BUF_T(minsk_syntax_node_t, minsk_syntax_node_buf)
   minsk_syntax_node_buf_t;
