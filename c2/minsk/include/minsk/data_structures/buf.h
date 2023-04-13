@@ -67,7 +67,7 @@
         (buf)->ptr = arena_realloc(                                         \
           arena,                                                            \
           (buf)->ptr,                                                       \
-          0,                                                                \
+          (buf)->len * sizeof(*(buf)->ptr),                                 \
           (buf)->cap * sizeof(*(buf)->ptr)                                  \
         );                                                                  \
       }                                                                     \
