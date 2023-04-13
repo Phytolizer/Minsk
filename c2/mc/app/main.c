@@ -37,8 +37,18 @@ extern int main(int argc, char** argv)
     Arena a = {0};
 
     minsk_syntax_parser_t parser = minsk_syntax_parser_new(&a, line);
-    minsk_syntax_node_t exp = minsk_syntax_parser_parse(&parser);
-    minsk_syntax_node_pretty_print(exp, stdout);
+    minsk_syntax_tree_t syntax_tree = minsk_syntax_parser_parse(&parser);
+    minsk_syntax_node_pretty_print(syntax_tree.root, stdout);
+
+    if (syntax_tree.diagnostics.len > 0)
+    {
+      printf("\x1b[0;31m");
+      for (size_t i = 0; i < syntax_tree.diagnostics.len; i++)
+      {
+        printf(STRING_FMT "\n", STRING_ARG(syntax_tree.diagnostics.ptr[i]));
+      }
+      printf("\x1b[0m");
+    }
 
     arena_free(&a);
     free(raw_line);

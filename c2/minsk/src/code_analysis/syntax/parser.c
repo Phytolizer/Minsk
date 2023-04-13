@@ -38,6 +38,18 @@ match_token(minsk_syntax_parser_t* parser, minsk_syntax_kind_t kind)
     return next_token(parser);
   }
 
+  BUF_PUSH_ARENA(
+    parser->_arena,
+    &parser->diagnostics,
+    string_printf_arena(
+      parser->_arena,
+      "Unexpected token <" STRING_FMT ">, expected <" STRING_FMT ">.",
+      STRING_ARG(
+        minsk_syntax_kind_display_name(parser->_arena, current(parser).kind)
+      ),
+      STRING_ARG(minsk_syntax_kind_display_name(parser->_arena, kind))
+    )
+  );
   return (minsk_syntax_token_t){
     .kind = kind,
     .position = current(parser).position,
@@ -49,7 +61,7 @@ match_token(minsk_syntax_parser_t* parser, minsk_syntax_kind_t kind)
 extern minsk_syntax_parser_t
 minsk_syntax_parser_new(Arena* arena, string_t text)
 {
-  minsk_syntax_lexer_t lexer = minsk_syntax_lexer_new(text);
+  minsk_syntax_lexer_t lexer = minsk_syntax_lexer_new(arena, text);
   minsk_syntax_parser_token_buf_t tokens = {0};
   while (true)
   {
@@ -69,6 +81,7 @@ minsk_syntax_parser_new(Arena* arena, string_t text)
     ._arena = arena,
     ._tokens = tokens,
     ._position = 0,
+    .diagnostics = lexer.diagnostics,
   };
 }
 
@@ -77,11 +90,18 @@ static minsk_syntax_node_t parse_primary_expression(
   minsk_syntax_parser_t* parser
 );
 
-extern minsk_syntax_node_t minsk_syntax_parser_parse(
+extern minsk_syntax_tree_t minsk_syntax_parser_parse(
   minsk_syntax_parser_t* parser
 )
 {
-  return parse_expression(parser);
+  minsk_syntax_node_t expression = parse_expression(parser);
+  minsk_syntax_token_t end_of_file_token =
+    match_token(parser, MINSK_SYNTAX_KIND_END_OF_FILE_TOKEN);
+  return (minsk_syntax_tree_t){
+    .diagnostics = parser->diagnostics,
+    .root = expression,
+    .end_of_file_token = end_of_file_token,
+  };
 }
 
 static minsk_syntax_node_t parse_expression(minsk_syntax_parser_t* parser)
