@@ -86,6 +86,8 @@ minsk_syntax_parser_new(Arena* arena, string_t text)
 }
 
 static minsk_syntax_node_t parse_expression(minsk_syntax_parser_t* parser);
+static minsk_syntax_node_t parse_term(minsk_syntax_parser_t* parser);
+static minsk_syntax_node_t parse_factor(minsk_syntax_parser_t* parser);
 static minsk_syntax_node_t parse_primary_expression(
   minsk_syntax_parser_t* parser
 );
@@ -106,10 +108,33 @@ extern minsk_syntax_tree_t minsk_syntax_parser_parse(
 
 static minsk_syntax_node_t parse_expression(minsk_syntax_parser_t* parser)
 {
-  minsk_syntax_node_t left = parse_primary_expression(parser);
+  return parse_term(parser);
+}
+
+static minsk_syntax_node_t parse_term(minsk_syntax_parser_t* parser)
+{
+  minsk_syntax_node_t left = parse_factor(parser);
 
   while (current(parser).kind == MINSK_SYNTAX_KIND_PLUS_TOKEN ||
          current(parser).kind == MINSK_SYNTAX_KIND_MINUS_TOKEN)
+  {
+    minsk_syntax_token_t op = next_token(parser);
+    minsk_syntax_node_t* right =
+      minsk_syntax_node_promote(parser->_arena, parse_factor(parser));
+    minsk_syntax_node_t* left_alloc =
+      minsk_syntax_node_promote(parser->_arena, left);
+    left = MINSK_SYNTAX_EXPRESSION_BINARY(left_alloc, op, right);
+  }
+
+  return left;
+}
+
+static minsk_syntax_node_t parse_factor(minsk_syntax_parser_t* parser)
+{
+  minsk_syntax_node_t left = parse_primary_expression(parser);
+
+  while (current(parser).kind == MINSK_SYNTAX_KIND_STAR_TOKEN ||
+         current(parser).kind == MINSK_SYNTAX_KIND_SLASH_TOKEN)
   {
     minsk_syntax_token_t op = next_token(parser);
     minsk_syntax_node_t* right = minsk_syntax_node_promote(
