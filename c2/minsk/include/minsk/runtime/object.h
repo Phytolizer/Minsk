@@ -22,11 +22,14 @@ typedef struct
   union
   {
     int64_t integer;
+    bool boolean;
   };
 } minsk_object_t;
 
 #define MINSK_OBJECT_INTEGER(i) \
   ((minsk_object_t){.type = MINSK_OBJECT_TYPE_INTEGER, .integer = (i)})
+#define MINSK_OBJECT_BOOLEAN(b) \
+  ((minsk_object_t){.type = MINSK_OBJECT_TYPE_BOOLEAN, .boolean = (b)})
 #define MINSK_OBJECT_NIL ((minsk_object_t){.type = MINSK_OBJECT_TYPE_NIL})
 
 extern string_t

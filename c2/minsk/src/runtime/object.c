@@ -31,6 +31,12 @@ extern int minsk_object_show(minsk_object_t object, FILE * stream)
     case MINSK_OBJECT_TYPE_NIL: return fprintf(stream, "nil");
     case MINSK_OBJECT_TYPE_INTEGER:
       return fprintf(stream, "%" PRId64, object.integer);
+    case MINSK_OBJECT_TYPE_BOOLEAN:
+      return fprintf(
+        stream,
+        STRING_FMT,
+        STRING_ARG(object.boolean ? STRING_REF("true") : STRING_REF("false"))
+      );
   }
 
   DEBUGGER_FATAL("invalid object type %d", object.type);

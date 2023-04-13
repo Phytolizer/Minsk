@@ -5,6 +5,7 @@
 typedef struct
 {
   minsk_syntax_token_t literal_token;
+  minsk_object_t value;
 } minsk_syntax_expression_literal_t;
 
 #define MINSK_SYNTAX_EXPRESSION_LITERAL(...)   \

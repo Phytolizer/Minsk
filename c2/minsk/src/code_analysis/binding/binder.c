@@ -148,7 +148,7 @@ static minsk_bound_node_t bind_literal_expression(
   minsk_syntax_expression_literal_t syntax
 )
 {
-  minsk_object_t value = syntax.literal_token.value;
+  minsk_object_t value = syntax.value;
   if (value.type == MINSK_OBJECT_TYPE_NIL)
   {
     value = MINSK_OBJECT_INTEGER(0);
