@@ -5,7 +5,7 @@
 typedef struct
 {
   struct minsk_bound_node * left;
-  minsk_bound_expression_binary_operator_kind_t op_kind;
+  minsk_bound_expression_binary_operator_t op;
   struct minsk_bound_node * right;
 } minsk_bound_expression_binary_t;
 

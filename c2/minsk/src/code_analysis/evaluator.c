@@ -51,7 +51,7 @@ static minsk_object_t evaluate_binary_expression(
   minsk_object_t left = evaluate_expression(node.left);
   minsk_object_t right = evaluate_expression(node.right);
 
-  switch (node.op_kind)
+  switch (node.op.kind)
   {
     case MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_ADDITION:
       return MINSK_OBJECT_INTEGER(left.integer + right.integer);
@@ -65,7 +65,7 @@ static minsk_object_t evaluate_binary_expression(
       return MINSK_OBJECT_BOOLEAN(left.boolean && right.boolean);
     case MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_LOGICAL_OR:
       return MINSK_OBJECT_BOOLEAN(left.boolean || right.boolean);
-    default: DEBUGGER_FATAL("invalid binary operator %d", node.op_kind);
+    default: DEBUGGER_FATAL("invalid binary operator %d", node.op.kind);
   }
 }
 
@@ -82,13 +82,13 @@ static minsk_object_t evaluate_unary_expression(
 {
   minsk_object_t operand = evaluate_expression(node.operand);
 
-  switch (node.op_kind)
+  switch (node.op.kind)
   {
     case MINSK_BOUND_EXPRESSION_UNARY_OPERATOR_KIND_IDENTITY: return operand;
     case MINSK_BOUND_EXPRESSION_UNARY_OPERATOR_KIND_NEGATION:
       return MINSK_OBJECT_INTEGER(-operand.integer);
     case MINSK_BOUND_EXPRESSION_UNARY_OPERATOR_KIND_LOGICAL_NEGATION:
       return MINSK_OBJECT_BOOLEAN(!operand.boolean);
-    default: DEBUGGER_FATAL("invalid unary operator %d", node.op_kind);
+    default: DEBUGGER_FATAL("invalid unary operator %d", node.op.kind);
   }
 }

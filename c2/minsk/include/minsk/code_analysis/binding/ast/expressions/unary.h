@@ -4,7 +4,7 @@
 
 typedef struct
 {
-  minsk_bound_expression_unary_operator_kind_t op_kind;
+  minsk_bound_expression_unary_operator_t op;
   struct minsk_bound_node * operand;
 } minsk_bound_expression_unary_t;
 

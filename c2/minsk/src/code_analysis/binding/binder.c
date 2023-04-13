@@ -48,83 +48,6 @@ extern minsk_bound_node_t minsk_binder_bind_expression(
   }
 }
 
-static bool bind_binary_operator_kind(
-  minsk_syntax_kind_t kind,
-  minsk_object_type_t left_type,
-  minsk_object_type_t right_type,
-  minsk_bound_expression_binary_operator_kind_t * out_kind
-)
-{
-  if (left_type == MINSK_OBJECT_TYPE_INTEGER && right_type == MINSK_OBJECT_TYPE_INTEGER)
-  {
-    switch (kind)
-    {
-      case MINSK_SYNTAX_KIND_PLUS_TOKEN:
-        *out_kind = MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_ADDITION;
-        return true;
-      case MINSK_SYNTAX_KIND_MINUS_TOKEN:
-        *out_kind = MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_SUBTRACTION;
-        return true;
-      case MINSK_SYNTAX_KIND_STAR_TOKEN:
-        *out_kind = MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_MULTIPLICATION;
-        return true;
-      case MINSK_SYNTAX_KIND_SLASH_TOKEN:
-        *out_kind = MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_DIVISION;
-        return true;
-      default: break;
-    }
-  }
-  else if (left_type == MINSK_OBJECT_TYPE_BOOLEAN && right_type == MINSK_OBJECT_TYPE_BOOLEAN)
-  {
-    switch (kind)
-    {
-      case MINSK_SYNTAX_KIND_AMPERSAND_AMPERSAND_TOKEN:
-        *out_kind = MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_LOGICAL_AND;
-        return true;
-      case MINSK_SYNTAX_KIND_PIPE_PIPE_TOKEN:
-        *out_kind = MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_LOGICAL_OR;
-        return true;
-      default: break;
-    }
-  }
-  return false;
-}
-
-static bool bind_unary_operator_kind(
-  minsk_syntax_kind_t kind,
-  minsk_object_type_t operand_type,
-  minsk_bound_expression_unary_operator_kind_t * out_kind
-)
-{
-  switch (operand_type)
-  {
-    case MINSK_OBJECT_TYPE_INTEGER:
-      switch (kind)
-      {
-        case MINSK_SYNTAX_KIND_PLUS_TOKEN:
-          *out_kind = MINSK_BOUND_EXPRESSION_UNARY_OPERATOR_KIND_IDENTITY;
-          return true;
-        case MINSK_SYNTAX_KIND_MINUS_TOKEN:
-          *out_kind = MINSK_BOUND_EXPRESSION_UNARY_OPERATOR_KIND_NEGATION;
-          return true;
-        default: break;
-      }
-      break;
-    case MINSK_OBJECT_TYPE_BOOLEAN:
-      switch (kind)
-      {
-        case MINSK_SYNTAX_KIND_BANG_TOKEN:
-          *out_kind =
-            MINSK_BOUND_EXPRESSION_UNARY_OPERATOR_KIND_LOGICAL_NEGATION;
-          return true;
-        default: break;
-      }
-      break;
-    default: break;
-  }
-  return false;
-}
-
 static minsk_bound_node_t bind_binary_expression(
   minsk_binder_t * binder,
   minsk_syntax_expression_binary_t syntax
@@ -133,13 +56,13 @@ static minsk_bound_node_t bind_binary_expression(
   minsk_bound_node_t left = minsk_binder_bind_expression(binder, *syntax.left);
   minsk_bound_node_t right =
     minsk_binder_bind_expression(binder, *syntax.right);
-  minsk_bound_expression_binary_operator_kind_t op_kind;
-  if (!bind_binary_operator_kind(
-        syntax.op.kind,
-        minsk_bound_expression_get_resolved_type(left.expression),
-        minsk_bound_expression_get_resolved_type(right.expression),
-        &op_kind
-      ))
+  minsk_bound_expression_binary_operator_t const * op =
+    minsk_bound_expression_binary_operator_bind(
+      syntax.op.kind,
+      minsk_bound_expression_get_resolved_type(left.expression),
+      minsk_bound_expression_get_resolved_type(right.expression)
+    );
+  if (op == NULL)
   {
     BUF_PUSH_ARENA(
       binder->_arena,
@@ -163,7 +86,7 @@ static minsk_bound_node_t bind_binary_expression(
   }
   return MINSK_BOUND_EXPRESSION_BINARY(
       .left = minsk_bound_node_promote(binder->_arena, left),
-      .op_kind = op_kind,
+      .op = *op,
       .right = minsk_bound_node_promote(binder->_arena, right),
   );
 }
@@ -195,12 +118,12 @@ static minsk_bound_node_t bind_unary_expression(
 {
   minsk_bound_node_t operand =
     minsk_binder_bind_expression(binder, *syntax.operand);
-  minsk_bound_expression_unary_operator_kind_t op_kind;
-  if (!bind_unary_operator_kind(
-        syntax.op.kind,
-        minsk_bound_expression_get_resolved_type(operand.expression),
-        &op_kind
-      ))
+  minsk_bound_expression_unary_operator_t const * op =
+    minsk_bound_expression_unary_operator_bind(
+      syntax.op.kind,
+      minsk_bound_expression_get_resolved_type(operand.expression)
+    );
+  if (op == NULL)
   {
     BUF_PUSH_ARENA(
       binder->_arena,
@@ -219,7 +142,7 @@ static minsk_bound_node_t bind_unary_expression(
     return operand;
   }
   return MINSK_BOUND_EXPRESSION_UNARY(
-      .op_kind = op_kind,
+      .op = *op,
       .operand = minsk_bound_node_promote(binder->_arena, operand)
   );
 }
