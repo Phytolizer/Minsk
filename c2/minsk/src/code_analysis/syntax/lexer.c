@@ -10,6 +10,7 @@
 #include <unicode/utf8.h>
 #include <unicode/utypes.h>
 
+#include "minsk/code_analysis/syntax/facts.h"
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/code_analysis/syntax/token.h"
 #include "minsk/data_structures/buf.h"
@@ -158,6 +159,14 @@ static void scan_digits(minsk_syntax_lexer_t * lexer)
   }
 }
 
+static void scan_identifier_or_keyword(minsk_syntax_lexer_t * lexer)
+{
+  while (u_hasBinaryProperty(current(lexer), UCHAR_XID_CONTINUE))
+  {
+    next(lexer, 1);
+  }
+}
+
 static string_t
 ref_current_text(minsk_syntax_lexer_t const * lexer, int64_t start)
 {
@@ -203,6 +212,13 @@ extern minsk_syntax_token_t minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer)
       {
         scan_whitespace(lexer);
         kind = MINSK_SYNTAX_KIND_WHITESPACE_TOKEN;
+      }
+      else if (u_hasBinaryProperty(cp, UCHAR_XID_START))
+      {
+        next(lexer, 1);
+        scan_identifier_or_keyword(lexer);
+        text = ref_current_text(lexer, start);
+        kind = minsk_syntax_facts_keyword_kind(text);
       }
       else if (is_digit(cp))
       {

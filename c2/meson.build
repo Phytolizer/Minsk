@@ -28,6 +28,7 @@ arena_hdr_dep = dependency(
 )
 
 icuuc_dep = dependency('icu-uc')
+uthash_dep = dependency('uthash')
 
 subdir('arena')
 subdir('string')

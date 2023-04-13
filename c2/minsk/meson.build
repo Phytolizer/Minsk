@@ -12,6 +12,7 @@ minsk_lib = static_library(
         icuuc_dep,
         platform_dep,
         string_dep,
+        uthash_dep,
     ],
 )
 
