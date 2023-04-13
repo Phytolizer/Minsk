@@ -153,6 +153,19 @@ static minsk_syntax_node_t parse_primary_expression(
   minsk_syntax_parser_t* parser
 )
 {
+  if (current(parser).kind == MINSK_SYNTAX_KIND_OPEN_PARENTHESIS_TOKEN)
+  {
+    minsk_syntax_token_t open_parenthesis_token = next_token(parser);
+    minsk_syntax_node_t expression = parse_expression(parser);
+    minsk_syntax_token_t close_parenthesis_token =
+      match_token(parser, MINSK_SYNTAX_KIND_CLOSE_PARENTHESIS_TOKEN);
+    return MINSK_SYNTAX_EXPRESSION_PARENTHESIZED(
+      open_parenthesis_token,
+      minsk_syntax_node_promote(parser->_arena, expression),
+      close_parenthesis_token
+    );
+  }
+
   minsk_syntax_token_t literal_token =
     match_token(parser, MINSK_SYNTAX_KIND_NUMBER_TOKEN);
   return MINSK_SYNTAX_EXPRESSION_LITERAL(literal_token);
