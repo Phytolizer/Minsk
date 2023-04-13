@@ -1,14 +1,11 @@
 #include <arena.h>
 #include <linenoise.h>
 #include <minsk-string/string.h>
-#include <minsk/code_analysis/binding/ast/node.h>
-#include <minsk/code_analysis/binding/binder.h>
+#include <minsk/code_analysis/compilation.h>
 #include <minsk/code_analysis/diagnostic_buf.h>
-#include <minsk/code_analysis/evaluator.h>
 #include <minsk/code_analysis/syntax/ast/node.h>
 #include <minsk/code_analysis/syntax/facts.h>
 #include <minsk/code_analysis/syntax/tree.h>
-#include <minsk/data_structures/buf.h>
 #include <minsk/runtime/object.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -73,28 +70,22 @@ main(int argc, char ** argv)
     {
       minsk_syntax_node_pretty_print(syntax_tree.root, stdout);
     }
-    minsk_diagnostic_buf_t diagnostics = syntax_tree.diagnostics;
-    minsk_binder_t binder = minsk_binder_new(&a);
-    minsk_bound_node_t bound_expression =
-      minsk_binder_bind_expression(&binder, syntax_tree.root);
+    minsk_compilation_t compilation = minsk_compilation_new(&a, syntax_tree);
+    minsk_evaluation_result_t result = minsk_compilation_evaluate(&compilation);
 
-    BUF_APPEND_ARENA(&a, &diagnostics, binder.diagnostics);
-
-    if (diagnostics.len > 0)
+    if (!result.success)
     {
       printf("\x1b[0;31m");
-      for (size_t i = 0; i < diagnostics.len; i++)
+      for (size_t i = 0; i < result.diagnostics.len; i++)
       {
-        printf(STRING_FMT "\n", STRING_ARG(diagnostics.ptr[i]));
+        printf(STRING_FMT "\n", STRING_ARG(result.diagnostics.ptr[i]));
       }
       printf("\x1b[0m");
     }
     else
     {
-      minsk_evaluator_t e = minsk_evaluator_new(bound_expression);
-      minsk_object_t result = minsk_evaluator_evaluate(&e);
       printf("\x1b[0;35m");
-      minsk_object_show(result, stdout);
+      minsk_object_show(result.value, stdout);
       printf("\x1b[0m\n");
     }
 
