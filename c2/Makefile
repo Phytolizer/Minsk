@@ -2,6 +2,7 @@
 # NOT a build script.
 
 CLANG_FORMAT ?= clang-format
+IWYU ?= iwyu-tool
 
 .PHONY: clang-format muon iwyu
 
@@ -12,4 +13,4 @@ muon:
 	fd -g meson.build -x muon fmt -i
 
 iwyu:
-	iwyu-tool -p build | tee build/iwyu-report.txt
+	$(IWYU) -p build | tee build/iwyu-report.txt
