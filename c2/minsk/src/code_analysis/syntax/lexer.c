@@ -167,9 +167,10 @@ ref_current_text(minsk_syntax_lexer_t const* lexer, utf8proc_ssize_t start)
   return STRING_REF_DATA(lexer->_text + start, lexer->_position - start);
 }
 
-extern minsk_syntax_lexer_t minsk_syntax_lexer_new(string_t text)
+extern minsk_syntax_lexer_t minsk_syntax_lexer_new(Arena* arena, string_t text)
 {
   return (minsk_syntax_lexer_t){
+    ._arena = arena,
     ._text = (utf8proc_uint8_t const*)text.data,
     ._text_len = text.length,
     ._position = 0,
@@ -215,19 +216,41 @@ extern minsk_syntax_token_t minsk_syntax_lexer_lex(minsk_syntax_lexer_t* lexer)
         overflow_t parse_result = parse_number(text);
         if (parse_result.did_overflow)
         {
-          DEBUGGER_FATAL("TODO");
+          BUF_PUSH_ARENA(
+            lexer->_arena,
+            &lexer->diagnostics,
+            string_printf_arena(
+              lexer->_arena,
+              "The number literal '" STRING_FMT "' is too large.",
+              STRING_ARG(text)
+            )
+          );
         }
-        DEBUGGER_ASSERT(
-          parse_result.value <= UINT63_MAX,
-          "parse_number overflowed silently!"
-        );
-        value = MINSK_OBJECT_INTEGER(parse_result.value);
+        else
+        {
+          DEBUGGER_ASSERT(
+            parse_result.value <= UINT63_MAX,
+            "parse_number overflowed silently!"
+          );
+          value = MINSK_OBJECT_INTEGER(parse_result.value);
+        }
       }
     }
   }
 
   if (kind == MINSK_SYNTAX_KIND_BAD_TOKEN)
   {
+    utf8proc_uint8_t charbuf[4];
+    utf8proc_ssize_t nbytes = utf8proc_encode_char(current(lexer), charbuf);
+    BUF_PUSH_ARENA(
+      lexer->_arena,
+      &lexer->diagnostics,
+      string_printf_arena(
+        lexer->_arena,
+        "Bad character in input: '" STRING_FMT "'",
+        STRING_ARG(STRING_REF_DATA(charbuf, nbytes))
+      )
+    );
     next(lexer, 1);
   }
 
