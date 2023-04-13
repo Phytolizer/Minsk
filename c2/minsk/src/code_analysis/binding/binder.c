@@ -19,14 +19,20 @@
 #include "minsk/runtime/object.h"
 
 extern minsk_binder_t
-minsk_binder_new(Arena * arena)
+minsk_binder_new(Arena * arena, minsk_variable_map_t * variables)
 {
   return (minsk_binder_t){
     ._arena = arena,
+    ._variables = variables,
     .diagnostics = minsk_diagnostic_bag_new(arena),
   };
 }
 
+static minsk_bound_node_t
+bind_assignment_expression(
+  minsk_binder_t * binder,
+  minsk_syntax_expression_assignment_t syntax
+);
 static minsk_bound_node_t
 bind_binary_expression(
   minsk_binder_t * binder,
@@ -34,6 +40,11 @@ bind_binary_expression(
 );
 static minsk_bound_node_t
 bind_literal_expression(minsk_syntax_expression_literal_t syntax);
+static minsk_bound_node_t
+bind_name_expression(
+  minsk_binder_t * binder,
+  minsk_syntax_expression_name_t syntax
+);
 static minsk_bound_node_t
 bind_parenthesized_expression(
   minsk_binder_t * binder,
@@ -53,10 +64,14 @@ minsk_binder_bind_expression(
 {
   switch (syntax.type)
   {
+    case MINSK_SYNTAX_NODE_TYPE_ASSIGNMENT_EXPRESSION:
+      return bind_assignment_expression(binder, syntax.expression.assignment);
     case MINSK_SYNTAX_NODE_TYPE_BINARY_EXPRESSION:
       return bind_binary_expression(binder, syntax.expression.binary);
     case MINSK_SYNTAX_NODE_TYPE_LITERAL_EXPRESSION:
       return bind_literal_expression(syntax.expression.literal);
+    case MINSK_SYNTAX_NODE_TYPE_NAME_EXPRESSION:
+      return bind_name_expression(binder, syntax.expression.name);
     case MINSK_SYNTAX_NODE_TYPE_PARENTHESIZED_EXPRESSION:
       return bind_parenthesized_expression(
         binder,
@@ -64,9 +79,43 @@ minsk_binder_bind_expression(
       );
     case MINSK_SYNTAX_NODE_TYPE_UNARY_EXPRESSION:
       return bind_unary_expression(binder, syntax.expression.unary);
-    case MINSK_SYNTAX_NODE_TYPE_TOKEN:
-    default: DEBUGGER_FATAL("invalid syntax node type %d", syntax.type);
+    case MINSK_SYNTAX_NODE_TYPE_TOKEN: break;
   }
+
+  DEBUGGER_FATAL("invalid syntax node type %d", syntax.type);
+}
+
+static minsk_bound_node_t
+bind_assignment_expression(
+  minsk_binder_t * binder,
+  minsk_syntax_expression_assignment_t syntax
+)
+{
+  string_t name = syntax.identifier_token.text;
+  minsk_bound_node_t expression =
+    minsk_binder_bind_expression(binder, *syntax.expression);
+
+  minsk_object_t default_value;
+  switch (minsk_bound_expression_get_resolved_type(expression.expression))
+  {
+    case MINSK_OBJECT_TYPE_INTEGER:
+      default_value = MINSK_OBJECT_INTEGER(0);
+      break;
+    case MINSK_OBJECT_TYPE_BOOLEAN:
+      default_value = MINSK_OBJECT_BOOLEAN(false);
+      break;
+    default:
+      DEBUGGER_FATAL(
+        "invalid variable type %d",
+        minsk_bound_expression_get_resolved_type(expression.expression)
+      );
+  }
+
+  minsk_variable_map_put(binder->_variables, name, default_value);
+  return MINSK_BOUND_EXPRESSION_ASSIGNMENT(
+      .name = name,
+      .expression = minsk_bound_node_promote(binder->_arena, expression)
+  );
 }
 
 static minsk_bound_node_t
@@ -111,6 +160,27 @@ bind_literal_expression(minsk_syntax_expression_literal_t syntax)
     value = MINSK_OBJECT_INTEGER(0);
   }
   return MINSK_BOUND_EXPRESSION_LITERAL(.value = value);
+}
+
+static minsk_bound_node_t
+bind_name_expression(
+  minsk_binder_t * binder,
+  minsk_syntax_expression_name_t syntax
+)
+{
+  string_t name = syntax.identifier_token.text;
+  minsk_object_t value;
+  if (!minsk_variable_map_try_get_value(binder->_variables, name, &value))
+  {
+    minsk_diagnostic_bag_report_undefined_name(
+      &binder->diagnostics,
+      minsk_syntax_token_span(syntax.identifier_token),
+      name
+    );
+    return MINSK_BOUND_EXPRESSION_LITERAL(MINSK_OBJECT_INTEGER(0));
+  }
+
+  return MINSK_BOUND_EXPRESSION_VARIABLE(.name = name, .type = value.type);
 }
 
 static minsk_bound_node_t

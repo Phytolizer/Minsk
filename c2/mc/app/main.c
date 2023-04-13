@@ -6,6 +6,7 @@
 #include <minsk/code_analysis/syntax/ast/node.h>
 #include <minsk/code_analysis/syntax/facts.h>
 #include <minsk/code_analysis/syntax/tree.h>
+#include <minsk/code_analysis/variable_map.h>
 #include <minsk/runtime/object.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -28,6 +29,8 @@ main(int argc, char ** argv)
   linenoiseHistoryLoad(HISTORY_PATH);
 
   bool show_tree = false;
+  Arena var_arena = {0};
+  minsk_variable_map_t variables = minsk_variable_map_new(&var_arena);
 
   while (true)
   {
@@ -71,7 +74,8 @@ main(int argc, char ** argv)
       minsk_syntax_node_pretty_print(syntax_tree.root, stdout);
     }
     minsk_compilation_t compilation = minsk_compilation_new(&a, syntax_tree);
-    minsk_evaluation_result_t result = minsk_compilation_evaluate(&compilation);
+    minsk_evaluation_result_t result =
+      minsk_compilation_evaluate(&compilation, &variables);
 
     if (!result.success)
     {
@@ -108,6 +112,7 @@ main(int argc, char ** argv)
     free(raw_line);
   }
 
+  arena_free(&var_arena);
   minsk_syntax_facts_free_keyword_table();
 
   linenoiseHistorySave(HISTORY_PATH);

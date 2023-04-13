@@ -122,3 +122,21 @@ minsk_diagnostic_bag_report_undefined_unary_operator(
     )
   );
 }
+
+extern void
+minsk_diagnostic_bag_report_undefined_name(
+  minsk_diagnostic_bag_t * bag,
+  minsk_text_span_t span,
+  string_t name
+)
+{
+  report(
+    bag,
+    span,
+    string_printf_arena(
+      bag->_arena,
+      "The variable '" STRING_FMT "' doesn't exist.",
+      STRING_ARG(name)
+    )
+  );
+}

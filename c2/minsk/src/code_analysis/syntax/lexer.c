@@ -249,7 +249,10 @@ minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer)
       {
         TOK(2, MINSK_SYNTAX_KIND_EQUALS_EQUALS_TOKEN);
       }
-      break;
+      else
+      {
+        TOK(1, MINSK_SYNTAX_KIND_EQUALS_TOKEN);
+      }
     case '&':
       if (peek(lexer, 1) == '&')
       {

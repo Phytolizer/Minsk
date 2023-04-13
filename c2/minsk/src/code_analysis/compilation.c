@@ -13,9 +13,12 @@ minsk_compilation_new(Arena * arena, minsk_syntax_tree_t syntax_tree)
 }
 
 extern minsk_evaluation_result_t
-minsk_compilation_evaluate(minsk_compilation_t * compilation)
+minsk_compilation_evaluate(
+  minsk_compilation_t * compilation,
+  minsk_variable_map_t * variables
+)
 {
-  minsk_binder_t binder = minsk_binder_new(compilation->_arena);
+  minsk_binder_t binder = minsk_binder_new(compilation->_arena, variables);
   minsk_bound_node_t bound_expression =
     minsk_binder_bind_expression(&binder, compilation->syntax_tree.root);
 
@@ -34,7 +37,8 @@ minsk_compilation_evaluate(minsk_compilation_t * compilation)
     };
   }
 
-  minsk_evaluator_t evaluator = minsk_evaluator_new(bound_expression);
+  minsk_evaluator_t evaluator =
+    minsk_evaluator_new(bound_expression, variables);
   minsk_object_t value = minsk_evaluator_evaluate(&evaluator);
   return (minsk_evaluation_result_t){
     .success = true,

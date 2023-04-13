@@ -90,6 +90,8 @@ minsk_syntax_parser_new(Arena * arena, string_t text)
 static minsk_syntax_node_t
 parse_expression(minsk_syntax_parser_t * parser);
 static minsk_syntax_node_t
+parse_assignment_expression(minsk_syntax_parser_t * parser);
+static minsk_syntax_node_t
 parse_binary_expression(
   minsk_syntax_parser_t * parser,
   minsk_syntax_facts_precedence_t precedence
@@ -113,6 +115,24 @@ minsk_syntax_parser_parse(minsk_syntax_parser_t * parser)
 static minsk_syntax_node_t
 parse_expression(minsk_syntax_parser_t * parser)
 {
+  return parse_assignment_expression(parser);
+}
+
+inline minsk_syntax_node_t
+parse_assignment_expression(minsk_syntax_parser_t * parser)
+{
+  if (peek(parser, 0).kind == MINSK_SYNTAX_KIND_IDENTIFIER_TOKEN && peek(parser, 1).kind == MINSK_SYNTAX_KIND_EQUALS_TOKEN)
+  {
+    minsk_syntax_token_t identifier_token = next_token(parser);
+    minsk_syntax_token_t equals_token = next_token(parser);
+    minsk_syntax_node_t expression = parse_assignment_expression(parser);
+    return MINSK_SYNTAX_EXPRESSION_ASSIGNMENT(
+        .identifier_token = identifier_token,
+        .equals_token = equals_token,
+        .expression = minsk_syntax_node_promote(parser->_arena, expression)
+    );
+  }
+
   return parse_binary_expression(parser, 0);
 }
 
@@ -172,6 +192,8 @@ static minsk_syntax_node_t
 parse_boolean_literal(minsk_syntax_parser_t * parser);
 static minsk_syntax_node_t
 parse_number_literal(minsk_syntax_parser_t * parser);
+static minsk_syntax_node_t
+parse_name_expression(minsk_syntax_parser_t * parser);
 
 static minsk_syntax_node_t
 parse_primary_expression(minsk_syntax_parser_t * parser)
@@ -182,7 +204,8 @@ parse_primary_expression(minsk_syntax_parser_t * parser)
       return parse_parenthesized_expression(parser);
     case MINSK_SYNTAX_KIND_TRUE_KEYWORD:
     case MINSK_SYNTAX_KIND_FALSE_KEYWORD: return parse_boolean_literal(parser);
-    default: return parse_number_literal(parser);
+    case MINSK_SYNTAX_KIND_NUMBER_TOKEN: return parse_number_literal(parser);
+    default: return parse_name_expression(parser);
   }
 }
 
@@ -223,4 +246,12 @@ parse_number_literal(minsk_syntax_parser_t * parser)
       .literal_token = literal_token,
       .value = literal_token.value
   );
+}
+
+inline minsk_syntax_node_t
+parse_name_expression(minsk_syntax_parser_t * parser)
+{
+  minsk_syntax_token_t identifier_token =
+    match_token(parser, MINSK_SYNTAX_KIND_IDENTIFIER_TOKEN);
+  return MINSK_SYNTAX_EXPRESSION_NAME(.identifier_token = identifier_token);
 }

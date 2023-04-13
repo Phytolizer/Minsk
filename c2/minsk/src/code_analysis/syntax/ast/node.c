@@ -111,6 +111,17 @@ minsk_syntax_node_children(Arena * arena, minsk_syntax_node_t node)
 {
   switch (node.type)
   {
+    case MINSK_SYNTAX_NODE_TYPE_ASSIGNMENT_EXPRESSION:
+    {
+      minsk_syntax_expression_assignment_t a = node.expression.assignment;
+      return BUF_LIT_ARENA(
+        arena,
+        minsk_syntax_node_buf_t,
+        MINSK_SYNTAX_NODE_TOKEN(a.identifier_token),
+        MINSK_SYNTAX_NODE_TOKEN(a.equals_token),
+        *a.expression
+      );
+    }
     case MINSK_SYNTAX_NODE_TYPE_BINARY_EXPRESSION:
     {
       minsk_syntax_expression_binary_t b = node.expression.binary;
@@ -129,6 +140,15 @@ minsk_syntax_node_children(Arena * arena, minsk_syntax_node_t node)
         arena,
         minsk_syntax_node_buf_t,
         MINSK_SYNTAX_NODE_TOKEN(l.literal_token)
+      );
+    }
+    case MINSK_SYNTAX_NODE_TYPE_NAME_EXPRESSION:
+    {
+      minsk_syntax_expression_name_t n = node.expression.name;
+      return BUF_LIT_ARENA(
+        arena,
+        minsk_syntax_node_buf_t,
+        MINSK_SYNTAX_NODE_TOKEN(n.identifier_token)
       );
     }
     case MINSK_SYNTAX_NODE_TYPE_PARENTHESIZED_EXPRESSION:

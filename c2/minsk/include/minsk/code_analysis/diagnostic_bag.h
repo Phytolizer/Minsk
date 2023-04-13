@@ -58,3 +58,10 @@ minsk_diagnostic_bag_report_undefined_unary_operator(
   string_t op_text,
   minsk_object_type_t operand_type
 );
+
+extern void
+minsk_diagnostic_bag_report_undefined_name(
+  minsk_diagnostic_bag_t * bag,
+  minsk_text_span_t span,
+  string_t name
+);
