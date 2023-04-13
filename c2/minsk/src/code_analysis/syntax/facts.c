@@ -8,9 +8,11 @@ minsk_syntax_facts_binary_operator_precedence(minsk_syntax_kind_t kind)
   switch (kind)
   {
     case MINSK_SYNTAX_KIND_STAR_TOKEN:
-    case MINSK_SYNTAX_KIND_SLASH_TOKEN: return 4;
+    case MINSK_SYNTAX_KIND_SLASH_TOKEN: return 5;
     case MINSK_SYNTAX_KIND_PLUS_TOKEN:
-    case MINSK_SYNTAX_KIND_MINUS_TOKEN: return 3;
+    case MINSK_SYNTAX_KIND_MINUS_TOKEN: return 4;
+    case MINSK_SYNTAX_KIND_EQUALS_EQUALS_TOKEN:
+    case MINSK_SYNTAX_KIND_BANG_EQUALS_TOKEN: return 3;
     case MINSK_SYNTAX_KIND_AMPERSAND_AMPERSAND_TOKEN: return 2;
     case MINSK_SYNTAX_KIND_PIPE_PIPE_TOKEN: return 1;
     default: return 0;
@@ -24,7 +26,7 @@ minsk_syntax_facts_unary_operator_precedence(minsk_syntax_kind_t kind)
   {
     case MINSK_SYNTAX_KIND_PLUS_TOKEN:
     case MINSK_SYNTAX_KIND_MINUS_TOKEN:
-    case MINSK_SYNTAX_KIND_BANG_TOKEN: return 5;
+    case MINSK_SYNTAX_KIND_BANG_TOKEN: return 6;
     default: return 0;
   }
 }

@@ -217,7 +217,21 @@ extern minsk_syntax_token_t minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer)
     case '/': TOK(1, MINSK_SYNTAX_KIND_SLASH_TOKEN);
     case '(': TOK(1, MINSK_SYNTAX_KIND_OPEN_PARENTHESIS_TOKEN);
     case ')': TOK(1, MINSK_SYNTAX_KIND_CLOSE_PARENTHESIS_TOKEN);
-    case '!': TOK(1, MINSK_SYNTAX_KIND_BANG_TOKEN);
+    case '!':
+      if (peek(lexer, 1) == '=')
+      {
+        TOK(2, MINSK_SYNTAX_KIND_BANG_EQUALS_TOKEN);
+      }
+      else
+      {
+        TOK(1, MINSK_SYNTAX_KIND_BANG_TOKEN);
+      }
+    case '=':
+      if (peek(lexer, 1) == '=')
+      {
+        TOK(2, MINSK_SYNTAX_KIND_EQUALS_EQUALS_TOKEN);
+      }
+      break;
     case '&':
       if (peek(lexer, 1) == '&')
       {

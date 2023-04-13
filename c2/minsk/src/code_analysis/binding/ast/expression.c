@@ -13,7 +13,7 @@ extern minsk_object_type_t minsk_bound_expression_get_resolved_type(
     case MINSK_BOUND_NODE_TYPE_BINARY_EXPRESSION:
     {
       minsk_bound_expression_binary_t b = expression.binary;
-      return minsk_bound_expression_get_resolved_type(b.left->expression);
+      return b.op.result_type;
     }
     case MINSK_BOUND_NODE_TYPE_LITERAL_EXPRESSION:
     {
@@ -23,7 +23,7 @@ extern minsk_object_type_t minsk_bound_expression_get_resolved_type(
     case MINSK_BOUND_NODE_TYPE_UNARY_EXPRESSION:
     {
       minsk_bound_expression_unary_t u = expression.unary;
-      return minsk_bound_expression_get_resolved_type(u.operand->expression);
+      return u.op.result_type;
     }
   }
 

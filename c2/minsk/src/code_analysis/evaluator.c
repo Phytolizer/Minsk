@@ -65,6 +65,24 @@ static minsk_object_t evaluate_binary_expression(
       return MINSK_OBJECT_BOOLEAN(left.boolean && right.boolean);
     case MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_LOGICAL_OR:
       return MINSK_OBJECT_BOOLEAN(left.boolean || right.boolean);
+    case MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_EQUALITY:
+      switch (left.type)
+      {
+        case MINSK_OBJECT_TYPE_BOOLEAN:
+          return MINSK_OBJECT_BOOLEAN(left.boolean == right.boolean);
+        case MINSK_OBJECT_TYPE_INTEGER:
+          return MINSK_OBJECT_BOOLEAN(left.integer == right.integer);
+        default: DEBUGGER_FATAL("unreachable");
+      }
+    case MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_INEQUALITY:
+      switch (left.type)
+      {
+        case MINSK_OBJECT_TYPE_BOOLEAN:
+          return MINSK_OBJECT_BOOLEAN(left.boolean != right.boolean);
+        case MINSK_OBJECT_TYPE_INTEGER:
+          return MINSK_OBJECT_BOOLEAN(left.integer != right.integer);
+        default: DEBUGGER_FATAL("unreachable");
+      }
     default: DEBUGGER_FATAL("invalid binary operator %d", node.op.kind);
   }
 }
