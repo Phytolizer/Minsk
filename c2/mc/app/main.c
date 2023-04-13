@@ -1,6 +1,7 @@
 #include <arena.h>
 #include <linenoise.h>
 #include <minsk-string/string.h>
+#include <minsk/code_analysis/evaluator.h>
 #include <minsk/code_analysis/syntax/kind.h>
 #include <minsk/code_analysis/syntax/parser.h>
 #include <minsk/code_analysis/syntax/token.h>
@@ -48,6 +49,14 @@ extern int main(int argc, char** argv)
         printf(STRING_FMT "\n", STRING_ARG(syntax_tree.diagnostics.ptr[i]));
       }
       printf("\x1b[0m");
+    }
+    else
+    {
+      minsk_evaluator_t e = minsk_evaluator_new(syntax_tree.root);
+      minsk_object_t result = minsk_evaluator_evaluate(&e);
+      printf("\x1b[0;35m");
+      minsk_object_show(result, stdout);
+      printf("\x1b[0m\n");
     }
 
     arena_free(&a);
