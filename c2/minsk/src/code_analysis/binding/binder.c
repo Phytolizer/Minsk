@@ -55,27 +55,39 @@ static bool bind_binary_operator_kind(
   minsk_bound_expression_binary_operator_kind_t * out_kind
 )
 {
-  if (left_type != MINSK_OBJECT_TYPE_INTEGER || right_type != MINSK_OBJECT_TYPE_INTEGER)
+  if (left_type == MINSK_OBJECT_TYPE_INTEGER && right_type == MINSK_OBJECT_TYPE_INTEGER)
   {
-    return false;
+    switch (kind)
+    {
+      case MINSK_SYNTAX_KIND_PLUS_TOKEN:
+        *out_kind = MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_ADDITION;
+        return true;
+      case MINSK_SYNTAX_KIND_MINUS_TOKEN:
+        *out_kind = MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_SUBTRACTION;
+        return true;
+      case MINSK_SYNTAX_KIND_STAR_TOKEN:
+        *out_kind = MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_MULTIPLICATION;
+        return true;
+      case MINSK_SYNTAX_KIND_SLASH_TOKEN:
+        *out_kind = MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_DIVISION;
+        return true;
+      default: break;
+    }
   }
-  switch (kind)
+  else if (left_type == MINSK_OBJECT_TYPE_BOOLEAN && right_type == MINSK_OBJECT_TYPE_BOOLEAN)
   {
-    case MINSK_SYNTAX_KIND_PLUS_TOKEN:
-      *out_kind = MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_ADDITION;
-      break;
-    case MINSK_SYNTAX_KIND_MINUS_TOKEN:
-      *out_kind = MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_SUBTRACTION;
-      break;
-    case MINSK_SYNTAX_KIND_STAR_TOKEN:
-      *out_kind = MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_MULTIPLICATION;
-      break;
-    case MINSK_SYNTAX_KIND_SLASH_TOKEN:
-      *out_kind = MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_DIVISION;
-      break;
-    default: DEBUGGER_FATAL("invalid syntax kind %d", kind);
+    switch (kind)
+    {
+      case MINSK_SYNTAX_KIND_AMPERSAND_AMPERSAND_TOKEN:
+        *out_kind = MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_LOGICAL_AND;
+        return true;
+      case MINSK_SYNTAX_KIND_PIPE_PIPE_TOKEN:
+        *out_kind = MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_LOGICAL_OR;
+        return true;
+      default: break;
+    }
   }
-  return true;
+  return false;
 }
 
 static bool bind_unary_operator_kind(
@@ -84,21 +96,33 @@ static bool bind_unary_operator_kind(
   minsk_bound_expression_unary_operator_kind_t * out_kind
 )
 {
-  if (operand_type != MINSK_OBJECT_TYPE_INTEGER)
+  switch (operand_type)
   {
-    return false;
-  }
-  switch (kind)
-  {
-    case MINSK_SYNTAX_KIND_PLUS_TOKEN:
-      *out_kind = MINSK_BOUND_EXPRESSION_UNARY_OPERATOR_KIND_IDENTITY;
+    case MINSK_OBJECT_TYPE_INTEGER:
+      switch (kind)
+      {
+        case MINSK_SYNTAX_KIND_PLUS_TOKEN:
+          *out_kind = MINSK_BOUND_EXPRESSION_UNARY_OPERATOR_KIND_IDENTITY;
+          return true;
+        case MINSK_SYNTAX_KIND_MINUS_TOKEN:
+          *out_kind = MINSK_BOUND_EXPRESSION_UNARY_OPERATOR_KIND_NEGATION;
+          return true;
+        default: break;
+      }
       break;
-    case MINSK_SYNTAX_KIND_MINUS_TOKEN:
-      *out_kind = MINSK_BOUND_EXPRESSION_UNARY_OPERATOR_KIND_NEGATION;
+    case MINSK_OBJECT_TYPE_BOOLEAN:
+      switch (kind)
+      {
+        case MINSK_SYNTAX_KIND_BANG_TOKEN:
+          *out_kind =
+            MINSK_BOUND_EXPRESSION_UNARY_OPERATOR_KIND_LOGICAL_NEGATION;
+          return true;
+        default: break;
+      }
       break;
-    default: DEBUGGER_FATAL("invalid syntax kind %d", kind);
+    default: break;
   }
-  return true;
+  return false;
 }
 
 static minsk_bound_node_t bind_binary_expression(
