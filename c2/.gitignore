@@ -2,3 +2,4 @@
 /subprojects/*/
 !/subprojects/packagefiles
 /.minsk-history
+/.vscode
