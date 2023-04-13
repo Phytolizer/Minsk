@@ -14,4 +14,5 @@ typedef struct
   minsk_syntax_token_t end_of_file_token;
 } minsk_syntax_tree_t;
 
-extern minsk_syntax_tree_t minsk_syntax_tree_parse(Arena* arena, string_t text);
+extern minsk_syntax_tree_t
+minsk_syntax_tree_parse(Arena * arena, string_t text);

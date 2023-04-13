@@ -15,4 +15,4 @@ typedef enum
 } minsk_syntax_kind_t;
 
 extern string_t
-minsk_syntax_kind_display_name(Arena* arena, minsk_syntax_kind_t kind);
+minsk_syntax_kind_display_name(Arena * arena, minsk_syntax_kind_t kind);

@@ -30,5 +30,5 @@ typedef struct
 #define MINSK_OBJECT_NIL ((minsk_object_t){.type = MINSK_OBJECT_TYPE_NIL})
 
 extern string_t
-minsk_object_type_display_name(Arena* arena, minsk_object_type_t type);
-extern int minsk_object_show(minsk_object_t object, FILE* stream);
+minsk_object_type_display_name(Arena * arena, minsk_object_type_t type);
+extern int minsk_object_show(minsk_object_t object, FILE * stream);

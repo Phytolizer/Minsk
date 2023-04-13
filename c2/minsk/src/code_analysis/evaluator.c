@@ -2,103 +2,87 @@
 
 #include <minsk-platform/debugger.h>
 
-#include "minsk/code_analysis/syntax/ast/expression.h"
-#include "minsk/code_analysis/syntax/ast/expressions/binary.h"
-#include "minsk/code_analysis/syntax/ast/expressions/literal.h"
-#include "minsk/code_analysis/syntax/ast/expressions/parenthesized.h"
-#include "minsk/code_analysis/syntax/ast/node.h"
-#include "minsk/code_analysis/syntax/ast/node_type.h"
-#include "minsk/code_analysis/syntax/kind.h"
-#include "minsk/code_analysis/syntax/token.h"
+#include "minsk/code_analysis/binding/ast/expression.h"
+#include "minsk/code_analysis/binding/ast/expressions/binary.h"
+#include "minsk/code_analysis/binding/ast/expressions/literal.h"
+#include "minsk/code_analysis/binding/ast/node.h"
+#include "minsk/code_analysis/binding/ast/node_type.h"
 
-static minsk_object_t evaluate_expression(minsk_syntax_node_t const* root);
+static minsk_object_t evaluate_expression(minsk_bound_node_t const * node);
 static minsk_object_t evaluate_binary_expression(
-  minsk_syntax_expression_binary_t syntax
+  minsk_bound_expression_binary_t node
 );
 static minsk_object_t evaluate_literal_expression(
-  minsk_syntax_expression_literal_t syntax
-);
-static minsk_object_t evaluate_parenthesized_expression(
-  minsk_syntax_expression_parenthesized_t syntax
+  minsk_bound_expression_literal_t node
 );
 static minsk_object_t evaluate_unary_expression(
-  minsk_syntax_expression_unary_t syntax
+  minsk_bound_expression_unary_t node
 );
 
-extern minsk_evaluator_t minsk_evaluator_new(minsk_syntax_node_t root)
+extern minsk_evaluator_t minsk_evaluator_new(minsk_bound_node_t root)
 {
   return (minsk_evaluator_t){
     ._root = root,
   };
 }
-extern minsk_object_t minsk_evaluator_evaluate(minsk_evaluator_t* evaluator)
+extern minsk_object_t minsk_evaluator_evaluate(minsk_evaluator_t * evaluator)
 {
   return evaluate_expression(&evaluator->_root);
 }
 
-static minsk_object_t evaluate_expression(minsk_syntax_node_t const* root)
+static minsk_object_t evaluate_expression(minsk_bound_node_t const * node)
 {
-  switch (root->type)
+  switch (node->type)
   {
-    case MINSK_SYNTAX_NODE_TYPE_BINARY_EXPRESSION:
-      return evaluate_binary_expression(root->expression.binary);
-    case MINSK_SYNTAX_NODE_TYPE_LITERAL_EXPRESSION:
-      return evaluate_literal_expression(root->expression.literal);
-    case MINSK_SYNTAX_NODE_TYPE_PARENTHESIZED_EXPRESSION:
-      return evaluate_parenthesized_expression(root->expression.parenthesized);
-    case MINSK_SYNTAX_NODE_TYPE_UNARY_EXPRESSION:
-      return evaluate_unary_expression(root->expression.unary);
-    case MINSK_SYNTAX_NODE_TYPE_TOKEN: break;  // invalid
+    case MINSK_BOUND_NODE_TYPE_BINARY_EXPRESSION:
+      return evaluate_binary_expression(node->expression.binary);
+    case MINSK_BOUND_NODE_TYPE_LITERAL_EXPRESSION:
+      return evaluate_literal_expression(node->expression.literal);
+    case MINSK_BOUND_NODE_TYPE_UNARY_EXPRESSION:
+      return evaluate_unary_expression(node->expression.unary);
   }
-  DEBUGGER_FATAL("invalid syntax node type %d", root->type);
+  DEBUGGER_FATAL("invalid bound node type %d", node->type);
 }
 
 static minsk_object_t evaluate_binary_expression(
-  minsk_syntax_expression_binary_t syntax
+  minsk_bound_expression_binary_t node
 )
 {
-  minsk_object_t left = evaluate_expression(syntax.left);
-  minsk_object_t right = evaluate_expression(syntax.right);
+  minsk_object_t left = evaluate_expression(node.left);
+  minsk_object_t right = evaluate_expression(node.right);
 
-  switch (syntax.op.kind)
+  switch (node.op_kind)
   {
-    case MINSK_SYNTAX_KIND_PLUS_TOKEN:
+    case MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_ADDITION:
       return MINSK_OBJECT_INTEGER(left.integer + right.integer);
-    case MINSK_SYNTAX_KIND_MINUS_TOKEN:
+    case MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_SUBTRACTION:
       return MINSK_OBJECT_INTEGER(left.integer - right.integer);
-    case MINSK_SYNTAX_KIND_STAR_TOKEN:
+    case MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_MULTIPLICATION:
       return MINSK_OBJECT_INTEGER(left.integer * right.integer);
-    case MINSK_SYNTAX_KIND_SLASH_TOKEN:
+    case MINSK_BOUND_EXPRESSION_BINARY_OPERATOR_KIND_DIVISION:
       return MINSK_OBJECT_INTEGER(left.integer / right.integer);
-    default: DEBUGGER_FATAL("invalid binary operator %d", syntax.op.kind);
+    default: DEBUGGER_FATAL("invalid binary operator %d", node.op_kind);
   }
 }
 
 static minsk_object_t evaluate_literal_expression(
-  minsk_syntax_expression_literal_t syntax
+  minsk_bound_expression_literal_t node
 )
 {
-  return syntax.literal_token.value;
-}
-
-static minsk_object_t evaluate_parenthesized_expression(
-  minsk_syntax_expression_parenthesized_t syntax
-)
-{
-  return evaluate_expression(syntax.expression);
+  return node.value;
 }
 
 static minsk_object_t evaluate_unary_expression(
-  minsk_syntax_expression_unary_t syntax
+  minsk_bound_expression_unary_t node
 )
 {
-  minsk_object_t operand = evaluate_expression(syntax.operand);
+  minsk_object_t operand = evaluate_expression(node.operand);
 
-  switch (syntax.op.kind)
+  switch (node.op_kind)
   {
-    case MINSK_SYNTAX_KIND_PLUS_TOKEN: return operand;
-    case MINSK_SYNTAX_KIND_MINUS_TOKEN:
+    case MINSK_BOUND_EXPRESSION_UNARY_OPERATOR_KIND_IDENTITY: return operand;
+    case MINSK_BOUND_EXPRESSION_UNARY_OPERATOR_KIND_NEGATION:
       return MINSK_OBJECT_INTEGER(-operand.integer);
-    default: DEBUGGER_FATAL("invalid unary operator %d", syntax.op.kind);
+    default: DEBUGGER_FATAL("invalid unary operator %d", node.op_kind);
   }
 }

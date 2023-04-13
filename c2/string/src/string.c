@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static void* string_alloc(Arena* maybe_arena, size_t size)
+static void * string_alloc(Arena * maybe_arena, size_t size)
 {
   if (maybe_arena != NULL)
   {
@@ -16,7 +16,7 @@ static void* string_alloc(Arena* maybe_arena, size_t size)
   return malloc(size);
 }
 
-static void* string_realloc(Arena* maybe_arena, void* ptr, size_t size)
+static void * string_realloc(Arena * maybe_arena, void * ptr, size_t size)
 {
   if (maybe_arena != NULL)
   {
@@ -26,7 +26,7 @@ static void* string_realloc(Arena* maybe_arena, void* ptr, size_t size)
 }
 
 static string_t
-string_vprintf_arena(Arena* arena, const char* fmt, va_list args)
+string_vprintf_arena(Arena * arena, const char * fmt, va_list args)
 {
   va_list args2;
   va_copy(args2, args);
@@ -46,7 +46,7 @@ string_vprintf_arena(Arena* arena, const char* fmt, va_list args)
   return str;
 }
 
-extern string_t string_printf_arena(Arena* arena, const char* fmt, ...)
+extern string_t string_printf_arena(Arena * arena, const char * fmt, ...)
 {
   va_list args;
   va_start(args, fmt);
@@ -56,7 +56,7 @@ extern string_t string_printf_arena(Arena* arena, const char* fmt, ...)
   return result;
 }
 
-extern string_t string_printf(const char* fmt, ...)
+extern string_t string_printf(const char * fmt, ...)
 {
   va_list args;
   va_start(args, fmt);
@@ -66,9 +66,9 @@ extern string_t string_printf(const char* fmt, ...)
   return result;
 }
 
-extern string_t string_dup_arena(Arena* arena, string_t s)
+extern string_t string_dup_arena(Arena * arena, string_t s)
 {
-  char* result = string_alloc(arena, s.length);
+  char * result = string_alloc(arena, s.length);
   memcpy(result, s.data, s.length);
   return STRING_OWN_DATA(result, s.length, s.length);
 }
@@ -78,7 +78,7 @@ extern string_t string_dup(string_t s)
   return string_dup_arena(NULL, s);
 }
 
-extern void string_append_arena(Arena* arena, string_t* buf, string_t arg)
+extern void string_append_arena(Arena * arena, string_t * buf, string_t arg)
 {
   if (arg.length == 0) return;
 
@@ -95,15 +95,15 @@ extern void string_append_arena(Arena* arena, string_t* buf, string_t arg)
   buf->length += arg.length;
 }
 
-extern void string_append(string_t* buf, string_t arg)
+extern void string_append(string_t * buf, string_t arg)
 {
   string_append_arena(NULL, buf, arg);
 }
 
 static void string_append_vprintf_arena(
-  Arena* arena,
-  string_t* buf,
-  const char* fmt,
+  Arena * arena,
+  string_t * buf,
+  const char * fmt,
   va_list args
 )
 {
@@ -128,7 +128,7 @@ static void string_append_vprintf_arena(
 }
 
 extern void
-string_append_printf_arena(Arena* arena, string_t* buf, const char* fmt, ...)
+string_append_printf_arena(Arena * arena, string_t * buf, const char * fmt, ...)
 {
   va_list args;
   va_start(args, fmt);
@@ -136,7 +136,7 @@ string_append_printf_arena(Arena* arena, string_t* buf, const char* fmt, ...)
   va_end(args);
 }
 
-extern void string_append_printf(string_t* buf, const char* fmt, ...)
+extern void string_append_printf(string_t * buf, const char * fmt, ...)
 {
   va_list args;
   va_start(args, fmt);
@@ -144,14 +144,14 @@ extern void string_append_printf(string_t* buf, const char* fmt, ...)
   va_end(args);
 }
 
-extern string_t string_term_arena(Arena* arena, string_t s, char termchar)
+extern string_t string_term_arena(Arena * arena, string_t s, char termchar)
 {
   if (s.capacity > s.length && s.data[s.length] == termchar)
   {
     // avoid copy
     return STRING_AS_REF(s);
   }
-  char* new_data = string_alloc(arena, s.length + 1);
+  char * new_data = string_alloc(arena, s.length + 1);
   memcpy(new_data, s.data, s.length);
   new_data[s.length] = termchar;
   return STRING_OWN_DATA(new_data, s.length, s.length + 1);
@@ -162,7 +162,7 @@ extern string_t string_term(string_t s, char termchar)
   return string_term_arena(NULL, s, termchar);
 }
 
-extern void string_free_arena(Arena* arena, string_t s)
+extern void string_free_arena(Arena * arena, string_t s)
 {
   if (arena == NULL && !s.is_ref)
   {
@@ -175,7 +175,7 @@ extern void string_free(string_t s)
   string_free_arena(NULL, s);
 }
 
-extern void string_reserve_arena(Arena* arena, string_t* s, size_t len)
+extern void string_reserve_arena(Arena * arena, string_t * s, size_t len)
 {
   if (s->capacity < len)
   {
@@ -184,7 +184,7 @@ extern void string_reserve_arena(Arena* arena, string_t* s, size_t len)
   }
 }
 
-extern void string_reserve(string_t* s, size_t len)
+extern void string_reserve(string_t * s, size_t len)
 {
   string_reserve_arena(NULL, s, len);
 }

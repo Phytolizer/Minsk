@@ -4,9 +4,9 @@
 
 typedef struct
 {
-  struct minsk_syntax_node* left;
+  struct minsk_syntax_node * left;
   minsk_syntax_token_t op;
-  struct minsk_syntax_node* right;
+  struct minsk_syntax_node * right;
 } minsk_syntax_expression_binary_t;
 
 #define MINSK_SYNTAX_EXPRESSION_BINARY(...)   \

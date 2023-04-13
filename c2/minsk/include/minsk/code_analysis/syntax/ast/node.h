@@ -24,11 +24,11 @@ typedef struct minsk_syntax_node
 typedef BUF_T(minsk_syntax_node_t, minsk_syntax_node_buf)
   minsk_syntax_node_buf_t;
 
-extern minsk_syntax_node_t*
-minsk_syntax_node_promote(Arena* arena, minsk_syntax_node_t node);
+extern minsk_syntax_node_t *
+minsk_syntax_node_promote(Arena * arena, minsk_syntax_node_t node);
 
 extern void
-minsk_syntax_node_pretty_print(minsk_syntax_node_t node, FILE* stream);
+minsk_syntax_node_pretty_print(minsk_syntax_node_t node, FILE * stream);
 
 extern minsk_syntax_node_buf_t
-minsk_syntax_node_children(Arena* arena, minsk_syntax_node_t node);
+minsk_syntax_node_children(Arena * arena, minsk_syntax_node_t node);

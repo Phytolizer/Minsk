@@ -11,7 +11,7 @@
 extern void minsk_report_error(minsk_errno_t error)
 {
 #ifdef _WIN32
-  char* buffer;
+  char * buffer;
   DWORD nchars = FormatMessage(
     FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
     NULL,

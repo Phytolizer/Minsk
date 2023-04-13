@@ -6,8 +6,10 @@
 
 #include "minsk/meta/snake_to_camel.h"
 
-extern string_t
-minsk_syntax_node_type_display_name(Arena* arena, minsk_syntax_node_type_t type)
+extern string_t minsk_syntax_node_type_display_name(
+  Arena * arena,
+  minsk_syntax_node_type_t type
+)
 {
   switch (type)
   {

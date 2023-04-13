@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-extern string_t snake_to_camel(Arena* arena, string_t str)
+extern string_t snake_to_camel(Arena * arena, string_t str)
 {
   string_t result = EMPTY_STRING;
   string_reserve_arena(arena, &result, str.length);

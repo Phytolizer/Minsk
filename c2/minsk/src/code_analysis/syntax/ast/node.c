@@ -14,18 +14,18 @@
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/runtime/object.h"
 
-extern minsk_syntax_node_t*
-minsk_syntax_node_promote(Arena* arena, minsk_syntax_node_t node)
+extern minsk_syntax_node_t *
+minsk_syntax_node_promote(Arena * arena, minsk_syntax_node_t node)
 {
-  minsk_syntax_node_t* new_node = arena_alloc(arena, sizeof(*new_node));
+  minsk_syntax_node_t * new_node = arena_alloc(arena, sizeof(*new_node));
   *new_node = node;
   return new_node;
 }
 
 static void pretty_print(
-  Arena* arena,
+  Arena * arena,
   minsk_syntax_node_t node,
-  FILE* stream,
+  FILE * stream,
   string_t indent,
   bool is_last,
   bool do_colors
@@ -97,7 +97,7 @@ static void pretty_print(
 }
 
 extern void
-minsk_syntax_node_pretty_print(minsk_syntax_node_t node, FILE* stream)
+minsk_syntax_node_pretty_print(minsk_syntax_node_t node, FILE * stream)
 {
   Arena arena = {0};
   pretty_print(&arena, node, stream, EMPTY_STRING, true, true);
@@ -105,7 +105,7 @@ minsk_syntax_node_pretty_print(minsk_syntax_node_t node, FILE* stream)
 }
 
 extern minsk_syntax_node_buf_t
-minsk_syntax_node_children(Arena* arena, minsk_syntax_node_t node)
+minsk_syntax_node_children(Arena * arena, minsk_syntax_node_t node)
 {
   switch (node.type)
   {

@@ -8,7 +8,7 @@
 #include "minsk/meta/snake_to_camel.h"
 
 extern string_t
-minsk_object_type_display_name(Arena* arena, minsk_object_type_t type)
+minsk_object_type_display_name(Arena * arena, minsk_object_type_t type)
 {
   switch (type)
   {
@@ -24,7 +24,7 @@ minsk_object_type_display_name(Arena* arena, minsk_object_type_t type)
   DEBUGGER_FATAL("invalid object type %d", type);
 }
 
-extern int minsk_object_show(minsk_object_t object, FILE* stream)
+extern int minsk_object_show(minsk_object_t object, FILE * stream)
 {
   switch (object.type)
   {

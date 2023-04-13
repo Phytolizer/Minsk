@@ -78,7 +78,7 @@ static overflow_t parse_number(string_t str)
   return (overflow_t){.value = result};
 }
 
-static codepoint_t peek(minsk_syntax_lexer_t* lexer, utf8proc_ssize_t offset)
+static codepoint_t peek(minsk_syntax_lexer_t * lexer, utf8proc_ssize_t offset)
 {
   DEBUGGER_ASSERT(offset < MINSK_SYNTAX_LEXER_MAX_PEEK, "offset too large");
   utf8proc_ssize_t position = lexer->_position;
@@ -111,19 +111,19 @@ static codepoint_t peek(minsk_syntax_lexer_t* lexer, utf8proc_ssize_t offset)
   return lexer->_peek_buf[offset].cp;
 }
 
-static inline utf8proc_int32_t current(minsk_syntax_lexer_t* lexer)
+static inline utf8proc_int32_t current(minsk_syntax_lexer_t * lexer)
 {
   return peek(lexer, 0);
 }
 
 /// Set lexer->_position to reflect a call to `next`.
-static void move(minsk_syntax_lexer_t* lexer, int amount)
+static void move(minsk_syntax_lexer_t * lexer, int amount)
 {
-  minsk_syntax_lexer_peek_char_t const* last = &lexer->_peek_buf[amount - 1];
+  minsk_syntax_lexer_peek_char_t const * last = &lexer->_peek_buf[amount - 1];
   lexer->_position = last->position + last->size;
 }
 
-static void next(minsk_syntax_lexer_t* lexer, int amount)
+static void next(minsk_syntax_lexer_t * lexer, int amount)
 {
   if (amount == 0)
   {
@@ -147,7 +147,7 @@ static void next(minsk_syntax_lexer_t* lexer, int amount)
   lexer->_peek_count -= amount;
 }
 
-static void scan_whitespace(minsk_syntax_lexer_t* lexer)
+static void scan_whitespace(minsk_syntax_lexer_t * lexer)
 {
   while (category_is_space(utf8proc_category(current(lexer))))
   {
@@ -155,7 +155,7 @@ static void scan_whitespace(minsk_syntax_lexer_t* lexer)
   }
 }
 
-static void scan_digits(minsk_syntax_lexer_t* lexer)
+static void scan_digits(minsk_syntax_lexer_t * lexer)
 {
   while (is_digit(current(lexer)))
   {
@@ -164,23 +164,23 @@ static void scan_digits(minsk_syntax_lexer_t* lexer)
 }
 
 static string_t
-ref_current_text(minsk_syntax_lexer_t const* lexer, utf8proc_ssize_t start)
+ref_current_text(minsk_syntax_lexer_t const * lexer, utf8proc_ssize_t start)
 {
   return STRING_REF_DATA(lexer->_text + start, lexer->_position - start);
 }
 
-extern minsk_syntax_lexer_t minsk_syntax_lexer_new(Arena* arena, string_t text)
+extern minsk_syntax_lexer_t minsk_syntax_lexer_new(Arena * arena, string_t text)
 {
   return (minsk_syntax_lexer_t){
     ._arena = arena,
-    ._text = (utf8proc_uint8_t const*)text.data,
+    ._text = (utf8proc_uint8_t const *)text.data,
     ._text_len = text.length,
     ._position = 0,
     ._peek_count = 0,
   };
 }
 
-extern minsk_syntax_token_t minsk_syntax_lexer_lex(minsk_syntax_lexer_t* lexer)
+extern minsk_syntax_token_t minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer)
 {
   minsk_syntax_kind_t kind = MINSK_SYNTAX_KIND_BAD_TOKEN;
   utf8proc_ssize_t start = lexer->_position;

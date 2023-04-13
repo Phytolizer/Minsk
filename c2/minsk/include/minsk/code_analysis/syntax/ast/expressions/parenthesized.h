@@ -5,7 +5,7 @@
 typedef struct
 {
   minsk_syntax_token_t open_parenthesis_token;
-  struct minsk_syntax_node* expression;
+  struct minsk_syntax_node * expression;
   minsk_syntax_token_t close_parenthesis_token;
 } minsk_syntax_expression_parenthesized_t;
 

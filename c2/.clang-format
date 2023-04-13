@@ -1,6 +1,7 @@
 ---
 BasedOnStyle: Google
-PointerAlignment: Left
+PointerAlignment: Middle
+DerivePointerAlignment: false
 AlignAfterOpenBracket: BlockIndent
 BreakBeforeBraces: Allman
 BinPackArguments: false
