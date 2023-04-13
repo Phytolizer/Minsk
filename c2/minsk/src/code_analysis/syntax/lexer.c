@@ -75,10 +75,21 @@ static overflow_t parse_number(string_t str)
   return (overflow_t){.value = result};
 }
 
+static int64_t peek_pos(minsk_syntax_lexer_t const * lexer)
+{
+  if (lexer->_peek_count > 0)
+  {
+    minsk_syntax_lexer_peek_char_t const * ch =
+      &lexer->_peek_buf[lexer->_peek_count - 1];
+    return ch->position + ch->size;
+  }
+  return lexer->_position;
+}
+
 static codepoint_t peek(minsk_syntax_lexer_t * lexer, int64_t offset)
 {
   DEBUGGER_ASSERT(offset < MINSK_SYNTAX_LEXER_MAX_PEEK, "offset too large");
-  int64_t position = lexer->_position;
+  int64_t position = peek_pos(lexer);
   while (lexer->_peek_count < offset + 1)
   {
     if (position >= lexer->_text_len)
