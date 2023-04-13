@@ -140,6 +140,16 @@ minsk_syntax_node_children(Arena* arena, minsk_syntax_node_t node)
         MINSK_SYNTAX_NODE_TOKEN(p.close_parenthesis_token)
       );
     }
+    case MINSK_SYNTAX_NODE_TYPE_UNARY_EXPRESSION:
+    {
+      minsk_syntax_expression_unary_t u = node.expression.unary;
+      return BUF_LIT_ARENA(
+        arena,
+        minsk_syntax_node_buf_t,
+        MINSK_SYNTAX_NODE_TOKEN(u.op),
+        *u.operand
+      );
+    }
     case MINSK_SYNTAX_NODE_TYPE_TOKEN:
     {
       return (minsk_syntax_node_buf_t){0};

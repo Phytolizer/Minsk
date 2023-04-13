@@ -7,8 +7,8 @@ typedef struct
   minsk_syntax_token_t literal_token;
 } minsk_syntax_expression_literal_t;
 
-#define MINSK_SYNTAX_EXPRESSION_LITERAL(literal_token_) \
-  MINSK_SYNTAX_EXPRESSION(                              \
-    MINSK_SYNTAX_NODE_TYPE_LITERAL_EXPRESSION,          \
-    .literal = {.literal_token = (literal_token_)}      \
+#define MINSK_SYNTAX_EXPRESSION_LITERAL(...)   \
+  MINSK_SYNTAX_EXPRESSION(                     \
+    MINSK_SYNTAX_NODE_TYPE_LITERAL_EXPRESSION, \
+    .literal = {__VA_ARGS__}                   \
   )

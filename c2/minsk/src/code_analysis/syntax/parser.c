@@ -124,7 +124,23 @@ static minsk_syntax_node_t parse_binary_expression(
   minsk_syntax_facts_precedence_t parent_precedence
 )
 {
-  minsk_syntax_node_t left = parse_primary_expression(parser);
+  minsk_syntax_node_t left;
+  minsk_syntax_facts_precedence_t unary_precedence =
+    minsk_syntax_facts_unary_operator_precedence(current(parser).kind);
+  if (unary_precedence != 0 && unary_precedence >= parent_precedence)
+  {
+    minsk_syntax_token_t op = next_token(parser);
+    minsk_syntax_node_t operand =
+      parse_binary_expression(parser, unary_precedence);
+    left = MINSK_SYNTAX_EXPRESSION_UNARY(
+      op,
+      minsk_syntax_node_promote(parser->_arena, operand)
+    );
+  }
+  else
+  {
+    left = parse_primary_expression(parser);
+  }
 
   while (true)
   {
@@ -142,7 +158,11 @@ static minsk_syntax_node_t parse_binary_expression(
     );
     minsk_syntax_node_t* left_alloc =
       minsk_syntax_node_promote(parser->_arena, left);
-    left = MINSK_SYNTAX_EXPRESSION_BINARY(left_alloc, op, right);
+    left = MINSK_SYNTAX_EXPRESSION_BINARY(
+        .left = left_alloc,
+        .op = op,
+        .right = right
+    );
   }
 
   return left;
@@ -175,9 +195,9 @@ static minsk_syntax_node_t parse_parenthesized_expression(
   minsk_syntax_token_t close_parenthesis_token =
     match_token(parser, MINSK_SYNTAX_KIND_CLOSE_PARENTHESIS_TOKEN);
   return MINSK_SYNTAX_EXPRESSION_PARENTHESIZED(
-    open_parenthesis_token,
-    minsk_syntax_node_promote(parser->_arena, expression),
-    close_parenthesis_token
+      .open_parenthesis_token = open_parenthesis_token,
+      .expression = minsk_syntax_node_promote(parser->_arena, expression),
+      .close_parenthesis_token = close_parenthesis_token
   );
 }
 
@@ -185,5 +205,5 @@ static minsk_syntax_node_t parse_number_literal(minsk_syntax_parser_t* parser)
 {
   minsk_syntax_token_t literal_token =
     match_token(parser, MINSK_SYNTAX_KIND_NUMBER_TOKEN);
-  return MINSK_SYNTAX_EXPRESSION_LITERAL(literal_token);
+  return MINSK_SYNTAX_EXPRESSION_LITERAL(.literal_token = literal_token);
 }
