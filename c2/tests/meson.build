@@ -1,4 +1,6 @@
 doctest_dep = dependency('doctest')
+magic_enum_dep = dependency('magic_enum')
+fmt_dep = dependency('fmt')
 
 test_src = []
 subdir('src')
@@ -8,8 +10,11 @@ test_exe = executable(
     test_src,
     include_directories: include_directories('include'),
     dependencies: [
-        minsk_dep,
+        arena_dep,
         doctest_dep,
+        fmt_dep,
+        magic_enum_dep,
+        minsk_dep,
     ],
     cpp_args: [
         '-DDOCTEST_CONFIG_REQUIRE_STRINGIFICATION_FOR_ALL_USED_TYPES',
