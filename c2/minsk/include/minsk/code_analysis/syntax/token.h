@@ -18,5 +18,6 @@ typedef struct
 static inline minsk_text_span_t
 minsk_syntax_token_span(minsk_syntax_token_t tok)
 {
-  return (minsk_text_span_t){tok.position, tok.text.length};
+  minsk_text_span_t span = {(size_t)tok.position, tok.text.length};
+  return span;
 }

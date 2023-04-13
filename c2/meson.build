@@ -1,8 +1,10 @@
 project(
     'Minsk',
     'c',
+    'cpp',
     default_options: [
         'c_std=gnu17',
+        'cpp_std=c++20',
         'warning_level=2',
         'default_library=static',
         'b_sanitize=address,undefined',
@@ -35,3 +37,4 @@ subdir('string')
 subdir('platform')
 subdir('minsk')
 subdir('mc')
+subdir('tests')
