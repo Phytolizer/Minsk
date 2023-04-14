@@ -10,7 +10,7 @@ pub fn build(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin.M
     result.linkLibC();
     result.addCSourceFile(this_dir ++ "/linenoise-ship.c", &.{"-DUSE_UTF8"});
     result.addIncludePath(this_dir);
-    result.install();
-    result.installHeader(this_dir ++ "/linenoise.h", "linenoise.h");
+    b.installArtifact(result);
+    b.addInstallHeaderFile(this_dir ++ "/linenoise.h", "linenoise.h");
     return result;
 }

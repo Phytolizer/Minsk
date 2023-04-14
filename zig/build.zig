@@ -32,7 +32,7 @@ pub fn build(b: *std.Build) void {
     mc_exe.addModule("minsk_runtime", minsk_runtime_mod);
     mc_exe.addModule("tty_ext", tty_ext_mod);
     mc_exe.linkLibrary(linenoise_lib);
-    mc_exe.install();
+    b.installArtifact(mc_exe);
 
     const mc_run = b.addRunArtifact(mc_exe);
     if (b.args) |args| {
