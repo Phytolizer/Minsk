@@ -51,6 +51,16 @@ typedef struct
 #define STRING_EQUAL(a, b) \
  ((a).length == (b).length && memcmp((a).data, (b).data, (a).length) == 0)
 
+static inline bool string_endswith(string_t a, string_t b)
+{
+  if (a.length < b.length)
+  {
+    return false;
+  }
+
+  return memcmp(a.data + a.length - b.length, b.data, b.length) == 0;
+}
+
 extern string_t
 string_printf_arena(Arena * arena, const char * fmt, ...);
 extern string_t
