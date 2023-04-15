@@ -22,8 +22,7 @@ typedef struct minsk_syntax_node
 #define MINSK_SYNTAX_NODE_TOKEN(tok) \
  ((minsk_syntax_node_t){.type = MINSK_SYNTAX_NODE_TYPE_TOKEN, .token = (tok)})
 
-typedef BUF_T(minsk_syntax_node_t, minsk_syntax_node_buf)
-  minsk_syntax_node_buf_t;
+typedef BUF_T(minsk_syntax_node_t) minsk_syntax_node_buf_t;
 
 extern minsk_syntax_node_t *
 minsk_syntax_node_promote(Arena * arena, minsk_syntax_node_t node);

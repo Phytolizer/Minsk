@@ -174,7 +174,7 @@ minsk_syntax_node_children(Arena * arena, minsk_syntax_node_t node)
     }
     case MINSK_SYNTAX_NODE_TYPE_TOKEN:
     {
-      return (minsk_syntax_node_buf_t){0};
+      return (minsk_syntax_node_buf_t)BUF_INIT;
     }
   }
 

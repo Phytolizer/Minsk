@@ -1,5 +1,5 @@
 subdir('code_analysis')
 
 test_src += files(
-    'doctest_main.cpp',
+    'tau_main.c',
 )

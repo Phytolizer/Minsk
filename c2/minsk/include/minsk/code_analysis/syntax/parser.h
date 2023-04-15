@@ -9,8 +9,7 @@
 #include "minsk/code_analysis/syntax/tree.h"
 #include "minsk/data_structures/buf.h"
 
-typedef BUF_T(minsk_syntax_token_t, parser_token)
-  minsk_syntax_parser_token_buf_t;
+typedef BUF_T(minsk_syntax_token_t) minsk_syntax_parser_token_buf_t;
 
 typedef struct
 {

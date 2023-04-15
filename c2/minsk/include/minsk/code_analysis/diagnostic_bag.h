@@ -8,7 +8,7 @@
 #include "minsk/data_structures/buf.h"
 #include "minsk/runtime/object.h"
 
-typedef BUF_T(minsk_diagnostic_t, minsk_diagnostic) minsk_diagnostic_bag_buf_t;
+typedef BUF_T(minsk_diagnostic_t) minsk_diagnostic_bag_buf_t;
 
 typedef struct
 {

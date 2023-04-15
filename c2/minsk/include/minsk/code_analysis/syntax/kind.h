@@ -1,22 +1,11 @@
 #pragma once
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 #include <arena.h>
 #include <minsk-string/string.h>
 
 #include "minsk/meta/concat.h"
-#ifdef __cplusplus
-}
-#endif
 
 #define MINSK_PREFIX_SYNTAX_KIND MINSK_SYNTAX_KIND_
-
-#ifdef __cplusplus
- #include <magic_enum.hpp>
-#endif
 
 typedef enum
 {

@@ -17,7 +17,6 @@ typedef struct
 extern minsk_syntax_tree_t
 minsk_syntax_tree_parse(Arena * arena, string_t text);
 
-typedef BUF_T(minsk_syntax_token_t, minsk_syntax_token_buf)
-  minsk_syntax_token_buf_t;
+typedef BUF_T(minsk_syntax_token_t) minsk_syntax_token_buf_t;
 extern minsk_syntax_token_buf_t
 minsk_syntax_tree_parse_tokens(Arena * arena, string_t text);

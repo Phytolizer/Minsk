@@ -1,0 +1,7 @@
+[wrap-git]
+url = https://github.com/jasmcaus/tau.git
+revision = 68d0408f12d18eeaa82bfe2a180d485ab96972ed
+patch_directory = tau
+
+[provide]
+tau = tau_dep

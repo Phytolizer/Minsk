@@ -1,3 +1,3 @@
 test_src += files(
-    'lexer.cpp',
+    'test_lexer.c',
 )

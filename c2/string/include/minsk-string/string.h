@@ -72,6 +72,10 @@ string_append_printf_arena(
 );
 extern void
 string_append_printf(string_t * buf, const char * fmt, ...);
+extern void
+string_push_arena(Arena * arena, string_t * buf, char c);
+extern void
+string_push(string_t * buf, char c);
 
 // Return a ref string that is definitely terminated. May/may not require
 // allocation.
