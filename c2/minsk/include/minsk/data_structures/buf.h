@@ -61,6 +61,8 @@
 
 #define BUF_PUSH(buf, val) BUF_PUSH_ARENA(NULL, buf, val)
 
+#define BUF_POP(buf) ((buf)->ptr[--(buf)->len])
+
 #define BUF_RESERVE_ARENA(arena, buf, size)                             \
  do                                                                     \
  {                                                                      \
