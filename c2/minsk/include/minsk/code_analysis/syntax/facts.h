@@ -1,6 +1,7 @@
 #pragma once
 
 #include <minsk-string/string.h>
+#include <minsk/data_structures/buf.h>
 #include <stdint.h>
 
 #include "minsk/code_analysis/syntax/kind.h"
@@ -21,3 +22,15 @@ minsk_syntax_facts_free_keyword_table(void);
 
 extern string_t
 minsk_syntax_facts_get_text(minsk_syntax_kind_t kind);
+
+typedef struct minsk_syntax_kind_iterator
+{
+  minsk_syntax_kind_t curr;
+  bool (*next)(struct minsk_syntax_kind_iterator * it);
+} minsk_syntax_kind_iterator_t;
+
+extern minsk_syntax_kind_iterator_t
+minsk_syntax_facts_get_binary_operator_kinds(void);
+
+extern minsk_syntax_kind_iterator_t
+minsk_syntax_facts_get_unary_operator_kinds(void);
