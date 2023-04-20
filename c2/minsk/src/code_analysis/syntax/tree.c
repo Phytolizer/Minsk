@@ -2,7 +2,9 @@
 
 #include <arena.h>
 #include <minsk-string/string.h>
+#include <stdbool.h>
 
+#include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/code_analysis/syntax/lexer.h"
 #include "minsk/code_analysis/syntax/parser.h"
 

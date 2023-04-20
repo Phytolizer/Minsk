@@ -1,7 +1,7 @@
 #pragma once
 
 #include <minsk-string/string.h>
-#include <minsk/data_structures/buf.h>
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "minsk/code_analysis/syntax/kind.h"

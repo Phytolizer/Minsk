@@ -1,10 +1,12 @@
 #include <arena.h>
+#include <minsk-string/string.h>
+#include <minsk/code_analysis/syntax/ast/node_type.h>
 #include <minsk/code_analysis/syntax/facts.h>
+#include <minsk/code_analysis/syntax/kind.h>
 #include <minsk/code_analysis/syntax/tree.h>
 #include <tau/tau.h>
 
 #include "minsk-test/asserting_iterator.h"
-#include "minsk-test/tau-ext.h"
 
 static void
 test_binary_expression_honors_precedence(

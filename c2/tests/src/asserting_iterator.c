@@ -1,5 +1,13 @@
 #include "minsk-test/asserting_iterator.h"
 
+#include <arena.h>
+#include <minsk-string/string.h>
+#include <minsk/code_analysis/syntax/ast/node.h>
+#include <minsk/code_analysis/syntax/ast/node_type.h>
+#include <minsk/code_analysis/syntax/kind.h>
+#include <minsk/code_analysis/syntax/token.h>
+#include <minsk/data_structures/buf.h>
+
 #include "minsk-test/tau-ext.h"
 
 static minsk_syntax_node_buf_t
@@ -12,7 +20,7 @@ flatten(Arena * arena, minsk_syntax_node_t root)
   while (stack.len > 0)
   {
     minsk_syntax_node_t n = BUF_POP(&stack);
-    BUF_PUSH(&out, n);
+    BUF_PUSH_ARENA(arena, &out, n);
     minsk_syntax_node_buf_t children = minsk_syntax_node_children(arena, n);
     for (size_t i = children.len; i > 0; i--)
     {

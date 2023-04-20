@@ -1,6 +1,7 @@
 #pragma once
 
 #include <minsk-string/string.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #include "minsk/code_analysis/syntax/kind.h"

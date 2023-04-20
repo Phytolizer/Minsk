@@ -1,7 +1,12 @@
+#include <arena.h>
 #include <minsk-string/string.h>
 #include <minsk/code_analysis/syntax/kind.h>
+#include <minsk/code_analysis/syntax/token.h>
 #include <minsk/code_analysis/syntax/tree.h>
 #include <minsk/data_structures/buf.h>
+#include <minsk/meta/concat.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include <tau/tau.h>
 
 #include "minsk-test/tau-ext.h"

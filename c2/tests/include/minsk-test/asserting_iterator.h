@@ -1,7 +1,11 @@
 #pragma once
 
+#include <arena.h>
+#include <minsk-string/string.h>
 #include <minsk/code_analysis/syntax/ast/node.h>
-#include <minsk/data_structures/buf.h>
+#include <minsk/code_analysis/syntax/ast/node_type.h>
+#include <minsk/code_analysis/syntax/kind.h>
+#include <stddef.h>
 
 typedef struct
 {

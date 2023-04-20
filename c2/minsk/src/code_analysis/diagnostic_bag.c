@@ -2,6 +2,8 @@
 
 #include <unicode/utf.h>
 
+#include "arena.h"
+
 extern minsk_diagnostic_bag_t
 minsk_diagnostic_bag_new(Arena * arena)
 {
@@ -44,7 +46,7 @@ minsk_diagnostic_bag_report_bad_character(
   UChar32 character
 )
 {
-  uint8_t utf8buf[UTF8_MAX_CHAR_LENGTH];
+  uint8_t utf8buf[U8_MAX_LENGTH];
   int64_t nbytes = 0;
   U8_APPEND_UNSAFE(utf8buf, nbytes, character);
   minsk_text_span_t span = {position, 1};

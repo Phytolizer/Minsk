@@ -1,9 +1,15 @@
 #include <arena.h>
+#include <inttypes.h>
 #include <minsk-string/string.h>
 #include <minsk/code_analysis/compilation.h>
+#include <minsk/code_analysis/diagnostic.h>
+#include <minsk/code_analysis/diagnostic_bag.h>
 #include <minsk/code_analysis/syntax/tree.h>
+#include <minsk/code_analysis/variable_map.h>
 #include <minsk/data_structures/buf.h>
 #include <minsk/runtime/object.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include <tau/tau.h>
 
 #include "minsk-test/tau-ext.h"

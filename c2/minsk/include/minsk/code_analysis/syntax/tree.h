@@ -6,6 +6,7 @@
 #include "minsk/code_analysis/diagnostic_bag.h"
 #include "minsk/code_analysis/syntax/ast/node.h"
 #include "minsk/code_analysis/syntax/token.h"
+#include "minsk/data_structures/buf.h"
 
 typedef struct
 {

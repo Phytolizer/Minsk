@@ -1,10 +1,13 @@
 #pragma once
 
 #include <arena.h>
+#include <stdint.h>
 #include <unicode/umachine.h>
 
+#include "minsk-string/string.h"
 #include "minsk/code_analysis/diagnostic.h"
 #include "minsk/code_analysis/syntax/kind.h"
+#include "minsk/code_analysis/text/span.h"
 #include "minsk/data_structures/buf.h"
 #include "minsk/runtime/object.h"
 

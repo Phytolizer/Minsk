@@ -1,5 +1,7 @@
 #include "minsk/code_analysis/binding/ast/node.h"
 
+#include "arena.h"
+
 extern minsk_bound_node_t *
 minsk_bound_node_promote(Arena * arena, minsk_bound_node_t node)
 {

@@ -1,6 +1,8 @@
 #include <arena.h>
+#include <minsk-string/string.h>
 #include <minsk/code_analysis/syntax/facts.h>
 #include <minsk/code_analysis/syntax/kind.h>
+#include <minsk/code_analysis/syntax/token.h>
 #include <minsk/code_analysis/syntax/tree.h>
 #include <tau/tau.h>
 

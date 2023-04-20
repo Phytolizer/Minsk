@@ -1,7 +1,10 @@
 #include "minsk/code_analysis/compilation.h"
 
+#include "arena.h"
+#include "minsk/code_analysis/binding/ast/node.h"
 #include "minsk/code_analysis/binding/binder.h"
 #include "minsk/code_analysis/evaluator.h"
+#include "minsk/data_structures/buf.h"
 
 extern minsk_compilation_t
 minsk_compilation_new(Arena * arena, minsk_syntax_tree_t syntax_tree)
