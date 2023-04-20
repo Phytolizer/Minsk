@@ -26,8 +26,7 @@ static minsk_bound_expression_unary_operator_t const ops[] = {
     MINSK_OBJECT_TYPE_BOOLEAN
   ),
 };
-typedef BUF_T(minsk_bound_expression_unary_operator_t const, unary_operator)
-  operator_buf_t;
+typedef BUF_T(minsk_bound_expression_unary_operator_t const) operator_buf_t;
 static operator_buf_t ops_buf = BUF_ARRAY(operator_buf_t, ops);
 
 extern minsk_bound_expression_unary_operator_t const *

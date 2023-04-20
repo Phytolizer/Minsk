@@ -13,6 +13,7 @@ typedef enum
 #define X(x) MINSK_CONCAT(MINSK_PREFIX_SYNTAX_KIND, x),
 #include "minsk/code_analysis/syntax/private/kinds.xmacro"
 #undef X
+  MINSK_SYNTAX_KIND_COUNT
 } minsk_syntax_kind_t;
 
 extern string_t

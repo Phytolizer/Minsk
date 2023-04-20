@@ -9,13 +9,15 @@
 #include "minsk/code_analysis/binding/ast/expressions/binary_operator.h"
 #include "minsk/code_analysis/binding/ast/expressions/unary_operator.h"
 #include "minsk/code_analysis/syntax/ast/expression.h"
+#include "minsk/code_analysis/syntax/ast/expressions/assignment.h"
 #include "minsk/code_analysis/syntax/ast/expressions/binary.h"
 #include "minsk/code_analysis/syntax/ast/expressions/literal.h"
+#include "minsk/code_analysis/syntax/ast/expressions/name.h"
 #include "minsk/code_analysis/syntax/ast/expressions/parenthesized.h"
 #include "minsk/code_analysis/syntax/ast/expressions/unary.h"
 #include "minsk/code_analysis/syntax/ast/node_type.h"
 #include "minsk/code_analysis/syntax/token.h"
-#include "minsk/data_structures/buf.h"
+#include "minsk/code_analysis/variable_symbol.h"
 #include "minsk/runtime/object.h"
 
 extern minsk_binder_t

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <arena.h>
+#include <stdbool.h>
 
 #include "minsk/code_analysis/diagnostic_bag.h"
 #include "minsk/code_analysis/syntax/tree.h"

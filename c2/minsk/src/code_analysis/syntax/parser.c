@@ -64,7 +64,7 @@ extern minsk_syntax_parser_t
 minsk_syntax_parser_new(Arena * arena, string_t text)
 {
   minsk_syntax_lexer_t lexer = minsk_syntax_lexer_new(arena, text);
-  minsk_syntax_parser_token_buf_t tokens = {0};
+  minsk_syntax_parser_token_buf_t tokens = BUF_INIT;
   while (true)
   {
     minsk_syntax_token_t tok = minsk_syntax_lexer_lex(&lexer);

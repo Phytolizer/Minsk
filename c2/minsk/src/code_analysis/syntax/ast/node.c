@@ -7,8 +7,10 @@
 #include <stdio.h>
 
 #include "minsk/code_analysis/syntax/ast/expression.h"
+#include "minsk/code_analysis/syntax/ast/expressions/assignment.h"
 #include "minsk/code_analysis/syntax/ast/expressions/binary.h"
 #include "minsk/code_analysis/syntax/ast/expressions/literal.h"
+#include "minsk/code_analysis/syntax/ast/expressions/name.h"
 #include "minsk/code_analysis/syntax/ast/expressions/parenthesized.h"
 #include "minsk/code_analysis/syntax/ast/expressions/unary.h"
 #include "minsk/code_analysis/syntax/ast/node_type.h"
@@ -174,7 +176,7 @@ minsk_syntax_node_children(Arena * arena, minsk_syntax_node_t node)
     }
     case MINSK_SYNTAX_NODE_TYPE_TOKEN:
     {
-      return (minsk_syntax_node_buf_t){0};
+      return (minsk_syntax_node_buf_t)BUF_INIT;
     }
   }
 

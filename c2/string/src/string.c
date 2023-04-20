@@ -18,11 +18,11 @@ string_alloc(Arena * maybe_arena, size_t size)
 }
 
 static void *
-string_realloc(Arena * maybe_arena, void * ptr, size_t size)
+string_realloc(Arena * maybe_arena, void * ptr, size_t old_size, size_t size)
 {
   if (maybe_arena != NULL)
   {
-    return arena_realloc(maybe_arena, ptr, 0, size);
+    return arena_realloc(maybe_arena, ptr, old_size, size);
   }
   return realloc(ptr, size);
 }
@@ -84,6 +84,25 @@ string_dup(string_t s)
   return string_dup_arena(NULL, s);
 }
 
+static void
+ensure_cap_arena(Arena * arena, string_t * buf, size_t len)
+{
+  if (buf->capacity >= len)
+  {
+    return;
+  }
+
+  size_t old_cap = buf->capacity;
+  while (len > buf->capacity)
+  {
+    buf->capacity = buf->capacity * 1.5 + 1;
+  }
+  if (buf->capacity > old_cap)
+  {
+    buf->data = string_realloc(arena, buf->data, old_cap, buf->capacity);
+  }
+}
+
 extern void
 string_append_arena(Arena * arena, string_t * buf, string_t arg)
 {
@@ -92,15 +111,7 @@ string_append_arena(Arena * arena, string_t * buf, string_t arg)
     return;
   }
 
-  size_t old_cap = buf->capacity;
-  while (buf->length + arg.length > buf->capacity)
-  {
-    buf->capacity = buf->capacity * 2 + 1;
-  }
-  if (buf->capacity > old_cap)
-  {
-    buf->data = string_realloc(arena, buf->data, buf->capacity);
-  }
+  ensure_cap_arena(arena, buf, buf->length + arg.length);
   memcpy(buf->data + buf->length, arg.data, arg.length);
   buf->length += arg.length;
 }
@@ -124,16 +135,7 @@ string_append_vprintf_arena(
   int length = vsnprintf(0, 0, fmt, args2);
   va_end(args2);
 
-  size_t old_cap = buf->capacity;
-  while (buf->length + length > buf->capacity)
-  {
-    buf->capacity = buf->capacity * 2 + 1;
-  }
-  if (buf->capacity > old_cap)
-  {
-    buf->data = string_realloc(arena, buf->data, buf->capacity);
-  }
-
+  ensure_cap_arena(arena, buf, buf->length + length);
   vsnprintf(buf->data + buf->length, buf->capacity - buf->length, fmt, args);
 
   buf->length += length;
@@ -155,6 +157,20 @@ string_append_printf(string_t * buf, const char * fmt, ...)
   va_start(args, fmt);
   string_append_vprintf_arena(NULL, buf, fmt, args);
   va_end(args);
+}
+
+extern void
+string_push_arena(Arena * arena, string_t * buf, char c)
+{
+  ensure_cap_arena(arena, buf, buf->length + 1);
+  buf->data[buf->length] = c;
+  buf->length++;
+}
+
+extern void
+string_push(string_t * buf, char c)
+{
+  string_push_arena(NULL, buf, c);
 }
 
 extern string_t
@@ -197,7 +213,7 @@ string_reserve_arena(Arena * arena, string_t * s, size_t len)
 {
   if (s->capacity < len)
   {
-    s->data = string_realloc(arena, s->data, len);
+    s->data = string_realloc(arena, s->data, s->capacity, len);
     s->capacity = len;
   }
 }

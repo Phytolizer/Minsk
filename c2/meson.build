@@ -5,7 +5,6 @@ project(
         'c_std=gnu17',
         'warning_level=2',
         'default_library=static',
-        'b_sanitize=address,undefined',
         'b_lundef=false',
     ],
 )
@@ -35,3 +34,4 @@ subdir('string')
 subdir('platform')
 subdir('minsk')
 subdir('mc')
+subdir('tests')

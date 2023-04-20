@@ -1,5 +1,10 @@
 #include "minsk/code_analysis/variable_map.h"
 
+#include <arena.h>
+#include <minsk-string/string.h>
+#include <stddef.h>
+#include <uthash.h>
+
 #undef uthash_malloc
 #define uthash_malloc(sz) arena_alloc(map->_arena, (sz))
 

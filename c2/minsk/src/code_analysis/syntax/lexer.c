@@ -13,7 +13,7 @@
 #include "minsk/code_analysis/syntax/facts.h"
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/code_analysis/syntax/token.h"
-#include "minsk/data_structures/buf.h"
+#include "minsk/code_analysis/text/span.h"
 #include "minsk/runtime/object.h"
 
 typedef UChar32 codepoint_t;

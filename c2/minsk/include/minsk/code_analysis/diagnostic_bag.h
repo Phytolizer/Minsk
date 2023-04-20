@@ -1,14 +1,17 @@
 #pragma once
 
 #include <arena.h>
+#include <stdint.h>
 #include <unicode/umachine.h>
 
+#include "minsk-string/string.h"
 #include "minsk/code_analysis/diagnostic.h"
 #include "minsk/code_analysis/syntax/kind.h"
+#include "minsk/code_analysis/text/span.h"
 #include "minsk/data_structures/buf.h"
 #include "minsk/runtime/object.h"
 
-typedef BUF_T(minsk_diagnostic_t, minsk_diagnostic) minsk_diagnostic_bag_buf_t;
+typedef BUF_T(minsk_diagnostic_t) minsk_diagnostic_bag_buf_t;
 
 typedef struct
 {

@@ -35,6 +35,8 @@ jobs:
       run: 'meson setup build -Dbuildtype=release'
     - name: Build project
       run: 'meson compile -C build'
+    - name: Test project
+      run: 'meson test -v -C build'
   ci-success:
     name: ci
     if: ${{ success() }}

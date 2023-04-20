@@ -6,6 +6,7 @@
 #include "minsk/code_analysis/diagnostic_bag.h"
 #include "minsk/code_analysis/syntax/ast/node.h"
 #include "minsk/code_analysis/syntax/token.h"
+#include "minsk/data_structures/buf.h"
 
 typedef struct
 {
@@ -16,3 +17,7 @@ typedef struct
 
 extern minsk_syntax_tree_t
 minsk_syntax_tree_parse(Arena * arena, string_t text);
+
+typedef BUF_T(minsk_syntax_token_t) minsk_syntax_token_buf_t;
+extern minsk_syntax_token_buf_t
+minsk_syntax_tree_parse_tokens(Arena * arena, string_t text);

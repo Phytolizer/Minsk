@@ -34,4 +34,6 @@ IncludeCategories:
     Priority: 3
   - Regex: '^"'
     Priority: 2
+StatementMacros:
+  - TAU_MAIN
 ...

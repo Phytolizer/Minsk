@@ -2,6 +2,7 @@
 
 #include <arena.h>
 #include <minsk-string/string.h>
+#include <stdbool.h>
 #include <uthash.h>
 
 #include "minsk/code_analysis/variable_symbol.h"

@@ -4,13 +4,18 @@
 #include <stddef.h>
 #include <stdlib.h>
 
-#define BUF_T(T, name) \
- struct name##_buf     \
- {                     \
-  T * ptr;             \
-  size_t len;          \
-  size_t cap;          \
-  bool is_ref;         \
+#define BUF_T(T) \
+ struct          \
+ {               \
+  T * ptr;       \
+  size_t len;    \
+  size_t cap;    \
+  bool is_ref;   \
+ }
+
+#define BUF_INIT \
+ {               \
+  0              \
  }
 
 #define BUF_REF(T, p, size)                                \
@@ -19,10 +24,10 @@
   .ptr = (p), .len = (size), .cap = (size), .is_ref = true \
  }
 
-#define BUF_ARRAY(T, arr)                                           \
- (T)                                                                \
- {                                                                  \
-  .ptr = (arr), .len = sizeof(arr) / sizeof(*(arr)), .is_ref = true \
+#define BUF_ARRAY(T, arr)                                                   \
+ (T)                                                                        \
+ {                                                                          \
+  .ptr = (void *)(arr), .len = sizeof(arr) / sizeof(*(arr)), .is_ref = true \
  }
 
 #define BUF_OWNER(T, p, size)                               \
@@ -55,6 +60,8 @@
  } while (false)
 
 #define BUF_PUSH(buf, val) BUF_PUSH_ARENA(NULL, buf, val)
+
+#define BUF_POP(buf) ((buf)->ptr[--(buf)->len])
 
 #define BUF_RESERVE_ARENA(arena, buf, size)                             \
  do                                                                     \
@@ -111,6 +118,11 @@
 #define BUF_FREE(buf, val) BUF_FREE_ARENA(NULL, buf, val)
 
 #ifdef __GNUC__
+ #define BUF_LIT_C(T, ...)                          \
+  ({                                                \
+ typeof(*((T)BUF_INIT.ptr)) arr_[] = {__VA_ARGS__}; \
+ BUF_ARRAY(T, arr_);                                \
+  })
  #define BUF_LIT_ARENA(arena, T, ...)                                 \
   ({                                                                  \
  typeof(*((T){0}.ptr)) arr_[] = {__VA_ARGS__};                        \

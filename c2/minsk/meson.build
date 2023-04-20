@@ -9,6 +9,7 @@ minsk_lib = static_library(
     minsk_src,
     include_directories: minsk_inc,
     dependencies: [
+        arena_dep,
         icuuc_dep,
         platform_dep,
         string_dep,
@@ -20,6 +21,7 @@ minsk_dep = declare_dependency(
     link_with: minsk_lib,
     include_directories: minsk_inc,
     dependencies: [
+        arena_dep,
         icuuc_dep,
         string_dep,
         uthash_dep,
