@@ -1,9 +1,10 @@
 #include <minsk-string/string.h>
-#include <minsk-test/tau-ext.h>
 #include <minsk/code_analysis/syntax/kind.h>
 #include <minsk/code_analysis/syntax/tree.h>
 #include <minsk/data_structures/buf.h>
 #include <tau/tau.h>
+
+#include "minsk-test/tau-ext.h"
 
 static string_t
 format_escapes(Arena * arena, string_t text)

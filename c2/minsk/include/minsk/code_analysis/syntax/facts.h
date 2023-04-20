@@ -18,3 +18,6 @@ minsk_syntax_facts_keyword_kind(string_t text);
 
 extern void
 minsk_syntax_facts_free_keyword_table(void);
+
+extern string_t
+minsk_syntax_facts_get_text(minsk_syntax_kind_t kind);

@@ -18,6 +18,7 @@ minsk_syntax_kind_display_name(Arena * arena, minsk_syntax_kind_t kind)
  }
 #include "minsk/code_analysis/syntax/private/kinds.xmacro"
 #undef X
+    default: break;
   }
 
   DEBUGGER_FATAL("invalid syntax kind %d", kind);
