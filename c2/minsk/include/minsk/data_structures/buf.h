@@ -24,10 +24,10 @@
   .ptr = (p), .len = (size), .cap = (size), .is_ref = true \
  }
 
-#define BUF_ARRAY(T, arr)                                           \
- (T)                                                                \
- {                                                                  \
-  .ptr = (arr), .len = sizeof(arr) / sizeof(*(arr)), .is_ref = true \
+#define BUF_ARRAY(T, arr)                                                   \
+ (T)                                                                        \
+ {                                                                          \
+  .ptr = (void *)(arr), .len = sizeof(arr) / sizeof(*(arr)), .is_ref = true \
  }
 
 #define BUF_OWNER(T, p, size)                               \

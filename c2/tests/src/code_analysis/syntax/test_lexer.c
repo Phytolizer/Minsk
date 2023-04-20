@@ -44,7 +44,7 @@ typedef struct
 
 typedef BUF_T(simple_token_t) simple_token_buf_t;
 
-static simple_token_t TOKENS[] = {
+static simple_token_t const TOKENS[] = {
   ST(MINSK_SYNTAX_KIND_PLUS_TOKEN, "+"),
   ST(MINSK_SYNTAX_KIND_MINUS_TOKEN, "-"),
   ST(MINSK_SYNTAX_KIND_STAR_TOKEN, "*"),
@@ -66,7 +66,7 @@ static simple_token_t TOKENS[] = {
   ST(MINSK_SYNTAX_KIND_NUMBER_TOKEN, "123"),
 };
 
-static simple_token_t SEPARATORS[] = {
+static simple_token_t const SEPARATORS[] = {
   ST(MINSK_SYNTAX_KIND_WHITESPACE_TOKEN, " "),
   ST(MINSK_SYNTAX_KIND_WHITESPACE_TOKEN, "  "),
   ST(MINSK_SYNTAX_KIND_WHITESPACE_TOKEN, "\r"),
@@ -267,6 +267,7 @@ TEST(lexer, lexes_token_pair)
       }
     }
   }
+  arena_free(&test_arena);
 }
 
 static void
@@ -376,4 +377,5 @@ TEST(lexer, lexes_token_pair_with_separator)
       }
     }
   }
+  arena_free(&test_arena);
 }
