@@ -1,5 +1,6 @@
 #include "minsk-platform/errno.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -19,7 +20,7 @@ minsk_report_error(minsk_errno_t error)
     error,
     // default language
     0,
-    &buffer,
+    (char*)&buffer,
     1,
     NULL
   );

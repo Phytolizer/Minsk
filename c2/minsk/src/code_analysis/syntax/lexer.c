@@ -30,10 +30,7 @@ typedef struct
   bool did_overflow;
 } overflow_t;
 
-enum
-{
-  UINT63_MAX = UINT64_MAX >> 1U
-};
+#define UINT63_MAX (UINT64_MAX >> 1U)
 
 static overflow_t
 add_overflow(uint64_t a, uint64_t b)
