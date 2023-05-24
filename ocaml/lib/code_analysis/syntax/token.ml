@@ -1,3 +1,5 @@
+open Runtime
+
 type kind =
   | Number
   | Whitespace
@@ -11,7 +13,6 @@ type kind =
   | EndOfFile
 [@@deriving show]
 
-type value = int option
-type t = { kind : kind; position : int; text : string; value : value }
+type t = { kind : kind; position : int; text : string; value : Value.t option }
 
 let make kind position text value = { kind; position; text; value }

@@ -21,7 +21,7 @@ let next_token l =
   let start = l.position in
   let kind = ref Token.Bad in
   let text = ref (None : string option) in
-  let value = ref (None : Token.value) in
+  let value = ref None in
 
   (match current l with
   | None -> kind := EndOfFile

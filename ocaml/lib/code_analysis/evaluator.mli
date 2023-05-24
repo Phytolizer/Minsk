@@ -1,1 +1,1 @@
-val evaluate : Syntax.Node.Expression.t -> int
+val evaluate : Binding.Node.Expression.t -> int

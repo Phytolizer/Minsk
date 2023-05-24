@@ -1,24 +1,20 @@
-open Syntax.Token
-open Syntax.Node.Expression
+open Binding.Node.Expression
 
 let rec evaluate_expression node =
   match node with
-  | Literal l -> l.literal_literal_token.value |> Option.get
+  | Literal l -> l.literal_value
   | Binary b -> (
       let left = evaluate_expression b.binary_left in
       let right = evaluate_expression b.binary_right in
-      match b.binary_operator_token.kind with
-      | Plus -> left + right
-      | Minus -> left - right
-      | Star -> left * right
-      | Slash -> left / right
-      | _ -> failwith "unreachable")
-  | Parenthesized p -> evaluate_expression p.parenthesized_expression
+      match b.binary_operator_kind with
+      | BinaryAddition -> left + right
+      | BinarySubtraction -> left - right
+      | BinaryMultiplication -> left * right
+      | BinaryDivision -> left / right)
   | Unary u -> (
       let operand = evaluate_expression u.unary_operand in
-      match u.unary_operator_token.kind with
-      | Plus -> operand
-      | Minus -> -operand
-      | _ -> failwith "unreachable")
+      match u.unary_operator_kind with
+      | UnaryIdentity -> operand
+      | UnaryNegation -> -operand)
 
 let evaluate root = evaluate_expression root
