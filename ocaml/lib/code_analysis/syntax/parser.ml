@@ -1,4 +1,5 @@
 open Node.Expression
+open Facts
 
 type t = {
   tokens : Token.t array;
@@ -45,14 +46,23 @@ let rec parse_expression p = parse_binary_expression ~parent_precedence:0 p
 
 and parse_binary_expression ~parent_precedence p =
   let rec next left =
-    let precedence = Facts.binary_operator_precedence (current p).kind in
+    let precedence = binary_operator_precedence (current p).kind in
     if precedence = 0 || precedence <= parent_precedence then left
     else
       let operator_token = next_token p in
       let right = parse_binary_expression ~parent_precedence:precedence p in
       Binary (Binary.make left operator_token right) |> next
   in
-  next (parse_primary_expression p)
+  let unary_precedence = unary_operator_precedence (current p).kind in
+  (if unary_precedence = 0 || unary_precedence < parent_precedence then
+     parse_primary_expression p
+   else
+     let operator_token = next_token p in
+     let operand =
+       parse_binary_expression ~parent_precedence:unary_precedence p
+     in
+     Unary (Unary.make operator_token operand))
+  |> next
 
 and parse_primary_expression p =
   match (current p).kind with

@@ -14,5 +14,11 @@ let rec evaluate_expression node =
       | Slash -> left / right
       | _ -> failwith "unreachable")
   | Parenthesized p -> evaluate_expression p.parenthesized_expression
+  | Unary u -> (
+      let operand = evaluate_expression u.unary_operand in
+      match u.unary_operator_token.kind with
+      | Plus -> operand
+      | Minus -> -operand
+      | _ -> failwith "unreachable")
 
 let evaluate root = evaluate_expression root

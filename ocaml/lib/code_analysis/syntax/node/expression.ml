@@ -2,6 +2,7 @@ type t =
   | Parenthesized of parenthesized
   | Literal of literal
   | Binary of binary
+  | Unary of unary
 
 and parenthesized = {
   parenthesized_open_parenthesis_token : Token.t;
@@ -17,7 +18,9 @@ and binary = {
   binary_right : t;
 }
 
-type kind = KindBinary | KindParenthesized | KindLiteral
+and unary = { unary_operator_token : Token.t; unary_operand : t }
+
+type kind = KindBinary | KindParenthesized | KindLiteral | KindUnary
 [@@deriving show { with_path = false }]
 
 let kind x =
@@ -25,6 +28,7 @@ let kind x =
   | Parenthesized _ -> KindParenthesized
   | Literal _ -> KindLiteral
   | Binary _ -> KindBinary
+  | Unary _ -> KindUnary
 
 module Parenthesized = struct
   type t = parenthesized
@@ -63,6 +67,16 @@ module Binary = struct
   let right x = x.binary_right
 end
 
+module Unary = struct
+  type t = unary
+
+  let make operator_token operand =
+    { unary_operator_token = operator_token; unary_operand = operand }
+
+  let operator_token x = x.unary_operator_token
+  let operand x = x.unary_operand
+end
+
 let children ~xctor ~tctor x =
   match x with
   | Parenthesized p ->
@@ -78,3 +92,4 @@ let children ~xctor ~tctor x =
         Binary.operator_token b |> tctor;
         Binary.right b |> xctor;
       |]
+  | Unary u -> [| Unary.operator_token u |> tctor; Unary.operand u |> xctor |]
