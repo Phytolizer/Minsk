@@ -41,27 +41,18 @@ let match_token kind p =
   | k when k = kind -> next_token p
   | k -> match_fail k kind p
 
-let rec parse_expression p = parse_term p
+let rec parse_expression p = parse_binary_expression ~parent_precedence:0 p
 
-and parse_term p =
-  let left = ref (parse_factor p) in
-  let is_op = function Token.Plus | Minus -> true | _ -> false in
-  while (current p).kind |> is_op do
-    let operator_token = next_token p in
-    let right = parse_factor p in
-    left := Binary (Binary.make !left operator_token right)
-  done;
-  !left
-
-and parse_factor p =
-  let left = ref (parse_primary_expression p) in
-  let is_op = function Token.Star | Slash -> true | _ -> false in
-  while (current p).kind |> is_op do
-    let operator_token = next_token p in
-    let right = parse_factor p in
-    left := Binary (Binary.make !left operator_token right)
-  done;
-  !left
+and parse_binary_expression ~parent_precedence p =
+  let rec next left =
+    let precedence = Facts.binary_operator_precedence (current p).kind in
+    if precedence = 0 || precedence <= parent_precedence then left
+    else
+      let operator_token = next_token p in
+      let right = parse_binary_expression ~parent_precedence:precedence p in
+      Binary (Binary.make left operator_token right) |> next
+  in
+  next (parse_primary_expression p)
 
 and parse_primary_expression p =
   match (current p).kind with
