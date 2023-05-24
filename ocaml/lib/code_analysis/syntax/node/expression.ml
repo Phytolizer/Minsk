@@ -10,7 +10,10 @@ and parenthesized = {
   parenthesized_close_parenthesis_token : Token.t;
 }
 
-and literal = { literal_literal_token : Token.t }
+and literal = {
+  literal_literal_token : Token.t;
+  literal_value : Runtime.Value.t option;
+}
 
 and binary = {
   binary_left : t;
@@ -48,8 +51,11 @@ end
 module Literal = struct
   type t = literal
 
-  let make literal_token = { literal_literal_token = literal_token }
+  let make literal_literal_token literal_value =
+    { literal_literal_token; literal_value }
+
   let literal_token x = x.literal_literal_token
+  let value x = x.literal_value
 end
 
 module Binary = struct

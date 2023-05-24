@@ -1,3 +1,4 @@
+open Runtime
 module Expression = Expression
 
 type kind = KindToken | KindExpression of Expression.kind
@@ -26,7 +27,9 @@ let rec pretty_print_inner ~indent ~is_last out x =
   | Token { value; kind; _ } -> (
       output_string out (kind |> Token.show_kind);
       match value with
-      | Some value -> Printf.fprintf out " %d" value
+      | Some value ->
+          output_char out ' ';
+          Value.show out value
       | None -> ())
   | _ -> output_string out (kind x |> show_kind));
   output_char out '\n';

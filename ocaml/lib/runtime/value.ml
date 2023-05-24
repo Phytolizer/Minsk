@@ -1,2 +1,10 @@
-type t = int
-type ty = Int [@@deriving show { with_path = false }]
+type t = Int of int | Bool of bool
+type ty = TyInt | TyBool [@@deriving show { with_path = false }]
+
+let tyof = function Int _ -> TyInt | Bool _ -> TyBool
+let get_int = function Int i -> i | _ -> failwith "not int"
+let get_bool = function Bool b -> b | _ -> failwith "not bool"
+
+let show out = function
+  | Int i -> Printf.fprintf out "%d" i
+  | Bool b -> Printf.fprintf out "%B" b

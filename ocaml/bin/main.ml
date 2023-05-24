@@ -1,3 +1,4 @@
+open Minsk.Runtime
 open Minsk.Code_analysis
 open Minsk.Code_analysis.Binding
 
@@ -31,7 +32,8 @@ let () =
           match diagnostics with
           | [||] ->
               let result = Evaluator.evaluate bound_expression in
-              Printf.printf "%d\n" result;
+              Value.show stdout result;
+              print_char '\n';
               flush stdout
           | _ ->
               prerr_string "\x1b[0;31m";

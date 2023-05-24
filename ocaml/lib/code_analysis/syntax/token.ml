@@ -2,6 +2,7 @@ open Runtime
 
 type kind =
   | Number
+  | Identifier
   | Whitespace
   | Plus
   | Minus
@@ -9,6 +10,8 @@ type kind =
   | Slash
   | OpenParenthesis
   | CloseParenthesis
+  | TrueKeyword
+  | FalseKeyword
   | Bad
   | EndOfFile
 [@@deriving show]

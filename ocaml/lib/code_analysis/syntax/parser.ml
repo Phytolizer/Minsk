@@ -1,4 +1,5 @@
 open Node.Expression
+open Token
 open Facts
 
 type t = {
@@ -12,7 +13,7 @@ let make text =
   let tokens =
     Array.to_seq tokens
     |> Seq.filter (fun (t : Token.t) ->
-           match t.kind with Token.Bad | Whitespace -> false | _ -> true)
+           match t.kind with Bad | Whitespace -> false | _ -> true)
     |> Array.of_seq
   in
   { tokens; diagnostics; position = 0 }
@@ -66,14 +67,18 @@ and parse_binary_expression ~parent_precedence p =
 
 and parse_primary_expression p =
   match (current p).kind with
-  | Token.OpenParenthesis ->
+  | OpenParenthesis ->
       let left = next_token p in
       let expression = parse_expression p in
       let right = match_token CloseParenthesis p in
       Parenthesized (Parenthesized.make left expression right)
+  | FalseKeyword | TrueKeyword ->
+      let keyword_token = next_token p in
+      let value = keyword_token.kind = TrueKeyword in
+      Literal (Literal.make keyword_token (Some (Bool value)))
   | _ ->
       let number_token = match_token Number p in
-      Literal (Literal.make number_token)
+      Literal (Literal.make number_token number_token.value)
 
 let parse text =
   let p = make text in

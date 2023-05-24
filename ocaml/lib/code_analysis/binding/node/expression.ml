@@ -57,5 +57,5 @@ end
 let rec ty x =
   match x with
   | Binary b -> Binary.left b |> ty
-  | Literal _ -> Value.Int
+  | Literal l -> Literal.value l |> Value.tyof
   | Unary u -> Unary.operand u |> ty

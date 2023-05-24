@@ -9,21 +9,23 @@ let make () = { diagnostics = BatVect.empty }
 
 let bind_binary_operator_kind kind left right =
   match (left, right) with
-  | Value.Int, Value.Int -> (
+  | Value.TyInt, Value.TyInt -> (
       match kind with
       | Plus -> Some BinaryAddition
       | Minus -> Some BinarySubtraction
       | Star -> Some BinaryMultiplication
       | Slash -> Some BinaryDivision
       | _ -> None)
+  | _ -> None
 
 let bind_unary_operator_kind kind operand =
   match operand with
-  | Value.Int -> (
+  | Value.TyInt -> (
       match kind with
       | Plus -> Some UnaryIdentity
       | Minus -> Some UnaryNegation
       | _ -> None)
+  | _ -> None
 
 let rec bind_expression node b =
   match node with
@@ -52,8 +54,8 @@ and bind_binary_expression node b =
       left
 
 and bind_literal_expression node _ =
-  node |> S.Literal.literal_token |> fun x ->
-  x.value |> Option.value ~default:0 |> Literal.make |> fun x -> Literal x
+  node |> S.Literal.value |> Option.value ~default:(Value.Int 0) |> Literal.make
+  |> fun x -> Literal x
 
 and bind_parenthesized_expression x =
   bind_expression (S.Parenthesized.expression x)

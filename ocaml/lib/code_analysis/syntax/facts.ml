@@ -6,3 +6,8 @@ let binary_operator_precedence = function
   | _ -> 0
 
 let unary_operator_precedence = function Plus | Minus -> 3 | _ -> 0
+
+let keyword_kind = function
+  | "true" -> TrueKeyword
+  | "false" -> FalseKeyword
+  | _ -> Identifier

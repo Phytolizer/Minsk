@@ -1,3 +1,5 @@
+open Runtime
+
 type t = {
   text : string;
   mutable position : int;
@@ -6,6 +8,7 @@ type t = {
 
 let is_digit = function '0' .. '9' -> true | _ -> false
 let is_space = function ' ' | '\t' | '\r' | '\n' -> true | _ -> false
+let is_letter = function 'a' .. 'z' | 'A' .. 'Z' | '_' -> true | _ -> false
 let make text = { text; position = 0; diagnostics = BatVect.empty }
 
 let peek n l =
@@ -15,12 +18,16 @@ let peek n l =
 let current = peek 0
 let next l = l.position <- l.position + 1
 let opt_and pred = function Some x -> pred x | None -> false
+
+let rec orp xs y =
+  match xs with x :: xs -> if x y then true else orp xs y | [] -> false
+
 let curtext start l = String.sub l.text start (l.position - start)
 
 let next_token l =
   let start = l.position in
   let kind = ref Token.Bad in
-  let text = ref (None : string option) in
+  let text = lazy (curtext start l) in
   let value = ref None in
 
   (match current l with
@@ -29,24 +36,28 @@ let next_token l =
       while current l |> opt_and is_digit do
         next l
       done;
-      let ct = curtext start l in
-      text := Some ct;
       kind := Number;
       value :=
         Some
-          (match ct |> int_of_string_opt with
-          | Some i -> i
+          (match Lazy.force text |> int_of_string_opt with
+          | Some i -> Value.Int i
           | None ->
               l.diagnostics <-
                 BatVect.append
-                  (Printf.sprintf "The number %s isn't a valid int." ct)
+                  (Printf.sprintf "The number %s isn't a valid int."
+                     (Lazy.force text))
                   l.diagnostics;
-              0)
+              Value.Int 0)
   | Some c when is_space c ->
       while current l |> opt_and is_space do
         next l
       done;
       kind := Whitespace
+  | Some c when is_letter c ->
+      while current l |> opt_and (orp [ is_letter; is_digit ]) do
+        next l
+      done;
+      kind := Lazy.force text |> Facts.keyword_kind
   | Some '+' ->
       next l;
       kind := Plus
@@ -67,8 +78,7 @@ let next_token l =
       kind := CloseParenthesis
   | Some _ -> next l);
 
-  let text = match !text with Some t -> t | None -> curtext start l in
-  Token.make !kind start text !value
+  Token.make !kind start (Lazy.force text) !value
 
 let lex text =
   let l = make text in

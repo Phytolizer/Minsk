@@ -1,1 +1,1 @@
-val evaluate : Binding.Node.Expression.t -> int
+val evaluate : Binding.Node.Expression.t -> Runtime.Value.t
