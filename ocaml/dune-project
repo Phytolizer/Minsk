@@ -5,13 +5,13 @@
 (generate_opam_files true)
 
 (source
- (github username/reponame))
+ (github Phytolizer/Minsk))
 
-(authors "Author Name")
+(authors "Kyle Coffey")
 
-(maintainers "Maintainer Name")
+(maintainers "Kyle Coffey")
 
-(license LICENSE)
+(license MIT)
 
 (documentation https://url/to/documentation)
 
@@ -19,7 +19,7 @@
  (name minsk)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends ocaml dune)
+ (depends ocaml dune batteries ppx_deriving)
  (tags
   (topics "to describe" your project)))
 
