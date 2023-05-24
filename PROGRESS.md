@@ -23,6 +23,9 @@ Episode 6.5.
 ## nim (Nim)
 Episode 3.
 
+## ocaml (OCaml)
+Episode 1.
+
 ## py (Python)
 Episode 6.
 
