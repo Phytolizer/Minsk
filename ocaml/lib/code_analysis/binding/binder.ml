@@ -11,10 +11,15 @@ let bind_binary_operator_kind kind left right =
   match (left, right) with
   | Value.TyInt, Value.TyInt -> (
       match kind with
-      | Plus -> Some BinaryAddition
-      | Minus -> Some BinarySubtraction
-      | Star -> Some BinaryMultiplication
-      | Slash -> Some BinaryDivision
+      | Plus -> Some Addition
+      | Minus -> Some Subtraction
+      | Star -> Some Multiplication
+      | Slash -> Some Division
+      | _ -> None)
+  | Value.TyBool, Value.TyBool -> (
+      match kind with
+      | AmpersandAmpersand -> Some LogicalAnd
+      | PipePipe -> Some LogicalOr
       | _ -> None)
   | _ -> None
 
@@ -22,10 +27,11 @@ let bind_unary_operator_kind kind operand =
   match operand with
   | Value.TyInt -> (
       match kind with
-      | Plus -> Some UnaryIdentity
-      | Minus -> Some UnaryNegation
+      | Plus -> Some Identity
+      | Minus -> Some Negation
       | _ -> None)
-  | _ -> None
+  | Value.TyBool -> (
+      match kind with Bang -> Some LogicalNegation | _ -> None)
 
 let rec bind_expression node b =
   match node with

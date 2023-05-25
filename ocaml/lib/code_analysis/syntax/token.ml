@@ -8,6 +8,9 @@ type kind =
   | Minus
   | Star
   | Slash
+  | Bang
+  | AmpersandAmpersand
+  | PipePipe
   | OpenParenthesis
   | CloseParenthesis
   | TrueKeyword

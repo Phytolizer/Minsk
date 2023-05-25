@@ -76,6 +76,17 @@ let next_token l =
   | Some ')' ->
       next l;
       kind := CloseParenthesis
+  | Some '!' ->
+      next l;
+      kind := Bang
+  | Some '&' when peek 1 l = Some '&' ->
+      next l;
+      next l;
+      kind := AmpersandAmpersand
+  | Some '|' when peek 1 l = Some '|' ->
+      next l;
+      next l;
+      kind := PipePipe
   | Some _ -> next l);
 
   Token.make !kind start (Lazy.force text) !value

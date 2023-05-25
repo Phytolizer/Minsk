@@ -9,14 +9,16 @@ and binary = {
 }
 
 and binary_operator_kind =
-  | BinaryAddition
-  | BinarySubtraction
-  | BinaryMultiplication
-  | BinaryDivision
+  | Addition
+  | Subtraction
+  | Multiplication
+  | Division
+  | LogicalAnd
+  | LogicalOr
 
 and literal = { literal_value : Value.t }
 and unary = { unary_operator_kind : unary_operator_kind; unary_operand : t }
-and unary_operator_kind = UnaryIdentity | UnaryNegation
+and unary_operator_kind = Identity | Negation | LogicalNegation
 
 type kind = KindBinary | KindLiteral | KindUnary
 
