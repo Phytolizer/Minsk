@@ -5,3 +5,4 @@ type t = {
 }
 
 val parse : string -> t
+val parse_tokens : string -> Token.t Seq.t
