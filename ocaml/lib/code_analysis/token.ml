@@ -10,6 +10,7 @@ type kind =
   | Star
   | Slash
   | Bang
+  | Equals
   | AmpersandAmpersand
   | PipePipe
   | EqualsEquals

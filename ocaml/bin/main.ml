@@ -3,6 +3,7 @@ open Minsk.Code_analysis
 
 let () =
   let show_tree = ref false in
+  let vars = Hashtbl.create 0 in
   try
     while true do
       prerr_string "> ";
@@ -19,7 +20,7 @@ let () =
           flush stdout
       | line -> (
           let syntax_tree = Syntax.Tree.parse line in
-          let result = Compilation.evaluate syntax_tree in
+          let result = Compilation.evaluate vars syntax_tree in
           if !show_tree then (
             prerr_string "\x1b[2m";
             Syntax.Node.pretty_print stderr (Expression syntax_tree.root);

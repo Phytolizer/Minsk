@@ -24,3 +24,5 @@ val report_undefined_binary_operator :
   right_ty:Value.ty ->
   t ->
   unit
+
+val report_undefined_name : Text.Span.t -> name:string -> t -> unit

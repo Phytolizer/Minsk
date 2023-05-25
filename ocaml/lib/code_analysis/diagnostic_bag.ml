@@ -43,3 +43,7 @@ let report_undefined_binary_operator span ~operator_text ~left_ty ~right_ty =
       operator_text (Value.show_ty left_ty) (Value.show_ty right_ty)
   in
   report span message
+
+let report_undefined_name span ~name =
+  let message = sprintf "Variable '%s' doesn't exist." name in
+  report span message

@@ -41,7 +41,15 @@ let match_token kind p =
   | k when k = kind -> next_token p
   | k -> match_fail k kind p
 
-let rec parse_expression p = parse_binary_expression ~parent_precedence:0 p
+let rec parse_expression p = parse_assignment_expression p
+
+and parse_assignment_expression p =
+  if (peek 0 p).kind = Identifier && (peek 1 p).kind = Equals then
+    let identifier_token = next_token p in
+    let operator_token = next_token p in
+    let right = parse_assignment_expression p in
+    Assignment (Assignment.make identifier_token operator_token right)
+  else parse_binary_expression ~parent_precedence:0 p
 
 and parse_binary_expression ~parent_precedence p =
   let rec next left =
@@ -74,6 +82,9 @@ and parse_primary_expression p =
       let keyword_token = next_token p in
       let value = keyword_token.kind = TrueKeyword in
       Literal (Literal.make keyword_token (Some (Bool value)))
+  | Identifier ->
+      let identifier_token = next_token p in
+      Name (Name.make identifier_token)
   | _ ->
       let number_token = match_token Number p in
       Literal (Literal.make number_token number_token.value)

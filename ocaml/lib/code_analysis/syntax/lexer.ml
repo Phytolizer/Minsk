@@ -78,6 +78,9 @@ let next_token l =
       next l;
       next l;
       kind := EqualsEquals
+  | Some '=' ->
+      next l;
+      kind := Equals
   | Some '!' when peek 1 l = Some '=' ->
       next l;
       next l;
