@@ -10,13 +10,15 @@ and binary_operator_kind =
   | Division
   | LogicalAnd
   | LogicalOr
+  | Equality
+  | Inequality
 
 and binary_op = {
   bop_syntax_kind : Syntax.Token.kind;
   bop_kind : binary_operator_kind;
   bop_left_ty : Value.ty;
   bop_right_ty : Value.ty;
-  bop_result_ty : Value.ty;
+  bop_ty : Value.ty;
 }
 
 and literal = { literal_value : Value.t }
@@ -26,8 +28,8 @@ and unary_operator_kind = Identity | Negation | LogicalNegation
 and unary_op = {
   uop_syntax_kind : Syntax.Token.kind;
   uop_kind : unary_operator_kind;
-  uop_operand_type : Value.ty;
-  uop_result_type : Value.ty;
+  uop_operand_ty : Value.ty;
+  uop_ty : Value.ty;
 }
 
 type kind = KindBinary | KindLiteral | KindUnary
@@ -64,7 +66,16 @@ end = struct
       bop_kind;
       bop_left_ty = ty;
       bop_right_ty = ty;
-      bop_result_ty = ty;
+      bop_ty = ty;
+    }
+
+  let make_matching_op bop_syntax_kind bop_kind operand_ty bop_ty =
+    {
+      bop_syntax_kind;
+      bop_kind;
+      bop_left_ty = operand_ty;
+      bop_right_ty = operand_ty;
+      bop_ty;
     }
 
   let bind_op syntax_kind left_ty right_ty =
@@ -77,8 +88,13 @@ end = struct
         make_same_op Minus Subtraction TyInt;
         make_same_op Star Multiplication TyInt;
         make_same_op Slash Division TyInt;
+        make_matching_op EqualsEquals Equality TyInt TyBool;
+        make_matching_op BangEquals Inequality TyInt TyBool;
+        (* boolean operators *)
         make_same_op AmpersandAmpersand LogicalAnd TyBool;
         make_same_op PipePipe LogicalOr TyBool;
+        make_same_op EqualsEquals Equality TyBool;
+        make_same_op BangEquals Inequality TyBool;
       |]
 
   let make binary_left binary_op binary_right =
@@ -90,7 +106,7 @@ end = struct
 
   module Op = struct
     let kind op = op.bop_kind
-    let result_ty op = op.bop_result_ty
+    let result_ty op = op.bop_ty
   end
 end
 
@@ -119,12 +135,12 @@ end = struct
   type op = unary_op
 
   let make_same_op uop_syntax_kind uop_kind ty =
-    { uop_syntax_kind; uop_kind; uop_operand_type = ty; uop_result_type = ty }
+    { uop_syntax_kind; uop_kind; uop_operand_ty = ty; uop_ty = ty }
 
   let bind_op syntax_kind operand_ty =
     Array.find_opt
       (fun op ->
-        op.uop_syntax_kind = syntax_kind && op.uop_operand_type = operand_ty)
+        op.uop_syntax_kind = syntax_kind && op.uop_operand_ty = operand_ty)
       [|
         make_same_op Plus Identity TyInt;
         make_same_op Minus Negation TyInt;
@@ -137,7 +153,7 @@ end = struct
 
   module Op = struct
     let kind op = op.uop_kind
-    let result_ty op = op.uop_result_type
+    let result_ty op = op.uop_ty
   end
 end
 

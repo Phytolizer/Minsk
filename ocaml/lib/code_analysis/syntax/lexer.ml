@@ -76,6 +76,14 @@ let next_token l =
   | Some ')' ->
       next l;
       kind := CloseParenthesis
+  | Some '=' when peek 1 l = Some '=' ->
+      next l;
+      next l;
+      kind := EqualsEquals
+  | Some '!' when peek 1 l = Some '=' ->
+      next l;
+      next l;
+      kind := BangEquals
   | Some '!' ->
       next l;
       kind := Bang

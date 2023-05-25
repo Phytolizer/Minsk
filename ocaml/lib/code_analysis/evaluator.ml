@@ -13,7 +13,9 @@ let rec evaluate_expression node =
       | Multiplication -> Int (get_int left * get_int right)
       | Division -> Int (get_int left / get_int right)
       | LogicalAnd -> Bool (get_bool left && get_bool right)
-      | LogicalOr -> Bool (get_bool left || get_bool right))
+      | LogicalOr -> Bool (get_bool left || get_bool right)
+      | Equality -> Bool (left = right)
+      | Inequality -> Bool (left = right |> not))
   | Unary u -> (
       let operand = evaluate_expression u.unary_operand in
       match u.unary_op.uop_kind with

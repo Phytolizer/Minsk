@@ -11,6 +11,8 @@ type kind =
   | Bang
   | AmpersandAmpersand
   | PipePipe
+  | EqualsEquals
+  | BangEquals
   | OpenParenthesis
   | CloseParenthesis
   | TrueKeyword
