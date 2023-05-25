@@ -1,4 +1,5 @@
 open Runtime
+open Text
 
 type kind =
   | Number
@@ -24,3 +25,4 @@ type kind =
 type t = { kind : kind; position : int; text : string; value : Value.t option }
 
 let make kind position text value = { kind; position; text; value }
+let span x = Span.make x.position (String.length x.text)
