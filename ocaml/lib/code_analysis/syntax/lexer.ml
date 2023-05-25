@@ -3,13 +3,13 @@ open Runtime
 type t = {
   text : string;
   mutable position : int;
-  mutable diagnostics : string BatVect.t;
+  diagnostics : Diagnostic_bag.t;
 }
 
 let is_digit = function '0' .. '9' -> true | _ -> false
 let is_space = function ' ' | '\t' | '\r' | '\n' -> true | _ -> false
 let is_letter = function 'a' .. 'z' | 'A' .. 'Z' | '_' -> true | _ -> false
-let make text = { text; position = 0; diagnostics = BatVect.empty }
+let make text = { text; position = 0; diagnostics = Diagnostic_bag.make () }
 
 let peek n l =
   let i = l.position + n in
@@ -42,11 +42,9 @@ let next_token l =
           (match Lazy.force text |> int_of_string_opt with
           | Some i -> Value.Int i
           | None ->
-              l.diagnostics <-
-                BatVect.append
-                  (Printf.sprintf "The number %s isn't a valid int."
-                     (Lazy.force text))
-                  l.diagnostics;
+              Diagnostic_bag.report_invalid_number
+                (Text.Span.make start (Lazy.force text |> String.length))
+                ~text:(Lazy.force text) ~ty:Value.TyInt l.diagnostics;
               Value.Int 0)
   | Some c when is_space c ->
       while current l |> opt_and is_space do

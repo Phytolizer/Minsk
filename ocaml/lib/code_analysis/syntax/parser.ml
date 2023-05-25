@@ -4,7 +4,7 @@ open Facts
 
 type t = {
   tokens : Token.t array;
-  mutable diagnostics : string BatVect.t;
+  diagnostics : Diagnostic_bag.t;
   mutable position : int;
 }
 
@@ -30,13 +30,11 @@ let next_token p =
   p.position <- p.position + 1;
   c
 
-let match_fail actual expected p =
-  p.diagnostics <-
-    BatVect.append
-      (Printf.sprintf "ERROR: Unexpected token <%s>, expected <%s>"
-         (Token.show_kind actual) (Token.show_kind expected))
-      p.diagnostics;
-  Token.make expected (current p).position "" None
+let match_fail actual_kind expected_kind p =
+  Diagnostic_bag.report_unexpected_token
+    (current p |> Token.span)
+    ~actual_kind ~expected_kind p.diagnostics;
+  Token.make expected_kind (current p).position "" None
 
 let match_token kind p =
   match (current p).kind with
@@ -84,4 +82,4 @@ let parse text =
   let p = make text in
   let expr = parse_expression p in
   let end_of_file_token = match_token EndOfFile p in
-  (p.diagnostics |> BatVect.to_array, expr, end_of_file_token)
+  (p.diagnostics |> Diagnostic_bag.to_array, expr, end_of_file_token)

@@ -1,11 +1,11 @@
 open Runtime
 open Node.Expression
-open Syntax.Token
+open Token
 module S = Syntax.Node.Expression
 
-type t = { mutable diagnostics : string BatVect.t }
+type t = { diagnostics : Diagnostic_bag.t }
 
-let make () = { diagnostics = BatVect.empty }
+let make () = { diagnostics = Diagnostic_bag.make () }
 
 let rec bind_expression node b =
   match node with
@@ -22,14 +22,10 @@ and bind_binary_expression node b =
   with
   | Some op -> Binary (Binary.make left op right)
   | None ->
-      b.diagnostics <-
-        BatVect.append
-          (Printf.sprintf
-             "Binary operator '%s' is not defined for types %s and %s."
-             (S.Binary.operator_token node).text
-             (Value.show_ty (ty left))
-             (Value.show_ty (ty right)))
-          b.diagnostics;
+      let operator_token = S.Binary.operator_token node in
+      Diagnostic_bag.report_undefined_binary_operator (span operator_token)
+        ~operator_text:operator_token.text ~left_ty:(ty left)
+        ~right_ty:(ty right) b.diagnostics;
       left
 
 and bind_literal_expression node _ =
@@ -43,9 +39,14 @@ and bind_unary_expression x b =
   let operand = bind_expression (S.Unary.operand x) b in
   match Unary.bind_op (S.Unary.operator_token x).kind (ty operand) with
   | Some op -> Unary (Unary.make op operand)
-  | None -> operand
+  | None ->
+      let operator_token = S.Unary.operator_token x in
+      Diagnostic_bag.report_undefined_unary_operator (span operator_token)
+        ~operator_text:operator_token.text ~operand_ty:(ty operand)
+        b.diagnostics;
+      operand
 
 let bind node =
   let b = make () in
   let node = bind_expression node b in
-  (node, b.diagnostics |> BatVect.to_array)
+  (node, b.diagnostics |> Diagnostic_bag.to_array)

@@ -8,7 +8,7 @@ let binary_operator_precedence = function
   | PipePipe -> 1
   | _ -> 0
 
-let unary_operator_precedence = function Plus | Minus -> 6 | _ -> 0
+let unary_operator_precedence = function Plus | Minus | Bang -> 6 | _ -> 0
 
 let keyword_kind = function
   | "true" -> TrueKeyword

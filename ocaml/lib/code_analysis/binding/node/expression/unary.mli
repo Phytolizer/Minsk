@@ -5,7 +5,7 @@ type t = unary
 type op = unary_op
 
 val make : op -> expr -> t
-val bind_op : Syntax.Token.kind -> Value.ty -> op option
+val bind_op : Token.kind -> Value.ty -> op option
 val op : t -> op
 val operand : t -> expr
 

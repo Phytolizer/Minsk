@@ -14,7 +14,7 @@ and binary_operator_kind =
   | Inequality
 
 and binary_op = {
-  bop_syntax_kind : Syntax.Token.kind;
+  bop_syntax_kind : Token.kind;
   bop_kind : binary_operator_kind;
   bop_left_ty : Value.ty;
   bop_right_ty : Value.ty;
@@ -26,7 +26,7 @@ and unary = { unary_op : unary_op; unary_operand : t }
 and unary_operator_kind = Identity | Negation | LogicalNegation
 
 and unary_op = {
-  uop_syntax_kind : Syntax.Token.kind;
+  uop_syntax_kind : Token.kind;
   uop_kind : unary_operator_kind;
   uop_operand_ty : Value.ty;
   uop_ty : Value.ty;

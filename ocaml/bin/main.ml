@@ -32,7 +32,9 @@ let () =
               flush stdout
           | Error diagnostics ->
               prerr_string "\x1b[0;31m";
-              Array.iter prerr_endline diagnostics;
+              Array.iter
+                (fun (d : Diagnostic.t) -> prerr_endline d.message)
+                diagnostics;
               prerr_string "\x1b[0m";
               flush stderr)
     done
