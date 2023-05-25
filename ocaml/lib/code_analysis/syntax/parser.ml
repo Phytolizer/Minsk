@@ -1,4 +1,6 @@
 open Node.Expression
+open Token
+open Facts
 
 type t = {
   tokens : Token.t array;
@@ -11,7 +13,7 @@ let make text =
   let tokens =
     Array.to_seq tokens
     |> Seq.filter (fun (t : Token.t) ->
-           match t.kind with Token.Bad | Whitespace -> false | _ -> true)
+           match t.kind with Bad | Whitespace -> false | _ -> true)
     |> Array.of_seq
   in
   { tokens; diagnostics; position = 0 }
@@ -41,38 +43,42 @@ let match_token kind p =
   | k when k = kind -> next_token p
   | k -> match_fail k kind p
 
-let rec parse_expression p = parse_term p
+let rec parse_expression p = parse_binary_expression ~parent_precedence:0 p
 
-and parse_term p =
-  let left = ref (parse_factor p) in
-  let is_op = function Token.Plus | Minus -> true | _ -> false in
-  while (current p).kind |> is_op do
-    let operator_token = next_token p in
-    let right = parse_factor p in
-    left := Binary (Binary.make !left operator_token right)
-  done;
-  !left
-
-and parse_factor p =
-  let left = ref (parse_primary_expression p) in
-  let is_op = function Token.Star | Slash -> true | _ -> false in
-  while (current p).kind |> is_op do
-    let operator_token = next_token p in
-    let right = parse_factor p in
-    left := Binary (Binary.make !left operator_token right)
-  done;
-  !left
+and parse_binary_expression ~parent_precedence p =
+  let rec next left =
+    let precedence = binary_operator_precedence (current p).kind in
+    if precedence = 0 || precedence <= parent_precedence then left
+    else
+      let operator_token = next_token p in
+      let right = parse_binary_expression ~parent_precedence:precedence p in
+      Binary (Binary.make left operator_token right) |> next
+  in
+  let unary_precedence = unary_operator_precedence (current p).kind in
+  (if unary_precedence = 0 || unary_precedence < parent_precedence then
+     parse_primary_expression p
+   else
+     let operator_token = next_token p in
+     let operand =
+       parse_binary_expression ~parent_precedence:unary_precedence p
+     in
+     Unary (Unary.make operator_token operand))
+  |> next
 
 and parse_primary_expression p =
   match (current p).kind with
-  | Token.OpenParenthesis ->
+  | OpenParenthesis ->
       let left = next_token p in
       let expression = parse_expression p in
       let right = match_token CloseParenthesis p in
       Parenthesized (Parenthesized.make left expression right)
+  | FalseKeyword | TrueKeyword ->
+      let keyword_token = next_token p in
+      let value = keyword_token.kind = TrueKeyword in
+      Literal (Literal.make keyword_token (Some (Bool value)))
   | _ ->
       let number_token = match_token Number p in
-      Literal (Literal.make number_token)
+      Literal (Literal.make number_token number_token.value)
 
 let parse text =
   let p = make text in

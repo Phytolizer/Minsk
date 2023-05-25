@@ -1,17 +1,26 @@
+open Runtime
+
 type kind =
   | Number
+  | Identifier
   | Whitespace
   | Plus
   | Minus
   | Star
   | Slash
+  | Bang
+  | AmpersandAmpersand
+  | PipePipe
+  | EqualsEquals
+  | BangEquals
   | OpenParenthesis
   | CloseParenthesis
+  | TrueKeyword
+  | FalseKeyword
   | Bad
   | EndOfFile
 [@@deriving show]
 
-type value = int option
-type t = { kind : kind; position : int; text : string; value : value }
+type t = { kind : kind; position : int; text : string; value : Value.t option }
 
 let make kind position text value = { kind; position; text; value }

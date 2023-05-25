@@ -1,4 +1,6 @@
+open Minsk.Runtime
 open Minsk.Code_analysis
+open Minsk.Code_analysis.Binding
 
 let () =
   let show_tree = ref false in
@@ -18,18 +20,23 @@ let () =
           flush stdout
       | line -> (
           let syntax_tree = Syntax.Tree.parse line in
+          let bound_expression, diagnostics = Binder.bind syntax_tree.root in
+          let diagnostics =
+            Array.concat [ syntax_tree.diagnostics; diagnostics ]
+          in
           if !show_tree then (
             prerr_string "\x1b[2m";
             Syntax.Node.pretty_print stderr (Expression syntax_tree.root);
             prerr_string "\x1b[0m";
             flush stderr);
-          match syntax_tree.diagnostics with
+          match diagnostics with
           | [||] ->
-              let result = Evaluator.evaluate syntax_tree.root in
-              Printf.printf "%d\n" result;
+              let result = Evaluator.evaluate bound_expression in
+              Value.show stdout result;
+              print_char '\n';
               flush stdout
-          | diagnostics ->
-              prerr_string "\x1b[1;31m";
+          | _ ->
+              prerr_string "\x1b[0;31m";
               Array.iter prerr_endline diagnostics;
               prerr_string "\x1b[0m";
               flush stderr)
