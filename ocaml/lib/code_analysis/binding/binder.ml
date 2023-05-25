@@ -19,11 +19,15 @@ let rec bind_expression node b =
 and bind_assignment_expression node b =
   let name = node.assignment_identifier_token.text in
   let expression = bind_expression node.assignment_expression b in
-  let default_value =
-    match ty expression with TyInt -> Value.Int 0 | TyBool -> Value.Bool false
-  in
-  Hashtbl.add b.variables name default_value;
-  Assignment (Assignment.make name expression)
+  (match
+     Hashtbl.to_seq_keys b.variables
+     |> Seq.find (fun (k : Variable_symbol.t) -> k.name = name)
+   with
+  | Some v -> Hashtbl.remove b.variables v
+  | None -> ());
+  let v = Variable_symbol.make name (ty expression) in
+  Hashtbl.add b.variables v (Int 0);
+  Assignment (Assignment.make v expression)
 
 and bind_binary_expression node b =
   let left = bind_expression (S.Binary.left node) b in
@@ -45,15 +49,16 @@ and bind_literal_expression node _ =
 
 and bind_name_expression node b =
   let name = node.name_identifier_token.text in
-  match Hashtbl.find_opt b.variables name with
+  match
+    Hashtbl.to_seq_keys b.variables
+    |> Seq.find (fun (k : Variable_symbol.t) -> k.name = name)
+  with
   | None ->
       Diagnostic_bag.report_undefined_name
         (node.name_identifier_token |> span)
         ~name b.diagnostics;
       Literal (Literal.make @@ Value.Int 0)
-  | Some value ->
-      let ty = Value.tyof value in
-      Variable (Variable.make name ty)
+  | Some value -> Variable (Variable.make value)
 
 and bind_parenthesized_expression x =
   bind_expression (S.Parenthesized.expression x)

@@ -1,5 +1,3 @@
-open Runtime
-
 let evaluate (variables : Variable_map.t) (syntax_tree : Syntax.Tree.t) =
   let bound_expression, diagnostics =
     Binding.Binder.bind variables syntax_tree.root

@@ -7,7 +7,11 @@ type t =
   | Unary of unary
   | Variable of variable
 
-and assignment = { assignment_name : string; assignment_expression : t }
+and assignment = {
+  assignment_variable : Variable_symbol.t;
+  assignment_expression : t;
+}
+
 and binary = { binary_left : t; binary_op : binary_op; binary_right : t }
 
 and binary_operator_kind =
@@ -39,7 +43,7 @@ and unary_op = {
   uop_ty : Value.ty;
 }
 
-and variable = { variable_name : string; variable_ty : Value.ty }
+and variable = { variable_variable : Variable_symbol.t }
 
 type kind =
   | KindAssignment

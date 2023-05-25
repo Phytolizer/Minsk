@@ -1,5 +1,3 @@
-open Runtime
-
 val bind :
   Variable_map.t ->
   Syntax.Node.Expression.t ->

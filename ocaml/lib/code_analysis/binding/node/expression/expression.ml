@@ -12,4 +12,4 @@ let rec ty x =
   | Binary b -> Binary.op b |> Binary.Op.result_ty
   | Literal l -> Literal.value l |> Value.tyof
   | Unary u -> Unary.op u |> Unary.Op.result_ty
-  | Variable v -> Variable.ty v
+  | Variable v -> (Variable.variable v).ty

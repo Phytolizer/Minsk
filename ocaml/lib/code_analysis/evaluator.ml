@@ -5,7 +5,7 @@ let rec evaluate_expression vars node =
   match node with
   | Assignment a ->
       let value = evaluate_expression vars a.assignment_expression in
-      Hashtbl.add vars a.assignment_name value;
+      Hashtbl.add vars a.assignment_variable value;
       value
   | Binary b -> (
       let left = evaluate_expression vars b.binary_left in
@@ -26,6 +26,6 @@ let rec evaluate_expression vars node =
       | Identity -> operand
       | Negation -> Int (-get_int operand)
       | LogicalNegation -> Bool (get_bool operand |> not))
-  | Variable v -> Hashtbl.find vars v.variable_name
+  | Variable v -> Hashtbl.find vars v.variable_variable
 
 let evaluate variables root = evaluate_expression variables root
