@@ -1,6 +1,7 @@
 #include "minsk-string/string.h"
 
 #include <arena.h>
+#include <assert.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -74,6 +75,7 @@ extern string_t
 string_dup_arena(Arena * arena, string_t s)
 {
   char * result = string_alloc(arena, s.length);
+  assert(result != NULL);
   memcpy(result, s.data, s.length);
   return STRING_OWN_DATA(result, s.length, s.length);
 }
@@ -99,7 +101,9 @@ ensure_cap_arena(Arena * arena, string_t * buf, size_t len)
   }
   if (buf->capacity > old_cap)
   {
-    buf->data = string_realloc(arena, buf->data, old_cap, buf->capacity);
+    char * tmp_data = string_realloc(arena, buf->data, old_cap, buf->capacity);
+    assert(tmp_data != NULL);
+    buf->data = tmp_data;
   }
 }
 
@@ -182,6 +186,7 @@ string_term_arena(Arena * arena, string_t s, char termchar)
     return STRING_AS_REF(s);
   }
   char * new_data = string_alloc(arena, s.length + 1);
+  assert(new_data != NULL);
   memcpy(new_data, s.data, s.length);
   new_data[s.length] = termchar;
   return STRING_OWN_DATA(new_data, s.length, s.length + 1);

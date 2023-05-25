@@ -5,6 +5,7 @@
 #include "minsk/code_analysis/binding/binder.h"
 #include "minsk/code_analysis/evaluator.h"
 #include "minsk/data_structures/buf.h"
+#include "minsk-platform/debugger.h"
 
 extern minsk_compilation_t
 minsk_compilation_new(Arena * arena, minsk_syntax_tree_t syntax_tree)
@@ -40,6 +41,7 @@ minsk_compilation_evaluate(
     };
   }
 
+  DEBUGGER_ASSERT(diagnostics.ptr == NULL);
   minsk_evaluator_t evaluator =
     minsk_evaluator_new(bound_expression, variables);
   minsk_object_t value = minsk_evaluator_evaluate(&evaluator);

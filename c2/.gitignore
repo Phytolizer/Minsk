@@ -3,3 +3,5 @@
 !/subprojects/packagefiles
 /.minsk-history
 /.vscode
+/infer-out
+/.clangd

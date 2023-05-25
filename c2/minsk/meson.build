@@ -23,6 +23,7 @@ minsk_dep = declare_dependency(
     dependencies: [
         arena_dep,
         icuuc_dep,
+        platform_dep,
         string_dep,
         uthash_dep,
     ],

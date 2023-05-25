@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#include "minsk-platform/debugger.h"
+
 #define BUF_T(T) \
   struct         \
   {              \
@@ -36,27 +38,32 @@
     .ptr = (p), .len = (size), .cap = (size), .is_ref = false \
   }
 
-#define BUF_PUSH_ARENA(arena, buf, val)                                     \
-  do                                                                        \
-  {                                                                         \
-    if ((buf)->len == (buf)->cap)                                           \
-    {                                                                       \
-      (buf)->cap = (buf)->cap ? (buf)->cap * 2 : 1;                         \
-      if (arena)                                                            \
-      {                                                                     \
-        (buf)->ptr = arena_realloc(                                         \
-          arena,                                                            \
-          (buf)->ptr,                                                       \
-          (buf)->len * sizeof(*(buf)->ptr),                                 \
-          (buf)->cap * sizeof(*(buf)->ptr)                                  \
-        );                                                                  \
-      }                                                                     \
-      else                                                                  \
-      {                                                                     \
-        (buf)->ptr = realloc((buf)->ptr, (buf)->cap * sizeof(*(buf)->ptr)); \
-      }                                                                     \
-    }                                                                       \
-    (buf)->ptr[(buf)->len++] = (val);                                       \
+#define BUF_PUSH_ARENA(arena, buf, val)                          \
+  do                                                             \
+  {                                                              \
+    if ((buf)->len == (buf)->cap)                                \
+    {                                                            \
+      (buf)->cap = (buf)->cap ? (buf)->cap * 2 : 1;              \
+      if (arena)                                                 \
+      {                                                          \
+        void * buf__tmp = arena_realloc(                         \
+          arena,                                                 \
+          (buf)->ptr,                                            \
+          (buf)->len * sizeof(*(buf)->ptr),                      \
+          (buf)->cap * sizeof(*(buf)->ptr)                       \
+        );                                                       \
+        DEBUGGER_ASSERT(buf__tmp != NULL);                       \
+        (buf)->ptr = buf__tmp;                                   \
+      }                                                          \
+      else                                                       \
+      {                                                          \
+        void * buf__tmp =                                        \
+          realloc((buf)->ptr, (buf)->cap * sizeof(*(buf)->ptr)); \
+        DEBUGGER_ASSERT(buf__tmp != NULL);                       \
+        (buf)->ptr = buf__tmp;                                   \
+      }                                                          \
+    }                                                            \
+    (buf)->ptr[(buf)->len++] = (val);                            \
   } while (false)
 
 #define BUF_PUSH(buf, val) BUF_PUSH_ARENA(NULL, buf, val)
@@ -129,6 +136,7 @@
     size_t arrlen_ = sizeof(arr_) / sizeof(*arr_);                       \
     void * newbuf =                                                      \
       arena ? arena_alloc(arena, sizeof(arr_)) : malloc(sizeof(arr_));   \
+    DEBUGGER_ASSERT(newbuf != NULL);                                     \
     memcpy(newbuf, arr_, sizeof(arr_));                                  \
     (T){.ptr = newbuf, .len = arrlen_, .cap = arrlen_, .is_ref = false}; \
    })

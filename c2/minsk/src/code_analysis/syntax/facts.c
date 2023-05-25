@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <uthash.h>
 
+#include "minsk-platform/debugger.h"
 #include "minsk-string/string.h"
 #include "minsk/code_analysis/syntax/kind.h"
 
@@ -48,6 +49,7 @@ static void
 add_keyword(string_t text, minsk_syntax_kind_t kind)
 {
   keyword_t * kw = malloc(sizeof(*kw));
+  DEBUGGER_ASSERT(kw != NULL);
   kw->text = text;
   kw->kind = kind;
   HASH_ADD_KEYPTR(hh, g_keywords, kw->text.data, kw->text.length, kw);

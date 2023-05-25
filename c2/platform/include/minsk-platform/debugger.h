@@ -17,11 +17,11 @@
 
  #define DEBUGGER_ABORT() abort()
 
- #define DEBUGGER(fmt, ...)                                \
-   do                                                      \
-   {                                                       \
-     fprintf(stderr, fmt "\n" __VA_OPT__(, ) __VA_ARGS__); \
-     DEBUGGER_TRAP();                                      \
+ #define DEBUGGER(fmt, ...)                    \
+   do                                          \
+   {                                           \
+     fprintf(stderr, fmt "\n", ##__VA_ARGS__); \
+     DEBUGGER_TRAP();                          \
    } while (0)
 
  #define DEBUGGER_FATAL(...) \

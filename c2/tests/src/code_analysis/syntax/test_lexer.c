@@ -32,7 +32,9 @@ format_escapes(Arena * arena, string_t text)
       case '#' ... '&':
       case '(' ... '[':
       case ']' ... '~': string_push_arena(arena, &result, byte); break;
-      default: string_append_printf_arena(arena, &result, "\\x%02x", byte);
+      default:
+        string_append_printf_arena(arena, &result, "\\x%02x", byte);
+        break;
     }
   }
   return result;
