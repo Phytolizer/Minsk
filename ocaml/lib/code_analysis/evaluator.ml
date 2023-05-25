@@ -7,7 +7,7 @@ let rec evaluate_expression node =
   | Binary b -> (
       let left = evaluate_expression b.binary_left in
       let right = evaluate_expression b.binary_right in
-      match b.binary_operator_kind with
+      match b.binary_op.bop_kind with
       | Addition -> Int (get_int left + get_int right)
       | Subtraction -> Int (get_int left - get_int right)
       | Multiplication -> Int (get_int left * get_int right)
@@ -16,7 +16,7 @@ let rec evaluate_expression node =
       | LogicalOr -> Bool (get_bool left || get_bool right))
   | Unary u -> (
       let operand = evaluate_expression u.unary_operand in
-      match u.unary_operator_kind with
+      match u.unary_op.uop_kind with
       | Identity -> operand
       | Negation -> Int (-get_int operand)
       | LogicalNegation -> Bool (get_bool operand |> not))

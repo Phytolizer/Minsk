@@ -7,32 +7,6 @@ type t = { mutable diagnostics : string BatVect.t }
 
 let make () = { diagnostics = BatVect.empty }
 
-let bind_binary_operator_kind kind left right =
-  match (left, right) with
-  | Value.TyInt, Value.TyInt -> (
-      match kind with
-      | Plus -> Some Addition
-      | Minus -> Some Subtraction
-      | Star -> Some Multiplication
-      | Slash -> Some Division
-      | _ -> None)
-  | Value.TyBool, Value.TyBool -> (
-      match kind with
-      | AmpersandAmpersand -> Some LogicalAnd
-      | PipePipe -> Some LogicalOr
-      | _ -> None)
-  | _ -> None
-
-let bind_unary_operator_kind kind operand =
-  match operand with
-  | Value.TyInt -> (
-      match kind with
-      | Plus -> Some Identity
-      | Minus -> Some Negation
-      | _ -> None)
-  | Value.TyBool -> (
-      match kind with Bang -> Some LogicalNegation | _ -> None)
-
 let rec bind_expression node b =
   match node with
   | S.Binary x -> bind_binary_expression x b
@@ -44,10 +18,9 @@ and bind_binary_expression node b =
   let left = bind_expression (S.Binary.left node) b in
   let right = bind_expression (S.Binary.right node) b in
   match
-    bind_binary_operator_kind (S.Binary.operator_token node).kind (ty left)
-      (ty right)
+    Binary.bind_op (S.Binary.operator_token node).kind (ty left) (ty right)
   with
-  | Some operator_kind -> Binary (Binary.make left operator_kind right)
+  | Some op -> Binary (Binary.make left op right)
   | None ->
       b.diagnostics <-
         BatVect.append
@@ -68,10 +41,8 @@ and bind_parenthesized_expression x =
 
 and bind_unary_expression x b =
   let operand = bind_expression (S.Unary.operand x) b in
-  match
-    bind_unary_operator_kind (S.Unary.operator_token x).kind (ty operand)
-  with
-  | Some operator_kind -> Unary (Unary.make operator_kind operand)
+  match Unary.bind_op (S.Unary.operator_token x).kind (ty operand) with
+  | Some op -> Unary (Unary.make op operand)
   | None -> operand
 
 let bind node =
