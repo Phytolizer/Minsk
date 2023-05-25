@@ -45,9 +45,9 @@ typedef struct
 } simple_token_t;
 
 #define DYN_ST(kind, text) \
- {                         \
-  kind, text               \
- }
+  {                        \
+    kind, text             \
+  }
 #define ST(kind, text_lit) DYN_ST(kind, STRING_REF(text_lit))
 
 typedef BUF_T(simple_token_t) simple_token_buf_t;

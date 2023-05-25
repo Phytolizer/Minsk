@@ -17,24 +17,24 @@ typedef struct
 
 #define EMPTY_STRING ((string_t){NULL, 0, 0, false})
 
-#define STRING_REF_C(str)                               \
- {                                                      \
-  (char *)(str), sizeof(str) - 1, sizeof(str) - 1, true \
- }
+#define STRING_REF_C(str)                                 \
+  {                                                       \
+    (char *)(str), sizeof(str) - 1, sizeof(str) - 1, true \
+  }
 
 #define STRING_REF(str) ((string_t)STRING_REF_C(str))
 
-#define STRING_REF_FROM_C(str)                  \
- ({                                             \
- size_t _len = strlen(str);                     \
- ((string_t){(char *)(str), _len, _len, true}); \
- })
+#define STRING_REF_FROM_C(str)                     \
+  ({                                               \
+    size_t _len = strlen(str);                     \
+    ((string_t){(char *)(str), _len, _len, true}); \
+  })
 
-#define STRING_REF_DATA(str, length)      \
- (string_t)                               \
- {                                        \
-  (char *)(str), (length), (length), true \
- }
+#define STRING_REF_DATA(str, length)        \
+  (string_t)                                \
+  {                                         \
+    (char *)(str), (length), (length), true \
+  }
 
 #define STRING_AS_REF(str) STRING_REF_DATA((str).data, (str).length)
 
@@ -43,15 +43,16 @@ typedef struct
 #define STRING_SUB_AFTER(str, a) STRING_SUB((str), (a), (str).length)
 
 #define STRING_OWN_DATA(str, length, alloc_length) \
- (string_t)                                        \
- {                                                 \
-  (str), (length), (alloc_length), false           \
- }
+  (string_t)                                       \
+  {                                                \
+    (str), (length), (alloc_length), false         \
+  }
 
 #define STRING_EQUAL(a, b) \
- ((a).length == (b).length && memcmp((a).data, (b).data, (a).length) == 0)
+  ((a).length == (b).length && memcmp((a).data, (b).data, (a).length) == 0)
 
-static inline bool string_endswith(string_t a, string_t b)
+static inline bool
+string_endswith(string_t a, string_t b)
 {
   if (a.length < b.length)
   {

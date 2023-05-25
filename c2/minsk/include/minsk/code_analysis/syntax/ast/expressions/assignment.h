@@ -9,8 +9,8 @@ typedef struct
   struct minsk_syntax_node * expression;
 } minsk_syntax_expression_assignment_t;
 
-#define MINSK_SYNTAX_EXPRESSION_ASSIGNMENT(...)  \
- MINSK_SYNTAX_EXPRESSION(                        \
-   MINSK_SYNTAX_NODE_TYPE_ASSIGNMENT_EXPRESSION, \
-   .assignment = {__VA_ARGS__}                   \
- )
+#define MINSK_SYNTAX_EXPRESSION_ASSIGNMENT(...)   \
+  MINSK_SYNTAX_EXPRESSION(                        \
+    MINSK_SYNTAX_NODE_TYPE_ASSIGNMENT_EXPRESSION, \
+    .assignment = {__VA_ARGS__}                   \
+  )

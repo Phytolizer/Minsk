@@ -27,14 +27,14 @@ variable_symbol_equal(minsk_variable_symbol_t * a, minsk_variable_symbol_t * b)
 
 #undef HASH_FUNCTION
 #define HASH_FUNCTION(s, len, hashv) \
- ((hashv) = variable_symbol_hash((minsk_variable_symbol_t *)s))
+  ((hashv) = variable_symbol_hash((minsk_variable_symbol_t *)s))
 
 #undef HASH_KEYCMP
-#define HASH_KEYCMP(a, b, len)   \
- (!variable_symbol_equal(        \
-   (minsk_variable_symbol_t *)a, \
-   (minsk_variable_symbol_t *)b  \
- ))
+#define HASH_KEYCMP(a, b, len)    \
+  (!variable_symbol_equal(        \
+    (minsk_variable_symbol_t *)a, \
+    (minsk_variable_symbol_t *)b  \
+  ))
 
 extern minsk_variable_map_t
 minsk_variable_map_new(Arena * arena)

@@ -20,7 +20,7 @@ minsk_report_error(minsk_errno_t error)
     error,
     // default language
     0,
-    (char*)&buffer,
+    (char *)&buffer,
     1,
     NULL
   );

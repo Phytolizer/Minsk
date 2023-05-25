@@ -4,16 +4,16 @@
 
 #include "minsk/data_structures/buf.h"
 
-#define UNIFORM(sk, k, t)                                        \
- {                                                               \
-  .syntax_kind = sk, .kind = k, .left_type = t, .right_type = t, \
-  .result_type = t,                                              \
- }
-#define MATCHING(sk, k, ti, to)                                    \
- {                                                                 \
-  .syntax_kind = sk, .kind = k, .left_type = ti, .right_type = ti, \
-  .result_type = to,                                               \
- }
+#define UNIFORM(sk, k, t)                                          \
+  {                                                                \
+    .syntax_kind = sk, .kind = k, .left_type = t, .right_type = t, \
+    .result_type = t,                                              \
+  }
+#define MATCHING(sk, k, ti, to)                                      \
+  {                                                                  \
+    .syntax_kind = sk, .kind = k, .left_type = ti, .right_type = ti, \
+    .result_type = to,                                               \
+  }
 
 static minsk_bound_expression_binary_operator_t const ops[] = {
   UNIFORM(

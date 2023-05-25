@@ -22,11 +22,11 @@ typedef struct
   };
 } minsk_bound_expression_t;
 
-#define MINSK_BOUND_EXPRESSION(ty, ...)       \
- ((minsk_bound_node_t){                       \
-   .type = (ty),                              \
-   .expression = {.type = (ty), __VA_ARGS__}, \
- })
+#define MINSK_BOUND_EXPRESSION(ty, ...)        \
+  ((minsk_bound_node_t){                       \
+    .type = (ty),                              \
+    .expression = {.type = (ty), __VA_ARGS__}, \
+  })
 
 extern minsk_object_type_t
 minsk_bound_expression_get_resolved_type(minsk_bound_expression_t expression);
