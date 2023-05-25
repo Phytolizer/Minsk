@@ -1,3 +1,2 @@
-module Binding = Binding
-module Evaluator = Evaluator
+module Compilation = Compilation
 module Syntax = Syntax
