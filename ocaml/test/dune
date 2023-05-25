@@ -1,2 +1,5 @@
 (test
- (name minsk))
+ (name minsk)
+ (libraries minsk alcotest))
+
+(include_subdirs qualified)
