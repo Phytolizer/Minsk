@@ -24,6 +24,33 @@ let rec orp xs y =
 
 let curtext start l = String.sub l.text start (l.position - start)
 
+let read_number start text kind value l =
+  while current l |> opt_and is_digit do
+    next l
+  done;
+  kind := Token.Number;
+  value :=
+    Some
+      (match Lazy.force text |> int_of_string_opt with
+      | Some i -> Value.Int i
+      | None ->
+          Diagnostic_bag.report_invalid_number
+            (Text.Span.make start (Lazy.force text |> String.length))
+            ~text:(Lazy.force text) ~ty:Value.TyInt l.diagnostics;
+          Value.Int 0)
+
+let read_identifier_or_keyword kind text l =
+  while current l |> opt_and (orp [ is_letter; is_digit ]) do
+    next l
+  done;
+  kind := Lazy.force text |> Facts.keyword_kind
+
+let read_whitespace kind l =
+  while current l |> opt_and is_space do
+    next l
+  done;
+  kind := Token.Whitespace
+
 let next_token l =
   let start = l.position in
   let kind = ref Token.Bad in
@@ -32,30 +59,9 @@ let next_token l =
 
   (match current l with
   | None -> kind := EndOfFile
-  | Some c when is_digit c ->
-      while current l |> opt_and is_digit do
-        next l
-      done;
-      kind := Number;
-      value :=
-        Some
-          (match Lazy.force text |> int_of_string_opt with
-          | Some i -> Value.Int i
-          | None ->
-              Diagnostic_bag.report_invalid_number
-                (Text.Span.make start (Lazy.force text |> String.length))
-                ~text:(Lazy.force text) ~ty:Value.TyInt l.diagnostics;
-              Value.Int 0)
-  | Some c when is_space c ->
-      while current l |> opt_and is_space do
-        next l
-      done;
-      kind := Whitespace
-  | Some c when is_letter c ->
-      while current l |> opt_and (orp [ is_letter; is_digit ]) do
-        next l
-      done;
-      kind := Lazy.force text |> Facts.keyword_kind
+  | Some c when is_digit c -> read_number start text kind value l
+  | Some c when is_space c -> read_whitespace kind l
+  | Some c when is_letter c -> read_identifier_or_keyword kind text l
   | Some '+' ->
       next l;
       kind := Plus
