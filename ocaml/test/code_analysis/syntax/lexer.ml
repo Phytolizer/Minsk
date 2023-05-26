@@ -5,26 +5,17 @@ module Syntax = Minsk.Code_analysis.Syntax
 let st = Simple_token.make
 
 let tokens =
-  [|
-    st Plus "+";
-    st Minus "-";
-    st Star "*";
-    st Slash "/";
-    st Bang "!";
-    st Equals "=";
-    st AmpersandAmpersand "&&";
-    st PipePipe "||";
-    st EqualsEquals "==";
-    st BangEquals "!=";
-    st OpenParenthesis "(";
-    st CloseParenthesis ")";
-    st FalseKeyword "false";
-    st TrueKeyword "true";
-    st Number "1";
-    st Number "123";
-    st Identifier "a";
-    st Identifier "abc";
-  |]
+  Array.concat
+    [
+      Seq.filter_map
+        (fun kind ->
+          Syntax.Facts.get_text kind |> Option.map (fun text -> st kind text))
+        Token.kinds
+      |> Array.of_seq;
+      [|
+        st Number "1"; st Number "123"; st Identifier "a"; st Identifier "abc";
+      |];
+    ]
 
 let separators =
   [|
