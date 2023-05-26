@@ -43,3 +43,18 @@ let rec pretty_print_inner ~indent ~is_last out x =
     children
 
 let pretty_print = pretty_print_inner ~indent:"" ~is_last:true
+
+let rec span x =
+  match x with
+  | Token t -> Token.span t
+  | Expression e ->
+      let children =
+        Expression.children
+          ~xctor:(fun x -> Expression x)
+          ~tctor:(fun x -> Token x)
+          e
+      in
+      let first = span children.(0) in
+      let last = span children.(Array.length children - 1) in
+      let open Text.Span in
+      from_bounds first.start (fin last)
