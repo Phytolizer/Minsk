@@ -31,3 +31,9 @@ let get_text = function
   | FalseKeyword -> Some "false"
   | TrueKeyword -> Some "true"
   | _ -> None
+
+let unary_operator_kinds =
+  Token.kinds |> Seq.filter (fun kind -> unary_operator_precedence kind > 0)
+
+let binary_operator_kinds =
+  Token.kinds |> Seq.filter (fun kind -> binary_operator_precedence kind > 0)

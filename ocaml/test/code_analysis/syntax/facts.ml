@@ -7,14 +7,9 @@ let get_text_round_trip kind text =
   let tokens = Syntax.Tree.parse_tokens text |> Array.of_seq in
   Simple_token.check_tokens tokens [| Simple_token.make kind text |] fmt
 
-let range low high =
-  let rec g i = if i <= high then Seq.cons i (g @@ (i + 1)) else Seq.empty in
-  g low
-
 let get_text_round_trips_test () =
-  range Token.min_kind Token.max_kind
-  |> Seq.iter (fun i ->
-         let kind = Token.kind_of_enum i |> Option.get in
+  Token.kinds
+  |> Seq.iter (fun kind ->
          match Syntax.Facts.get_text kind with
          | None -> ()
          | Some text -> get_text_round_trip kind text)
