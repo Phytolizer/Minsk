@@ -14,7 +14,7 @@ depends: [
   "dune" {>= "3.7"}
   "batteries"
   "ppx_deriving"
-  "alcotest"
+  "alcotest" {with-test}
   "odoc" {with-doc}
 ]
 build: [
