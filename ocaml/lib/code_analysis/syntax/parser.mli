@@ -1,1 +1,1 @@
-val parse : string -> string array * Node.Expression.t * Token.t
+val parse : string -> Diagnostic.t array * Node.Expression.t * Token.t

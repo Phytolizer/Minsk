@@ -4,7 +4,7 @@ open Facts
 
 type t = {
   tokens : Token.t array;
-  mutable diagnostics : string BatVect.t;
+  diagnostics : Diagnostic_bag.t;
   mutable position : int;
 }
 
@@ -30,20 +30,26 @@ let next_token p =
   p.position <- p.position + 1;
   c
 
-let match_fail actual expected p =
-  p.diagnostics <-
-    BatVect.append
-      (Printf.sprintf "ERROR: Unexpected token <%s>, expected <%s>"
-         (Token.show_kind actual) (Token.show_kind expected))
-      p.diagnostics;
-  Token.make expected (current p).position "" None
+let match_fail actual_kind expected_kind p =
+  Diagnostic_bag.report_unexpected_token
+    (current p |> Token.span)
+    ~actual_kind ~expected_kind p.diagnostics;
+  Token.make expected_kind (current p).position "" None
 
 let match_token kind p =
   match (current p).kind with
   | k when k = kind -> next_token p
   | k -> match_fail k kind p
 
-let rec parse_expression p = parse_binary_expression ~parent_precedence:0 p
+let rec parse_expression p = parse_assignment_expression p
+
+and parse_assignment_expression p =
+  if (peek 0 p).kind = Identifier && (peek 1 p).kind = Equals then
+    let identifier_token = next_token p in
+    let operator_token = next_token p in
+    let right = parse_assignment_expression p in
+    Assignment (Assignment.make identifier_token operator_token right)
+  else parse_binary_expression ~parent_precedence:0 p
 
 and parse_binary_expression ~parent_precedence p =
   let rec next left =
@@ -76,6 +82,9 @@ and parse_primary_expression p =
       let keyword_token = next_token p in
       let value = keyword_token.kind = TrueKeyword in
       Literal (Literal.make keyword_token (Some (Bool value)))
+  | Identifier ->
+      let identifier_token = next_token p in
+      Name (Name.make identifier_token)
   | _ ->
       let number_token = match_token Number p in
       Literal (Literal.make number_token number_token.value)
@@ -84,4 +93,4 @@ let parse text =
   let p = make text in
   let expr = parse_expression p in
   let end_of_file_token = match_token EndOfFile p in
-  (p.diagnostics |> BatVect.to_array, expr, end_of_file_token)
+  (p.diagnostics |> Diagnostic_bag.to_array, expr, end_of_file_token)

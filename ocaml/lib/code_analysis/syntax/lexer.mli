@@ -1,1 +1,1 @@
-val lex : string -> Token.t array * string BatVect.t
+val lex : string -> Token.t array * Diagnostic_bag.t
