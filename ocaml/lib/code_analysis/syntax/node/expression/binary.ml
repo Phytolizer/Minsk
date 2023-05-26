@@ -1,4 +1,5 @@
 open Types
+
 type t = binary
 
 let make left operator_token right =

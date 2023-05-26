@@ -1,6 +1,7 @@
 (library
  (name minsk)
  (libraries batteries)
- (preprocess (pps ppx_deriving.show)))
+ (preprocess
+  (pps ppx_deriving.show ppx_deriving.enum)))
 
 (include_subdirs qualified)

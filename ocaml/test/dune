@@ -1,2 +1,6 @@
 (test
- (name minsk))
+ (name minsk_test)
+ (preprocess (pps ppx_deriving.show))
+ (libraries minsk alcotest))
+
+(include_subdirs qualified)

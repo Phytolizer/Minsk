@@ -29,7 +29,7 @@ let rec pretty_print_inner ~indent ~is_last out x =
       match value with
       | Some value ->
           output_char out ' ';
-          Value.show out value
+          output_string out @@ Value.show value
       | None -> ())
   | _ -> output_string out (kind x |> show_kind));
   output_char out '\n';

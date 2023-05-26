@@ -28,7 +28,7 @@ let () =
             flush stderr);
           match result with
           | Ok value ->
-              Value.show stdout value;
+              print_string @@ Value.show value;
               print_char '\n';
               flush stdout
           | Error diagnostics ->

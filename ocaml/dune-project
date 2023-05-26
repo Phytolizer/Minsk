@@ -19,7 +19,7 @@
  (name minsk)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends ocaml dune batteries ppx_deriving)
+ (depends ocaml dune batteries ppx_deriving alcotest)
  (tags
   (topics "to describe" your project)))
 
