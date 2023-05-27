@@ -1,1 +1,1 @@
-val lex : string -> Token.t array * Diagnostic_bag.t
+val lex : Text.Source.t -> Token.t array * Diagnostic_bag.t

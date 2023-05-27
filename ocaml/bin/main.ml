@@ -1,6 +1,9 @@
 open Minsk.Runtime
 open Minsk.Code_analysis
 
+let red () = prerr_string "\x1b[0;31m"
+let reset () = prerr_string "\x1b[0m"
+
 let () =
   let show_tree = ref false in
   let vars = Hashtbl.create 0 in
@@ -32,11 +35,19 @@ let () =
               print_char '\n';
               flush stdout
           | Error diagnostics ->
-              prerr_string "\x1b[0;31m";
+              let text = syntax_tree.text in
               Array.iter
-                (fun (d : Diagnostic.t) -> prerr_endline d.message)
+                (fun (d : Diagnostic.t) ->
+                  let line_index = Text.Source.line_index text d.span.start in
+                  let line_number = line_index + 1 in
+                  let character =
+                    d.span.start - (Text.Source.line text line_index).start + 1
+                  in
+                  red ();
+                  Printf.eprintf "(%d, %d): " line_number character;
+                  prerr_endline d.message;
+                  reset ())
                 diagnostics;
-              prerr_string "\x1b[0m";
               flush stderr)
     done
   with End_of_file -> prerr_endline ""
