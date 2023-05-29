@@ -1,0 +1,7 @@
+[wrap-git]
+url = https://github.com/ac000/textus_coloris.git
+revision = 16bb6a8f85c824213e972e16a33b755cd0e3561e
+patch_directory = textus_coloris
+
+[provide]
+textus_coloris = textus_coloris_dep

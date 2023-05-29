@@ -22,7 +22,7 @@ AlwaysBreakBeforeMultilineStrings: true
 BreakBeforeTernaryOperators: true
 SeparateDefinitionBlocks: Always
 IndentPPDirectives: BeforeHash
-PPIndentWidth: 1
+PPIndentWidth: 2
 InsertBraces: true
 TypenameMacros:
   - BUF_T

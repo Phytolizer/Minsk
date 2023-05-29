@@ -4,10 +4,10 @@
 
 // platform-specific includes
 #ifdef _WIN32
- #include <windows.h>
+  #include <windows.h>
 #else
- #include <errno.h>
- #include <unistd.h>
+  #include <errno.h>
+  #include <unistd.h>
 #endif
 
 extern minsk_errno_t

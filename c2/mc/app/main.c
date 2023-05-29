@@ -13,10 +13,32 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <textus_coloris.h>
 
 #include "mc/cwd.h"
 
 #define HISTORY_PATH ".minsk-history"
+
+static const struct tc_coloris colors[] = {
+  {"RED", "\e[31m"},
+  {"GREEN", "\e[32m"},
+  {"YELLOW", "\e[33m"},
+  {"BLUE", "\e[34m"},
+  {"MAGENTA", "\e[35m"},
+  {"CYAN", "\e[36m"},
+  {"WHITE", "\e[37m"},
+  {"BRIGHT_RED", "\e[91m"},
+  {"BRIGHT_GREEN", "\e[92m"},
+  {"BRIGHT_YELLOW", "\e[93m"},
+  {"BRIGHT_BLUE", "\e[94m"},
+  {"BRIGHT_MAGENTA", "\e[95m"},
+  {"BRIGHT_CYAN", "\e[96m"},
+  {"BRIGHT_WHITE", "\e[97m"},
+  {"RESET", "\e[0m"},
+  {"BOLD", "\e[1m"},
+  {"DIM", "\e[2m"},
+  {0},
+};
 
 extern int
 main(int argc, char ** argv)
@@ -28,6 +50,8 @@ main(int argc, char ** argv)
     return 1;
   }
 
+  tc_set_colors(colors, TC_COLORIS_MODE_AUTO);
+
   linenoiseHistoryLoad(HISTORY_PATH);
 
   bool show_tree = false;
@@ -36,8 +60,9 @@ main(int argc, char ** argv)
 
   while (true)
   {
-    const char * prompt = "\x1b[32m»\x1b[0m ";
+    char * prompt = tc_cstring("#GREEN#»#RESET# ");
     char * raw_line = linenoise(prompt);
+    free(prompt);
     if (raw_line == NULL)
     {
       break;
@@ -86,28 +111,32 @@ main(int argc, char ** argv)
         minsk_diagnostic_t diagnostic = result.diagnostics.ptr[i];
 
         printf("\n");
-        printf("\x1b[0;31m");
-        printf(STRING_FMT "\n", STRING_ARG(diagnostic.message));
-        printf("\x1b[0m");
+        tc_print(
+          stdout,
+          "#RED#" STRING_FMT "#RESET#\n",
+          STRING_ARG(diagnostic.message)
+        );
         string_t prefix = STRING_SUB(line, 0, diagnostic.span.start);
         string_t error =
           STRING_SUB_LEN(line, diagnostic.span.start, diagnostic.span.length);
         string_t suffix =
           STRING_SUB_AFTER(line, minsk_text_span_end(diagnostic.span));
 
-        printf("    " STRING_FMT, STRING_ARG(prefix));
-        printf("\x1b[0;31m");
-        printf(STRING_FMT, STRING_ARG(error));
-        printf("\x1b[0m");
-        printf(STRING_FMT "\n", STRING_ARG(suffix));
+        tc_print(
+          stdout,
+          "    " STRING_FMT "#RED#" STRING_FMT "#RESET#" STRING_FMT "\n",
+          STRING_ARG(prefix),
+          STRING_ARG(error),
+          STRING_ARG(suffix)
+        );
       }
       printf("\n");
     }
     else
     {
-      printf("\x1b[0;35m");
+      tc_print(stdout, "#MAGENTA#");
       minsk_object_show(result.value, stdout);
-      printf("\x1b[0m\n");
+      tc_print(stdout, "#RESET#\n");
     }
 
     arena_free(&a);

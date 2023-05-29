@@ -125,24 +125,24 @@
 #define BUF_FREE(buf, val) BUF_FREE_ARENA(NULL, buf, val)
 
 #if defined(__GNUC__) || defined(__clang__)
- #define BUF_LIT_C(T, ...)                             \
-   ({                                                  \
-    typeof(*((T)BUF_INIT.ptr)) arr_[] = {__VA_ARGS__}; \
-    BUF_ARRAY(T, arr_);                                \
-   })
- #define BUF_LIT_ARENA(arena, T, ...)                                    \
-   ({                                                                    \
-    typeof(*((T){0}.ptr)) arr_[] = {__VA_ARGS__};                        \
-    size_t arrlen_ = sizeof(arr_) / sizeof(*arr_);                       \
-    void * newbuf =                                                      \
-      arena ? arena_alloc(arena, sizeof(arr_)) : malloc(sizeof(arr_));   \
-    DEBUGGER_ASSERT(newbuf != NULL);                                     \
-    memcpy(newbuf, arr_, sizeof(arr_));                                  \
-    (T){.ptr = newbuf, .len = arrlen_, .cap = arrlen_, .is_ref = false}; \
-   })
+  #define BUF_LIT_C(T, ...)                              \
+    ({                                                   \
+      typeof(*((T)BUF_INIT.ptr)) arr_[] = {__VA_ARGS__}; \
+      BUF_ARRAY(T, arr_);                                \
+    })
+  #define BUF_LIT_ARENA(arena, T, ...)                                     \
+    ({                                                                     \
+      typeof(*((T){0}.ptr)) arr_[] = {__VA_ARGS__};                        \
+      size_t arrlen_ = sizeof(arr_) / sizeof(*arr_);                       \
+      void * newbuf =                                                      \
+        arena ? arena_alloc(arena, sizeof(arr_)) : malloc(sizeof(arr_));   \
+      DEBUGGER_ASSERT(newbuf != NULL);                                     \
+      memcpy(newbuf, arr_, sizeof(arr_));                                  \
+      (T){.ptr = newbuf, .len = arrlen_, .cap = arrlen_, .is_ref = false}; \
+    })
 
- #define BUF_LIT(T, ...) BUF_LIT_ARENA(NULL, T, __VA_ARGS__)
+  #define BUF_LIT(T, ...) BUF_LIT_ARENA(NULL, T, __VA_ARGS__)
 #else
- #define BUF_LIT_ARENA(...) error_non_gnu_compiler
- #define BUF_LIT(...) error_non_gnu_compiler
+  #define BUF_LIT_ARENA(...) error_non_gnu_compiler
+  #define BUF_LIT(...) error_non_gnu_compiler
 #endif  // __GNUC__

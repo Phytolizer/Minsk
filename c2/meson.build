@@ -25,6 +25,14 @@ arena_hdr_dep = dependency(
     ],
     default_options: ['warning_level=0'],
 )
+textus_coloris_dep = dependency(
+    'textus_coloris',
+    fallback: [
+        'textus_coloris',
+        'textus_coloris_dep',
+    ],
+    default_options: ['warning_level=0'],
+)
 
 icuuc_dep = dependency('icu-uc')
 uthash_dep = dependency('uthash')
