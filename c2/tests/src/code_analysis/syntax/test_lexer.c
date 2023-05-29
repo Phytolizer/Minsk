@@ -10,6 +10,7 @@
 #include <stddef.h>
 #include <tau/tau.h>
 
+#include "minsk-test/bitset.h"
 #include "minsk-test/tau-ext.h"
 
 static string_t
@@ -387,6 +388,54 @@ TEST(lexer, lexes_token_pair_with_separator)
         }
       }
     }
+  }
+  arena_free(&test_arena);
+}
+
+typedef BUF_T(minsk_syntax_kind_t) minsk_syntax_kind_buf_t;
+
+TEST(lexer, tests_all_tokens)
+{
+  Arena test_arena = {0};
+  bitset_t * all_token_kinds =
+    bitset_create_cap(&test_arena, MINSK_SYNTAX_KIND_COUNT);
+  for (int i = 0; i < MINSK_SYNTAX_KIND_COUNT; i++)
+  {
+    string_t kind_name = minsk_syntax_kind_display_name(&test_arena, i);
+    if (string_endswith(kind_name, STRING_REF("Keyword")) || string_endswith(kind_name, STRING_REF("Token")))
+    {
+      bitset_set(all_token_kinds, i);
+    }
+  }
+
+  bitset_t * tested_token_kinds =
+    bitset_create_cap(&test_arena, MINSK_SYNTAX_KIND_COUNT);
+  simple_token_buf_t toks = get_all_tokens(&test_arena);
+  for (size_t i = 0; i < toks.len; i++)
+  {
+    simple_token_t tok = toks.ptr[i];
+    bitset_set(tested_token_kinds, tok.kind);
+  }
+
+  bitset_t * untested_token_kinds =
+    bitset_create_cap(&test_arena, MINSK_SYNTAX_KIND_COUNT);
+  for (size_t i = 0; bitset_next_set_bit(all_token_kinds, &i); i++)
+  {
+    if (i != MINSK_SYNTAX_KIND_BAD_TOKEN && i != MINSK_SYNTAX_KIND_END_OF_FILE_TOKEN && !bitset_get(tested_token_kinds, i))
+    {
+      bitset_set(untested_token_kinds, i);
+    }
+  }
+
+  CHECK(bitset_count(untested_token_kinds) == 0);
+  for (size_t i = 0; bitset_next_set_bit(untested_token_kinds, &i); i++)
+  {
+    string_t kind_name = minsk_syntax_kind_display_name(&test_arena, i);
+    EXTCHECK(
+      false,
+      "tests_all_tokens: untested token kind " STRING_FMT,
+      STRING_ARG(kind_name)
+    );
   }
   arena_free(&test_arena);
 }
