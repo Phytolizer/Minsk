@@ -1,4 +1,5 @@
 type t = { start : int; length : int; length_including_line_break : int }
+[@@deriving show]
 
 let make ~start ~length ~length_including_line_break =
   { start; length; length_including_line_break }

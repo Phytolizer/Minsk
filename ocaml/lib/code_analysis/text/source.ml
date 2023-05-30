@@ -28,8 +28,8 @@ let parse_lines text =
         position := !position + width;
         line_start := !position
   done;
-  if !position > !line_start then add_line result !position !line_start 0;
-  !result |> BatVect.to_array
+  if !position >= !line_start then add_line result !position !line_start 0;
+  BatVect.to_array !result
 
 let make text = { text; lines = parse_lines text }
 let sub self start length = String.sub self.text start length
@@ -41,9 +41,9 @@ let line_index self position =
   let rec loop lower upper =
     if lower > upper then lower - 1
     else
-      let index = lower + ((upper - lower) / 2) in
+      let index = (lower + upper) / 2 in
       let start = self.lines.(index).start in
-      if start = position then position
+      if start = position then index
       else if start > position then loop lower (index - 1)
       else loop (index + 1) upper
   in
