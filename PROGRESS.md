@@ -24,7 +24,7 @@ Episode 6.5.
 Episode 3.
 
 ## ocaml (OCaml)
-Episode 4.
+Episode 5.
 
 ## py (Python)
 Episode 6.

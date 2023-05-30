@@ -1,4 +1,4 @@
-type t = { start : int; length : int }
+type t = { start : int; length : int } [@@deriving show]
 
 let make start length = { start; length }
 let from_bounds start fin = make start (fin - start)

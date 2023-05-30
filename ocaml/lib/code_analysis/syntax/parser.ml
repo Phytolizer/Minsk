@@ -73,21 +73,31 @@ and parse_binary_expression ~parent_precedence p =
 
 and parse_primary_expression p =
   match (current p).kind with
-  | OpenParenthesis ->
-      let left = next_token p in
-      let expression = parse_expression p in
-      let right = match_token CloseParenthesis p in
-      Parenthesized (Parenthesized.make left expression right)
-  | FalseKeyword | TrueKeyword ->
-      let keyword_token = next_token p in
-      let value = keyword_token.kind = TrueKeyword in
-      Literal (Literal.make keyword_token (Some (Bool value)))
-  | Identifier ->
-      let identifier_token = next_token p in
-      Name (Name.make identifier_token)
-  | _ ->
-      let number_token = match_token Number p in
-      Literal (Literal.make number_token number_token.value)
+  | OpenParenthesis -> parse_parenthesized_expression p
+  | FalseKeyword | TrueKeyword -> parse_boolean_literal p
+  | Number -> parse_number_literal p
+  | _ -> parse_name_expression p
+
+and parse_parenthesized_expression p =
+  let left = match_token OpenParenthesis p in
+  let expression = parse_expression p in
+  let right = match_token CloseParenthesis p in
+  Parenthesized (Parenthesized.make left expression right)
+
+and parse_boolean_literal p =
+  let is_true = (current p).kind = TrueKeyword in
+  let keyword_token =
+    match_token (if is_true then TrueKeyword else FalseKeyword) p
+  in
+  Literal (Literal.make keyword_token (Some (Bool is_true)))
+
+and parse_number_literal p =
+  let number_token = match_token Number p in
+  Literal (Literal.make number_token number_token.value)
+
+and parse_name_expression p =
+  let identifier_token = match_token Identifier p in
+  Name (Name.make identifier_token)
 
 let parse text =
   let p = make text in

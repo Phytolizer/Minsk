@@ -5,26 +5,17 @@ module Syntax = Minsk.Code_analysis.Syntax
 let st = Simple_token.make
 
 let tokens =
-  [|
-    st Plus "+";
-    st Minus "-";
-    st Star "*";
-    st Slash "/";
-    st Bang "!";
-    st Equals "=";
-    st AmpersandAmpersand "&&";
-    st PipePipe "||";
-    st EqualsEquals "==";
-    st BangEquals "!=";
-    st OpenParenthesis "(";
-    st CloseParenthesis ")";
-    st FalseKeyword "false";
-    st TrueKeyword "true";
-    st Number "1";
-    st Number "123";
-    st Identifier "a";
-    st Identifier "abc";
-  |]
+  Array.concat
+    [
+      Seq.filter_map
+        (fun kind ->
+          Syntax.Facts.get_text kind |> Option.map (fun text -> st kind text))
+        Token.kinds
+      |> Array.of_seq;
+      [|
+        st Number "1"; st Number "123"; st Identifier "a"; st Identifier "abc";
+      |];
+    ]
 
 let separators =
   [|
@@ -105,6 +96,33 @@ let lexes_token_pair_with_separator_test () =
   get_token_pairs_with_separator ()
   |> Seq.iter (fun (t1, sep, t2) -> lexes_token_pair_with_separator t1 sep t2)
 
+module TokenKindSet = Set.Make (struct
+  open Token
+
+  type t = kind
+
+  let compare x y = Int.compare (kind_to_enum x) (kind_to_enum y)
+end)
+
+let set_of_seq seq =
+  let open TokenKindSet in
+  Seq.fold_left (fun acc x -> add x acc) empty seq
+
+let tests_all_tokens_test () =
+  let open Token in
+  let token_kinds = kinds |> set_of_seq in
+  let tested_token_kinds =
+    Seq.map (fun (t : Simple_token.t) -> t.kind) (get_tokens ()) |> set_of_seq
+  in
+  let missing_token_kinds =
+    TokenKindSet.(
+      diff tested_token_kinds token_kinds
+      |> remove Bad |> remove EndOfFile |> to_seq)
+    |> Array.of_seq
+  in
+  (check @@ array Token_ext.kind)
+    "all tokens are tested" [||] missing_token_kinds
+
 let suite () =
   run "Lexer"
     [
@@ -114,6 +132,7 @@ let suite () =
           test_case "lexes token pair" `Slow lexes_token_pair_test;
           test_case "lexes token pair with separator" `Slow
             lexes_token_pair_with_separator_test;
+          test_case "all tokens are tested" `Quick tests_all_tokens_test;
         ] );
     ]
     ~and_exit:false
