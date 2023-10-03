@@ -1,5 +1,6 @@
 #include <arena.h>
 #include <minsk-string/string.h>
+#include <minsk/code_analysis/syntax/facts.h>
 #include <minsk/code_analysis/syntax/kind.h>
 #include <minsk/code_analysis/syntax/token.h>
 #include <minsk/code_analysis/syntax/tree.h>
@@ -43,29 +44,30 @@ typedef struct
   string_t text;
 } simple_token_t;
 
-#define ST(kind, text_lit)   \
- {                           \
-  kind, STRING_REF(text_lit) \
- }
+#define ST(kind, text_lit)     \
+  {                            \
+    kind, STRING_REF(text_lit) \
+  }
 
 typedef BUF_T(simple_token_t) simple_token_buf_t;
 
-static simple_token_t const TOKENS[] = {
-  ST(MINSK_SYNTAX_KIND_PLUS_TOKEN, "+"),
-  ST(MINSK_SYNTAX_KIND_MINUS_TOKEN, "-"),
-  ST(MINSK_SYNTAX_KIND_STAR_TOKEN, "*"),
-  ST(MINSK_SYNTAX_KIND_SLASH_TOKEN, "/"),
-  ST(MINSK_SYNTAX_KIND_OPEN_PARENTHESIS_TOKEN, "("),
-  ST(MINSK_SYNTAX_KIND_CLOSE_PARENTHESIS_TOKEN, ")"),
-  ST(MINSK_SYNTAX_KIND_BANG_TOKEN, "!"),
-  ST(MINSK_SYNTAX_KIND_AMPERSAND_AMPERSAND_TOKEN, "&&"),
-  ST(MINSK_SYNTAX_KIND_PIPE_PIPE_TOKEN, "||"),
-  ST(MINSK_SYNTAX_KIND_BANG_EQUALS_TOKEN, "!="),
-  ST(MINSK_SYNTAX_KIND_EQUALS_EQUALS_TOKEN, "=="),
-  ST(MINSK_SYNTAX_KIND_EQUALS_TOKEN, "="),
-  ST(MINSK_SYNTAX_KIND_FALSE_KEYWORD, "false"),
-  ST(MINSK_SYNTAX_KIND_TRUE_KEYWORD, "true"),
+static simple_token_buf_t
+get_fixed_tokens(Arena * arena)
+{
+  simple_token_buf_t buf = BUF_INIT;
+  for (minsk_syntax_kind_t kind = 0; kind < MINSK_SYNTAX_KIND_COUNT; ++kind)
+  {
+    string_t text = minsk_syntax_facts_get_text(kind);
+    if (text.length > 0)
+    {
+      simple_token_t tok = {kind, text};
+      BUF_PUSH_ARENA(arena, &buf, tok);
+    }
+  }
+  return buf;
+}
 
+static simple_token_t const DYNAMIC_TOKENS[] = {
   ST(MINSK_SYNTAX_KIND_IDENTIFIER_TOKEN, "a"),
   ST(MINSK_SYNTAX_KIND_IDENTIFIER_TOKEN, "abc"),
   ST(MINSK_SYNTAX_KIND_NUMBER_TOKEN, "1"),
@@ -81,10 +83,19 @@ static simple_token_t const SEPARATORS[] = {
 };
 
 static simple_token_buf_t
+get_tokens(Arena * arena)
+{
+  simple_token_buf_t buf = BUF_INIT;
+  BUF_APPEND_ARENA(arena, &buf, get_fixed_tokens(arena));
+  BUF_APPEND_ARENA(arena, &buf, BUF_ARRAY(simple_token_buf_t, DYNAMIC_TOKENS));
+  return buf;
+}
+
+static simple_token_buf_t
 get_all_tokens(Arena * arena)
 {
   simple_token_buf_t buf = BUF_INIT;
-  BUF_APPEND_ARENA(arena, &buf, BUF_ARRAY(simple_token_buf_t, TOKENS));
+  BUF_APPEND_ARENA(arena, &buf, get_tokens(arena));
   BUF_APPEND_ARENA(arena, &buf, BUF_ARRAY(simple_token_buf_t, SEPARATORS));
   return buf;
 }
@@ -252,7 +263,7 @@ test_lexes_token_pair(
 TEST(lexer, lexes_token_pair)
 {
   Arena test_arena = {0};
-  simple_token_buf_t tokens = BUF_ARRAY(simple_token_buf_t, TOKENS);
+  simple_token_buf_t tokens = get_tokens(&test_arena);
   for (size_t i = 0; i < tokens.len; i++)
   {
     simple_token_t t1 = tokens.ptr[i];
@@ -355,7 +366,7 @@ test_lexes_token_pair_with_separator(
 TEST(lexer, lexes_token_pair_with_separator)
 {
   Arena test_arena = {0};
-  simple_token_buf_t tokens = BUF_ARRAY(simple_token_buf_t, TOKENS);
+  simple_token_buf_t tokens = get_tokens(&test_arena);
   simple_token_buf_t separators = BUF_ARRAY(simple_token_buf_t, SEPARATORS);
   for (size_t i = 0; i < tokens.len; i++)
   {
