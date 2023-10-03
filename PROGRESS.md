@@ -6,7 +6,7 @@ Progress for each language implementation is detailed below.
 Episode 5.
 
 ## c2 (C)
-Episode 3.
+Episode 4.
 
 ## cpp (C++)
 Episode 7.
