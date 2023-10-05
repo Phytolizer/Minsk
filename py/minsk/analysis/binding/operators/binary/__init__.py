@@ -1,4 +1,3 @@
-
 from minsk.analysis.binding.operators.binary.kind import BoundBinaryOperatorKind
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.type import MinskType
