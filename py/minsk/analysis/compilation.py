@@ -26,9 +26,10 @@ class Compilation:
     @property
     def global_scope(self) -> BoundGlobalScope:
         if self._global_scope is None:
-            previous_scope = self.previous
-            if previous_scope is not None:
-                previous_scope = previous_scope.global_scope
+            if self.previous is not None:
+                previous_scope = self.previous.global_scope
+            else:
+                previous_scope = None
             global_scope = Binder.bind_global_scope(previous_scope, self.syntax.root)
             with threading.Lock():
                 if self._global_scope is None:
