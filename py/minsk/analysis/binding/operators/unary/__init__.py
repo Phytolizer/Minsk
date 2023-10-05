@@ -1,4 +1,3 @@
-from typing import Optional
 
 from minsk.analysis.binding.operators.unary.kind import BoundUnaryOperatorKind
 from minsk.analysis.syntax.kind import SyntaxKind
@@ -17,7 +16,7 @@ class BoundUnaryOperator:
         operator_kind: BoundUnaryOperatorKind,
         operand_type: MinskType,
         result_type: MinskType,
-    ):
+    ) -> None:
         self.syntax_kind = syntax_kind
         self.kind = operator_kind
         self.operand_type = operand_type
@@ -48,7 +47,7 @@ _OPERATORS = (
 
 def bind_unary_operator(
     syntax_kind: SyntaxKind, operand_type: MinskType
-) -> Optional[BoundUnaryOperator]:
+) -> BoundUnaryOperator | None:
     for op in _OPERATORS:
         if op.syntax_kind == syntax_kind and op.operand_type == operand_type:
             return op

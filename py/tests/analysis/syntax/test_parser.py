@@ -1,4 +1,5 @@
-from typing import Iterable, Iterator
+from collections.abc import Iterable, Iterator
+from typing import cast
 
 import pytest
 
@@ -14,7 +15,7 @@ from minsk.analysis.syntax.token import SyntaxToken
 class AssertingIterator:
     _iter: Iterator[SyntaxNode]
 
-    def __init__(self, root: SyntaxNode):
+    def __init__(self, root: SyntaxNode) -> None:
         self._iter = self._flatten(root)
 
     @staticmethod
@@ -25,24 +26,23 @@ class AssertingIterator:
             node = stack.pop()
             yield node
 
-            for child in reversed(list(node.children)):
-                stack.append(child)
+            stack.extend(reversed(list(node.children)))
 
-    def assert_node(self, kind: SyntaxKind):
+    def assert_node(self, kind: SyntaxKind) -> None:
         node = next(self._iter)
         assert node.kind == kind
         assert not isinstance(node, SyntaxToken)
 
-    def assert_token(self, kind: SyntaxKind, text: str):
+    def assert_token(self, kind: SyntaxKind, text: str) -> None:
         token = next(self._iter)
         assert token.kind == kind
         assert isinstance(token, SyntaxToken)
         assert token.text == text
 
-    def assert_at_end(self):
+    def assert_at_end(self) -> None:
         try:
             next(self._iter)
-            assert False, "not at end"
+            raise AssertionError("not at end")
         except StopIteration:
             pass
 
@@ -60,9 +60,9 @@ def parse_expression(text: str) -> ExpressionSyntax:
 
 
 @pytest.mark.parametrize("op1,op2", get_binary_operator_pairs())
-def test_binary_operator_precedence(op1: SyntaxKind, op2: SyntaxKind):
-    op1_text = facts.get_text(op1)
-    op2_text = facts.get_text(op2)
+def test_binary_operator_precedence(op1: SyntaxKind, op2: SyntaxKind) -> None:
+    op1_text = cast(str, facts.get_text(op1))
+    op2_text = cast(str, facts.get_text(op2))
     op1_precedence = facts.binary_operator_precedence(op1)
     op2_precedence = facts.binary_operator_precedence(op2)
 
@@ -106,9 +106,9 @@ def get_unary_operator_pairs() -> Iterable[tuple[SyntaxKind, SyntaxKind]]:
 
 
 @pytest.mark.parametrize("unary,binary", get_unary_operator_pairs())
-def test_unary_operator_precedence(unary: SyntaxKind, binary: SyntaxKind):
-    unary_text = facts.get_text(unary)
-    binary_text = facts.get_text(binary)
+def test_unary_operator_precedence(unary: SyntaxKind, binary: SyntaxKind) -> None:
+    unary_text = cast(str, facts.get_text(unary))
+    binary_text = cast(str, facts.get_text(binary))
     unary_precedence = facts.unary_operator_precedence(unary)
     binary_precedence = facts.binary_operator_precedence(binary)
 

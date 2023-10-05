@@ -1,5 +1,5 @@
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.node import SyntaxNode
@@ -20,6 +20,5 @@ class BlockStatementSyntax(StatementSyntax):
     @property
     def children(self) -> Iterable[SyntaxNode]:
         yield self.open_brace_token
-        for statement in self.statements:
-            yield statement
+        yield from self.statements
         yield self.close_brace_token

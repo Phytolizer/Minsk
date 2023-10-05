@@ -5,7 +5,7 @@ class AnnotatedText:
     text: str
     spans: list[TextSpan]
 
-    def __init__(self, text: str, spans: list[TextSpan]):
+    def __init__(self, text: str, spans: list[TextSpan]) -> None:
         self.text = text
         self.spans = spans
 

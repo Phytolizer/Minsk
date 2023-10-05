@@ -1,5 +1,5 @@
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.node import SyntaxNode

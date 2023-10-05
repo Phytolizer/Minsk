@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 import colorama
 from colorama import Fore, Style
@@ -13,7 +13,7 @@ colorama.init()
 show_tree = False
 variables: dict[VariableSymbol, Any] = {}
 text_builder = ""
-previous: Optional[Compilation] = None
+previous: Compilation | None = None
 
 while True:
     print(Fore.GREEN, end="")

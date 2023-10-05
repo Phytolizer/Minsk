@@ -1,5 +1,5 @@
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable
 
 import pytest
 
@@ -15,10 +15,10 @@ class SimpleToken:
 
 
 def get_tokens() -> Iterable[SimpleToken]:
-    for static_kind in (
-        kind for kind in SyntaxKind if facts.get_text(kind) is not None
-    ):
-        yield SimpleToken(static_kind, facts.get_text(static_kind))
+    for kind in SyntaxKind:
+        text = facts.get_text(kind)
+        if text is not None:
+            yield SimpleToken(kind, text)
     yield SimpleToken(SyntaxKind.NumberToken, "1")
     yield SimpleToken(SyntaxKind.NumberToken, "123")
     yield SimpleToken(SyntaxKind.IdentifierToken, "a")
@@ -45,8 +45,8 @@ def requires_separator(t1: SimpleToken, t2: SimpleToken) -> bool:
     if t1.kind == SyntaxKind.NumberToken and t2.kind == SyntaxKind.NumberToken:
         return True
 
-    if (t1.kind == SyntaxKind.BangToken or t1.kind == SyntaxKind.EqualsToken) and (
-        t2.kind == SyntaxKind.EqualsToken or t2.kind == SyntaxKind.EqualsEqualsToken
+    if t1.kind in {SyntaxKind.BangToken, SyntaxKind.EqualsToken} and (
+        t2.kind in {SyntaxKind.EqualsToken, SyntaxKind.EqualsEqualsToken}
     ):
         return True
 
@@ -60,9 +60,9 @@ def get_token_pairs() -> Iterable[tuple[SimpleToken, SimpleToken]]:
                 yield t1, t2
 
 
-def get_token_pairs_with_separator() -> Iterable[
-    tuple[SimpleToken, SimpleToken, SimpleToken]
-]:
+def get_token_pairs_with_separator() -> (
+    Iterable[tuple[SimpleToken, SimpleToken, SimpleToken]]
+):
     for t1 in get_tokens():
         for t2 in get_tokens():
             if requires_separator(t1, t2):
@@ -70,14 +70,14 @@ def get_token_pairs_with_separator() -> Iterable[
                     yield t1, sep, t2
 
 
-def test_tests_all_tokens():
-    tested_token_kinds = set(
+def test_tests_all_tokens() -> None:
+    tested_token_kinds = {
         t.kind for lst in (get_tokens(), get_separators()) for t in lst
-    )
+    }
 
-    untested_token_kinds = set(
+    untested_token_kinds = {
         k for k in SyntaxKind if str(k).endswith("Token") or str(k).endswith("Keyword")
-    ) - {
+    } - {
         SyntaxKind.BadToken,
         SyntaxKind.EndOfFileToken,
     }
@@ -87,7 +87,7 @@ def test_tests_all_tokens():
 
 
 @pytest.mark.parametrize("t", get_tokens())
-def test_lexes_token(t: SimpleToken):
+def test_lexes_token(t: SimpleToken) -> None:
     tokens = SyntaxTree.parse_tokens(t.text)
     assert len(tokens) == 1
     assert tokens[0].kind == t.kind
@@ -95,7 +95,7 @@ def test_lexes_token(t: SimpleToken):
 
 
 @pytest.mark.parametrize("t1,t2", get_token_pairs())
-def test_lexes_token_pairs(t1: SimpleToken, t2: SimpleToken):
+def test_lexes_token_pairs(t1: SimpleToken, t2: SimpleToken) -> None:
     text = t1.text + t2.text
     tokens = SyntaxTree.parse_tokens(text)
     assert len(tokens) == 2
@@ -108,7 +108,7 @@ def test_lexes_token_pairs(t1: SimpleToken, t2: SimpleToken):
 @pytest.mark.parametrize("t1,sep,t2", get_token_pairs_with_separator())
 def test_lexes_token_pairs_with_separator(
     t1: SimpleToken, sep: SimpleToken, t2: SimpleToken
-):
+) -> None:
     text = t1.text + sep.text + t2.text
     tokens = SyntaxTree.parse_tokens(text)
     assert len(tokens) == 3

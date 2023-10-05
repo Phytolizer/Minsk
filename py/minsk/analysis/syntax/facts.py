@@ -1,4 +1,4 @@
-from typing import Iterable, Optional
+from collections.abc import Iterable
 
 from minsk.analysis.syntax.kind import SyntaxKind
 
@@ -49,7 +49,7 @@ def unary_operators() -> Iterable[SyntaxKind]:
     return filter(lambda kind: unary_operator_precedence(kind) > 0, SyntaxKind)
 
 
-def get_text(kind: SyntaxKind) -> Optional[str]:
+def get_text(kind: SyntaxKind) -> str | None:
     match kind:
         case SyntaxKind.PlusToken:
             return "+"

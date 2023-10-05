@@ -1,12 +1,15 @@
 import sys
 from abc import ABC, abstractmethod
+from collections.abc import Iterable
+from enum import Enum, auto
 from io import StringIO
-from typing import Any, Iterable, Optional, TextIO
+from typing import TextIO
 
 from colorama import Fore, Style
 
 from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.text.span import TextSpan
+from minsk.runtime.value import Value
 
 
 class SyntaxNode(ABC):
@@ -25,7 +28,7 @@ class SyntaxNode(ABC):
         return False
 
     @property
-    def value(self) -> Optional[Any]:
+    def value(self) -> Value:
         return None
 
     @property
@@ -35,13 +38,21 @@ class SyntaxNode(ABC):
         last = children[-1]
         return TextSpan.from_bounds(first.span.start, last.span.end)
 
-    def pretty_print(self):
-        SyntaxNode._pretty_print(self, sys.stdout, True, "", True)
+    class _OutputKind(Enum):
+        Console = auto()
+        Redirected = auto()
 
-    def write_to(self, writer: TextIO):
-        SyntaxNode._pretty_print(self, writer, False, "", True)
+    class _OutputStyle(Enum):
+        Regular = auto()
+        Last = auto()
 
-    def __str__(self):
+    def pretty_print(self) -> None:
+        SyntaxNode._pretty_print(self, sys.stdout, self._OutputKind.Console)
+
+    def write_to(self, writer: TextIO) -> None:
+        SyntaxNode._pretty_print(self, writer, self._OutputKind.Redirected)
+
+    def __str__(self) -> str:
         writer = StringIO()
         self.write_to(writer)
         return str(writer)
@@ -50,27 +61,24 @@ class SyntaxNode(ABC):
     def _pretty_print(
         node: "SyntaxNode",
         writer: TextIO,
-        is_to_console: bool,
-        indent: str,
-        is_last: bool,
-    ):
-        if is_to_console:
+        output: _OutputKind,
+        indent: str = "",
+        style: _OutputStyle = _OutputStyle.Last,
+    ) -> None:
+        if output == SyntaxNode._OutputKind.Console:
             writer.write(Fore.WHITE + Style.DIM)
         writer.write(indent)
-        if is_last:
-            marker = "└── "
-        else:
-            marker = "├── "
+        marker = "└── " if style == SyntaxNode._OutputStyle.Last else "├── "
         writer.write(marker)
-        if is_to_console:
+        if output == SyntaxNode._OutputKind.Console:
             writer.write(Style.NORMAL + (Fore.CYAN if node.is_token() else Fore.BLUE))
         writer.write(node.kind.name)
-        if is_to_console:
+        if output == SyntaxNode._OutputKind.Console:
             writer.write(Style.RESET_ALL)
         if node.is_token() and node.value is not None:
             writer.write(f" {node.value}")
         writer.write("\n")
-        if is_last:
+        if style == SyntaxNode._OutputStyle.Last:
             indent += "    "
         else:
             indent += "│   "
@@ -79,5 +87,11 @@ class SyntaxNode(ABC):
             last_child = children[-1]
             for child in children:
                 SyntaxNode._pretty_print(
-                    child, writer, is_to_console, indent, child is last_child
+                    child,
+                    writer,
+                    output,
+                    indent,
+                    SyntaxNode._OutputStyle.Last
+                    if child is last_child
+                    else SyntaxNode._OutputStyle.Regular,
                 )

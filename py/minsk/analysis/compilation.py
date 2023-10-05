@@ -8,15 +8,17 @@ from minsk.analysis.evaluator import Evaluator
 from minsk.analysis.syntax.parser import SyntaxTree
 from minsk.analysis.variable import VariableSymbol
 
-EvaluationResult = tuple[tuple[Diagnostic, ...], Optional[Any]]
+EvaluationResult = tuple[tuple[Diagnostic, ...], Any | None]
 
 
 class Compilation:
     syntax: SyntaxTree
     previous: Optional["Compilation"]
-    _global_scope: Optional[BoundGlobalScope]
+    _global_scope: BoundGlobalScope | None
 
-    def __init__(self, syntax: SyntaxTree, previous: Optional["Compilation"] = None):
+    def __init__(
+        self, syntax: SyntaxTree, previous: Optional["Compilation"] = None
+    ) -> None:
         self.syntax = syntax
         self.previous = previous
         self._global_scope = None

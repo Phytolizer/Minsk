@@ -1,4 +1,3 @@
-from typing import Optional
 
 from minsk.analysis.binding.operators.binary.kind import BoundBinaryOperatorKind
 from minsk.analysis.syntax.kind import SyntaxKind
@@ -19,7 +18,7 @@ class BoundBinaryOperator:
         left_type: MinskType,
         right_type: MinskType,
         result_type: MinskType,
-    ):
+    ) -> None:
         self.syntax_kind = syntax_kind
         self.kind = operator_kind
         self.left_type = left_type
@@ -103,7 +102,7 @@ _OPERATORS = (
 
 def bind_binary_operator(
     syntax_kind: SyntaxKind, left_type: MinskType, right_type: MinskType
-) -> Optional[BoundBinaryOperator]:
+) -> BoundBinaryOperator | None:
     for op in _OPERATORS:
         if (
             op.syntax_kind == syntax_kind

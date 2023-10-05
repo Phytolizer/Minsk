@@ -5,7 +5,7 @@ class MinskType(Enum):
     Int = auto()
     Bool = auto()
 
-    def __str__(self):
+    def __str__(self) -> str:
         match self:
             case MinskType.Int:
                 return "integer"

@@ -7,12 +7,12 @@ class BoundScope:
     _variables: dict[str, VariableSymbol]
     parent: Optional["BoundScope"]
 
-    def __init__(self, parent: Optional["BoundScope"]):
+    def __init__(self, parent: Optional["BoundScope"]) -> None:
         self._variables = {}
         self.parent = parent
 
-    def try_lookup(self, name: str) -> Optional[VariableSymbol]:
-        if name in self._variables.keys():
+    def try_lookup(self, name: str) -> VariableSymbol | None:
+        if name in self._variables:
             return self._variables[name]
 
         if self.parent is None:
@@ -21,7 +21,7 @@ class BoundScope:
         return self.parent.try_lookup(name)
 
     def try_declare(self, variable: VariableSymbol) -> bool:
-        if variable.name in self._variables.keys():
+        if variable.name in self._variables:
             return False
 
         self._variables[variable.name] = variable

@@ -5,6 +5,7 @@ import pytest
 from minsk.analysis.compilation import Compilation
 from minsk.analysis.syntax.parser import SyntaxTree
 from minsk.analysis.variable import VariableSymbol
+from minsk.runtime.value import Value
 from tests.analysis.text.annotated import AnnotatedText
 
 
@@ -34,7 +35,7 @@ from tests.analysis.text.annotated import AnnotatedText
         ("{ var a = 0 (a = 10) * a }", 100),
     ),
 )
-def test_evaluates_correct_value(text, expected):
+def test_evaluates_correct_value(text: str, expected: Value) -> None:
     syntax_tree = SyntaxTree.parse(text)
     compilation = Compilation(syntax_tree)
     variables: dict[VariableSymbol, Any] = {}
@@ -44,7 +45,7 @@ def test_evaluates_correct_value(text, expected):
     assert value == expected
 
 
-def assert_diagnostics(raw_text, raw_diagnostics):
+def assert_diagnostics(raw_text: str, raw_diagnostics: str) -> None:
     annotated_text = AnnotatedText.parse(raw_text)
     syntax_tree = SyntaxTree.parse(annotated_text.text)
     compilation = Compilation(syntax_tree)
@@ -60,7 +61,7 @@ def assert_diagnostics(raw_text, raw_diagnostics):
         assert actual_diagnostics[i].span == annotated_text.spans[i]
 
 
-def test_variable_expression_reports_undeclared():
+def test_variable_expression_reports_undeclared() -> None:
     text = "[a] + 3"
     diagnostics = """
         Undefined name 'a'
@@ -68,7 +69,7 @@ def test_variable_expression_reports_undeclared():
     assert_diagnostics(text, diagnostics)
 
 
-def test_variable_declaration_reports_redeclaration():
+def test_variable_declaration_reports_redeclaration() -> None:
     text = """
         {
             var x = 10
@@ -85,7 +86,7 @@ def test_variable_declaration_reports_redeclaration():
     assert_diagnostics(text, diagnostics)
 
 
-def test_binary_operator_reports_undefined():
+def test_binary_operator_reports_undefined() -> None:
     text = "3 [&&] 4"
     diagnostics = """
         The binary operator '&&' isn't defined for types 'integer' and 'integer'
@@ -93,7 +94,7 @@ def test_binary_operator_reports_undefined():
     assert_diagnostics(text, diagnostics)
 
 
-def test_assignment_expression_reports_undefined():
+def test_assignment_expression_reports_undefined() -> None:
     text = "[x] = 3"
     diagnostics = """
         Undefined name 'x'
@@ -101,7 +102,7 @@ def test_assignment_expression_reports_undefined():
     assert_diagnostics(text, diagnostics)
 
 
-def test_assignment_expression_reports_read_only():
+def test_assignment_expression_reports_read_only() -> None:
     text = """
         {
             let x = 10

@@ -1,24 +1,107 @@
-[tool.poetry]
-name = "minsk"
-version = "0.1.0"
-description = ""
-authors = ["Kyle Coffey <me@phytolizer.dev>"]
-
-[tool.poetry.dependencies]
-python = "^3.10"
-colorama = "^0.4.4"
-
-[tool.poetry.dev-dependencies]
-black = "^22.1.0"
-isort = "^5.10.1"
-pytest = "^7.1.1"
-
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["pdm-pep517>=1.0.0"]
+build-backend = "pdm.pep517.api"
 
 [tool.isort]
 line_length = 88
 multi_line_output = 3
 use_parentheses = true
 include_trailing_comma = true
+
+[tool.pdm]
+[tool.pdm.dev-dependencies]
+dev = [
+    "black<23.0.0,>=22.1.0",
+    "isort<6.0.0,>=5.10.1",
+    "pytest<8.0.0,>=7.1.1",
+    "ruff>=0.0.292",
+    "mypy>=1.5.1",
+    "types-colorama>=0.4.15.12",
+]
+
+[tool.pdm.build]
+includes = []
+[project]
+name = "minsk"
+version = "0.1.0"
+description = ""
+authors = [{ name = "Kyle Coffey", email = "me@phytolizer.dev" }]
+license = { text = "MIT" }
+dependencies = ["colorama<1.0.0,>=0.4.4"]
+requires-python = ">=3.10,<4.0"
+
+[tool.ruff]
+select = [
+    # pycodestyle errors
+    "E",
+    # pyflakes
+    "F",
+    # pycodestyle warnings
+    "W",
+    # isort
+    "I",
+    # naming
+    "N",
+    # upgrade
+    "UP",
+    # type annotations
+    "ANN",
+    # bandit
+    "S",
+    # blind except
+    "BLE",
+    # boolean args
+    "FBT",
+    # bugbear
+    "B",
+    # builtins
+    "A",
+    # comprehensions
+    "C4",
+    # implicit string concat
+    "ISC",
+    # implicit packages
+    "INP",
+    # pie
+    "PIE",
+    # quotes
+    "Q",
+    # raise parens
+    "RSE",
+    # return analyzer
+    "RET",
+    # simplifications
+    "SIM",
+    # pathlib
+    "PTH",
+    # todos
+    "TD",
+    # pylint
+    "PL",
+    # performance
+    "PERF",
+    # ruff
+    "RUF",
+]
+
+ignore = [
+    # annotating `self` param
+    "ANN101",
+    # assert usage
+    "S101",
+    # else after return
+    "RET505",
+    # todo missing link
+    "TD003",
+    # too many returns
+    "PLR0911",
+    # too many params
+    "PLR0913",
+    # method too long
+    "PLR0915",
+    # magic numbers
+    "PLR2004",
+]
+
+[tool.mypy]
+strict = true

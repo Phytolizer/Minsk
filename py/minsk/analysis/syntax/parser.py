@@ -29,13 +29,13 @@ class Parser:
     _position: int
     _diagnostics: DiagnosticBag
 
-    def __init__(self, text: SourceText):
+    def __init__(self, text: SourceText) -> None:
         self._text = text
         lexer = Lexer(text)
         tokens = list(
             filter(
-                lambda tok: tok.kind != SyntaxKind.BadToken
-                and tok.kind != SyntaxKind.WhitespaceToken,
+                lambda tok: tok.kind
+                not in {SyntaxKind.BadToken, SyntaxKind.WhitespaceToken},
                 lexer,
             )
         )
@@ -131,6 +131,7 @@ class Parser:
 
     def _parse_binary_expression(self, parent_precedence: int) -> ExpressionSyntax:
         unary_operator_precedence = facts.unary_operator_precedence(self._current.kind)
+        left: ExpressionSyntax
         if (
             unary_operator_precedence != 0
             and unary_operator_precedence >= parent_precedence
@@ -197,7 +198,7 @@ class SyntaxTree:
     root: CompilationUnitSyntax
     diagnostics: tuple[Diagnostic, ...]
 
-    def __init__(self, text: SourceText):
+    def __init__(self, text: SourceText) -> None:
         parser = Parser(text)
         root = parser.parse_compilation_unit()
         diagnostics = parser.diagnostics
@@ -213,7 +214,7 @@ class SyntaxTree:
         return SyntaxTree(text)
 
     @staticmethod
-    def parse_tokens(text: str | SourceText) -> tuple[SyntaxToken]:
+    def parse_tokens(text: str | SourceText) -> tuple[SyntaxToken, ...]:
         if isinstance(text, str):
             text = SourceText(text)
         return tuple(Lexer(text))

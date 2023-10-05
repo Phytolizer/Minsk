@@ -1,14 +1,14 @@
 from dataclasses import dataclass
-from typing import Any
 
 from minsk.analysis.binding.expression import BoundExpression
 from minsk.analysis.binding.kind import BoundNodeKind
 from minsk.analysis.type import MinskType
+from minsk.runtime.value import Value
 
 
 @dataclass(frozen=True)
 class BoundLiteralExpression(BoundExpression):
-    value: Any
+    value: Value
 
     @property
     def kind(self) -> BoundNodeKind:

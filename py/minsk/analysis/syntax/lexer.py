@@ -1,5 +1,3 @@
-from typing import Any, Optional
-
 from minsk.analysis.diagnostic import Diagnostic
 from minsk.analysis.diagnostic.bag import DiagnosticBag
 from minsk.analysis.syntax import facts
@@ -7,6 +5,7 @@ from minsk.analysis.syntax.kind import SyntaxKind
 from minsk.analysis.syntax.token import SyntaxToken
 from minsk.analysis.text.source import SourceText
 from minsk.analysis.text.span import TextSpan
+from minsk.runtime.value import Value
 
 
 class Lexer:
@@ -15,7 +14,7 @@ class Lexer:
         _position: int
         _diagnostics: DiagnosticBag
 
-        def __init__(self, text: SourceText, diagnostics: DiagnosticBag):
+        def __init__(self, text: SourceText, diagnostics: DiagnosticBag) -> None:
             self._text = text
             self._position = 0
             self._diagnostics = diagnostics
@@ -24,14 +23,14 @@ class Lexer:
         def _current(self) -> str:
             return self._peek(0)
 
-        def __next__(self):
+        def __next__(self) -> SyntaxToken:
             if self._position >= len(self._text):
                 raise StopIteration
 
             start = self._position
             kind = SyntaxKind.BadToken
-            value: Optional[Any] = None
-            current_text: Optional[str] = None
+            value: Value = None
+            current_text: str | None = None
 
             match self._current:
                 case c if c.isspace():
@@ -118,11 +117,11 @@ class Lexer:
     _text: SourceText
     _diagnostics: DiagnosticBag
 
-    def __init__(self, text: SourceText):
+    def __init__(self, text: SourceText) -> None:
         self._text = text
         self._diagnostics = DiagnosticBag()
 
-    def __iter__(self):
+    def __iter__(self) -> _Iter:
         return Lexer._Iter(self._text, self._diagnostics)
 
     @property

@@ -8,5 +8,5 @@ class Diagnostic:
     span: TextSpan
     message: str
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.message

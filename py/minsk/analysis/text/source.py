@@ -31,12 +31,12 @@ class SourceText:
     _text: str
     lines: tuple[TextLine, ...]
 
-    def __init__(self, text: str):
+    def __init__(self, text: str) -> None:
         self._text = text
         self.lines = self._parse_lines(text)
 
     def _parse_lines(self, text: str) -> tuple[TextLine, ...]:
-        result = []
+        result: list[TextLine] = []
 
         position = 0
         line_start = 0
@@ -58,13 +58,12 @@ class SourceText:
     @staticmethod
     def _get_line_break_width(text: str, position: int) -> int:
         look = text[position + 1] if position + 1 < len(text) else "\0"
-        match text[position]:
-            case "\r" if look == "\n":
-                return 2
-            case "\r" | "\n":
-                return 1
-            case _:
-                return 0
+        cur = text[position]
+        if cur == "\r" and look == "\n":
+            return 2
+        if cur in ("\r", "\n"):
+            return 1
+        return 0
 
     def _add_line(
         self,
@@ -72,7 +71,7 @@ class SourceText:
         line_start: int,
         position: int,
         line_break_width: int,
-    ):
+    ) -> None:
         length = position - line_start
         length_including_line_break = length + line_break_width
         line = TextLine(self, line_start, length, length_including_line_break)
@@ -96,14 +95,14 @@ class SourceText:
 
         return lower - 1
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self._text
 
     def to_str(self, span: TextSpan) -> str:
         return self._text[span.start : span.end]
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self._text)
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: int | slice) -> str:
         return self._text[item]

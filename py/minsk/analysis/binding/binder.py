@@ -1,4 +1,4 @@
-from typing import Optional, cast
+from typing import cast
 
 from minsk.analysis.binding.expression import BoundExpression
 from minsk.analysis.binding.expressions.assignment import BoundAssignmentExpression
@@ -38,13 +38,13 @@ class Binder:
     _diagnostics: DiagnosticBag
     _scope: BoundScope
 
-    def __init__(self, parent: Optional[BoundScope]):
+    def __init__(self, parent: BoundScope | None) -> None:
         self._diagnostics = DiagnosticBag()
         self._scope = BoundScope(parent)
 
     @staticmethod
     def bind_global_scope(
-        previous: Optional[BoundGlobalScope], syntax: CompilationUnitSyntax
+        previous: BoundGlobalScope | None, syntax: CompilationUnitSyntax
     ) -> BoundGlobalScope:
         parent_scope = Binder._create_parent_scopes(previous)
         binder = Binder(parent_scope)
@@ -59,15 +59,15 @@ class Binder:
 
     @staticmethod
     def _create_parent_scopes(
-        previous: Optional[BoundGlobalScope],
-    ) -> Optional[BoundScope]:
+        previous: BoundGlobalScope | None,
+    ) -> BoundScope | None:
         stack: list[BoundGlobalScope] = []
 
         while previous is not None:
             stack.append(previous)
             previous = previous.previous
 
-        current: Optional[BoundScope] = None
+        current: BoundScope | None = None
         while len(stack) > 0:
             previous = stack.pop()
             scope = BoundScope(current)
