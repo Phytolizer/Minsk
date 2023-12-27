@@ -1,0 +1,34 @@
+name: Zig
+
+on:
+  push:
+    branches: [ main, staging, trying ]
+    paths:
+      - 'pascal/**'
+      - '.github/workflows/pascal.yml'
+  pull_request:
+    branches: [ main, staging, trying ]
+    paths:
+      - 'pascal/**'
+      - '.github/workflows/pascal.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: pascal
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install FPC
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fpc
+          fpc -i
+      - name: Build
+        run: |
+          fpc fpmake.pp
+          ./fpmake build
