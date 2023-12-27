@@ -1,10 +1,12 @@
 .{
     .name = "minsk",
     .version = "0.0.1",
+    .minimum_zig_version = "0.12.0-dev.1836+dd189a354",
     .dependencies = .{
         .ziglyph = .{
-            .url = "https://github.com/jecolon/ziglyph/archive/a737cf1808f35f7cb5eb54a9b0bc47d839bae506.tar.gz",
-            .hash = "1220c892b709f43fac99c3ea7876fd0333274c8bec5fee62f7a341b523687e85d722",
+            .url = "https://codeberg.org/dude_the_builder/ziglyph/archive/c64c54c6c55545a935c6884a8cdc7d02051633c7.tar.gz",
+            .hash = "1220a0ffa93af4ba93abafbec043fdfd852fea258423f0534c2ab6d81bdbde532eb8",
         },
     },
+    .paths = .{""},
 }

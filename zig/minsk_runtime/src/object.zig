@@ -45,7 +45,7 @@ pub const Object = union(Type) {
         };
 
         pub fn displayName(self: Type) []const u8 {
-            return display_names[@enumToInt(self)];
+            return display_names[@intFromEnum(self)];
         }
     };
 };

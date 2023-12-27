@@ -21,7 +21,7 @@ pub const Map = std.ArrayHashMap(
             var hasher = std.hash.Wyhash.init(0);
             hasher.update(key.name);
             hasher.update(std.mem.asBytes(&key.ty));
-            const result = @truncate(u32, hasher.final());
+            const result = @as(u32, @truncate(hasher.final()));
             return result;
         }
         pub fn eql(ctx: @This(), a: VariableSymbol, b: VariableSymbol, b_index: usize) bool {

@@ -19,7 +19,7 @@ pub fn build(
     exe.addAnonymousModule("framework", .{
         .source_file = .{ .path = this_dir ++ "/framework.zig" },
     });
-    exe.install();
+    _ = b.addInstallArtifact(exe, .{});
 
     const run = b.addRunArtifact(exe);
     if (b.args) |args| {

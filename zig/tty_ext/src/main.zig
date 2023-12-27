@@ -1,7 +1,7 @@
 const std = @import("std");
 const builtin = @import("builtin");
 
-pub fn clearScreen(tty: std.debug.TTY.Config, writer: anytype) !void {
+pub fn clearScreen(tty: std.io.tty.Config, writer: anytype) !void {
     nosuspend switch (tty) {
         .no_color => return,
         .escape_codes => {
@@ -20,10 +20,7 @@ pub fn clearScreen(tty: std.debug.TTY.Config, writer: anytype) !void {
             if (kernel32.FillConsoleOutputCharacterA(
                 wapi.handle,
                 ' ',
-                @intCast(
-                    std.os.windows.DWORD,
-                    screen_info.dwSize.X * screen_info.dwSize.Y,
-                ),
+                @intCast(screen_info.dwSize.X * screen_info.dwSize.Y),
                 std.os.windows.COORD{ .X = 0, .Y = 0 },
                 &num_chars,
             ) == 0) {
@@ -54,7 +51,7 @@ pub const Color = enum {
     reset,
 };
 
-pub fn colorString(conf: std.debug.TTY.Config, color: Color) []const u8 {
+pub fn colorString(conf: std.io.tty.Config, color: Color) []const u8 {
     return switch (conf) {
         .no_color => "",
         else => switch (color) {
@@ -70,7 +67,7 @@ pub fn colorString(conf: std.debug.TTY.Config, color: Color) []const u8 {
     };
 }
 
-pub fn setColor(conf: std.debug.TTY.Config, out_stream: anytype, color: Color) !void {
+pub fn setColor(conf: std.io.tty.Config, out_stream: anytype, color: Color) !void {
     nosuspend switch (conf) {
         .no_color => return,
         else => {

@@ -48,7 +48,7 @@ pub fn prettyPrint(
     is_last: bool,
     writer: anytype,
     comptime colors: enum { colors, no_colors },
-    tty: ?std.debug.TTY.Config,
+    tty: ?std.io.tty.Config,
 ) !void {
     if (colors == .colors) {
         try tty_ext.setColor(tty.?, writer, .gray);
