@@ -32,7 +32,6 @@ pub fn build(b: *std.Build) void {
     mc_exe.addModule("minsk_runtime", minsk_runtime_mod);
     mc_exe.addModule("tty_ext", tty_ext_mod);
     mc_exe.linkLibrary(linenoise.raw);
-    mc_exe.step.dependOn(&linenoise.inc.step);
     mc_exe.step.dependOn(&linenoise.lib.step);
     b.installArtifact(mc_exe);
 

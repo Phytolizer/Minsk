@@ -27,7 +27,7 @@ pub fn main() !void {
     var stderr_buf = std.io.bufferedWriter(std.io.getStdErr().writer());
     const stderr = stderr_buf.writer();
     try tty_ext.enableAnsiEscapes(std.io.getStdErr());
-    const tty = std.debug.detectTTYConfig(std.io.getStdErr());
+    const tty = std.io.tty.detectConfig(std.io.getStdErr());
     var text_builder = std.ArrayList(u8).init(line_alloc);
     defer text_builder.deinit();
     var previous: ?*Compilation = null;
@@ -67,7 +67,7 @@ pub fn main() !void {
             const continue_prompt = "· ";
             const buf_len =
                 "\x1b[0;32m".len +
-                comptime std.math.max(begin_prompt.len, continue_prompt.len) +
+                comptime @max(begin_prompt.len, continue_prompt.len) +
                 "\x1b[0m".len +
                 1;
             var prompt_buf: [buf_len]u8 = undefined;

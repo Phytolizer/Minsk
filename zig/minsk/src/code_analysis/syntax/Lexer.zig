@@ -88,7 +88,7 @@ fn readWhitespace(self: *Self) AllocError!void {
 }
 
 fn readIdentifierOrKeyword(self: *Self) AllocError!void {
-    while (glyph.derived_core_properties.isXidContinue(try self.current())) {
+    while (glyph.core_properties.isXidContinue(try self.current())) {
         self.next();
     }
     self.text = self.source.text[self.start..self.position];
@@ -189,7 +189,7 @@ pub fn lex(self: *Self) AllocError!?SyntaxToken {
         else => // More complex versions of above, support full Unicode range.
         if (glyph.isWhiteSpace(try self.current())) {
             try self.readWhitespace();
-        } else if (glyph.derived_core_properties.isXidStart(try self.current())) {
+        } else if (glyph.core_properties.isXidStart(try self.current())) {
             try self.readIdentifierOrKeyword();
         },
     }

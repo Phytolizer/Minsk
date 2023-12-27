@@ -67,6 +67,6 @@ pub const SyntaxKind = enum(usize) {
     };
 
     pub fn displayName(self: Self) []const u8 {
-        return display_names[@enumToInt(self)];
+        return display_names[@intFromEnum(self)];
     }
 };

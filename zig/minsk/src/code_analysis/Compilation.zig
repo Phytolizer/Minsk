@@ -7,7 +7,7 @@ const Diagnostic = @import("Diagnostic.zig");
 const DiagnosticBag = @import("DiagnosticBag.zig");
 const VariableSymbol = @import("VariableSymbol.zig");
 const BoundGlobalScope = @import("binding/BoundGlobalScope.zig");
-const Atomic = std.atomic.Atomic;
+const Atomic = std.atomic.Value;
 
 allocator: std.mem.Allocator,
 previous: ?*Self = null,
@@ -48,7 +48,7 @@ fn globalScope(self: *Self) !*BoundGlobalScope {
         if (self.previous) |p| try p.globalScope() else null,
         self.syntax_tree.root,
     );
-    if (self.global_scope.compareAndSwap(null, new_gs, .SeqCst, .SeqCst)) |old_gs| {
+    if (self.global_scope.cmpxchgStrong(null, new_gs, .SeqCst, .SeqCst)) |old_gs| {
         new_gs.deinit();
         // not null, compareAndSwap would not give anything if it was
         return old_gs.?;

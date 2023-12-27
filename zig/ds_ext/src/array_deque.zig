@@ -30,11 +30,11 @@ pub fn ArrayDeque(comptime T: type) type {
             const new_buf = try self.allocator.alloc(T, len);
             const is_divided = self.begin > self.end;
             if (is_divided) {
-                std.mem.copy(T, new_buf, self.buf[self.begin..]);
+                @memcpy(new_buf[0..(self.buf.len - self.begin)], self.buf[self.begin..]);
                 const offset = self.buf.len - self.begin;
-                std.mem.copy(T, new_buf[offset..], self.buf[0..self.end]);
+                @memcpy(new_buf[offset..(offset + self.end)], self.buf[0..self.end]);
             } else {
-                std.mem.copy(T, new_buf, self.buf[self.begin..self.end]);
+                @memcpy(new_buf[0..(self.end - self.begin)], self.buf[self.begin..self.end]);
             }
             self.begin = 0;
             self.end = self.len;
@@ -46,7 +46,7 @@ pub fn ArrayDeque(comptime T: type) type {
             var cap = self.buf.len;
             while (cap < target) {
                 const min_size = 8;
-                cap = std.math.max(
+                cap = @max(
                     cap + @divTrunc(cap, 2),
                     min_size,
                 );
