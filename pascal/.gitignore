@@ -1,0 +1,6 @@
+*.o
+fpmake
+manifest.xml
+bin/
+units/
+*.fpm
