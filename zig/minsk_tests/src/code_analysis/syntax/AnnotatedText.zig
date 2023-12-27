@@ -71,7 +71,7 @@ pub fn unindentLines(comptime text: []const u8) []const []const u8 {
             }
 
             const indentation = line.len - std.mem.trimLeft(u8, line, " ").len;
-            min_indentation = std.math.min(min_indentation, indentation);
+            min_indentation = @min(min_indentation, indentation);
         }
 
         const start = blk: {
