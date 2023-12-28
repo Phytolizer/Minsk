@@ -4,3 +4,4 @@ manifest.xml
 bin/
 units/
 *.fpm
+.minsk_history
