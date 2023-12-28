@@ -83,7 +83,15 @@ var
   right: TExpressionSyntax;
   precedence: Integer;
 begin
-  left := ParsePrimaryExpression;
+  precedence := GetUnaryOperatorPrecedence(Current.Kind);
+  if (precedence <> 0) and (precedence >= AParentPrecedence) then
+    begin
+    operatorToken := NextToken;
+    right := ParseExpression(precedence);
+    left  := TUnaryExpressionSyntax.Create(operatorToken, right);
+    end
+  else
+    left := ParsePrimaryExpression;
 
   while true do
     begin

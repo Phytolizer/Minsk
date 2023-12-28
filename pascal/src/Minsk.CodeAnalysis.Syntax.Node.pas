@@ -17,9 +17,10 @@ type
     SK_OpenParenthesisToken,
     SK_CloseParenthesisToken,
 
-    SK_LiteralExpression,
     SK_BinaryExpression,
-    SK_ParenthesizedExpression);
+    SK_LiteralExpression,
+    SK_ParenthesizedExpression,
+    SK_UnaryExpression);
 
   TSyntaxNode         = class;
   TSyntaxNodeChildren = array of TSyntaxNode;

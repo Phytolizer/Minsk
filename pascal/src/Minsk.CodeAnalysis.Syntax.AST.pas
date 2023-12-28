@@ -36,6 +36,19 @@ type
     property CloseParenthesisToken: TSyntaxToken read FCloseParenthesisToken;
   end;
 
+  TUnaryExpressionSyntax = class(TExpressionSyntax)
+  private
+    FOperatorToken: TSyntaxToken;
+    FOperand:       TExpressionSyntax;
+
+  public
+    constructor Create(AOperatorToken: TSyntaxToken; AOperand: TExpressionSyntax);
+    function GetKind: TSyntaxKind; override;
+    function GetChildren: TSyntaxNodeChildren; override;
+    property OperatorToken: TSyntaxToken read FOperatorToken;
+    property Operand: TExpressionSyntax read FOperand;
+  end;
+
   TBinaryExpressionSyntax = class(TExpressionSyntax)
   private
     FLeft:          TExpressionSyntax;
@@ -91,6 +104,26 @@ begin
   Result[0] := FOpenParenthesisToken;
   Result[1] := FExpression;
   Result[2] := FCloseParenthesisToken;
+end;
+
+{ TUnaryExpressionSyntax }
+constructor TUnaryExpressionSyntax.Create(AOperatorToken: TSyntaxToken; AOperand: TExpressionSyntax);
+begin
+  FOperatorToken := AOperatorToken;
+  FOperand := AOperand;
+end;
+
+function TUnaryExpressionSyntax.GetKind: TSyntaxKind;
+begin
+  Result := SK_UnaryExpression;
+end;
+
+function TUnaryExpressionSyntax.GetChildren: TSyntaxNodeChildren;
+begin
+  Result := nil;
+  SetLength(Result, 2);
+  Result[0] := FOperatorToken;
+  Result[1] := FOperand;
 end;
 
 { TBinaryExpressionSyntax }
