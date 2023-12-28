@@ -26,6 +26,9 @@ Episode 3.
 ## ocaml (OCaml)
 Episode 5.
 
+## pascal (Pascal)
+Episode 1.
+
 ## py (Python)
 Episode 6.
 
