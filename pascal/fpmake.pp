@@ -26,6 +26,7 @@ begin
     p.Directory := 'src';
     p.Dependencies.Add('rtl-objpas');
     p.Targets.AddUnit('Minsk.CodeAnalysis.Syntax.Node.pas');
+    p.Targets.AddUnit('Minsk.CodeAnalysis.Syntax.Facts.pas');
     p.Targets.AddUnit('Minsk.CodeAnalysis.Syntax.Token.pas');
     p.Targets.AddUnit('Minsk.CodeAnalysis.Syntax.Lexer.pas');
     p.Targets.AddUnit('Minsk.CodeAnalysis.Syntax.AST.pas');

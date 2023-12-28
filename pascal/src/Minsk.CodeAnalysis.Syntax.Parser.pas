@@ -22,9 +22,7 @@ type
     function Current: TSyntaxToken;
     function NextToken: TSyntaxToken;
     function MatchToken(AKind: TSyntaxKind): TSyntaxToken;
-    function ParseExpression: TExpressionSyntax;
-    function ParseTerm: TExpressionSyntax;
-    function ParseFactor: TExpressionSyntax;
+    function ParseExpression(AParentPrecedence: Integer): TExpressionSyntax;
     function ParsePrimaryExpression: TExpressionSyntax;
 
   public
@@ -39,6 +37,7 @@ implementation
 uses
   Variants,
   SysUtils,
+  Minsk.CodeAnalysis.Syntax.Facts,
   Minsk.CodeAnalysis.Syntax.Lexer;
 
 function TParser.Peek(ADistance: Integer): TSyntaxToken;
@@ -77,41 +76,23 @@ begin
     end;
 end;
 
-function TParser.ParseExpression: TExpressionSyntax;
-begin
-  Result := ParseTerm;
-end;
-
-function TParser.ParseTerm: TExpressionSyntax;
+function TParser.ParseExpression(AParentPrecedence: Integer): TExpressionSyntax;
 var
   left:  TExpressionSyntax;
   operatorToken: TSyntaxToken;
   right: TExpressionSyntax;
-begin
-  left := ParseFactor;
-
-  while (Current.Kind = SK_PlusToken) or (Current.Kind = SK_MinusToken) do
-    begin
-    operatorToken := NextToken;
-    right := ParseFactor;
-    left  := TBinaryExpressionSyntax.Create(left, operatorToken, right);
-    end;
-
-  Result := left;
-end;
-
-function TParser.ParseFactor: TExpressionSyntax;
-var
-  left:  TExpressionSyntax;
-  operatorToken: TSyntaxToken;
-  right: TExpressionSyntax;
+  precedence: Integer;
 begin
   left := ParsePrimaryExpression;
 
-  while (Current.Kind = SK_StarToken) or (Current.Kind = SK_SlashToken) do
+  while true do
     begin
+    precedence := GetBinaryOperatorPrecedence(Current.Kind);
+    if (precedence = 0) or (precedence <= AParentPrecedence) then
+      break;
+
     operatorToken := NextToken;
-    right := ParsePrimaryExpression;
+    right := ParseExpression(precedence);
     left  := TBinaryExpressionSyntax.Create(left, operatorToken, right);
     end;
 
@@ -128,7 +109,7 @@ begin
   if Current.Kind = SK_OpenParenthesisToken then
     begin
     openParenthesisToken := NextToken;
-    expression := ParseExpression;
+    expression := ParseExpression(0);
     closeParenthesisToken := NextToken;
     Result := TParenthesizedExpressionSyntax.Create(openParenthesisToken, expression, closeParenthesisToken);
     end
@@ -167,7 +148,7 @@ var
   expression: TExpressionSyntax;
   endOfFileToken: TSyntaxToken;
 begin
-  expression := ParseExpression;
+  expression := ParseExpression(0);
   endOfFileToken := MatchToken(SK_EndOfFileToken);
   Result := TSyntaxTree.Create(FDiagnostics, expression, endOfFileToken);
 end;
