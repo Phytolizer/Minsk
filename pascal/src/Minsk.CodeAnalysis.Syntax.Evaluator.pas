@@ -26,25 +26,25 @@ implementation
 function TEvaluator.EvaluateExpression(ANode: TExpressionSyntax): Integer;
 begin
   case ANode.Kind of
-    SK_BinaryExpression: Result := EvaluateBinaryExpression(TBinaryExpressionSyntax(ANode));
+    SK_BinaryExpression: Result  := EvaluateBinaryExpression(TBinaryExpressionSyntax(ANode));
     SK_ParenthesizedExpression: Result := EvaluateParenthesizedExpression(TParenthesizedExpressionSyntax(ANode));
     SK_LiteralExpression: Result := EvaluateLiteralExpression(TLiteralExpressionSyntax(ANode));
-  end;
+    end;
 end;
 
 function TEvaluator.EvaluateBinaryExpression(ANode: TBinaryExpressionSyntax): Integer;
 var
   left, right: Integer;
 begin
-  left := EvaluateExpression(ANode.Left);
+  left  := EvaluateExpression(ANode.Left);
   right := EvaluateExpression(ANode.Right);
 
   case ANode.OperatorToken.Kind of
-    SK_PlusToken: Result := left + right;
+    SK_PlusToken: Result  := left + right;
     SK_MinusToken: Result := left - right;
-    SK_StarToken: Result := left * right;
+    SK_StarToken: Result  := left * right;
     SK_SlashToken: Result := left div right;
-  end;
+    end;
 end;
 
 function TEvaluator.EvaluateLiteralExpression(ANode: TLiteralExpressionSyntax): Integer;
