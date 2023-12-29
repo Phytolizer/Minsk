@@ -1,4 +1,4 @@
-unit Minsk.CodeAnalysis.Syntax.Facts;
+﻿unit Minsk.CodeAnalysis.Syntax.Facts;
 
 interface
 

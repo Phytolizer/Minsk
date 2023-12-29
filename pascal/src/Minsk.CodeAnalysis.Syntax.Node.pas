@@ -1,4 +1,4 @@
-unit Minsk.CodeAnalysis.Syntax.Node;
+﻿unit Minsk.CodeAnalysis.Syntax.Node;
 
 interface
 
@@ -22,7 +22,7 @@ type
     SK_ParenthesizedExpression,
     SK_UnaryExpression);
 
-  TSyntaxNode         = class;
+  TSyntaxNode = class;
   TSyntaxNodeChildren = array of TSyntaxNode;
 
   TSyntaxNode = class

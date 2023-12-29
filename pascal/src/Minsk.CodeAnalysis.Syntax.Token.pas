@@ -1,4 +1,4 @@
-unit Minsk.CodeAnalysis.Syntax.Token;
+﻿unit Minsk.CodeAnalysis.Syntax.Token;
 
 interface
 
@@ -9,10 +9,10 @@ uses
 type
   TSyntaxToken = class(TSyntaxNode)
   private
-    FKind:     TSyntaxKind;
+    FKind: TSyntaxKind;
     FPosition: Integer;
-    FText:     String;
-    FValue:    Variant;
+    FText: String;
+    FValue: Variant;
 
   public
     constructor Create(AKind: TSyntaxKind; APosition: Integer; AText: String; AValue: Variant);
@@ -31,9 +31,9 @@ implementation
 { TSyntaxToken }
 constructor TSyntaxToken.Create(AKind: TSyntaxKind; APosition: Integer; AText: String; AValue: Variant);
 begin
-  FKind  := AKind;
+  FKind := AKind;
   FPosition := APosition;
-  FText  := AText;
+  FText := AText;
   FValue := AValue;
 end;
 

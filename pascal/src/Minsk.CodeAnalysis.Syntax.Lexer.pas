@@ -1,4 +1,4 @@
-unit Minsk.CodeAnalysis.Syntax.Lexer;
+﻿unit Minsk.CodeAnalysis.Syntax.Lexer;
 
 interface
 
@@ -12,8 +12,8 @@ type
 
   TLexer = class
   private
-    FText:        String;
-    FPosition:    Integer;
+    FText: String;
+    FPosition: Integer;
     FDiagnostics: TStringArray;
 
     function Peek(distance: Integer): Char;

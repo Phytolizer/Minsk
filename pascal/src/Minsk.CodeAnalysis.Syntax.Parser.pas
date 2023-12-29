@@ -1,4 +1,4 @@
-unit Minsk.CodeAnalysis.Syntax.Parser;
+﻿unit Minsk.CodeAnalysis.Syntax.Parser;
 
 interface
 
@@ -9,14 +9,14 @@ uses
   Minsk.CodeAnalysis.Syntax.Tree;
 
 type
-  TTokenArray  = array of TSyntaxToken;
+  TTokenArray = array of TSyntaxToken;
   TStringArray = array of String;
 
   TParser = class
   private
-    FTokens:      TTokenArray;
+    FTokens: TTokenArray;
     FDiagnostics: TStringArray;
-    FPosition:    Integer;
+    FPosition: Integer;
 
     function Peek(ADistance: Integer): TSyntaxToken;
     function Current: TSyntaxToken;
@@ -78,7 +78,7 @@ end;
 
 function TParser.ParseExpression(AParentPrecedence: Integer): TExpressionSyntax;
 var
-  left:  TExpressionSyntax;
+  left: TExpressionSyntax;
   operatorToken: TSyntaxToken;
   right: TExpressionSyntax;
   precedence: Integer;
@@ -88,7 +88,7 @@ begin
     begin
     operatorToken := NextToken;
     right := ParseExpression(precedence);
-    left  := TUnaryExpressionSyntax.Create(operatorToken, right);
+    left := TUnaryExpressionSyntax.Create(operatorToken, right);
     end
   else
     left := ParsePrimaryExpression;
@@ -101,7 +101,7 @@ begin
 
     operatorToken := NextToken;
     right := ParseExpression(precedence);
-    left  := TBinaryExpressionSyntax.Create(left, operatorToken, right);
+    left := TBinaryExpressionSyntax.Create(left, operatorToken, right);
     end;
 
   Result := left;
@@ -111,7 +111,7 @@ function TParser.ParsePrimaryExpression: TExpressionSyntax;
 var
   numberToken: TSyntaxToken;
   openParenthesisToken: TSyntaxToken;
-  expression:  TExpressionSyntax;
+  expression: TExpressionSyntax;
   closeParenthesisToken: TSyntaxToken;
 begin
   if Current.Kind = SK_OpenParenthesisToken then

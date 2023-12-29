@@ -1,4 +1,4 @@
-unit Minsk.CodeAnalysis.Syntax.AST;
+﻿unit Minsk.CodeAnalysis.Syntax.AST;
 
 interface
 
@@ -24,7 +24,7 @@ type
   TParenthesizedExpressionSyntax = class(TExpressionSyntax)
   private
     FOpenParenthesisToken: TSyntaxToken;
-    FExpression:           TExpressionSyntax;
+    FExpression: TExpressionSyntax;
     FCloseParenthesisToken: TSyntaxToken;
 
   public
@@ -39,7 +39,7 @@ type
   TUnaryExpressionSyntax = class(TExpressionSyntax)
   private
     FOperatorToken: TSyntaxToken;
-    FOperand:       TExpressionSyntax;
+    FOperand: TExpressionSyntax;
 
   public
     constructor Create(AOperatorToken: TSyntaxToken; AOperand: TExpressionSyntax);
@@ -51,9 +51,9 @@ type
 
   TBinaryExpressionSyntax = class(TExpressionSyntax)
   private
-    FLeft:          TExpressionSyntax;
+    FLeft: TExpressionSyntax;
     FOperatorToken: TSyntaxToken;
-    FRight:         TExpressionSyntax;
+    FRight: TExpressionSyntax;
 
   public
     constructor Create(ALeft: TExpressionSyntax; AOperatorToken: TSyntaxToken; ARight: TExpressionSyntax);
@@ -129,7 +129,7 @@ end;
 { TBinaryExpressionSyntax }
 constructor TBinaryExpressionSyntax.Create(ALeft: TExpressionSyntax; AOperatorToken: TSyntaxToken; ARight: TExpressionSyntax);
 begin
-  FLeft  := ALeft;
+  FLeft := ALeft;
   FOperatorToken := AOperatorToken;
   FRight := ARight;
 end;

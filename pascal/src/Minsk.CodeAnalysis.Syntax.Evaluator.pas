@@ -1,4 +1,4 @@
-unit Minsk.CodeAnalysis.Syntax.Evaluator;
+﻿unit Minsk.CodeAnalysis.Syntax.Evaluator;
 
 interface
 
@@ -38,13 +38,13 @@ function TEvaluator.EvaluateBinaryExpression(ANode: TBinaryExpressionSyntax): In
 var
   left, right: Integer;
 begin
-  left  := EvaluateExpression(ANode.Left);
+  left := EvaluateExpression(ANode.Left);
   right := EvaluateExpression(ANode.Right);
 
   case ANode.OperatorToken.Kind of
-    SK_PlusToken: Result  := left + right;
+    SK_PlusToken: Result := left + right;
     SK_MinusToken: Result := left - right;
-    SK_StarToken: Result  := left * right;
+    SK_StarToken: Result := left * right;
     SK_SlashToken: Result := left div right;
     end;
 end;
@@ -66,7 +66,7 @@ begin
   operand := EvaluateExpression(ANode.Operand);
 
   case ANode.OperatorToken.Kind of
-    SK_PlusToken: Result  := +operand;
+    SK_PlusToken: Result := +operand;
     SK_MinusToken: Result := -operand;
     end;
 end;
