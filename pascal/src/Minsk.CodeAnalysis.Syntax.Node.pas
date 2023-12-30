@@ -45,8 +45,8 @@ implementation
 uses
   TypInfo,
   StrUtils,
-  Variants,
-  Minsk.CodeAnalysis.Syntax.Token;
+  Minsk.CodeAnalysis.Syntax.Token,
+  Minsk.Runtime.Types;
 
 function SyntaxKindToString(SyntaxKind: TSyntaxKind): String;
 begin
@@ -66,8 +66,11 @@ begin
     LMarker := '├──';
 
   Write(AIndent, LMarker, SyntaxKindToString(Kind));
-  if EndsStr('Token', SyntaxKindToString(Kind)) and not VarIsNull(TSyntaxToken(Self).Value) then
-    Write(' ', TSyntaxToken(Self).Value);
+  if EndsStr('Token', SyntaxKindToString(Kind)) and (TSyntaxToken(Self).Value.MinskType <> mtNull) then
+    begin
+    Write(' ');
+    WriteMinskValue(TSyntaxToken(Self).Value);
+    end;
   WriteLn;
 
   if AIsLast then

@@ -35,10 +35,10 @@ type
 implementation
 
 uses
-  Variants,
   SysUtils,
   Minsk.CodeAnalysis.Syntax.Facts,
-  Minsk.CodeAnalysis.Syntax.Lexer;
+  Minsk.CodeAnalysis.Syntax.Lexer,
+  Minsk.Runtime.Types;
 
 function TParser.Peek(ADistance: Integer): TSyntaxToken;
 var
@@ -72,7 +72,7 @@ begin
     SetLength(FDiagnostics, Length(FDiagnostics) + 1);
     FDiagnostics[High(FDiagnostics)] :=
       Format('ERROR: Unexpected token <%s>, expected <%s>.', [SyntaxKindToString(Current.Kind), SyntaxKindToString(AKind)]);
-    Result := TSyntaxToken.Create(AKind, Current.Position, '', Null);
+    Result := TSyntaxToken.Create(AKind, Current.Position, '', MinskNull);
     end;
 end;
 

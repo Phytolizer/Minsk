@@ -3,9 +3,9 @@
 interface
 
 uses
-  Variants,
   Minsk.CodeAnalysis.Syntax.Node,
-  Minsk.CodeAnalysis.Syntax.Token;
+  Minsk.CodeAnalysis.Syntax.Token,
+  Minsk.Runtime.Types;
 
 type
   TStringArray = array of String;
@@ -83,7 +83,7 @@ begin
 
   svalue := Copy(FText, start, FPosition - start);
   Val(svalue, ivalue, code);
-  Result := TSyntaxToken.Create(SK_NumberToken, start, svalue, ivalue);
+  Result := TSyntaxToken.Create(SK_NumberToken, start, svalue, MinskInteger(ivalue));
 end;
 
 function TLexer.LexWhitespaceToken: TSyntaxToken;
@@ -94,7 +94,7 @@ begin
   while IsWhiteSpace(Current) do
     Inc(FPosition);
 
-  Result := TSyntaxToken.Create(SK_WhitespaceToken, start, Copy(FText, start, FPosition - start), Null);
+  Result := TSyntaxToken.Create(SK_WhitespaceToken, start, Copy(FText, start, FPosition - start), MinskNull);
 end;
 
 constructor TLexer.Create(AText: String);
@@ -107,35 +107,35 @@ end;
 function TLexer.NextToken: TSyntaxToken;
 begin
   case Current of
-    #0: Result := TSyntaxToken.Create(SK_EndOfFileToken, FPosition, '', Null);
+    #0: Result := TSyntaxToken.Create(SK_EndOfFileToken, FPosition, '', MinskNull);
     '+':
       begin
-      Result := TSyntaxToken.Create(SK_PlusToken, FPosition, '+', Null);
+      Result := TSyntaxToken.Create(SK_PlusToken, FPosition, '+', MinskNull);
       Inc(FPosition);
       end;
     '-':
       begin
-      Result := TSyntaxToken.Create(SK_MinusToken, FPosition, '-', Null);
+      Result := TSyntaxToken.Create(SK_MinusToken, FPosition, '-', MinskNull);
       Inc(FPosition);
       end;
     '*':
       begin
-      Result := TSyntaxToken.Create(SK_StarToken, FPosition, '*', Null);
+      Result := TSyntaxToken.Create(SK_StarToken, FPosition, '*', MinskNull);
       Inc(FPosition);
       end;
     '/':
       begin
-      Result := TSyntaxToken.Create(SK_SlashToken, FPosition, '/', Null);
+      Result := TSyntaxToken.Create(SK_SlashToken, FPosition, '/', MinskNull);
       Inc(FPosition);
       end;
     '(':
       begin
-      Result := TSyntaxToken.Create(SK_OpenParenthesisToken, FPosition, '(', Null);
+      Result := TSyntaxToken.Create(SK_OpenParenthesisToken, FPosition, '(', MinskNull);
       Inc(FPosition);
       end;
     ')':
       begin
-      Result := TSyntaxToken.Create(SK_CloseParenthesisToken, FPosition, ')', Null);
+      Result := TSyntaxToken.Create(SK_CloseParenthesisToken, FPosition, ')', MinskNull);
       Inc(FPosition);
       end;
     else
@@ -147,7 +147,7 @@ begin
         begin
         SetLength(FDiagnostics, Length(FDiagnostics) + 1);
         FDiagnostics[High(FDiagnostics)] := Format('ERROR: bad character input: ''%s''', [Current]);
-        Result := TSyntaxToken.Create(SK_BadToken, FPosition, Copy(FText, FPosition, 1), Null);
+        Result := TSyntaxToken.Create(SK_BadToken, FPosition, Copy(FText, FPosition, 1), MinskNull);
         Inc(FPosition);
         end;
     end;

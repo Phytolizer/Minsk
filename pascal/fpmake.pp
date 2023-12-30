@@ -25,6 +25,7 @@ begin
     p.OSes := [win32, linux];
     p.Directory := 'src';
     p.Dependencies.Add('rtl-objpas');
+    p.Targets.AddUnit('Minsk.Runtime.Types.pas');
     p.Targets.AddUnit('Minsk.CodeAnalysis.Syntax.Node.pas');
     p.Targets.AddUnit('Minsk.CodeAnalysis.Syntax.Token.pas');
     p.Targets.AddUnit('Minsk.CodeAnalysis.Syntax.Facts.pas');

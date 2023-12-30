@@ -51,7 +51,7 @@ end;
 
 function TEvaluator.EvaluateLiteralExpression(ANode: TLiteralExpressionSyntax): Integer;
 begin
-  Result := ANode.LiteralToken.Value;
+  Result := ANode.LiteralToken.Value.IntegerValue;
 end;
 
 function TEvaluator.EvaluateParenthesizedExpression(ANode: TParenthesizedExpressionSyntax): Integer;
