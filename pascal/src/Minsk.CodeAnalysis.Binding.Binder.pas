@@ -9,41 +9,73 @@ uses
   Minsk.Runtime.Types;
 
 type
+  TStringArray = array of String;
+
   TBinder = class
   private
-    function BindBinaryOperatorKind(AKind: TSyntaxKind): TBoundBinaryOperatorKind;
-    function BindUnaryOperatorKind(AKind: TSyntaxKind): TBoundUnaryOperatorKind;
+    FDiagnostics: TStringArray;
+
+    function BindBinaryOperatorKind(
+      AKind: TSyntaxKind; ALeftType: TMinskType; ARightType: TMinskType;
+      var AOperatorKind: TBoundBinaryOperatorKind): Boolean;
+    function BindUnaryOperatorKind(
+      AKind: TSyntaxKind; AOperandType: TMinskType;
+      var AOperatorKind: TBoundUnaryOperatorKind): Boolean;
     function BindBinaryExpression(ASyntax: TBinaryExpressionSyntax): TBoundExpression;
     function BindLiteralExpression(ASyntax: TLiteralExpressionSyntax): TBoundExpression;
     function BindParenthesizedExpression(ASyntax: TParenthesizedExpressionSyntax): TBoundExpression;
     function BindUnaryExpression(ASyntax: TUnaryExpressionSyntax): TBoundExpression;
 
   public
+    constructor Create;
     function BindExpression(ASyntax: TExpressionSyntax): TBoundExpression;
+    property Diagnostics: TStringArray read FDiagnostics;
   end;
 
 implementation
 
+uses
+  SysUtils;
+
 { TBinder }
-function TBinder.BindBinaryOperatorKind(AKind: TSyntaxKind): TBoundBinaryOperatorKind;
+constructor TBinder.Create;
 begin
-  case AKind of
-    SK_PlusToken: Result := BBOK_Addition;
-    SK_MinusToken: Result := BBOK_Subtraction;
-    SK_StarToken: Result := BBOK_Multiplication;
-    SK_SlashToken: Result := BBOK_Division;
-    else
-      raise TMinskException.Create('Unexpected binary operator ' + SyntaxKindToString(AKind));
+  FDiagnostics := nil;
+end;
+
+function TBinder.BindBinaryOperatorKind(
+  AKind: TSyntaxKind; ALeftType, ARightType: TMinskType;
+  var AOperatorKind: TBoundBinaryOperatorKind): Boolean;
+begin
+  Result := false;
+  if (ALeftType = mtInteger) and (ARightType = mtInteger) then
+    begin
+    Result := true;
+    case AKind of
+      SK_PlusToken: AOperatorKind := BBOK_Addition;
+      SK_MinusToken: AOperatorKind := BBOK_Subtraction;
+      SK_StarToken: AOperatorKind := BBOK_Multiplication;
+      SK_SlashToken: AOperatorKind := BBOK_Division;
+      else
+        raise TMinskException.Create('Unexpected binary operator ' + SyntaxKindToString(AKind));
+      end;
     end;
 end;
 
-function TBinder.BindUnaryOperatorKind(AKind: TSyntaxKind): TBoundUnaryOperatorKind;
+function TBinder.BindUnaryOperatorKind(
+  AKind: TSyntaxKind; AOperandType: TMinskType;
+  var AOperatorKind: TBoundUnaryOperatorKind): Boolean;
 begin
-  case AKind of
-    SK_PlusToken: Result := BUOK_Identity;
-    SK_MinusToken: Result := BUOK_ArithmeticNegation;
-    else
-      raise TMinskException.Create('Unexpected unary operator ' + SyntaxKindToString(AKind));
+  Result := false;
+  if AOperandType = mtInteger then
+    begin
+    Result := true;
+    case AKind of
+      SK_PlusToken: AOperatorKind := BUOK_Identity;
+      SK_MinusToken: AOperatorKind := BUOK_ArithmeticNegation;
+      else
+        raise TMinskException.Create('Unexpected unary operator ' + SyntaxKindToString(AKind));
+      end;
     end;
 end;
 
@@ -54,8 +86,15 @@ var
 begin
   left := BindExpression(ASyntax.Left);
   right := BindExpression(ASyntax.Right);
-  operatorKind := BindBinaryOperatorKind(ASyntax.OperatorToken.Kind);
-  Result := TBoundBinaryExpression.Create(operatorKind, left, right);
+  if BindBinaryOperatorKind(ASyntax.OperatorToken.Kind, left.ValueType, right.ValueType, operatorKind) then
+    Result := TBoundBinaryExpression.Create(operatorKind, left, right)
+  else
+    begin
+    SetLength(FDiagnostics, Length(FDiagnostics) + 1);
+    FDiagnostics[High(FDiagnostics)] := Format('Binary operator ''%s'' is not defined for types %s and %s',
+      [ASyntax.OperatorToken.Text, MinskTypeToString(left.ValueType), MinskTypeToString(right.ValueType)]);
+    Result := left;
+    end;
 end;
 
 function TBinder.BindLiteralExpression(ASyntax: TLiteralExpressionSyntax): TBoundExpression;
@@ -74,8 +113,15 @@ var
   operatorKind: TBoundUnaryOperatorKind;
 begin
   operand := BindExpression(ASyntax.Operand);
-  operatorKind := BindUnaryOperatorKind(ASyntax.OperatorToken.Kind);
-  Result := TBoundUnaryExpression.Create(operatorKind, operand);
+  if BindUnaryOperatorKind(ASyntax.OperatorToken.Kind, operand.ValueType, operatorKind) then
+    Result := TBoundUnaryExpression.Create(operatorKind, operand)
+  else
+    begin
+    SetLength(FDiagnostics, Length(FDiagnostics) + 1);
+    FDiagnostics[High(FDiagnostics)] := Format('Unary operator ''%s'' is not defined for type %s',
+      [ASyntax.OperatorToken.Text, MinskTypeToString(operand.ValueType)]);
+    Result := operand;
+    end;
 end;
 
 function TBinder.BindExpression(ASyntax: TExpressionSyntax): TBoundExpression;

@@ -22,8 +22,12 @@ type
 function MinskNull: TMinskValue;
 function MinskInteger(AValue: Integer): TMinskValue;
 procedure WriteMinskValue(const AValue: TMinskValue);
+function MinskTypeToString(const AType: TMinskType): string;
 
 implementation
+
+uses
+  TypInfo;
 
 function MinskNull: TMinskValue;
 begin
@@ -47,6 +51,12 @@ end;
 constructor TMinskException.Create(const AMessage: string);
 begin
   Message := AMessage;
+end;
+
+function MinskTypeToString(const AType: TMinskType): string;
+begin
+  Result := GetEnumName(TypeInfo(TMinskType), Ord(AType));
+  Delete(Result, 1, 2);
 end;
 
 end.
