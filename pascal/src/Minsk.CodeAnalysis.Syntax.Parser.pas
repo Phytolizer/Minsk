@@ -110,21 +110,29 @@ end;
 function TParser.ParsePrimaryExpression: TExpressionSyntax;
 var
   numberToken: TSyntaxToken;
+  keywordToken: TSyntaxToken;
   openParenthesisToken: TSyntaxToken;
   expression: TExpressionSyntax;
   closeParenthesisToken: TSyntaxToken;
 begin
-  if Current.Kind = SK_OpenParenthesisToken then
-    begin
-    openParenthesisToken := NextToken;
-    expression := ParseExpression(0);
-    closeParenthesisToken := NextToken;
-    Result := TParenthesizedExpressionSyntax.Create(openParenthesisToken, expression, closeParenthesisToken);
-    end
-  else
-    begin
-    numberToken := MatchToken(SK_NumberToken);
-    Result := TLiteralExpressionSyntax.Create(numberToken);
+  case Current.Kind of
+    SK_OpenParenthesisToken:
+      begin
+      openParenthesisToken := NextToken;
+      expression := ParseExpression(0);
+      closeParenthesisToken := NextToken;
+      Result := TParenthesizedExpressionSyntax.Create(openParenthesisToken, expression, closeParenthesisToken);
+      end;
+    SK_TrueKeyword, SK_FalseKeyword:
+      begin
+      keywordToken := NextToken;
+      Result := TLiteralExpressionSyntax.Create(keywordToken, MinskBoolean(keywordToken.Kind = SK_TrueKeyword));
+      end;
+    else
+      begin
+      numberToken := MatchToken(SK_NumberToken);
+      Result := TLiteralExpressionSyntax.Create(numberToken);
+      end;
     end;
 end;
 

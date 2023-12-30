@@ -4,26 +4,27 @@ interface
 
 uses
   Minsk.CodeAnalysis.Syntax.Node,
-  Minsk.CodeAnalysis.Binding.Node;
+  Minsk.CodeAnalysis.Binding.Node,
+  Minsk.Runtime.Types;
 
 type
   TEvaluator = class
   private
     FRoot: TBoundExpression;
 
-    function EvaluateExpression(ANode: TBoundExpression): Integer;
-    function EvaluateBinaryExpression(ANode: TBoundBinaryExpression): Integer;
-    function EvaluateLiteralExpression(ANode: TBoundLiteralExpression): Integer;
-    function EvaluateUnaryExpression(ANode: TBoundUnaryExpression): Integer;
+    function EvaluateExpression(ANode: TBoundExpression): TMinskValue;
+    function EvaluateBinaryExpression(ANode: TBoundBinaryExpression): TMinskValue;
+    function EvaluateLiteralExpression(ANode: TBoundLiteralExpression): TMinskValue;
+    function EvaluateUnaryExpression(ANode: TBoundUnaryExpression): TMinskValue;
 
   public
     constructor Create(ARoot: TBoundExpression);
-    function Evaluate: Integer;
+    function Evaluate: TMinskValue;
   end;
 
 implementation
 
-function TEvaluator.EvaluateExpression(ANode: TBoundExpression): Integer;
+function TEvaluator.EvaluateExpression(ANode: TBoundExpression): TMinskValue;
 begin
   case ANode.Kind of
     BNK_BinaryExpression: Result := EvaluateBinaryExpression(TBoundBinaryExpression(ANode));
@@ -32,35 +33,35 @@ begin
     end;
 end;
 
-function TEvaluator.EvaluateBinaryExpression(ANode: TBoundBinaryExpression): Integer;
+function TEvaluator.EvaluateBinaryExpression(ANode: TBoundBinaryExpression): TMinskValue;
 var
-  left, right: Integer;
+  left, right: TMinskValue;
 begin
   left := EvaluateExpression(ANode.Left);
   right := EvaluateExpression(ANode.Right);
 
   case ANode.OperatorKind of
-    BBOK_Addition: Result := left + right;
-    BBOK_Subtraction: Result := left - right;
-    BBOK_Multiplication: Result := left * right;
-    BBOK_Division: Result := left div right;
+    BBOK_Addition: Result := MinskInteger(left.IntegerValue + right.IntegerValue);
+    BBOK_Subtraction: Result := MinskInteger(left.IntegerValue - right.IntegerValue);
+    BBOK_Multiplication: Result := MinskInteger(left.IntegerValue * right.IntegerValue);
+    BBOK_Division: Result := MinskInteger(left.IntegerValue div right.IntegerValue);
     end;
 end;
 
-function TEvaluator.EvaluateLiteralExpression(ANode: TBoundLiteralExpression): Integer;
+function TEvaluator.EvaluateLiteralExpression(ANode: TBoundLiteralExpression): TMinskValue;
 begin
-  Result := ANode.Value.IntegerValue;
+  Result := ANode.Value;
 end;
 
-function TEvaluator.EvaluateUnaryExpression(ANode: TBoundUnaryExpression): Integer;
+function TEvaluator.EvaluateUnaryExpression(ANode: TBoundUnaryExpression): TMinskValue;
 var
-  operand: Integer;
+  operand: TMinskValue;
 begin
   operand := EvaluateExpression(ANode.Operand);
 
   case ANode.OperatorKind of
-    BUOK_Identity: Result := +operand;
-    BUOK_ArithmeticNegation: Result := -operand;
+    BUOK_Identity: Result := operand;
+    BUOK_ArithmeticNegation: Result := MinskInteger(-operand.IntegerValue);
     end;
 end;
 
@@ -69,7 +70,7 @@ begin
   FRoot := ARoot;
 end;
 
-function TEvaluator.Evaluate: Integer;
+function TEvaluator.Evaluate: TMinskValue;
 begin
   Result := EvaluateExpression(FRoot);
 end;

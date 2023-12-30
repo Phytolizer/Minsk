@@ -99,7 +99,7 @@ end;
 
 function TBinder.BindLiteralExpression(ASyntax: TLiteralExpressionSyntax): TBoundExpression;
 begin
-  Result := TBoundLiteralExpression.Create(ASyntax.LiteralToken.Value);
+  Result := TBoundLiteralExpression.Create(ASyntax.Value);
 end;
 
 function TBinder.BindParenthesizedExpression(ASyntax: TParenthesizedExpressionSyntax): TBoundExpression;

@@ -9,6 +9,7 @@ type
 
     SK_NumberToken,
     SK_WhitespaceToken,
+    SK_IdentifierToken,
 
     SK_PlusToken,
     SK_MinusToken,
@@ -16,6 +17,9 @@ type
     SK_SlashToken,
     SK_OpenParenthesisToken,
     SK_CloseParenthesisToken,
+
+    SK_TrueKeyword,
+    SK_FalseKeyword,
 
     SK_BinaryExpression,
     SK_LiteralExpression,

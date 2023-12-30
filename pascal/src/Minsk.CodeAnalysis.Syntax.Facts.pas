@@ -7,6 +7,7 @@ uses
 
 function GetBinaryOperatorPrecedence(AKind: TSyntaxKind): Integer;
 function GetUnaryOperatorPrecedence(AKind: TSyntaxKind): Integer;
+function GetKeywordKind(AText: string): TSyntaxKind;
 
 implementation
 
@@ -33,6 +34,16 @@ begin
     else
       Result := 0;
     end;
+end;
+
+function GetKeywordKind(AText: string): TSyntaxKind;
+begin
+  if AText = 'true' then
+    Result := SK_TrueKeyword
+  else if AText = 'false' then
+    Result := SK_FalseKeyword
+  else
+    Result := SK_IdentifierToken;
 end;
 
 end.

@@ -3,6 +3,7 @@
 interface
 
 uses
+  Minsk.CodeAnalysis.Syntax.Facts,
   Minsk.CodeAnalysis.Syntax.Node,
   Minsk.CodeAnalysis.Syntax.Token,
   Minsk.Runtime.Types;
@@ -20,8 +21,10 @@ type
     function Current: Char;
     class function IsDigit(c: Char): Boolean; static;
     class function IsWhiteSpace(c: Char): Boolean; static;
+    class function IsLetter(c: Char): Boolean; static;
     function LexNumberToken: TSyntaxToken;
     function LexWhitespaceToken: TSyntaxToken;
+    function LexIdentifierOrKeyword: TSyntaxToken;
 
   public
     constructor Create(AText: String);
@@ -70,6 +73,15 @@ begin
     end;
 end;
 
+class function TLexer.IsLetter(c: Char): Boolean;
+begin
+  case c of
+    'a'..'z', 'A'..'Z', '_': Result := true;
+    else
+      Result := false;
+    end;
+end;
+
 function TLexer.LexNumberToken: TSyntaxToken;
 var
   start: Integer;
@@ -95,6 +107,22 @@ begin
     Inc(FPosition);
 
   Result := TSyntaxToken.Create(SK_WhitespaceToken, start, Copy(FText, start, FPosition - start), MinskNull);
+end;
+
+function TLexer.LexIdentifierOrKeyword: TSyntaxToken;
+var
+  start: Integer;
+  svalue: String;
+  kind: TSyntaxKind;
+begin
+  start := FPosition;
+  while IsLetter(Current) or IsDigit(Current) do
+    Inc(FPosition);
+
+  svalue := Copy(FText, start, FPosition - start);
+  kind := GetKeywordKind(svalue);
+
+  Result := TSyntaxToken.Create(kind, start, svalue, MinskNull);
 end;
 
 constructor TLexer.Create(AText: String);
@@ -143,6 +171,8 @@ begin
         Result := LexNumberToken
       else if IsWhiteSpace(Current) then
         Result := LexWhitespaceToken
+      else if IsLetter(Current) then
+        Result := LexIdentifierOrKeyword
       else
         begin
         SetLength(FDiagnostics, Length(FDiagnostics) + 1);

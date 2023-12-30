@@ -4,7 +4,8 @@ interface
 
 uses
   Minsk.CodeAnalysis.Syntax.Node,
-  Minsk.CodeAnalysis.Syntax.Token;
+  Minsk.CodeAnalysis.Syntax.Token,
+  Minsk.Runtime.Types;
 
 type
   TExpressionSyntax = class(TSyntaxNode)
@@ -13,12 +14,15 @@ type
   TLiteralExpressionSyntax = class(TExpressionSyntax)
   private
     FLiteralToken: TSyntaxToken;
+    FValue: TMinskValue;
 
   public
-    constructor Create(ALiteralToken: TSyntaxToken);
+    constructor Create(ALiteralToken: TSyntaxToken); overload;
+    constructor Create(ALiteralToken: TSyntaxToken; AValue: TMinskValue); overload;
     function GetKind: TSyntaxKind; override;
     function GetChildren: TSyntaxNodeChildren; override;
     property LiteralToken: TSyntaxToken read FLiteralToken;
+    property Value: TMinskValue read FValue;
   end;
 
   TParenthesizedExpressionSyntax = class(TExpressionSyntax)
@@ -70,6 +74,13 @@ implementation
 constructor TLiteralExpressionSyntax.Create(ALiteralToken: TSyntaxToken);
 begin
   FLiteralToken := ALiteralToken;
+  FValue := ALiteralToken.Value;
+end;
+
+constructor TLiteralExpressionSyntax.Create(ALiteralToken: TSyntaxToken; AValue: TMinskValue);
+begin
+  FLiteralToken := ALiteralToken;
+  FValue := AValue;
 end;
 
 function TLiteralExpressionSyntax.GetKind: TSyntaxKind;

@@ -5,12 +5,14 @@ interface
 type
   TMinskType = (
     mtNull,
-    mtInteger);
+    mtInteger,
+    mtBoolean);
 
   TMinskValue = record
     case MinskType: TMinskType of
       mtNull: ();
       mtInteger: (IntegerValue: Integer);
+      mtBoolean: (BooleanValue: Boolean);
   end;
 
   TMinskException = class
@@ -21,6 +23,7 @@ type
 
 function MinskNull: TMinskValue;
 function MinskInteger(AValue: Integer): TMinskValue;
+function MinskBoolean(AValue: Boolean): TMinskValue;
 procedure WriteMinskValue(const AValue: TMinskValue);
 function MinskTypeToString(const AType: TMinskType): string;
 
@@ -40,11 +43,22 @@ begin
   Result.IntegerValue := AValue;
 end;
 
+function MinskBoolean(AValue: Boolean): TMinskValue;
+begin
+  Result.MinskType := mtBoolean;
+  Result.BooleanValue := AValue;
+end;
+
 procedure WriteMinskValue(const AValue: TMinskValue);
 begin
   case AValue.MinskType of
     mtNull: ;
     mtInteger: Write(AValue.IntegerValue);
+    mtBoolean:
+      if AValue.BooleanValue then
+        Write('true')
+      else
+        Write('false');
     end;
 end;
 

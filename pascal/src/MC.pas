@@ -5,6 +5,7 @@ uses
   Minsk.CodeAnalysis.Binding.Binder,
   Minsk.CodeAnalysis.Binding.Node,
   Minsk.CodeAnalysis.Evaluator,
+  Minsk.Runtime.Types,
   DynLibs,
   CTypes;
 
@@ -80,7 +81,8 @@ begin
     else
       begin
       evaluator := TEvaluator.Create(boundExpression);
-      WriteLn(evaluator.Evaluate);
+      WriteMinskValue(evaluator.Evaluate);
+      WriteLn;
       end;
     end;
 
