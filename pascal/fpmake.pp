@@ -35,6 +35,7 @@ begin
     p.Targets.AddUnit('Minsk.CodeAnalysis.Syntax.Tree.pas');
     p.Targets.AddUnit('Minsk.CodeAnalysis.Evaluator.pas');
     p.Targets.AddUnit('Minsk.CodeAnalysis.Binding.Node.pas');
+    p.Targets.AddUnit('Minsk.CodeAnalysis.Binding.Binder.pas');
 
     p.Targets.AddProgram('MC.pas');
 

@@ -13,6 +13,12 @@ type
       mtInteger: (IntegerValue: Integer);
   end;
 
+  TMinskException = class
+  public
+    Message: string;
+    constructor Create(const AMessage: string);
+  end;
+
 function MinskNull: TMinskValue;
 function MinskInteger(AValue: Integer): TMinskValue;
 procedure WriteMinskValue(const AValue: TMinskValue);
@@ -36,6 +42,11 @@ begin
     mtNull: ;
     mtInteger: Write(AValue.IntegerValue);
     end;
+end;
+
+constructor TMinskException.Create(const AMessage: string);
+begin
+  Message := AMessage;
 end;
 
 end.
