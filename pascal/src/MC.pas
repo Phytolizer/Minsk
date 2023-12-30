@@ -2,6 +2,8 @@
 
 uses
   Minsk.CodeAnalysis.Syntax.Tree,
+  Minsk.CodeAnalysis.Binding.Binder,
+  Minsk.CodeAnalysis.Binding.Node,
   Minsk.CodeAnalysis.Evaluator,
   DynLibs,
   CTypes;
@@ -27,6 +29,9 @@ var
   syntaxTree: TSyntaxTree;
   diagnostic: String;
   evaluator: TEvaluator;
+  diagnostics: TStringArray;
+  binder: TBinder;
+  boundExpression: TBoundExpression;
 
 begin
   libc := LoadLibrary('libc.so');
@@ -62,16 +67,19 @@ begin
       end;
 
     syntaxTree := TSyntaxTree.Parse(line);
+    binder := TBinder.Create;
+    boundExpression := binder.BindExpression(syntaxTree.Root);
+    diagnostics := Concat(syntaxTree.Diagnostics, binder.Diagnostics);
 
     if showTree then
       syntaxTree.Root.PrettyPrint;
 
-    if Length(syntaxTree.Diagnostics) > 0 then
-      for diagnostic in syntaxTree.Diagnostics do
+    if Length(diagnostics) > 0 then
+      for diagnostic in diagnostics do
         WriteLn(diagnostic)
     else
       begin
-      evaluator := TEvaluator.Create(syntaxTree.Root);
+      evaluator := TEvaluator.Create(boundExpression);
       WriteLn(evaluator.Evaluate);
       end;
     end;
