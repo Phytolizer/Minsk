@@ -2,7 +2,7 @@
 
 uses
   Minsk.CodeAnalysis.Syntax.Tree,
-  Minsk.CodeAnalysis.Syntax.Evaluator,
+  Minsk.CodeAnalysis.Evaluator,
   DynLibs,
   CTypes;
 

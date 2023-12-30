@@ -1,4 +1,4 @@
-﻿unit Minsk.CodeAnalysis.Syntax.Evaluator;
+﻿unit Minsk.CodeAnalysis.Evaluator;
 
 interface
 
