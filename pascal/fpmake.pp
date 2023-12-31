@@ -1,4 +1,4 @@
-program fpmake;
+﻿program fpmake;
 
 uses
   fpmkunit;
@@ -25,14 +25,17 @@ begin
     p.OSes := [win32, linux];
     p.Directory := 'src';
     p.Dependencies.Add('rtl-objpas');
+    p.Targets.AddUnit('Minsk.Runtime.Types.pas');
     p.Targets.AddUnit('Minsk.CodeAnalysis.Syntax.Node.pas');
-    p.Targets.AddUnit('Minsk.CodeAnalysis.Syntax.Facts.pas');
     p.Targets.AddUnit('Minsk.CodeAnalysis.Syntax.Token.pas');
+    p.Targets.AddUnit('Minsk.CodeAnalysis.Syntax.Facts.pas');
     p.Targets.AddUnit('Minsk.CodeAnalysis.Syntax.Lexer.pas');
     p.Targets.AddUnit('Minsk.CodeAnalysis.Syntax.AST.pas');
     p.Targets.AddUnit('Minsk.CodeAnalysis.Syntax.Parser.pas');
     p.Targets.AddUnit('Minsk.CodeAnalysis.Syntax.Tree.pas');
-    p.Targets.AddUnit('Minsk.CodeAnalysis.Syntax.Evaluator.pas');
+    p.Targets.AddUnit('Minsk.CodeAnalysis.Evaluator.pas');
+    p.Targets.AddUnit('Minsk.CodeAnalysis.Binding.Node.pas');
+    p.Targets.AddUnit('Minsk.CodeAnalysis.Binding.Binder.pas');
 
     p.Targets.AddProgram('MC.pas');
 

@@ -1,27 +1,30 @@
-unit Minsk.CodeAnalysis.Syntax.Lexer;
+﻿unit Minsk.CodeAnalysis.Syntax.Lexer;
 
 interface
 
 uses
-  Variants,
+  Minsk.CodeAnalysis.Syntax.Facts,
   Minsk.CodeAnalysis.Syntax.Node,
-  Minsk.CodeAnalysis.Syntax.Token;
+  Minsk.CodeAnalysis.Syntax.Token,
+  Minsk.Runtime.Types;
 
 type
   TStringArray = array of String;
 
   TLexer = class
   private
-    FText:        String;
-    FPosition:    Integer;
+    FText: String;
+    FPosition: Integer;
     FDiagnostics: TStringArray;
 
     function Peek(distance: Integer): Char;
     function Current: Char;
     class function IsDigit(c: Char): Boolean; static;
     class function IsWhiteSpace(c: Char): Boolean; static;
-    function LexNumberToken: TSyntaxToken;
-    function LexWhitespaceToken: TSyntaxToken;
+    class function IsLetter(c: Char): Boolean; static;
+    procedure LexNumberToken;
+    procedure LexWhitespaceToken;
+    procedure LexIdentifierOrKeyword;
 
   public
     constructor Create(AText: String);
@@ -70,31 +73,31 @@ begin
     end;
 end;
 
-function TLexer.LexNumberToken: TSyntaxToken;
-var
-  start: Integer;
-  svalue: String;
-  ivalue: Integer;
-  code: Integer;
+class function TLexer.IsLetter(c: Char): Boolean;
 begin
-  start := FPosition;
-  while IsDigit(Current) do
-    Inc(FPosition);
-
-  svalue := Copy(FText, start, FPosition - start);
-  Val(svalue, ivalue, code);
-  Result := TSyntaxToken.Create(SK_NumberToken, start, svalue, ivalue);
+  case c of
+    'a'..'z', 'A'..'Z', '_': Result := true;
+    else
+      Result := false;
+    end;
 end;
 
-function TLexer.LexWhitespaceToken: TSyntaxToken;
-var
-  start: Integer;
+procedure TLexer.LexNumberToken;
 begin
-  start := FPosition;
+  while IsDigit(Current) do
+    Inc(FPosition);
+end;
+
+procedure TLexer.LexWhitespaceToken;
+begin
   while IsWhiteSpace(Current) do
     Inc(FPosition);
+end;
 
-  Result := TSyntaxToken.Create(SK_WhitespaceToken, start, Copy(FText, start, FPosition - start), Null);
+procedure TLexer.LexIdentifierOrKeyword;
+begin
+  while IsLetter(Current) or IsDigit(Current) do
+    Inc(FPosition);
 end;
 
 constructor TLexer.Create(AText: String);
@@ -105,52 +108,110 @@ begin
 end;
 
 function TLexer.NextToken: TSyntaxToken;
+var
+  kind: TSyntaxKind = SK_BadToken;
+  start: Integer;
+  text: String;
+  code: Integer;
+  value: TMinskValue;
 begin
+  start := FPosition;
+  text := '';
+  value := MinskNull;
   case Current of
-    #0: Result := TSyntaxToken.Create(SK_EndOfFileToken, FPosition, '', Null);
+    #0: kind := SK_EndOfFileToken;
     '+':
       begin
-      Result := TSyntaxToken.Create(SK_PlusToken, FPosition, '+', Null);
+      kind := SK_PlusToken;
       Inc(FPosition);
       end;
     '-':
       begin
-      Result := TSyntaxToken.Create(SK_MinusToken, FPosition, '-', Null);
+      kind := SK_MinusToken;
       Inc(FPosition);
       end;
     '*':
       begin
-      Result := TSyntaxToken.Create(SK_StarToken, FPosition, '*', Null);
+      kind := SK_StarToken;
       Inc(FPosition);
       end;
     '/':
       begin
-      Result := TSyntaxToken.Create(SK_SlashToken, FPosition, '/', Null);
+      kind := SK_SlashToken;
       Inc(FPosition);
       end;
     '(':
       begin
-      Result := TSyntaxToken.Create(SK_OpenParenthesisToken, FPosition, '(', Null);
+      kind := SK_OpenParenthesisToken;
       Inc(FPosition);
       end;
     ')':
       begin
-      Result := TSyntaxToken.Create(SK_CloseParenthesisToken, FPosition, ')', Null);
+      kind := SK_CloseParenthesisToken;
       Inc(FPosition);
       end;
-    else
-      if IsDigit(Current) then
-        Result := LexNumberToken
-      else if IsWhiteSpace(Current) then
-        Result := LexWhitespaceToken
+    '!':
+      if Peek(1) = '=' then
+        begin
+        kind := SK_BangEqualsToken;
+        Inc(FPosition, 2);
+        end
       else
         begin
-        SetLength(FDiagnostics, Length(FDiagnostics) + 1);
-        FDiagnostics[High(FDiagnostics)] := Format('ERROR: bad character input: ''%s''', [Current]);
-        Result := TSyntaxToken.Create(SK_BadToken, FPosition, Copy(FText, FPosition, 1), Null);
+        kind := SK_BangToken;
         Inc(FPosition);
         end;
+    '=':
+      if Peek(1) = '=' then
+        begin
+        kind := SK_EqualsEqualsToken;
+        Inc(FPosition, 2);
+        end;
+    '&':
+      if Peek(1) = '&' then
+        begin
+        kind := SK_AmpersandAmpersandToken;
+        Inc(FPosition, 2);
+        end;
+    '|':
+      if Peek(1) = '|' then
+        begin
+        kind := SK_PipePipeToken;
+        Inc(FPosition, 2);
+        end;
+    else
+      if IsDigit(Current) then
+        begin
+        LexNumberToken;
+        text := Copy(FText, start, FPosition - start);
+        value.MinskType := mtInteger;
+        Val(text, value.IntegerValue, code);
+        Kind := SK_NumberToken;
+        end
+      else if IsWhiteSpace(Current) then
+        begin
+        LexWhitespaceToken;
+        Kind := SK_WhitespaceToken;
+        end
+      else if IsLetter(Current) then
+        begin
+        LexIdentifierOrKeyword;
+        text := Copy(FText, start, FPosition - start);
+        kind := GetKeywordKind(text);
+        end;
     end;
+  if kind = SK_BadToken then
+    begin
+    SetLength(FDiagnostics, Length(FDiagnostics) + 1);
+    FDiagnostics[High(FDiagnostics)] := Format('ERROR: bad character input: ''%s''', [Current]);
+    Result := TSyntaxToken.Create(SK_BadToken, FPosition, Copy(FText, FPosition, 1), MinskNull);
+    Inc(FPosition);
+    end;
+
+  if text = '' then
+    text := Copy(FText, start, FPosition - start);
+
+  Result := TSyntaxToken.Create(kind, start, text, value);
 end;
 
 end.

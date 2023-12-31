@@ -1,4 +1,4 @@
-unit Minsk.CodeAnalysis.Syntax.Node;
+﻿unit Minsk.CodeAnalysis.Syntax.Node;
 
 interface
 
@@ -9,6 +9,7 @@ type
 
     SK_NumberToken,
     SK_WhitespaceToken,
+    SK_IdentifierToken,
 
     SK_PlusToken,
     SK_MinusToken,
@@ -16,12 +17,21 @@ type
     SK_SlashToken,
     SK_OpenParenthesisToken,
     SK_CloseParenthesisToken,
+    SK_BangToken,
+    SK_AmpersandAmpersandToken,
+    SK_PipePipeToken,
+    SK_EqualsEqualsToken,
+    SK_BangEqualsToken,
 
-    SK_LiteralExpression,
+    SK_TrueKeyword,
+    SK_FalseKeyword,
+
     SK_BinaryExpression,
-    SK_ParenthesizedExpression);
+    SK_LiteralExpression,
+    SK_ParenthesizedExpression,
+    SK_UnaryExpression);
 
-  TSyntaxNode         = class;
+  TSyntaxNode = class;
   TSyntaxNodeChildren = array of TSyntaxNode;
 
   TSyntaxNode = class
@@ -44,8 +54,8 @@ implementation
 uses
   TypInfo,
   StrUtils,
-  Variants,
-  Minsk.CodeAnalysis.Syntax.Token;
+  Minsk.CodeAnalysis.Syntax.Token,
+  Minsk.Runtime.Types;
 
 function SyntaxKindToString(SyntaxKind: TSyntaxKind): String;
 begin
@@ -65,8 +75,11 @@ begin
     LMarker := '├──';
 
   Write(AIndent, LMarker, SyntaxKindToString(Kind));
-  if EndsStr('Token', SyntaxKindToString(Kind)) and not VarIsNull(TSyntaxToken(Self).Value) then
-    Write(' ', TSyntaxToken(Self).Value);
+  if EndsStr('Token', SyntaxKindToString(Kind)) and (TSyntaxToken(Self).Value.MinskType <> mtNull) then
+    begin
+    Write(' ');
+    WriteMinskValue(TSyntaxToken(Self).Value);
+    end;
   WriteLn;
 
   if AIsLast then

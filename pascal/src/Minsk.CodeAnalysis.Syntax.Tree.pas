@@ -1,4 +1,4 @@
-unit Minsk.CodeAnalysis.Syntax.Tree;
+﻿unit Minsk.CodeAnalysis.Syntax.Tree;
 
 interface
 
@@ -12,8 +12,8 @@ type
 
   TSyntaxTree = class
   private
-    FDiagnostics:    TStringArray;
-    FRoot:           TExpressionSyntax;
+    FDiagnostics: TStringArray;
+    FRoot: TExpressionSyntax;
     FEndOfFileToken: TSyntaxToken;
 
   public

@@ -1,4 +1,4 @@
-unit Minsk.CodeAnalysis.Syntax.Parser;
+﻿unit Minsk.CodeAnalysis.Syntax.Parser;
 
 interface
 
@@ -9,14 +9,14 @@ uses
   Minsk.CodeAnalysis.Syntax.Tree;
 
 type
-  TTokenArray  = array of TSyntaxToken;
+  TTokenArray = array of TSyntaxToken;
   TStringArray = array of String;
 
   TParser = class
   private
-    FTokens:      TTokenArray;
+    FTokens: TTokenArray;
     FDiagnostics: TStringArray;
-    FPosition:    Integer;
+    FPosition: Integer;
 
     function Peek(ADistance: Integer): TSyntaxToken;
     function Current: TSyntaxToken;
@@ -35,10 +35,10 @@ type
 implementation
 
 uses
-  Variants,
   SysUtils,
   Minsk.CodeAnalysis.Syntax.Facts,
-  Minsk.CodeAnalysis.Syntax.Lexer;
+  Minsk.CodeAnalysis.Syntax.Lexer,
+  Minsk.Runtime.Types;
 
 function TParser.Peek(ADistance: Integer): TSyntaxToken;
 var
@@ -72,18 +72,26 @@ begin
     SetLength(FDiagnostics, Length(FDiagnostics) + 1);
     FDiagnostics[High(FDiagnostics)] :=
       Format('ERROR: Unexpected token <%s>, expected <%s>.', [SyntaxKindToString(Current.Kind), SyntaxKindToString(AKind)]);
-    Result := TSyntaxToken.Create(AKind, Current.Position, '', Null);
+    Result := TSyntaxToken.Create(AKind, Current.Position, '', MinskNull);
     end;
 end;
 
 function TParser.ParseExpression(AParentPrecedence: Integer): TExpressionSyntax;
 var
-  left:  TExpressionSyntax;
+  left: TExpressionSyntax;
   operatorToken: TSyntaxToken;
   right: TExpressionSyntax;
   precedence: Integer;
 begin
-  left := ParsePrimaryExpression;
+  precedence := GetUnaryOperatorPrecedence(Current.Kind);
+  if (precedence <> 0) and (precedence >= AParentPrecedence) then
+    begin
+    operatorToken := NextToken;
+    right := ParseExpression(precedence);
+    left := TUnaryExpressionSyntax.Create(operatorToken, right);
+    end
+  else
+    left := ParsePrimaryExpression;
 
   while true do
     begin
@@ -93,7 +101,7 @@ begin
 
     operatorToken := NextToken;
     right := ParseExpression(precedence);
-    left  := TBinaryExpressionSyntax.Create(left, operatorToken, right);
+    left := TBinaryExpressionSyntax.Create(left, operatorToken, right);
     end;
 
   Result := left;
@@ -102,21 +110,29 @@ end;
 function TParser.ParsePrimaryExpression: TExpressionSyntax;
 var
   numberToken: TSyntaxToken;
+  keywordToken: TSyntaxToken;
   openParenthesisToken: TSyntaxToken;
-  expression:  TExpressionSyntax;
+  expression: TExpressionSyntax;
   closeParenthesisToken: TSyntaxToken;
 begin
-  if Current.Kind = SK_OpenParenthesisToken then
-    begin
-    openParenthesisToken := NextToken;
-    expression := ParseExpression(0);
-    closeParenthesisToken := NextToken;
-    Result := TParenthesizedExpressionSyntax.Create(openParenthesisToken, expression, closeParenthesisToken);
-    end
-  else
-    begin
-    numberToken := MatchToken(SK_NumberToken);
-    Result := TLiteralExpressionSyntax.Create(numberToken);
+  case Current.Kind of
+    SK_OpenParenthesisToken:
+      begin
+      openParenthesisToken := NextToken;
+      expression := ParseExpression(0);
+      closeParenthesisToken := NextToken;
+      Result := TParenthesizedExpressionSyntax.Create(openParenthesisToken, expression, closeParenthesisToken);
+      end;
+    SK_TrueKeyword, SK_FalseKeyword:
+      begin
+      keywordToken := NextToken;
+      Result := TLiteralExpressionSyntax.Create(keywordToken, MinskBoolean(keywordToken.Kind = SK_TrueKeyword));
+      end;
+    else
+      begin
+      numberToken := MatchToken(SK_NumberToken);
+      Result := TLiteralExpressionSyntax.Create(numberToken);
+      end;
     end;
 end;
 
