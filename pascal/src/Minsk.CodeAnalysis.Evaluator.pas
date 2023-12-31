@@ -45,6 +45,8 @@ begin
     BBOK_Subtraction: Result := MinskInteger(left.IntegerValue - right.IntegerValue);
     BBOK_Multiplication: Result := MinskInteger(left.IntegerValue * right.IntegerValue);
     BBOK_Division: Result := MinskInteger(left.IntegerValue div right.IntegerValue);
+    BBOK_LogicalAnd: Result := MinskBoolean(left.BooleanValue and right.BooleanValue);
+    BBOK_LogicalOr: Result := MinskBoolean(left.BooleanValue or right.BooleanValue);
     end;
 end;
 
@@ -62,6 +64,7 @@ begin
   case ANode.OperatorKind of
     BUOK_Identity: Result := operand;
     BUOK_ArithmeticNegation: Result := MinskInteger(-operand.IntegerValue);
+    BUOK_LogicalNegation: Result := MinskBoolean(not operand.BooleanValue);
     end;
 end;
 

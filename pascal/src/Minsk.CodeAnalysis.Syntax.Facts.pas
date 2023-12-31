@@ -16,9 +16,13 @@ begin
   case AKind of
     SK_StarToken,
     SK_SlashToken:
-      Result := 2;
+      Result := 4;
     SK_PlusToken,
     SK_MinusToken:
+      Result := 3;
+    SK_AmpersandAmpersandToken:
+      Result := 2;
+    SK_PipePipeToken:
       Result := 1;
     else
       Result := 0;
@@ -29,8 +33,9 @@ function GetUnaryOperatorPrecedence(AKind: TSyntaxKind): Integer;
 begin
   case AKind of
     SK_PlusToken,
-    SK_MinusToken:
-      Result := 3;
+    SK_MinusToken,
+    SK_BangToken:
+      Result := 5;
     else
       Result := 0;
     end;

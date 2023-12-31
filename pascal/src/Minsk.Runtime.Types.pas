@@ -15,12 +15,6 @@ type
       mtBoolean: (BooleanValue: Boolean);
   end;
 
-  TMinskException = class
-  public
-    Message: string;
-    constructor Create(const AMessage: string);
-  end;
-
 function MinskNull: TMinskValue;
 function MinskInteger(AValue: Integer): TMinskValue;
 function MinskBoolean(AValue: Boolean): TMinskValue;
@@ -60,11 +54,6 @@ begin
       else
         Write('false');
     end;
-end;
-
-constructor TMinskException.Create(const AMessage: string);
-begin
-  Message := AMessage;
 end;
 
 function MinskTypeToString(const AType: TMinskType): string;

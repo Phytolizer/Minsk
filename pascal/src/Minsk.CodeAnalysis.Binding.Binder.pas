@@ -3,6 +3,7 @@
 interface
 
 uses
+  SysUtils,
   Minsk.CodeAnalysis.Binding.Node,
   Minsk.CodeAnalysis.Syntax.AST,
   Minsk.CodeAnalysis.Syntax.Node,
@@ -34,9 +35,6 @@ type
 
 implementation
 
-uses
-  SysUtils;
-
 { TBinder }
 constructor TBinder.Create;
 begin
@@ -56,8 +54,16 @@ begin
       SK_MinusToken: AOperatorKind := BBOK_Subtraction;
       SK_StarToken: AOperatorKind := BBOK_Multiplication;
       SK_SlashToken: AOperatorKind := BBOK_Division;
-      else
-        raise TMinskException.Create('Unexpected binary operator ' + SyntaxKindToString(AKind));
+      else Result := false;
+      end;
+    end
+  else if (ALeftType = mtBoolean) and (ARightType = mtBoolean) then
+    begin
+    Result := true;
+    case AKind of
+      SK_AmpersandAmpersandToken: AOperatorKind := BBOK_LogicalAnd;
+      SK_PipePipeToken: AOperatorKind := BBOK_LogicalOr;
+      else Result := false;
       end;
     end;
 end;
@@ -67,14 +73,23 @@ function TBinder.BindUnaryOperatorKind(
   var AOperatorKind: TBoundUnaryOperatorKind): Boolean;
 begin
   Result := false;
-  if AOperandType = mtInteger then
-    begin
-    Result := true;
-    case AKind of
-      SK_PlusToken: AOperatorKind := BUOK_Identity;
-      SK_MinusToken: AOperatorKind := BUOK_ArithmeticNegation;
-      else
-        raise TMinskException.Create('Unexpected unary operator ' + SyntaxKindToString(AKind));
+  case AOperandType of
+    mtInteger:
+      begin
+      Result := true;
+      case AKind of
+        SK_PlusToken: AOperatorKind := BUOK_Identity;
+        SK_MinusToken: AOperatorKind := BUOK_ArithmeticNegation;
+        else Result := false;
+        end;
+      end;
+    mtBoolean:
+      begin
+      Result := true;
+      case AKind of
+        SK_BangToken: AOperatorKind := BUOK_LogicalNegation;
+        else Result := false;
+        end;
       end;
     end;
 end;
@@ -132,7 +147,7 @@ begin
     SK_ParenthesizedExpression: Result := BindParenthesizedExpression(TParenthesizedExpressionSyntax(ASyntax));
     SK_UnaryExpression: Result := BindUnaryExpression(TUnaryExpressionSyntax(ASyntax));
     else
-      raise TMinskException.Create('Unexpected syntax ' + SyntaxKindToString(ASyntax.Kind));
+      raise Exception.Create('Unexpected syntax ' + SyntaxKindToString(ASyntax.Kind));
     end;
 end;
 

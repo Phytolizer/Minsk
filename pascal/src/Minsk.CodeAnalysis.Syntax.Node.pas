@@ -17,6 +17,9 @@ type
     SK_SlashToken,
     SK_OpenParenthesisToken,
     SK_CloseParenthesisToken,
+    SK_BangToken,
+    SK_AmpersandAmpersandToken,
+    SK_PipePipeToken,
 
     SK_TrueKeyword,
     SK_FalseKeyword,

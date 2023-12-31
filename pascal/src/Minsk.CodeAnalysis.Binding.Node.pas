@@ -36,7 +36,8 @@ type
 
   TBoundUnaryOperatorKind = (
     BUOK_Identity,
-    BUOK_ArithmeticNegation);
+    BUOK_ArithmeticNegation,
+    BUOK_LogicalNegation);
 
   TBoundUnaryExpression = class(TBoundExpression)
   private
@@ -55,7 +56,9 @@ type
     BBOK_Addition,
     BBOK_Subtraction,
     BBOK_Multiplication,
-    BBOK_Division);
+    BBOK_Division,
+    BBOK_LogicalAnd,
+    BBOK_LogicalOr);
 
   TBoundBinaryExpression = class(TBoundExpression)
   private
