@@ -40,7 +40,7 @@ begin
   left := EvaluateExpression(ANode.Left);
   right := EvaluateExpression(ANode.Right);
 
-  case ANode.OperatorKind of
+  case ANode.Op.Kind of
     BBOK_Addition: Result := MinskInteger(left.IntegerValue + right.IntegerValue);
     BBOK_Subtraction: Result := MinskInteger(left.IntegerValue - right.IntegerValue);
     BBOK_Multiplication: Result := MinskInteger(left.IntegerValue * right.IntegerValue);
@@ -61,7 +61,7 @@ var
 begin
   operand := EvaluateExpression(ANode.Operand);
 
-  case ANode.OperatorKind of
+  case ANode.Op.Kind of
     BUOK_Identity: Result := operand;
     BUOK_ArithmeticNegation: Result := MinskInteger(-operand.IntegerValue);
     BUOK_LogicalNegation: Result := MinskBoolean(not operand.BooleanValue);
