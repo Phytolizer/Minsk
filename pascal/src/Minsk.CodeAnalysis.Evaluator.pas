@@ -47,6 +47,8 @@ begin
     BBOK_Division: Result := MinskInteger(left.IntegerValue div right.IntegerValue);
     BBOK_LogicalAnd: Result := MinskBoolean(left.BooleanValue and right.BooleanValue);
     BBOK_LogicalOr: Result := MinskBoolean(left.BooleanValue or right.BooleanValue);
+    BBOK_Equality: Result := MinskBoolean(left = right);
+    BBOK_Inequality: Result := MinskBoolean(left <> right);
     end;
 end;
 

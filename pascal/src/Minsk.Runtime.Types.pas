@@ -20,6 +20,8 @@ function MinskInteger(AValue: Integer): TMinskValue;
 function MinskBoolean(AValue: Boolean): TMinskValue;
 procedure WriteMinskValue(const AValue: TMinskValue);
 function MinskTypeToString(const AType: TMinskType): string;
+operator = (const ALeft, ARight: TMinskValue): Boolean;
+operator <> (const ALeft, ARight: TMinskValue): Boolean;
 
 implementation
 
@@ -60,6 +62,22 @@ function MinskTypeToString(const AType: TMinskType): string;
 begin
   Result := GetEnumName(TypeInfo(TMinskType), Ord(AType));
   Delete(Result, 1, 2);
+end;
+
+operator = (const ALeft, ARight: TMinskValue): Boolean;
+begin
+  Result := ALeft.MinskType = ARight.MinskType;
+  if Result then
+    case ALeft.MinskType of
+      mtNull: ;
+      mtInteger: Result := ALeft.IntegerValue = ARight.IntegerValue;
+      mtBoolean: Result := ALeft.BooleanValue = ARight.BooleanValue;
+    end;
+end;
+
+operator <> (const ALeft, ARight: TMinskValue): Boolean;
+begin
+  Result := not (ALeft = ARight);
 end;
 
 end.

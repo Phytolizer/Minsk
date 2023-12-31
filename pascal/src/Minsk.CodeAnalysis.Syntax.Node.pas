@@ -20,6 +20,8 @@ type
     SK_BangToken,
     SK_AmpersandAmpersandToken,
     SK_PipePipeToken,
+    SK_EqualsEqualsToken,
+    SK_BangEqualsToken,
 
     SK_TrueKeyword,
     SK_FalseKeyword,

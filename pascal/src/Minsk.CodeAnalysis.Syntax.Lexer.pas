@@ -151,10 +151,22 @@ begin
       Inc(FPosition);
       end;
     '!':
-      begin
-      kind := SK_BangToken;
-      Inc(FPosition);
-      end;
+      if Peek(1) = '=' then
+        begin
+        kind := SK_BangEqualsToken;
+        Inc(FPosition, 2);
+        end
+      else
+        begin
+        kind := SK_BangToken;
+        Inc(FPosition);
+        end;
+    '=':
+      if Peek(1) = '=' then
+        begin
+        kind := SK_EqualsEqualsToken;
+        Inc(FPosition, 2);
+        end;
     '&':
       if Peek(1) = '&' then
         begin

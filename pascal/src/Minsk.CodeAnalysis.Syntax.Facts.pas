@@ -16,9 +16,12 @@ begin
   case AKind of
     SK_StarToken,
     SK_SlashToken:
-      Result := 4;
+      Result := 5;
     SK_PlusToken,
     SK_MinusToken:
+      Result := 4;
+    SK_EqualsEqualsToken,
+    SK_BangEqualsToken:
       Result := 3;
     SK_AmpersandAmpersandToken:
       Result := 2;
@@ -35,7 +38,7 @@ begin
     SK_PlusToken,
     SK_MinusToken,
     SK_BangToken:
-      Result := 5;
+      Result := 6;
     else
       Result := 0;
     end;

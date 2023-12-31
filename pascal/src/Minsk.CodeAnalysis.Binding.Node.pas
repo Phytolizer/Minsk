@@ -79,7 +79,9 @@ type
     BBOK_Multiplication,
     BBOK_Division,
     BBOK_LogicalAnd,
-    BBOK_LogicalOr);
+    BBOK_LogicalOr,
+    BBOK_Equality,
+    BBOK_Inequality);
 
   TBoundBinaryOperator = class
   private
@@ -90,7 +92,7 @@ type
     FResultType: TMinskType;
 
     constructor Create(ASyntaxKind: TSyntaxKind; AKind: TBoundBinaryOperatorKind; ALeftType, ARightType, AResultType: TMinskType); overload;
-    constructor Create(ASyntaxKind: TSyntaxKind; AKind: TBoundBinaryOperatorKind; ALeftType, ARightType: TMinskType); overload;
+    constructor Create(ASyntaxKind: TSyntaxKind; AKind: TBoundBinaryOperatorKind; AOperandType, AResultType: TMinskType); overload;
     constructor Create(ASyntaxKind: TSyntaxKind; AKind: TBoundBinaryOperatorKind; AType: TMinskType); overload;
 
   public
@@ -200,9 +202,9 @@ begin
   FResultType := AResultType;
 end;
 
-constructor TBoundBinaryOperator.Create(ASyntaxKind: TSyntaxKind; AKind: TBoundBinaryOperatorKind; ALeftType, ARightType: TMinskType);
+constructor TBoundBinaryOperator.Create(ASyntaxKind: TSyntaxKind; AKind: TBoundBinaryOperatorKind; AOperandType, AResultType: TMinskType);
 begin
-  Create(ASyntaxKind, AKind, ALeftType, ARightType, ALeftType);
+  Create(ASyntaxKind, AKind, AOperandType, AOperandType, AResultType);
 end;
 
 constructor TBoundBinaryOperator.Create(ASyntaxKind: TSyntaxKind; AKind: TBoundBinaryOperatorKind; AType: TMinskType);
@@ -260,6 +262,10 @@ initialization
     TBoundBinaryOperator.Create(SK_StarToken, BBOK_Multiplication, mtInteger),
     TBoundBinaryOperator.Create(SK_SlashToken, BBOK_Division, mtInteger),
     TBoundBinaryOperator.Create(SK_AmpersandAmpersandToken, BBOK_LogicalAnd, mtBoolean),
-    TBoundBinaryOperator.Create(SK_PipePipeToken, BBOK_LogicalOr, mtBoolean)];
+    TBoundBinaryOperator.Create(SK_PipePipeToken, BBOK_LogicalOr, mtBoolean),
+    TBoundBinaryOperator.Create(SK_EqualsEqualsToken, BBOK_Equality, mtBoolean),
+    TBoundBinaryOperator.Create(SK_BangEqualsToken, BBOK_Inequality, mtBoolean),
+    TBoundBinaryOperator.Create(SK_EqualsEqualsToken, BBOK_Equality, mtInteger, mtBoolean),
+    TBoundBinaryOperator.Create(SK_BangEqualsToken, BBOK_Inequality, mtInteger, mtBoolean)];
 
 end.
