@@ -11,26 +11,26 @@ pub fn build(b: *std.Build) void {
     const minsk_meta_mod = @import("minsk_meta/build.zig").build(b);
     const linenoise = @import("linenoise/build.zig").build(b, target, optimize);
 
-    minsk_runtime_mod.dependencies.put("minsk_meta", minsk_meta_mod) catch unreachable;
+    minsk_runtime_mod.addImport("minsk_meta", minsk_meta_mod);
 
-    minsk_mod.dependencies.put("ds_ext", ds_ext_mod) catch unreachable;
-    minsk_mod.dependencies.put("tty_ext", tty_ext_mod) catch unreachable;
-    minsk_mod.dependencies.put("minsk_runtime", minsk_runtime_mod) catch unreachable;
-    minsk_mod.dependencies.put("minsk_meta", minsk_meta_mod) catch unreachable;
+    minsk_mod.addImport("ds_ext", ds_ext_mod);
+    minsk_mod.addImport("tty_ext", tty_ext_mod);
+    minsk_mod.addImport("minsk_runtime", minsk_runtime_mod);
+    minsk_mod.addImport("minsk_meta", minsk_meta_mod);
 
     const ziglyph_dep = b.dependency("ziglyph", .{
         .target = target,
         .optimize = optimize,
     });
-    minsk_mod.dependencies.put(
+    minsk_mod.addImport(
         "ziglyph",
         ziglyph_dep.module("ziglyph"),
-    ) catch unreachable;
+    );
     const mc_exe = @import("mc/build.zig").build(b, target, optimize);
 
-    mc_exe.addModule("minsk", minsk_mod);
-    mc_exe.addModule("minsk_runtime", minsk_runtime_mod);
-    mc_exe.addModule("tty_ext", tty_ext_mod);
+    mc_exe.root_module.addImport("minsk", minsk_mod);
+    mc_exe.root_module.addImport("minsk_runtime", minsk_runtime_mod);
+    mc_exe.root_module.addImport("tty_ext", tty_ext_mod);
     mc_exe.linkLibrary(linenoise.raw);
     mc_exe.step.dependOn(&linenoise.lib.step);
     b.installArtifact(mc_exe);

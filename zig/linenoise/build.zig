@@ -1,8 +1,8 @@
 const std = @import("std");
 
-pub fn build(b: *std.Build, target: std.zig.CrossTarget, optimize: std.builtin.Mode) struct {
-    raw: *std.Build.CompileStep,
-    lib: *std.Build.InstallArtifactStep,
+pub fn build(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.builtin.Mode) struct {
+    raw: *std.Build.Step.Compile,
+    lib: *std.Build.Step.InstallArtifact,
 } {
     const this_dir = comptime std.fs.path.dirname(@src().file) orelse ".";
     const result = b.addStaticLibrary(.{

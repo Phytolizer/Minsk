@@ -63,7 +63,7 @@ pub fn unindentLines(comptime text: []const u8) []const []const u8 {
             pos = eol + 1;
         }
 
-        comptime var min_indentation = std.math.maxInt(usize);
+        var min_indentation = std.math.maxInt(usize);
         for (lines) |line| {
             if (std.mem.trim(u8, line, " ").len == 0) {
                 line.* = "";

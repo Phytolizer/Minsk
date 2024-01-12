@@ -2,7 +2,7 @@ const std = @import("std");
 
 pub fn build(
     b: *std.Build,
-    target: std.zig.CrossTarget,
+    target: std.Build.ResolvedTarget,
     optimize: std.builtin.Mode,
     minsk: *std.Build.Module,
     minsk_runtime: *std.Build.Module,
@@ -14,10 +14,10 @@ pub fn build(
         .target = target,
         .optimize = optimize,
     });
-    exe.addModule("minsk", minsk);
-    exe.addModule("minsk_runtime", minsk_runtime);
-    exe.addAnonymousModule("framework", .{
-        .source_file = .{ .path = this_dir ++ "/framework.zig" },
+    exe.root_module.addImport("minsk", minsk);
+    exe.root_module.addImport("minsk_runtime", minsk_runtime);
+    exe.root_module.addAnonymousImport("framework", .{
+        .root_source_file = .{ .path = this_dir ++ "/framework.zig" },
     });
     _ = b.addInstallArtifact(exe, .{});
 
