@@ -4,5 +4,5 @@ import BasicPrelude
 
 data Object
   = String String
-  | Number Int
+  | Number Integer
   deriving (Eq, Show)

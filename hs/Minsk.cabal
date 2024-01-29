@@ -22,11 +22,19 @@ maintainer:         kylecoffey1999@gmail.com
 -- extra-source-files:
 
 common exts
-    ghc-options: -XLambdaCase -XApplicativeDo -XNoImplicitPrelude -XOverloadedStrings
+    ghc-options:
+        -XLambdaCase
+        -XApplicativeDo
+        -XNoImplicitPrelude
+        -XOverloadedStrings
+        -XBlockArguments
+        -XArrows
+        -XMultiWayIf
 
 library
     import: exts
-    exposed-modules: Minsk.Lexer
+    exposed-modules: Minsk.Diagnostic
+                   , Minsk.Lexer
                    , Minsk.SyntaxToken
                    , Minsk.SyntaxKind
                    , Minsk.Object
@@ -37,6 +45,7 @@ library
                       , basic-prelude
                       , text
                       , mtl
+                      , formatting
     default-language:   Haskell2010
 
 executable MinskCompiler
