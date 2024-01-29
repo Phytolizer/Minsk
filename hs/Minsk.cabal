@@ -21,7 +21,11 @@ maintainer:         kylecoffey1999@gmail.com
 -- category:
 -- extra-source-files:
 
+common exts
+    ghc-options: -XLambdaCase -XApplicativeDo -XNoImplicitPrelude -XOverloadedStrings
+
 library
+    import: exts
     exposed-modules: Minsk.Lexer
                    , Minsk.SyntaxToken
                    , Minsk.SyntaxKind
@@ -29,12 +33,14 @@ library
     -- other-modules:
     -- other-extensions:
     hs-source-dirs:     src
-    build-depends:      base ^>=4.16.3.0
+    build-depends:      base ^>=4.17.2.1
+                      , basic-prelude
                       , text
                       , mtl
     default-language:   Haskell2010
 
 executable MinskCompiler
+    import: exts
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.
@@ -42,7 +48,8 @@ executable MinskCompiler
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
-    build-depends:    base ^>=4.16.3.0
+    build-depends:    base ^>=4.17.2.1
+                    , basic-prelude
                     , Minsk
                     , text
     hs-source-dirs:   app
