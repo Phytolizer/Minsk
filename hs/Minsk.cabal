@@ -73,5 +73,7 @@ executable MinskCompiler
     build-depends:    Minsk
                     , text
                     , monad-loops
+                    , formatting
+                    , ansi-terminal
     hs-source-dirs:   app
     default-language: Haskell2010
