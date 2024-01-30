@@ -1,7 +1,6 @@
 module Minsk.SyntaxNode
   ( IsSyntaxNode (..),
     SyntaxNode (..),
-    node,
     pprint,
   )
 where
@@ -13,23 +12,20 @@ import Formatting (hprintLn, later, shown, text, (%))
 import Minsk.SyntaxKind (SyntaxKind)
 import System.IO (Handle)
 
+data SyntaxNode = SyntaxNode
+  { kind :: SyntaxKind,
+    children :: [SyntaxNode],
+    showEx :: TL.Builder
+  }
+
 class IsSyntaxNode n where
-  kind :: n -> SyntaxKind
-  children :: n -> [SyntaxNode]
-  showEx :: n -> TL.Builder
-  default showEx :: n -> TL.Builder
-  showEx _ = mempty
-
-data SyntaxNode = forall n. (IsSyntaxNode n) => SyntaxNode n
-
-node :: (IsSyntaxNode n) => n -> SyntaxNode
-node = SyntaxNode
+  node :: n -> SyntaxNode
 
 pprint :: Handle -> SyntaxNode -> IO ()
 pprint = pprint' "" True
   where
     pprint' :: TL.Text -> Bool -> Handle -> SyntaxNode -> IO ()
-    pprint' indent isLast h (SyntaxNode n) = do
+    pprint' indent isLast h n = do
       let marker = if isLast then "└── " else "├── "
       hprintLn h (text % text % shown % later showEx) indent marker (kind n) n
       let indent' = if isLast then indent <> "    " else indent <> "│   "

@@ -11,8 +11,7 @@ import Minsk.ExpressionSyntax.Parenthesized (parenthesizedExpressionSyntax)
 import qualified Minsk.Lexer as Lexer
 import Minsk.SyntaxKind (SyntaxKind)
 import qualified Minsk.SyntaxKind as SyntaxKind
-import Minsk.SyntaxNode (IsSyntaxNode (kind))
-import Minsk.SyntaxToken (SyntaxToken (SyntaxToken, position))
+import Minsk.SyntaxToken (SyntaxToken (SyntaxToken, kind, position))
 import Safe (atMay)
 
 data Parser = Parser
@@ -24,7 +23,7 @@ data Parser = Parser
 newParser :: Text -> Parser
 newParser text = do
   let (tokens, diags) = Lexer.allTokens text
-  let tokens' = filter (\tok -> kind tok `notElem` [SyntaxKind.WhitespaceToken, SyntaxKind.BadToken]) tokens
+  let tokens' = filter (\tok -> tok.kind `notElem` [SyntaxKind.WhitespaceToken, SyntaxKind.BadToken]) tokens
   let diags' = reverse diags
   Parser tokens' diags' 0
 
@@ -52,10 +51,10 @@ report msg = modify \p -> p {_diagnostics = Diagnostic msg : p._diagnostics}
 match :: SyntaxKind -> State Parser SyntaxToken
 match k = do
   c <- current
-  if kind c == k
+  if c.kind == k
     then nextToken
     else do
-      report $ sformat ("ERROR: Unexpected token <" % shown % ">, expected <" % shown % ">") (kind c) k
+      report $ sformat ("ERROR: Unexpected token <" % shown % ">, expected <" % shown % ">") c.kind k
       return $ SyntaxToken k c.position "" Nothing
 
 parseExpression :: State Parser ExpressionSyntax
@@ -69,7 +68,7 @@ parseTerm = do
   where
     parseTerm' left = do
       op <- current
-      let k = kind op
+      let k = op.kind
       if k `elem` [SyntaxKind.PlusToken, SyntaxKind.MinusToken]
         then do
           moveNext
@@ -85,7 +84,7 @@ parseFactor = do
   where
     parseFactor' left = do
       op <- current
-      let k = kind op
+      let k = op.kind
       if k `elem` [SyntaxKind.StarToken, SyntaxKind.SlashToken]
         then do
           moveNext
@@ -95,8 +94,8 @@ parseFactor = do
 
 parsePrimaryExpression :: State Parser ExpressionSyntax
 parsePrimaryExpression = do
-  k <- kind <$> current
-  case k of
+  c <- current
+  case c.kind of
     SyntaxKind.OpenParenthesisToken -> do
       left <- nextToken
       expr <- parseExpression

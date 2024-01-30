@@ -17,8 +17,7 @@ import Minsk.Diagnostic (Diagnostic (Diagnostic))
 import Minsk.Object (Object (Number))
 import Minsk.SyntaxKind (SyntaxKind)
 import qualified Minsk.SyntaxKind as SyntaxKind
-import Minsk.SyntaxNode (IsSyntaxNode (kind))
-import Minsk.SyntaxToken (SyntaxToken (SyntaxToken))
+import Minsk.SyntaxToken (SyntaxToken (SyntaxToken, kind))
 
 data Lexer = Lexer
   { _text :: Text,
@@ -140,7 +139,7 @@ allTokens text = evalState go (new text)
     go :: State Lexer ([SyntaxToken], [Diagnostic])
     go = do
       token <- nextToken
-      case kind token of
+      case token.kind of
         SyntaxKind.EndOfFileToken -> do
           diagnostics <- gets (reverse . _diagnostics)
           return ([token], diagnostics)

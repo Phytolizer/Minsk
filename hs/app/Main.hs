@@ -5,7 +5,7 @@ import Control.Exception (try)
 import Formatting (fprintLn, text)
 import GHC.IO.Handle (hFlush)
 import GHC.IO.Handle.FD (stdout)
-import Minsk.SyntaxNode (SyntaxNode (SyntaxNode), pprint)
+import Minsk.SyntaxNode (node, pprint)
 import qualified Minsk.SyntaxTree as SyntaxTree
 import System.Console.ANSI
   ( Color (Black, Red),
@@ -42,7 +42,7 @@ repl state = do
         case ast.diagnostics of
           [] -> when state.showTree do
             setSGR [SetColor Foreground Vivid Black]
-            pprint stdout $ SyntaxNode ast.root
+            pprint stdout $ node ast.root
             hFlush stdout
             setSGR [Reset]
           diagnostics -> do

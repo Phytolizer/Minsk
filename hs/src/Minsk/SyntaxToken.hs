@@ -1,13 +1,13 @@
-module Minsk.SyntaxToken (SyntaxToken (SyntaxToken, position, text, value)) where
+module Minsk.SyntaxToken (SyntaxToken (..)) where
 
 import BasicPrelude
-import Formatting (bformat, shown, (%), optioned)
+import Formatting (bformat, optioned, shown, (%))
 import Minsk.Object (Object)
 import Minsk.SyntaxKind (SyntaxKind)
-import Minsk.SyntaxNode (IsSyntaxNode (..))
+import Minsk.SyntaxNode (IsSyntaxNode (..), SyntaxNode (SyntaxNode))
 
 data SyntaxToken = SyntaxToken
-  { _kind :: SyntaxKind,
+  { kind :: SyntaxKind,
     position :: Int,
     text :: Text,
     value :: Maybe Object
@@ -15,6 +15,4 @@ data SyntaxToken = SyntaxToken
   deriving (Show)
 
 instance IsSyntaxNode SyntaxToken where
-  kind = _kind
-  children _ = []
-  showEx (SyntaxToken {value}) = bformat (" " % optioned shown) value
+  node (SyntaxToken k _ _ v) = SyntaxNode k [] (bformat (" " % optioned shown) v)

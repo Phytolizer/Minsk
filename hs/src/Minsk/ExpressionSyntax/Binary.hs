@@ -7,7 +7,7 @@ where
 import BasicPrelude
 import Minsk.ExpressionSyntax (ExpressionSyntax (ExpressionSyntax), IsExpressionSyntax)
 import qualified Minsk.SyntaxKind as SyntaxKind
-import Minsk.SyntaxNode (IsSyntaxNode (..), node)
+import Minsk.SyntaxNode (IsSyntaxNode (..), SyntaxNode (SyntaxNode), node)
 import Minsk.SyntaxToken (SyntaxToken)
 
 data BinaryExpressionSyntax = BinaryExpressionSyntax
@@ -20,7 +20,7 @@ binaryExpressionSyntax :: ExpressionSyntax -> SyntaxToken -> ExpressionSyntax ->
 binaryExpressionSyntax l op r = ExpressionSyntax $ BinaryExpressionSyntax l op r
 
 instance IsSyntaxNode BinaryExpressionSyntax where
-  kind _ = SyntaxKind.BinaryExpression
-  children (BinaryExpressionSyntax l op r) = [node l, node op, node r]
+  node (BinaryExpressionSyntax l op r) =
+    SyntaxNode SyntaxKind.BinaryExpression [node l, node op, node r] mempty
 
 instance IsExpressionSyntax BinaryExpressionSyntax

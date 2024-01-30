@@ -42,6 +42,7 @@ common exts
 library
     import: exts
     exposed-modules: Minsk.Diagnostic
+                   , Minsk.Evaluator
                    , Minsk.SyntaxNode
                    , Minsk.SyntaxTree
     other-modules:   Minsk.ExpressionSyntax

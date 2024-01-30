@@ -10,7 +10,7 @@ where
 import BasicPrelude
 import Minsk.ExpressionSyntax (ExpressionSyntax (ExpressionSyntax), IsExpressionSyntax)
 import qualified Minsk.SyntaxKind as SyntaxKind
-import Minsk.SyntaxNode (IsSyntaxNode (..), node)
+import Minsk.SyntaxNode (IsSyntaxNode (..), SyntaxNode (SyntaxNode), node)
 import Minsk.SyntaxToken (SyntaxToken)
 
 data LiteralExpressionSyntax = LiteralExpressionSyntax
@@ -21,7 +21,7 @@ literalExpressionSyntax :: SyntaxToken -> ExpressionSyntax
 literalExpressionSyntax t = ExpressionSyntax $ LiteralExpressionSyntax t
 
 instance IsSyntaxNode LiteralExpressionSyntax where
-  kind _ = SyntaxKind.LiteralExpression
-  children (LiteralExpressionSyntax tok) = [node tok]
+  node (LiteralExpressionSyntax t) =
+    SyntaxNode SyntaxKind.LiteralExpression [node t] mempty
 
 instance IsExpressionSyntax LiteralExpressionSyntax

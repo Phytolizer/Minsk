@@ -7,7 +7,7 @@ where
 import BasicPrelude
 import Minsk.ExpressionSyntax (ExpressionSyntax (ExpressionSyntax), IsExpressionSyntax)
 import qualified Minsk.SyntaxKind as SyntaxKind
-import Minsk.SyntaxNode (IsSyntaxNode (..), node)
+import Minsk.SyntaxNode (IsSyntaxNode (..), SyntaxNode (SyntaxNode), node)
 import Minsk.SyntaxToken (SyntaxToken)
 
 data ParenthesizedExpressionSyntax = ParenthesizedExpressionSyntax
@@ -20,8 +20,7 @@ parenthesizedExpressionSyntax :: SyntaxToken -> ExpressionSyntax -> SyntaxToken 
 parenthesizedExpressionSyntax open e close = ExpressionSyntax $ ParenthesizedExpressionSyntax open e close
 
 instance IsSyntaxNode ParenthesizedExpressionSyntax where
-  kind _ = SyntaxKind.ParenthesizedExpression
-  children (ParenthesizedExpressionSyntax open e close) =
-    [node open, node e, node close]
+  node (ParenthesizedExpressionSyntax open e close) =
+    SyntaxNode SyntaxKind.ParenthesizedExpression [node open, node e, node close] mempty
 
 instance IsExpressionSyntax ParenthesizedExpressionSyntax
