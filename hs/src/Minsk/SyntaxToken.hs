@@ -1,14 +1,18 @@
-module Minsk.SyntaxToken (SyntaxToken (..)) where
+module Minsk.SyntaxToken (SyntaxToken (SyntaxToken, position, text, value)) where
 
 import BasicPrelude
-import Data.Text (Text)
 import Minsk.Object (Object)
 import Minsk.SyntaxKind (SyntaxKind)
+import Minsk.SyntaxNode (IsSyntaxNode (..))
 
 data SyntaxToken = SyntaxToken
-  { kind :: SyntaxKind,
+  { _kind :: SyntaxKind,
     position :: Int,
     text :: Text,
     value :: Maybe Object
   }
   deriving (Show)
+
+instance IsSyntaxNode SyntaxToken where
+  kind = _kind
+  children _ = []

@@ -9,7 +9,7 @@ import Control.Monad.State
     modify,
     put,
   )
-import Data.Text (Text, uncons)
+import Data.Text (uncons)
 import qualified Data.Text as Text
 import Formatting (char, sformat, (%))
 import GHC.Unicode (isDigit, isSpace)
@@ -17,8 +17,8 @@ import Minsk.Diagnostic (Diagnostic (Diagnostic))
 import Minsk.Object (Object (Number))
 import Minsk.SyntaxKind (SyntaxKind)
 import qualified Minsk.SyntaxKind as SyntaxKind
+import Minsk.SyntaxNode (IsSyntaxNode (kind))
 import Minsk.SyntaxToken (SyntaxToken (SyntaxToken))
-import qualified Minsk.SyntaxToken as SyntaxToken
 
 data Lexer = Lexer
   { _text :: Text,
@@ -83,29 +83,23 @@ startToken = do
   put lexer {_start = _pos lexer, _tokenText = []}
 
 mkTokenInner :: SyntaxKind -> Maybe Object -> State Lexer SyntaxToken
-mkTokenInner kind value = do
+mkTokenInner k value = do
   start <- gets _start
   text <- tokenText
-  return $ SyntaxToken kind start text value
+  return $ SyntaxToken k start text value
 
 mkToken :: SyntaxKind -> State Lexer SyntaxToken
-mkToken kind = mkTokenInner kind Nothing
+mkToken k = mkTokenInner k Nothing
 
 mkToken' :: SyntaxKind -> Object -> State Lexer SyntaxToken
-mkToken' kind value = mkTokenInner kind (Just value)
+mkToken' k value = mkTokenInner k (Just value)
 
 takeWhile :: (Char -> Bool) -> State Lexer ()
-takeWhile pred = do
+takeWhile p = do
   c <- current
-  when (pred c) do
+  when (p c) do
     advance
-    takeWhile pred
-
-numberToken :: State Lexer SyntaxToken
-numberToken = do
-  takeWhile isDigit
-  value <- read <$> tokenText
-  mkToken' SyntaxKind.NumberToken (Number value)
+    takeWhile p
 
 report :: Text -> State Lexer ()
 report msg = modify \lexer -> lexer {_diagnostics = Diagnostic msg : _diagnostics lexer}
@@ -120,36 +114,25 @@ nextToken = do
         mkToken SyntaxKind.EndOfFileToken
     | c `elem` ['+', '-', '*', '/', '(', ')'] -> do
         advance
-        let kind = case c of
-              '+' -> SyntaxKind.PlusToken
-              '-' -> SyntaxKind.MinusToken
-              '*' -> SyntaxKind.StarToken
-              '/' -> SyntaxKind.SlashToken
-              '(' -> SyntaxKind.OpenParenthesisToken
-              ')' -> SyntaxKind.CloseParenthesisToken
-              _ -> undefined
-        mkToken kind
+        mkToken $ case c of
+          '+' -> SyntaxKind.PlusToken
+          '-' -> SyntaxKind.MinusToken
+          '*' -> SyntaxKind.StarToken
+          '/' -> SyntaxKind.SlashToken
+          '(' -> SyntaxKind.OpenParenthesisToken
+          ')' -> SyntaxKind.CloseParenthesisToken
+          _ -> undefined
     | isDigit c -> do
         takeWhile isDigit
-        value <- read <$> tokenText
+        value <- fromMaybe 0 . readMay <$> tokenText
         mkToken' SyntaxKind.NumberToken (Number value)
     | isSpace c -> do
         takeWhile isSpace
         mkToken SyntaxKind.WhitespaceToken
     | otherwise -> do
         advance
-        modify \lexer ->
-          lexer
-            { _diagnostics =
-                Diagnostic
-                  (sformat ("ERROR: Bad character in input: '" % char % "'") c)
-                  : _diagnostics lexer
-            }
+        report $ sformat ("ERROR: Bad character in input: '" % char % "'") c
         mkToken SyntaxKind.BadToken
-
-isEndOfFileToken :: SyntaxToken -> Bool
-isEndOfFileToken token =
-  SyntaxToken.kind token == SyntaxKind.EndOfFileToken
 
 allTokens :: Text -> ([SyntaxToken], [Diagnostic])
 allTokens text = evalState go (new text)
@@ -157,7 +140,7 @@ allTokens text = evalState go (new text)
     go :: State Lexer ([SyntaxToken], [Diagnostic])
     go = do
       token <- nextToken
-      case SyntaxToken.kind token of
+      case kind token of
         SyntaxKind.EndOfFileToken -> do
           diagnostics <- gets (reverse . _diagnostics)
           return ([token], diagnostics)

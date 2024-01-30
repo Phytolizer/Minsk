@@ -16,4 +16,8 @@ data SyntaxKind
   | CloseParenthesisToken
   | -- Multi-char tokens
     NumberToken
+  | -- Expressions
+    BinaryExpression
+  | LiteralExpression
+  | ParenthesizedExpression
   deriving (Eq, Show)

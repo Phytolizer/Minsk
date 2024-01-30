@@ -2,14 +2,9 @@ module Main where
 
 import BasicPrelude
 import Control.Exception (try)
-import Control.Exception.Base (Exception)
-import qualified Data.Text as Text
-import GHC.IO.Exception (IOException)
 import GHC.IO.Handle (hFlush)
 import GHC.IO.Handle.FD (stdout)
-import Minsk.Diagnostic (Diagnostic (Diagnostic))
-import qualified Minsk.Lexer as Lexer
-import System.IO.Error (isEOFError)
+import qualified Minsk.SyntaxTree as SyntaxTree
 
 main :: IO ()
 main = loop ()
@@ -27,7 +22,6 @@ main = loop ()
               return ()
             else ioError e
         Right line -> do
-          let tokens = Lexer.allTokens line
-          mapM_ print (take 6 (fst tokens))
-          mapM_ (\(Diagnostic d) -> putStrLn d) (snd tokens)
+          let ast = SyntaxTree.parse line
+          mapM_ print ast.diagnostics
           loop ()

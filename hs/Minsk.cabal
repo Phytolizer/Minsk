@@ -22,30 +22,41 @@ maintainer:         kylecoffey1999@gmail.com
 -- extra-source-files:
 
 common exts
-    ghc-options:
-        -XLambdaCase
-        -XApplicativeDo
-        -XNoImplicitPrelude
-        -XOverloadedStrings
-        -XBlockArguments
-        -XArrows
-        -XMultiWayIf
+    default-extensions:
+        LambdaCase
+        ApplicativeDo
+        OverloadedStrings
+        BlockArguments
+        Arrows
+        MultiWayIf
+        NoImplicitPrelude
+        GADTs
+        OverloadedRecordDot
+        TupleSections
+    ghc-options: -Wall
+    build-depends:      base ^>=4.17.2.1
+                      , basic-prelude
 
 library
     import: exts
     exposed-modules: Minsk.Diagnostic
+                   , Minsk.SyntaxTree
+    other-modules:   Minsk.ExpressionSyntax
+                   , Minsk.ExpressionSyntax.Binary
+                   , Minsk.ExpressionSyntax.Literal
+                   , Minsk.ExpressionSyntax.Parenthesized
                    , Minsk.Lexer
-                   , Minsk.SyntaxToken
-                   , Minsk.SyntaxKind
                    , Minsk.Object
-    -- other-modules:
+                   , Minsk.Parser
+                   , Minsk.SyntaxKind
+                   , Minsk.SyntaxNode
+                   , Minsk.SyntaxToken
     -- other-extensions:
     hs-source-dirs:     src
-    build-depends:      base ^>=4.17.2.1
-                      , basic-prelude
-                      , text
+    build-depends:      text
                       , mtl
                       , formatting
+                      , safe
     default-language:   Haskell2010
 
 executable MinskCompiler
@@ -57,9 +68,7 @@ executable MinskCompiler
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
-    build-depends:    base ^>=4.17.2.1
-                    , basic-prelude
-                    , Minsk
+    build-depends:    Minsk
                     , text
     hs-source-dirs:   app
     default-language: Haskell2010
