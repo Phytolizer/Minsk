@@ -5,4 +5,8 @@ import BasicPrelude
 data Object
   = String String
   | Number Integer
-  deriving (Eq, Show)
+  deriving (Eq)
+
+instance Show Object where
+  show (String s) = s
+  show (Number n) = show n

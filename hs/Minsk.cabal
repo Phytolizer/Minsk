@@ -33,6 +33,8 @@ common exts
         GADTs
         OverloadedRecordDot
         TupleSections
+        DefaultSignatures
+        NamedFieldPuns
     ghc-options: -Wall
     build-depends:      base ^>=4.17.2.1
                       , basic-prelude
@@ -40,6 +42,7 @@ common exts
 library
     import: exts
     exposed-modules: Minsk.Diagnostic
+                   , Minsk.SyntaxNode
                    , Minsk.SyntaxTree
     other-modules:   Minsk.ExpressionSyntax
                    , Minsk.ExpressionSyntax.Binary
@@ -49,7 +52,6 @@ library
                    , Minsk.Object
                    , Minsk.Parser
                    , Minsk.SyntaxKind
-                   , Minsk.SyntaxNode
                    , Minsk.SyntaxToken
     -- other-extensions:
     hs-source-dirs:     src
