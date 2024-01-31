@@ -6,6 +6,7 @@ import Formatting (fprintLn, text)
 import GHC.IO.Handle (hFlush)
 import GHC.IO.Handle.FD (stdout)
 import qualified Minsk.AST as AST
+import Minsk.Evaluator (evaluate)
 import qualified Minsk.SyntaxTree as SyntaxTree
 import System.Console.ANSI
   ( Color (Black, Red),
@@ -40,11 +41,20 @@ repl state = do
       _ -> do
         let ast = SyntaxTree.parse line
         case ast.diagnostics of
-          [] -> when state.showTree do
-            setSGR [SetColor Foreground Vivid Black]
-            AST.pprint stdout $ AST.NExpression () ast.root
-            hFlush stdout
-            setSGR [Reset]
+          [] -> do
+            when state.showTree do
+              setSGR [SetColor Foreground Vivid Black]
+              AST.pprint stdout $ AST.NExpression () ast.root
+              hFlush stdout
+              setSGR [Reset]
+            case evaluate ast.root of
+              Left err -> do
+                setSGR [SetColor Foreground Dull Red]
+                putStrLn err
+                hFlush stdout
+                setSGR [Reset]
+              Right result -> do
+                print result
           diagnostics -> do
             setSGR [SetColor Foreground Dull Red]
             mapM_ print diagnostics
