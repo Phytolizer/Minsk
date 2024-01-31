@@ -35,6 +35,9 @@ common exts
         TupleSections
         DefaultSignatures
         NamedFieldPuns
+        KindSignatures
+        DataKinds
+        TypeFamilies
     ghc-options: -Wall
     build-depends:      base ^>=4.17.2.1
                       , basic-prelude
@@ -42,16 +45,12 @@ common exts
 library
     import: exts
     exposed-modules: Minsk.Diagnostic
-                   , Minsk.Evaluator
-                   , Minsk.SyntaxNode
+                   , Minsk.AST
                    , Minsk.SyntaxTree
-    other-modules:   Minsk.ExpressionSyntax
-                   , Minsk.ExpressionSyntax.Binary
-                   , Minsk.ExpressionSyntax.Literal
-                   , Minsk.ExpressionSyntax.Parenthesized
-                   , Minsk.Lexer
+    other-modules:   Minsk.Lexer
                    , Minsk.Object
                    , Minsk.Parser
+                   , Minsk.Pass
                    , Minsk.SyntaxKind
                    , Minsk.SyntaxToken
     -- other-extensions:
