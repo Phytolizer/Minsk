@@ -17,6 +17,9 @@ Episode 7.
 ## d (D)
 Episode 2.
 
+## hs (Haskell)
+Episode 1.
+
 ## kt (Kotlin)
 Episode 6.5.
 
