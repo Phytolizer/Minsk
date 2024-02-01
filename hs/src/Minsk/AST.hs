@@ -22,8 +22,9 @@ data SyntaxNode (p :: Pass)
 
 data ExpressionSyntax (p :: Pass)
   = EBinary (XBinaryExpression p) (BinaryExpression p)
-  | ELiteral (XLiteralExpression p) (LiteralExpression p)
+  | ELiteral (XLiteralExpression p) LiteralExpression
   | EParenthesized (XParenthesizedExpression p) (ParenthesizedExpression p)
+  | EUnary (XUnaryExpression p) (UnaryExpression p)
 
 data BinaryExpression (p :: Pass) = BinaryExpression
   { left :: ExpressionSyntax p,
@@ -31,7 +32,7 @@ data BinaryExpression (p :: Pass) = BinaryExpression
     right :: ExpressionSyntax p
   }
 
-data LiteralExpression (p :: Pass) = LiteralExpression
+data LiteralExpression = LiteralExpression
   { literalToken :: SyntaxToken
   }
 
@@ -39,6 +40,11 @@ data ParenthesizedExpression (p :: Pass) = ParenthesizedExpression
   { openParenthesisToken :: SyntaxToken,
     expression :: ExpressionSyntax p,
     closeParenthesisToken :: SyntaxToken
+  }
+
+data UnaryExpression (p :: Pass) = UnaryExpression
+  { operatorToken :: SyntaxToken,
+    operand :: ExpressionSyntax p
   }
 
 type family XExpression (p :: Pass)
@@ -57,6 +63,10 @@ type family XParenthesizedExpression (p :: Pass)
 
 type instance XParenthesizedExpression Parsed = ()
 
+type family XUnaryExpression (p :: Pass)
+
+type instance XUnaryExpression Parsed = ()
+
 info :: SyntaxNode p -> Info
 info (NExpression _ e) = expInfo e
 info (NToken t) = tokenInfo t
@@ -65,6 +75,7 @@ expInfo :: ExpressionSyntax p -> Info
 expInfo (EBinary _ e) = binaryInfo e
 expInfo (ELiteral _ e) = literalInfo e
 expInfo (EParenthesized _ e) = parenthesizedInfo e
+expInfo (EUnary _ e) = unaryInfo e
 
 binaryInfo :: BinaryExpression p -> Info
 binaryInfo (BinaryExpression left tok right) =
@@ -74,7 +85,7 @@ binaryInfo (BinaryExpression left tok right) =
       showEx = mempty
     }
 
-literalInfo :: LiteralExpression p -> Info
+literalInfo :: LiteralExpression -> Info
 literalInfo (LiteralExpression tok) =
   Info
     { kind = SyntaxKind.LiteralExpression,
@@ -87,6 +98,14 @@ parenthesizedInfo (ParenthesizedExpression open e close) =
   Info
     { kind = SyntaxKind.ParenthesizedExpression,
       children = [tokenInfo open, expInfo e, tokenInfo close],
+      showEx = mempty
+    }
+
+unaryInfo :: UnaryExpression p -> Info
+unaryInfo (UnaryExpression tok e) =
+  Info
+    { kind = SyntaxKind.UnaryExpression,
+      children = [tokenInfo tok, expInfo e],
       showEx = mempty
     }
 

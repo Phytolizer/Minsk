@@ -20,4 +20,5 @@ data SyntaxKind
     BinaryExpression
   | LiteralExpression
   | ParenthesizedExpression
+  | UnaryExpression
   deriving (Eq, Show)

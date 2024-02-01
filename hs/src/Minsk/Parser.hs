@@ -7,7 +7,7 @@ import qualified Minsk.AST as AST
 import Minsk.Diagnostic (Diagnostic (Diagnostic))
 import qualified Minsk.Lexer as Lexer
 import Minsk.Pass (Pass (Parsed))
-import Minsk.SyntaxFacts (Precedence (..), binaryOperatorPrecedence)
+import Minsk.SyntaxFacts (Precedence (..), binaryOperatorPrecedence, unaryOperatorPrecedence)
 import Minsk.SyntaxKind (SyntaxKind)
 import qualified Minsk.SyntaxKind as SyntaxKind
 import Minsk.SyntaxToken (SyntaxToken (SyntaxToken, kind, position))
@@ -59,8 +59,16 @@ match k = do
       return $ SyntaxToken k c.position "" Nothing
 
 parseExpression :: Precedence -> State Parser ParsedExpression
-parseExpression startPrec =
-  parsePrimaryExpression >>= parseExpression' startPrec
+parseExpression startPrec = do
+  unaryPrecedence <- unaryOperatorPrecedence . kind <$> current
+  left <-
+    if unaryPrecedence /= PZero && unaryPrecedence >= startPrec
+      then do
+        op <- nextToken
+        operand <- parseExpression unaryPrecedence
+        return $ AST.EUnary () $ AST.UnaryExpression op operand
+      else parsePrimaryExpression
+  parseExpression' startPrec left
   where
     parseExpression' :: Precedence -> ParsedExpression -> State Parser ParsedExpression
     parseExpression' parentPrec left = do
