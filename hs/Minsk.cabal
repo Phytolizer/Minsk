@@ -52,6 +52,7 @@ library
                    , Minsk.Object
                    , Minsk.Parser
                    , Minsk.Pass
+                   , Minsk.SyntaxFacts
                    , Minsk.SyntaxKind
                    , Minsk.SyntaxToken
     -- other-extensions:

@@ -7,6 +7,7 @@ import qualified Minsk.AST as AST
 import Minsk.Diagnostic (Diagnostic (Diagnostic))
 import qualified Minsk.Lexer as Lexer
 import Minsk.Pass (Pass (Parsed))
+import Minsk.SyntaxFacts (Precedence (..), binaryOperatorPrecedence)
 import Minsk.SyntaxKind (SyntaxKind)
 import qualified Minsk.SyntaxKind as SyntaxKind
 import Minsk.SyntaxToken (SyntaxToken (SyntaxToken, kind, position))
@@ -57,40 +58,19 @@ match k = do
       report $ sformat ("ERROR: Unexpected token <" % shown % ">, expected <" % shown % ">") c.kind k
       return $ SyntaxToken k c.position "" Nothing
 
-parseExpression :: State Parser ParsedExpression
-parseExpression = parseTerm
-
-parseTerm :: State Parser ParsedExpression
-parseTerm = do
-  left <- parseFactor
-
-  parseTerm' left
+parseExpression :: Precedence -> State Parser ParsedExpression
+parseExpression startPrec =
+  parsePrimaryExpression >>= parseExpression' startPrec
   where
-    parseTerm' left = do
-      op <- current
-      let k = op.kind
-      if k `elem` [SyntaxKind.PlusToken, SyntaxKind.MinusToken]
-        then do
-          moveNext
-          right <- parseFactor
-          parseTerm' $ AST.EBinary () $ AST.BinaryExpression left op right
-        else return left
-
-parseFactor :: State Parser ParsedExpression
-parseFactor = do
-  left <- parsePrimaryExpression
-
-  parseFactor' left
-  where
-    parseFactor' left = do
-      op <- current
-      let k = op.kind
-      if k `elem` [SyntaxKind.StarToken, SyntaxKind.SlashToken]
-        then do
-          moveNext
-          right <- parsePrimaryExpression
-          parseFactor' $ AST.EBinary () $ AST.BinaryExpression left op right
-        else return left
+    parseExpression' :: Precedence -> ParsedExpression -> State Parser ParsedExpression
+    parseExpression' parentPrec left = do
+      prec <- binaryOperatorPrecedence . kind <$> current
+      if prec == PZero || prec <= parentPrec
+        then return left
+        else do
+          op <- nextToken
+          right <- parseExpression prec
+          parseExpression' parentPrec $ AST.EBinary () $ AST.BinaryExpression left op right
 
 parsePrimaryExpression :: State Parser ParsedExpression
 parsePrimaryExpression = do
@@ -98,7 +78,7 @@ parsePrimaryExpression = do
   case c.kind of
     SyntaxKind.OpenParenthesisToken -> do
       left <- nextToken
-      expr <- parseExpression
+      expr <- parseExpression PZero
       right <- match SyntaxKind.CloseParenthesisToken
       return $ AST.EParenthesized () $ AST.ParenthesizedExpression left expr right
     _ -> do
@@ -107,7 +87,7 @@ parsePrimaryExpression = do
 
 doParse :: State Parser (ParsedExpression, SyntaxToken)
 doParse = do
-  e <- parseExpression
+  e <- parseExpression PZero
   eof <- match SyntaxKind.EndOfFileToken
   return (e, eof)
 
