@@ -14,6 +14,7 @@ minsk_lib = static_library(
         platform_dep,
         string_dep,
         uthash_dep,
+        textus_coloris_dep,
     ],
 )
 

@@ -7,6 +7,7 @@ mc_exe = executable(
         minsk_dep,
         platform_dep,
         string_dep,
+        textus_coloris_dep,
     ],
     install: true,
     c_args: '-DNO_COMPLETION',

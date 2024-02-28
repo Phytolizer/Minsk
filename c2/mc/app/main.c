@@ -14,6 +14,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <textus_coloris.h>
 
 #include "mc/cwd.h"
 #include "minsk/code_analysis/text/source_text.h"
@@ -21,6 +22,32 @@
 #define HISTORY_PATH ".minsk-history"
 
 typedef BUF_T(string_t) string_buf_t;
+
+static const struct tc_coloris colors[] = {
+  {"RED", "\e[0;31m"},
+  {"GREEN", "\e[0;32m"},
+  {"YELLOW", "\e[0;33m"},
+  {"BLUE", "\e[0;34m"},
+  {"MAGENTA", "\e[0;35m"},
+  {"CYAN", "\e[0;36m"},
+  {"WHITE", "\e[0;37m"},
+  {"DIM_RED", "\e[2;31m"},
+  {"DIM_GREEN", "\e[2;32m"},
+  {"DIM_YELLOW", "\e[2;33m"},
+  {"DIM_BLUE", "\e[2;34m"},
+  {"DIM_MAGENTA", "\e[2;35m"},
+  {"DIM_CYAN", "\e[2;36m"},
+  {"DIM_WHITE", "\e[2;37m"},
+  {"BRIGHT_RED", "\e[0;91m"},
+  {"BRIGHT_GREEN", "\e[0;92m"},
+  {"BRIGHT_YELLOW", "\e[0;93m"},
+  {"BRIGHT_BLUE", "\e[0;94m"},
+  {"BRIGHT_MAGENTA", "\e[0;95m"},
+  {"BRIGHT_CYAN", "\e[0;96m"},
+  {"BRIGHT_WHITE", "\e[0;97m"},
+  {"RESET", "\e[0m"},
+  {0},
+};
 
 extern int
 main(int argc, char ** argv)
@@ -32,6 +59,8 @@ main(int argc, char ** argv)
     return 1;
   }
 
+  tc_set_colors(colors, TC_COLORIS_MODE_AUTO);
+
   linenoiseHistoryLoad(HISTORY_PATH);
 
   bool show_tree = false;
@@ -42,9 +71,11 @@ main(int argc, char ** argv)
 
   while (true)
   {
-    const char * prompt =
-      (text_builder.len == 0) ? "\x1b[32m»\x1b[0m " : "\x1b[32m·\x1b[0m ";
+    char * prompt = tc_cstring(
+      (text_builder.len == 0) ? "#GREEN#»#RESET# " : "#GREEN#·#RESET# "
+    );
     char * raw_line = linenoise(prompt);
+    free(prompt);
     if (raw_line != NULL)
     {
       linenoiseHistoryAdd(raw_line);
@@ -127,14 +158,14 @@ main(int argc, char ** argv)
         size_t character = diagnostic.span.start - line.start + 1;
 
         printf("\n");
-        printf("\x1b[0;31m");
+        tc_print(stdout, "#RED#");
         printf(
           "(%zu, %zu): " STRING_FMT "\n",
           line_number,
           character,
           STRING_ARG(diagnostic.message)
         );
-        printf("\x1b[0m");
+        tc_print(stdout, "#RESET#");
         minsk_text_span_t prefix_span =
           minsk_text_span_from_bounds(line.start, diagnostic.span.start);
         minsk_text_span_t suffix_span = minsk_text_span_from_bounds(
@@ -151,18 +182,18 @@ main(int argc, char ** argv)
           minsk_text_source_text_substring_span(syntax_tree.text, suffix_span);
 
         printf("    " STRING_FMT, STRING_ARG(prefix));
-        printf("\x1b[0;31m");
+        tc_print(stdout, "#RED#");
         printf(STRING_FMT, STRING_ARG(error));
-        printf("\x1b[0m");
+        tc_print(stdout, "#RESET#");
         printf(STRING_FMT "\n", STRING_ARG(suffix));
       }
       printf("\n");
     }
     else
     {
-      printf("\x1b[0;35m");
+      tc_print(stdout, "#MAGENTA#");
       minsk_object_show(result.value, stdout);
-      printf("\x1b[0m\n");
+      tc_print(stdout, "#RESET#\n");
     }
 
     for (size_t i = 0; i < text_builder.len; i++)

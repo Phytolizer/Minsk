@@ -5,6 +5,7 @@
 #include <minsk-string/string.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <textus_coloris.h>
 
 #include "minsk/code_analysis/syntax/ast/expression.h"
 #include "minsk/code_analysis/syntax/ast/expressions/assignment.h"
@@ -38,7 +39,7 @@ pretty_print(
   string_t marker = is_last ? STRING_REF("└───") : STRING_REF("├───");
   if (do_colors)
   {
-    fprintf(stream, "\x1b[2m");
+    tc_print(stream, "#DIM_WHITE#");
   }
   fprintf(
     stream,
@@ -48,10 +49,9 @@ pretty_print(
   );
   if (do_colors)
   {
-    fprintf(
+    tc_print(
       stream,
-      "%s",
-      node.type == MINSK_SYNTAX_NODE_TYPE_TOKEN ? "\x1b[0;34m" : "\x1b[0;36m"
+      node.type == MINSK_SYNTAX_NODE_TYPE_TOKEN ? "#BLUE#" : "#CYAN#"
     );
   }
   if (node.type == MINSK_SYNTAX_NODE_TYPE_TOKEN)
@@ -63,7 +63,7 @@ pretty_print(
       fprintf(stream, " ");
       if (do_colors)
       {
-        fprintf(stream, "\x1b[0;35m");
+        tc_print(stream, "#MAGENTA#");
       }
       minsk_object_show(node.token.value, stream);
     }
@@ -75,7 +75,7 @@ pretty_print(
   }
   if (do_colors)
   {
-    fprintf(stream, "\x1b[0m");
+    tc_print(stream, "#RESET#");
   }
   fprintf(stream, "\n");
 
