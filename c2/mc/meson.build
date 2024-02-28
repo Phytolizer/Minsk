@@ -12,7 +12,7 @@ mc_exe = executable(
     c_args: '-DNO_COMPLETION',
 )
 
-mc_run = run_target(
+run_target(
     'run-mc',
     command: [mc_exe],
 )
