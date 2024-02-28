@@ -445,5 +445,14 @@ TEST(lexer, tests_all_tokens)
       "untested token kind: " STRING_FMT,
       STRING_ARG(minsk_syntax_kind_display_name(&test_arena, s->key))
     );
+
+    HASH_DEL(all_token_kinds, s);
   }
+
+  HASH_ITER(hh, tested_token_kinds, s, tmp)
+  {
+    HASH_DEL(tested_token_kinds, s);
+  }
+
+  arena_free(&test_arena);
 }
