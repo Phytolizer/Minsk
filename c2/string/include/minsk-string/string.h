@@ -38,6 +38,8 @@ typedef struct
 
 #define STRING_AS_REF(str) STRING_REF_DATA((str).data, (str).length)
 
+#define STRING_AT(str, a) ((a) >= (str).length ? '\0' : (str).data[(a)])
+
 #define STRING_SUB(str, a, b) STRING_REF_DATA((str).data + (a), (b) - (a))
 #define STRING_SUB_LEN(str, a, len) STRING_REF_DATA((str).data + (a), (len))
 #define STRING_SUB_AFTER(str, a) STRING_SUB((str), (a), (str).length)

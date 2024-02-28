@@ -81,13 +81,25 @@ main(int argc, char ** argv)
 
     if (!result.success)
     {
+      minsk_text_source_text_t text = syntax_tree.text;
+
       for (size_t i = 0; i < result.diagnostics.len; i++)
       {
         minsk_diagnostic_t diagnostic = result.diagnostics.ptr[i];
+        size_t line_index =
+          minsk_text_source_text_get_line_index(text, diagnostic.span.start);
+        size_t line_number = line_index + 1;
+        size_t character =
+          diagnostic.span.start - text._lines.ptr[line_index].start + 1;
 
         printf("\n");
         printf("\x1b[0;31m");
-        printf(STRING_FMT "\n", STRING_ARG(diagnostic.message));
+        printf(
+          "(%zu, %zu): " STRING_FMT "\n",
+          line_number,
+          character,
+          STRING_ARG(diagnostic.message)
+        );
         printf("\x1b[0m");
         string_t prefix = STRING_SUB(line, 0, diagnostic.span.start);
         string_t error =

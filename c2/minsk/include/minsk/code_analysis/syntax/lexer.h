@@ -7,6 +7,7 @@
 
 #include "minsk/code_analysis/diagnostic_bag.h"
 #include "minsk/code_analysis/syntax/token.h"
+#include "minsk/code_analysis/text/source_text.h"
 
 enum
 {
@@ -23,7 +24,7 @@ typedef struct
 typedef struct
 {
   Arena * _arena;
-  uint8_t const * _text;
+  minsk_text_source_text_t _text;
   int64_t _text_len;
   int64_t _position;
   // text spans do NOT care about utf8 char length, they are user facing
@@ -34,6 +35,6 @@ typedef struct
 } minsk_syntax_lexer_t;
 
 extern minsk_syntax_lexer_t
-minsk_syntax_lexer_new(Arena * arena, string_t text);
+minsk_syntax_lexer_new(Arena * arena, minsk_text_source_text_t text);
 extern minsk_syntax_token_t
 minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer);

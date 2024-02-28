@@ -1,10 +1,10 @@
 #pragma once
 
-#include "minsk/code_analysis/binding/ast/expressions/assignment.h"
-#include "minsk/code_analysis/binding/ast/expressions/binary.h"
-#include "minsk/code_analysis/binding/ast/expressions/literal.h"
-#include "minsk/code_analysis/binding/ast/expressions/unary.h"
-#include "minsk/code_analysis/binding/ast/expressions/variable.h"
+#include "minsk/code_analysis/binding/ast/expressions/assignment.h"  // IWYU pragma: export
+#include "minsk/code_analysis/binding/ast/expressions/binary.h"  // IWYU pragma: export
+#include "minsk/code_analysis/binding/ast/expressions/literal.h"  // IWYU pragma: export
+#include "minsk/code_analysis/binding/ast/expressions/unary.h"  // IWYU pragma: export
+#include "minsk/code_analysis/binding/ast/expressions/variable.h"  // IWYU pragma: export
 #include "minsk/code_analysis/binding/ast/node_type.h"
 #include "minsk/runtime/object.h"
 

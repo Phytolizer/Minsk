@@ -1,11 +1,11 @@
 #pragma once
 
-#include "minsk/code_analysis/syntax/ast/expressions/assignment.h"
-#include "minsk/code_analysis/syntax/ast/expressions/binary.h"
-#include "minsk/code_analysis/syntax/ast/expressions/literal.h"
-#include "minsk/code_analysis/syntax/ast/expressions/name.h"
-#include "minsk/code_analysis/syntax/ast/expressions/parenthesized.h"
-#include "minsk/code_analysis/syntax/ast/expressions/unary.h"
+#include "minsk/code_analysis/syntax/ast/expressions/assignment.h"  // IWYU pragma: export
+#include "minsk/code_analysis/syntax/ast/expressions/binary.h"  // IWYU pragma: export
+#include "minsk/code_analysis/syntax/ast/expressions/literal.h"  // IWYU pragma: export
+#include "minsk/code_analysis/syntax/ast/expressions/name.h"  // IWYU pragma: export
+#include "minsk/code_analysis/syntax/ast/expressions/parenthesized.h"  // IWYU pragma: export
+#include "minsk/code_analysis/syntax/ast/expressions/unary.h"  // IWYU pragma: export
 #include "minsk/code_analysis/syntax/ast/node_type.h"
 
 typedef struct

@@ -102,7 +102,7 @@ peek(minsk_syntax_lexer_t * lexer, int64_t offset)
 
     codepoint_t cp;
     int64_t next_position = position;
-    U8_NEXT(lexer->_text, next_position, lexer->_text_len, cp);
+    U8_NEXT(lexer->_text.text.data, next_position, lexer->_text_len, cp);
     if (cp >= 0)
     {
       lexer->_peek_buf[lexer->_peek_count].cp = cp;
@@ -191,16 +191,20 @@ scan_identifier_or_keyword(minsk_syntax_lexer_t * lexer)
 static string_t
 ref_current_text(minsk_syntax_lexer_t const * lexer, int64_t start)
 {
-  return STRING_REF_DATA(lexer->_text + start, lexer->_position - start);
+  return minsk_text_source_text_substring_bounds(
+    lexer->_text,
+    start,
+    lexer->_position
+  );
 }
 
 extern minsk_syntax_lexer_t
-minsk_syntax_lexer_new(Arena * arena, string_t text)
+minsk_syntax_lexer_new(Arena * arena, minsk_text_source_text_t text)
 {
   return (minsk_syntax_lexer_t){
     ._arena = arena,
-    ._text = (uint8_t const *)text.data,
-    ._text_len = text.length,
+    ._text = text,
+    ._text_len = text.text.length,
     ._position = 0,
     ._char_position = 0,
     ._peek_count = 0,

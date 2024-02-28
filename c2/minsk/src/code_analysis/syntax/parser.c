@@ -61,7 +61,7 @@ match_token(minsk_syntax_parser_t * parser, minsk_syntax_kind_t kind)
 }
 
 extern minsk_syntax_parser_t
-minsk_syntax_parser_new(Arena * arena, string_t text)
+minsk_syntax_parser_new(Arena * arena, minsk_text_source_text_t text)
 {
   minsk_syntax_lexer_t lexer = minsk_syntax_lexer_new(arena, text);
   minsk_syntax_parser_token_buf_t tokens = BUF_INIT;
@@ -81,6 +81,7 @@ minsk_syntax_parser_new(Arena * arena, string_t text)
   }
   return (minsk_syntax_parser_t){
     ._arena = arena,
+    ._text = text,
     ._tokens = tokens,
     ._position = 0,
     .diagnostics = lexer.diagnostics,
@@ -106,6 +107,7 @@ minsk_syntax_parser_parse(minsk_syntax_parser_t * parser)
   minsk_syntax_token_t end_of_file_token =
     match_token(parser, MINSK_SYNTAX_KIND_END_OF_FILE_TOKEN);
   return (minsk_syntax_tree_t){
+    .text = parser->_text,
     .diagnostics = parser->diagnostics,
     .root = expression,
     .end_of_file_token = end_of_file_token,

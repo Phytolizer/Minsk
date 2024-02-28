@@ -1,5 +1,6 @@
 subdir('syntax')
 subdir('binding')
+subdir('text')
 
 minsk_src += files(
     'compilation.c',
