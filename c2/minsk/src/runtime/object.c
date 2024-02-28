@@ -12,11 +12,11 @@ minsk_object_type_display_name(Arena * arena, minsk_object_type_t type)
 {
   switch (type)
   {
-#define X(x)                                    \
- case MINSK_OBJECT_TYPE_##x:                    \
- {                                              \
-  return snake_to_camel(arena, STRING_REF(#x)); \
- }
+#define X(x) \
+  case MINSK_OBJECT_TYPE_##x: \
+  { \
+    return snake_to_camel(arena, STRING_REF(#x)); \
+  }
 #include "minsk/runtime/private/object_types.xmacro"
 #undef X
   }

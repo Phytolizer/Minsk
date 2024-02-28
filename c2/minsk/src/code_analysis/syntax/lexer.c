@@ -217,10 +217,10 @@ minsk_syntax_lexer_lex(minsk_syntax_lexer_t * lexer)
   string_t text = EMPTY_STRING;
   minsk_object_t value = MINSK_OBJECT_NIL;
 
-#define TOK(n, k)  \
- next(lexer, (n)); \
- kind = (k);       \
- break
+#define TOK(n, k) \
+  next(lexer, (n)); \
+  kind = (k); \
+  break
 
   codepoint_t cp = current(lexer);
   switch (cp)

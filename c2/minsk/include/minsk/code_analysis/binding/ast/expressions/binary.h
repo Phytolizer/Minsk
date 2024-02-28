@@ -9,8 +9,8 @@ typedef struct
   struct minsk_bound_node * right;
 } minsk_bound_expression_binary_t;
 
-#define MINSK_BOUND_EXPRESSION_BINARY(...)  \
- MINSK_BOUND_EXPRESSION(                    \
-   MINSK_BOUND_NODE_TYPE_BINARY_EXPRESSION, \
-   .binary = {__VA_ARGS__}                  \
- )
+#define MINSK_BOUND_EXPRESSION_BINARY(...) \
+  MINSK_BOUND_EXPRESSION( \
+    MINSK_BOUND_NODE_TYPE_BINARY_EXPRESSION, \
+    .binary = {__VA_ARGS__} \
+  )

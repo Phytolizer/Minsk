@@ -182,3 +182,24 @@ minsk_syntax_node_children(Arena * arena, minsk_syntax_node_t node)
 
   DEBUGGER_FATAL("invalid node type %d", node.type);
 }
+
+extern minsk_text_span_t
+minsk_syntax_node_span(Arena * arena, minsk_syntax_node_t node)
+{
+  if (node.type == MINSK_SYNTAX_NODE_TYPE_TOKEN)
+  {
+    return minsk_syntax_token_span(node.token);
+  }
+  else
+  {
+    minsk_syntax_node_buf_t children = minsk_syntax_node_children(arena, node);
+    minsk_text_span_t first_span =
+      minsk_syntax_node_span(arena, BUF_SIDX(children, 0));
+    minsk_text_span_t last_span =
+      minsk_syntax_node_span(arena, BUF_SIDX(children, -1));
+    return minsk_text_span_from_bounds(
+      first_span.start,
+      minsk_text_span_end(last_span)
+    );
+  }
+}

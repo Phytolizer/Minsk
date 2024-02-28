@@ -4,6 +4,7 @@ PointerAlignment: Middle
 DerivePointerAlignment: false
 AlignAfterOpenBracket: BlockIndent
 AlignTrailingComments: false
+AlignEscapedNewlines: DontAlign
 BreakBeforeBraces: Allman
 BinPackArguments: false
 BinPackParameters: false

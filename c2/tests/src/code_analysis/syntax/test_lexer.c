@@ -45,8 +45,8 @@ typedef struct
   string_t text;
 } simple_token_t;
 
-#define ST(kind, text_lit)     \
-  {                            \
+#define ST(kind, text_lit) \
+  { \
     kind, STRING_REF(text_lit) \
   }
 
