@@ -21,7 +21,7 @@ pub fn init(
 ) !*BoundStatement {
     const result = try allocator.create(Self);
     result.* = .{
-        .base = BoundStatement.init(.for_statement, &deinit, &children),
+        .base = BoundStatement.init(.for_statement, &deinit, &children, &properties),
         .variable = variable,
         .lower_bound = lower_bound,
         .upper_bound = upper_bound,
@@ -45,4 +45,12 @@ fn children(node: *const BoundNode, allocator: std.mem.Allocator) ![]*const Boun
         &self.upper_bound.base,
         &self.body.base,
     });
+}
+
+fn properties(node: *const BoundNode, allocator: std.mem.Allocator) ![]BoundNode.Property {
+    const self = BoundStatement.downcastNode(node, Self);
+    return try allocator.dupe(BoundNode.Property, &[_]BoundNode.Property{.{
+        .name = "variable",
+        .value = self.variable.name,
+    }});
 }

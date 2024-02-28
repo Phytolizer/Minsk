@@ -15,6 +15,7 @@ pub fn init(
     kind: BoundNodeKind,
     deinit_fn: BoundNode.DeinitFn,
     children_fn: BoundNode.ChildrenFn,
+    properties_fn: BoundNode.PropertiesFn,
     type_fn: TypeFn,
 ) Self {
     return .{
@@ -22,6 +23,7 @@ pub fn init(
             .kind = kind,
             .deinit_fn = deinit_fn,
             .children_fn = children_fn,
+            .properties_fn = properties_fn,
         },
         .type_fn = type_fn,
     };

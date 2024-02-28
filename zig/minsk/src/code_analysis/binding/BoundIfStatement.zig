@@ -18,7 +18,7 @@ pub fn init(
 ) !*BoundStatement {
     const result = try allocator.create(Self);
     result.* = .{
-        .base = BoundStatement.init(.if_statement, &deinit, &children),
+        .base = BoundStatement.init(.if_statement, &deinit, &children, &properties),
         .condition = condition,
         .then_statement = then_statement,
         .else_statement = else_statement,
@@ -43,4 +43,9 @@ fn children(node: *const BoundNode, allocator: std.mem.Allocator) ![]*const Boun
     if (self.else_statement) |es|
         result.appendAssumeCapacity(&es.base);
     return try result.toOwnedSlice();
+}
+
+fn properties(node: *const BoundNode, allocator: std.mem.Allocator) ![]BoundNode.Property {
+    _ = node;
+    return try allocator.dupe(BoundNode.Property, &.{});
 }

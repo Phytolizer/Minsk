@@ -58,7 +58,7 @@ pub fn init(
 ) !*BoundExpression {
     const result = try allocator.create(Self);
     result.* = .{
-        .base = BoundExpression.init(.unary_expression, &deinit, &children, &@"type"),
+        .base = BoundExpression.init(.unary_expression, &deinit, &children, &properties, &@"type"),
         .operator = operator,
         .operand = operand,
     };
@@ -76,6 +76,14 @@ fn children(node: *const BoundNode, allocator: std.mem.Allocator) ![]*const Boun
     return try allocator.dupe(*const BoundNode, &.{
         &self.operand.base,
     });
+}
+
+fn properties(node: *const BoundNode, allocator: std.mem.Allocator) ![]BoundNode.Property {
+    const self = BoundExpression.downcastNode(node, Self);
+    return try allocator.dupe(BoundNode.Property, &.{.{
+        .name = "operator",
+        .value = @tagName(self.operator.kind),
+    }});
 }
 
 fn @"type"(node: *const BoundExpression) Object.Type {

@@ -14,7 +14,7 @@ pub fn init(
 ) !*BoundStatement {
     const result = try allocator.create(Self);
     result.* = .{
-        .base = BoundStatement.init(.expression_statement, &deinit, &children),
+        .base = BoundStatement.init(.expression_statement, &deinit, &children, null),
         .expression = expression,
     };
     return &result.base;
