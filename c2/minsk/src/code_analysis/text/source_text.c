@@ -1,8 +1,16 @@
 #include "minsk/code_analysis/text/source_text.h"
 
 #include <unicode/uchar.h>
+#include <unicode/urename.h>
 
 typedef UChar32 codepoint_t;
+
+static bool
+is_like_lf(ULineBreak prop)
+{
+  return prop == U_LB_MANDATORY_BREAK || prop == U_LB_LINE_FEED ||
+         prop == U_LB_NEXT_LINE;
+}
 
 static size_t
 get_line_break_width(string_t text, size_t position)
@@ -17,12 +25,14 @@ get_line_break_width(string_t text, size_t position)
     return 2;
   }
 
-  if (u_hasBinaryProperty(current, UCHAR_LINE_BREAK) && u_getIntPropertyValue(current, UCHAR_LINE_BREAK) == U_LB_MANDATORY_BREAK)
+  ULineBreak prop = u_getIntPropertyValue(current, UCHAR_LINE_BREAK);
+
+  if (!is_like_lf(prop))
   {
-    return U8_LENGTH(current);
+    return 0;
   }
 
-  return 0;
+  return U8_LENGTH(current);
 }
 
 static void
@@ -77,7 +87,7 @@ minsk_text_source_text_from(string_t text, Arena * arena)
 {
   return (minsk_text_source_text_t){
     ._arena = arena,
-    ._lines = parse_lines(text, arena),
+    .lines = parse_lines(text, arena),
     .text = text,
   };
 }
@@ -89,12 +99,12 @@ minsk_text_source_text_get_line_index(
 )
 {
   size_t lower = 0;
-  size_t upper = text._lines.len - 1;
+  size_t upper = text.lines.len - 1;
 
   while (lower <= upper)
   {
     size_t index = lower + (upper - lower) / 2;
-    minsk_text_line_t line = text._lines.ptr[index];
+    minsk_text_line_t line = text.lines.ptr[index];
     if (line.start == position)
     {
       return index;

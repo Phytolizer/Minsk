@@ -9,14 +9,18 @@
 #include <minsk/code_analysis/syntax/tree.h>
 #include <minsk/code_analysis/text/span.h>
 #include <minsk/code_analysis/variable_map.h>
+#include <minsk/data_structures/buf.h>
 #include <minsk/runtime/object.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "mc/cwd.h"
+#include "minsk/code_analysis/text/source_text.h"
 
 #define HISTORY_PATH ".minsk-history"
+
+typedef BUF_T(string_t) string_buf_t;
 
 extern int
 main(int argc, char ** argv)
@@ -34,43 +38,73 @@ main(int argc, char ** argv)
   Arena var_arena = {0};
   minsk_variable_map_t variables = minsk_variable_map_new(&var_arena);
 
+  string_buf_t text_builder = BUF_INIT;
+
   while (true)
   {
-    const char * prompt = "\x1b[32m»\x1b[0m ";
+    const char * prompt =
+      (text_builder.len == 0) ? "\x1b[32m»\x1b[0m " : "\x1b[32m·\x1b[0m ";
     char * raw_line = linenoise(prompt);
-    if (raw_line == NULL)
+    if (raw_line != NULL)
     {
-      break;
+      linenoiseHistoryAdd(raw_line);
     }
-    linenoiseHistoryAdd(raw_line);
-    string_t line = STRING_REF_FROM_C(raw_line);
+    string_t input = raw_line ? STRING_REF_FROM_C(raw_line) : EMPTY_STRING;
 
-    if (STRING_EQUAL(line, STRING_REF("#showTree")))
+    if (text_builder.len == 0)
     {
-      free(raw_line);
+      if (raw_line == NULL)
+      {
+        break;
+      }
+      if (STRING_EQUAL(input, STRING_REF("#showTree")))
+      {
+        free(raw_line);
 
-      show_tree = !show_tree;
-      printf(
-        STRING_FMT "\n",
-        STRING_ARG(
-          show_tree ? STRING_REF("Showing parse trees.")
-                    : STRING_REF("Not showing parse trees.")
-        )
-      );
-      continue;
-    }
-    if (STRING_EQUAL(line, STRING_REF("#cls")))
-    {
-      free(raw_line);
+        show_tree = !show_tree;
+        printf(
+          STRING_FMT "\n",
+          STRING_ARG(
+            show_tree ? STRING_REF("Showing parse trees.")
+                      : STRING_REF("Not showing parse trees.")
+          )
+        );
+        continue;
+      }
+      if (STRING_EQUAL(input, STRING_REF("#cls")))
+      {
+        free(raw_line);
 
-      printf("\x1b[2J\x1b[H");
-      fflush(stdout);
-      continue;
+        printf("\x1b[2J\x1b[H");
+        fflush(stdout);
+        continue;
+      }
     }
+
+    BUF_PUSH(&text_builder, string_dup(input));
 
     Arena a = {0};
 
-    minsk_syntax_tree_t syntax_tree = minsk_syntax_tree_parse(&a, line);
+    string_t text = EMPTY_STRING;
+    for (size_t i = 0; i < text_builder.len; i++)
+    {
+      if (i > 0)
+      {
+        string_push_arena(&a, &text, '\n');
+      }
+      string_t line = text_builder.ptr[i];
+      string_append_arena(&a, &text, line);
+    }
+
+    minsk_syntax_tree_t syntax_tree = minsk_syntax_tree_parse(&a, text);
+
+    if (input.length > 0 && syntax_tree.diagnostics.diagnostics.len > 0)
+    {
+      arena_free(&a);
+      free(raw_line);
+      continue;
+    }
+
     if (show_tree)
     {
       minsk_syntax_node_pretty_print(syntax_tree.root, stdout);
@@ -81,16 +115,16 @@ main(int argc, char ** argv)
 
     if (!result.success)
     {
-      minsk_text_source_text_t text = syntax_tree.text;
-
       for (size_t i = 0; i < result.diagnostics.len; i++)
       {
         minsk_diagnostic_t diagnostic = result.diagnostics.ptr[i];
-        size_t line_index =
-          minsk_text_source_text_get_line_index(text, diagnostic.span.start);
+        size_t line_index = minsk_text_source_text_get_line_index(
+          syntax_tree.text,
+          diagnostic.span.start
+        );
+        minsk_text_line_t line = syntax_tree.text.lines.ptr[line_index];
         size_t line_number = line_index + 1;
-        size_t character =
-          diagnostic.span.start - text._lines.ptr[line_index].start + 1;
+        size_t character = diagnostic.span.start - line.start + 1;
 
         printf("\n");
         printf("\x1b[0;31m");
@@ -101,11 +135,20 @@ main(int argc, char ** argv)
           STRING_ARG(diagnostic.message)
         );
         printf("\x1b[0m");
-        string_t prefix = STRING_SUB(line, 0, diagnostic.span.start);
-        string_t error =
-          STRING_SUB_LEN(line, diagnostic.span.start, diagnostic.span.length);
+        minsk_text_span_t prefix_span =
+          minsk_text_span_from_bounds(line.start, diagnostic.span.start);
+        minsk_text_span_t suffix_span = minsk_text_span_from_bounds(
+          minsk_text_span_end(diagnostic.span),
+          minsk_text_line_end(line)
+        );
+        string_t prefix =
+          minsk_text_source_text_substring_span(syntax_tree.text, prefix_span);
+        string_t error = minsk_text_source_text_substring_span(
+          syntax_tree.text,
+          diagnostic.span
+        );
         string_t suffix =
-          STRING_SUB_AFTER(line, minsk_text_span_end(diagnostic.span));
+          minsk_text_source_text_substring_span(syntax_tree.text, suffix_span);
 
         printf("    " STRING_FMT, STRING_ARG(prefix));
         printf("\x1b[0;31m");
@@ -122,10 +165,20 @@ main(int argc, char ** argv)
       printf("\x1b[0m\n");
     }
 
+    for (size_t i = 0; i < text_builder.len; i++)
+    {
+      string_free(text_builder.ptr[i]);
+    }
+    text_builder.len = 0;
     arena_free(&a);
     free(raw_line);
   }
 
+  for (size_t i = 0; i < text_builder.len; i++)
+  {
+    string_free(text_builder.ptr[i]);
+  }
+  BUF_FREE(text_builder);
   arena_free(&var_arena);
   minsk_syntax_facts_free_keyword_table();
 

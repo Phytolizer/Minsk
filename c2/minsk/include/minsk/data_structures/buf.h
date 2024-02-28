@@ -118,7 +118,7 @@
     } \
   } while (false)
 
-#define BUF_FREE(buf, val) BUF_FREE_ARENA(NULL, buf, val)
+#define BUF_FREE(buf) BUF_FREE_ARENA(NULL, buf)
 
 #if defined(__GNUC__) || defined(__clang__)
  #define BUF_LIT_C(T, ...) \

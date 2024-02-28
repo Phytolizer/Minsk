@@ -48,7 +48,7 @@ typedef BUF_T(minsk_text_line_t) minsk_text_line_buf_t;
 typedef struct
 {
   Arena * _arena;
-  minsk_text_line_buf_t _lines;
+  minsk_text_line_buf_t lines;
   string_t text;
 } minsk_text_source_text_t;
 
