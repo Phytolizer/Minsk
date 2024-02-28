@@ -15,7 +15,7 @@ typedef struct
   bool is_ref;
 } string_t;
 
-#define EMPTY_STRING ((string_t){NULL, 0, 0, false})
+#define EMPTY_STRING ((string_t){"", 0, 0, false})
 
 #define STRING_REF_C(str) \
   { \
