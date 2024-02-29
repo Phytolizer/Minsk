@@ -31,7 +31,7 @@ pub const BoundNodeKind = enum {
     }
 
     fn endsWithOneOf(comptime s: []const u8, comptime suffixes: []const []const u8) bool {
-        for (suffixes) |suffix| {
+        inline for (suffixes) |suffix| {
             if (std.mem.endsWith(u8, s, suffix)) {
                 return true;
             }
