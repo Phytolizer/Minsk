@@ -34,7 +34,7 @@ fn properties(node: *const BoundNode, allocator: std.mem.Allocator) ![]BoundNode
     const self = BoundExpression.downcastNode(node, Self);
     return try allocator.dupe(BoundNode.Property, &[_]BoundNode.Property{.{
         .name = "variable",
-        .value = self.variable.name,
+        .value = try allocator.dupe(u8, self.variable.name),
     }});
 }
 

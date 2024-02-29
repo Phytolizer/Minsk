@@ -82,7 +82,7 @@ fn properties(node: *const BoundNode, allocator: std.mem.Allocator) ![]BoundNode
     const self = BoundExpression.downcastNode(node, Self);
     return try allocator.dupe(BoundNode.Property, &.{.{
         .name = "operator",
-        .value = @tagName(self.operator.kind),
+        .value = try allocator.dupe(u8, @tagName(self.operator.kind)),
     }});
 }
 
