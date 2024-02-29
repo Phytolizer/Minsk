@@ -30,19 +30,14 @@ pub const BoundNodeKind = enum {
         return display_names[@intFromEnum(self)];
     }
 
-    fn endsWithOneOf(comptime s: []const u8, comptime suffixes: []const []const u8) bool {
-        inline for (suffixes) |suffix| {
-            if (std.mem.endsWith(u8, s, suffix)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     fn suffixMap(comptime fields: []const std.builtin.Type.EnumField, comptime suffixes: []const []const u8) [fields.len]bool {
-        var result: [fields.len]bool = undefined;
+        var result: [fields.len]bool = [_]bool{false} ** fields.len;
         for (&result, fields) |*r, field| {
-            r.* = endsWithOneOf(field.name, suffixes);
+            inline for (suffixes) |suffix| {
+                if (std.mem.endsWith(u8, field.name, suffix)) {
+                    r.* = true;
+                }
+            }
         }
         return result;
     }
