@@ -7,6 +7,8 @@ const Diagnostic = @import("Diagnostic.zig");
 const DiagnosticBag = @import("DiagnosticBag.zig");
 const VariableSymbol = @import("VariableSymbol.zig");
 const BoundGlobalScope = @import("binding/BoundGlobalScope.zig");
+const BoundStatement = @import("binding/BoundStatement.zig");
+const Lowerer = @import("lowering/Lowerer.zig");
 const Atomic = std.atomic.Value;
 
 allocator: std.mem.Allocator,
@@ -77,6 +79,13 @@ pub const EvaluationResult = union(enum) {
     }
 };
 
+fn getStatement(self: *Self) !*BoundStatement {
+    const gs = try self.globalScope();
+    const lowerer = try Lowerer.init(self.allocator);
+    defer lowerer.deinit();
+    return try lowerer.rewriteStatement(gs.statement);
+}
+
 pub fn evaluate(self: *Self, variables: *VariableSymbol.Map) !EvaluationResult {
     const global_scope = try self.globalScope();
     const diagnostics = blk: {
@@ -90,11 +99,12 @@ pub fn evaluate(self: *Self, variables: *VariableSymbol.Map) !EvaluationResult {
         return .{ .failure = diagnostics };
     }
 
-    var evaluator = Evaluator.init(global_scope.statement, variables);
+    const statement = try self.getStatement();
+    var evaluator = Evaluator.init(statement, variables);
     return .{ .success = try evaluator.evaluate() };
 }
 
 pub fn emitTree(self: *Self, allocator: std.mem.Allocator, writer: anytype, tty: ?std.io.tty.Config) !void {
-    const gs = try self.globalScope();
-    try gs.statement.base.prettyPrint(allocator, "", true, writer, tty);
+    const statement = try self.getStatement();
+    try statement.base.prettyPrint(allocator, "", true, writer, tty);
 }

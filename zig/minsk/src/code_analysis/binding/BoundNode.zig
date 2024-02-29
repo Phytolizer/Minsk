@@ -45,9 +45,9 @@ pub fn properties(self: *const Self, allocator: std.mem.Allocator) ![]Property {
 }
 
 fn nodeColor(kind: BoundNodeKind) tty_ext.Color {
-    return if (kind.is_expression())
+    return if (kind.isExpression())
         .blue
-    else if (kind.is_statement())
+    else if (kind.isStatement())
         .cyan
     else
         .yellow;

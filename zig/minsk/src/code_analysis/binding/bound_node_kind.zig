@@ -42,12 +42,12 @@ pub const BoundNodeKind = enum {
         return result;
     }
 
-    pub fn is_expression(self: Self) bool {
+    pub fn isExpression(self: Self) bool {
         const map = comptime suffixMap(std.meta.fields(Self), &.{"_expression"});
         return map[@intFromEnum(self)];
     }
 
-    pub fn is_statement(self: Self) bool {
+    pub fn isStatement(self: Self) bool {
         const map = comptime suffixMap(std.meta.fields(Self), &.{"_statement, _declaration"});
         return map[@intFromEnum(self)];
     }
