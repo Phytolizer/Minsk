@@ -93,3 +93,8 @@ pub fn evaluate(self: *Self, variables: *VariableSymbol.Map) !EvaluationResult {
     var evaluator = Evaluator.init(global_scope.statement, variables);
     return .{ .success = try evaluator.evaluate() };
 }
+
+pub fn emitTree(self: *Self, allocator: std.mem.Allocator, writer: anytype, tty: ?std.io.tty.Config) !void {
+    const gs = try self.globalScope();
+    try gs.statement.base.prettyPrint(allocator, "", true, writer, tty);
+}
