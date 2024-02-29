@@ -136,7 +136,7 @@ fn children(node: *const BoundNode, allocator: std.mem.Allocator) ![]*const Boun
 fn properties(node: *const BoundNode, allocator: std.mem.Allocator) ![]BoundNode.Property {
     const self = BoundExpression.downcastNode(node, Self);
     return try allocator.dupe(BoundNode.Property, &.{.{
-        .name = "operator",
+        .name = "operation",
         .value = try allocator.dupe(u8, @tagName(self.operator.kind)),
     }});
 }
