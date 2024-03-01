@@ -47,12 +47,9 @@ pub fn prettyPrint(
     indent: []const u8,
     is_last: bool,
     writer: anytype,
-    comptime colors: enum { colors, no_colors },
     tty: ?std.io.tty.Config,
 ) !void {
-    if (colors == .colors) {
-        try tty_ext.setColor(tty.?, writer, .gray);
-    }
+    try tty_ext.maybeSetColor(tty, writer, .gray);
     try writer.print("{s}{s}", .{
         indent,
         if (is_last)
@@ -61,25 +58,19 @@ pub fn prettyPrint(
             "├───",
     });
     const is_token = std.mem.endsWith(u8, self.kind.displayName(), "Token");
-    if (colors == .colors) {
-        try tty_ext.setColor(tty.?, writer, if (is_token)
-            .blue
-        else
-            .cyan);
-    }
+    try tty_ext.maybeSetColor(tty, writer, if (is_token)
+        .blue
+    else
+        .cyan);
     try writer.writeAll(self.kind.displayName());
     if (is_token) {
         const token = self.downcast(SyntaxToken);
         if (token.value) |value| {
-            if (colors == .colors) {
-                try tty_ext.setColor(tty.?, writer, .magenta);
-            }
+            try tty_ext.maybeSetColor(tty, writer, .magenta);
             try writer.print(" {}", .{value});
         }
     }
-    if (colors == .colors) {
-        try tty_ext.setColor(tty.?, writer, .reset);
-    }
+    try tty_ext.maybeSetColor(tty, writer, .reset);
     try writer.writeAll("\n");
     const new_indent = try std.mem.concat(allocator, u8, &.{
         indent, if (is_last)
@@ -97,7 +88,6 @@ pub fn prettyPrint(
             new_indent,
             i == cs.len - 1,
             writer,
-            colors,
             tty,
         );
     }

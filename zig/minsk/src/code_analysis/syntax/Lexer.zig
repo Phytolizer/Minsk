@@ -169,11 +169,25 @@ pub fn lex(self: *Self) AllocError!?SyntaxToken {
             self.next();
             self.next();
             self.kind = .ampersand_ampersand_token;
+        } else {
+            self.next();
+            self.kind = .ampersand_token;
         },
         '|' => if (try self.look(1) == '|') {
             self.next();
             self.next();
             self.kind = .pipe_pipe_token;
+        } else {
+            self.next();
+            self.kind = .pipe_token;
+        },
+        '~' => {
+            self.next();
+            self.kind = .tilde_token;
+        },
+        '^' => {
+            self.next();
+            self.kind = .hat_token;
         },
         '=' => if (try self.look(1) == '=') {
             self.next();
