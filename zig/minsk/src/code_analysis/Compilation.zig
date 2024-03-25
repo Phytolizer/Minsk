@@ -36,19 +36,19 @@ pub fn deinit(
 ) void {
     if (with_parents == .with_parents) if (self.previous) |p| p.deinit(.with_parents);
     self.syntax_tree.deinit();
-    if (self.global_scope.load(.SeqCst)) |gs| gs.deinit();
+    if (self.global_scope.load(.seq_cst)) |gs| gs.deinit();
     self.allocator.destroy(self);
 }
 
 fn globalScope(self: *Self) !*BoundGlobalScope {
-    if (self.global_scope.load(.SeqCst)) |gs| return gs;
+    if (self.global_scope.load(.seq_cst)) |gs| return gs;
 
     const new_gs = try Binder.bindGlobalScope(
         self.allocator,
         if (self.previous) |p| try p.globalScope() else null,
         self.syntax_tree.root,
     );
-    if (self.global_scope.cmpxchgStrong(null, new_gs, .SeqCst, .SeqCst)) |old_gs| {
+    if (self.global_scope.cmpxchgStrong(null, new_gs, .seq_cst, .seq_cst)) |old_gs| {
         new_gs.deinit();
         // not null, compareAndSwap would not give anything if it was
         return old_gs.?;
