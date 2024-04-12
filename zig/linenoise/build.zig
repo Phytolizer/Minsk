@@ -17,6 +17,6 @@ pub fn build(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
     });
     result.addIncludePath(.{ .path = this_dir });
     const lib = b.addInstallArtifact(result, .{});
-    result.installHeader(this_dir ++ "/linenoise.h", "linenoise.h");
+    result.installHeader(.{ .path = this_dir ++ "/linenoise.h" }, "linenoise.h");
     return .{ .raw = result, .lib = lib };
 }
