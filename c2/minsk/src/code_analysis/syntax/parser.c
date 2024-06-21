@@ -68,7 +68,8 @@ minsk_syntax_parser_new(Arena * arena, minsk_text_source_text_t text)
   while (true)
   {
     minsk_syntax_token_t tok = minsk_syntax_lexer_lex(&lexer);
-    if (tok.kind == MINSK_SYNTAX_KIND_WHITESPACE_TOKEN || tok.kind == MINSK_SYNTAX_KIND_BAD_TOKEN)
+    if (tok.kind == MINSK_SYNTAX_KIND_WHITESPACE_TOKEN ||
+        tok.kind == MINSK_SYNTAX_KIND_BAD_TOKEN)
     {
       string_free(tok.text);
       continue;
@@ -123,7 +124,8 @@ parse_expression(minsk_syntax_parser_t * parser)
 inline minsk_syntax_node_t
 parse_assignment_expression(minsk_syntax_parser_t * parser)
 {
-  if (peek(parser, 0).kind == MINSK_SYNTAX_KIND_IDENTIFIER_TOKEN && peek(parser, 1).kind == MINSK_SYNTAX_KIND_EQUALS_TOKEN)
+  if (peek(parser, 0).kind == MINSK_SYNTAX_KIND_IDENTIFIER_TOKEN &&
+      peek(parser, 1).kind == MINSK_SYNTAX_KIND_EQUALS_TOKEN)
   {
     minsk_syntax_token_t identifier_token = next_token(parser);
     minsk_syntax_token_t equals_token = next_token(parser);

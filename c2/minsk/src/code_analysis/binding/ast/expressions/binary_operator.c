@@ -6,12 +6,18 @@
 
 #define UNIFORM(sk, k, t) \
   { \
-    .syntax_kind = sk, .kind = k, .left_type = t, .right_type = t, \
+    .syntax_kind = sk, \
+    .kind = k, \
+    .left_type = t, \
+    .right_type = t, \
     .result_type = t, \
   }
 #define MATCHING(sk, k, ti, to) \
   { \
-    .syntax_kind = sk, .kind = k, .left_type = ti, .right_type = ti, \
+    .syntax_kind = sk, \
+    .kind = k, \
+    .left_type = ti, \
+    .right_type = ti, \
     .result_type = to, \
   }
 
@@ -82,7 +88,8 @@ minsk_bound_expression_binary_operator_bind(
   for (size_t i = 0; i < ops_buf.len; i++)
   {
     minsk_bound_expression_binary_operator_t const * op = &ops_buf.ptr[i];
-    if (op->syntax_kind == syntax_kind && op->left_type == left_type && op->right_type == right_type)
+    if (op->syntax_kind == syntax_kind && op->left_type == left_type &&
+        op->right_type == right_type)
     {
       return op;
     }

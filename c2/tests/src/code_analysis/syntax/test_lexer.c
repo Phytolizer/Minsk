@@ -45,10 +45,7 @@ typedef struct
   string_t text;
 } simple_token_t;
 
-#define ST(kind, text_lit) \
-  { \
-    kind, STRING_REF(text_lit) \
-  }
+#define ST(kind, text_lit) {kind, STRING_REF(text_lit)}
 
 typedef BUF_T(simple_token_t) simple_token_buf_t;
 
@@ -185,7 +182,8 @@ requires_separator(minsk_syntax_kind_t k1, minsk_syntax_kind_t k2)
     return true;
   }
 
-  if (k1 == MINSK_SYNTAX_KIND_NUMBER_TOKEN && k2 == MINSK_SYNTAX_KIND_NUMBER_TOKEN)
+  if (k1 == MINSK_SYNTAX_KIND_NUMBER_TOKEN &&
+      k2 == MINSK_SYNTAX_KIND_NUMBER_TOKEN)
   {
     return true;
   }
@@ -411,12 +409,14 @@ TEST(lexer, tests_all_tokens)
   kind_set_t * all_token_kinds = NULL;
   for (minsk_syntax_kind_t kind = 0; kind < MINSK_SYNTAX_KIND_COUNT; ++kind)
   {
-    if (kind == MINSK_SYNTAX_KIND_BAD_TOKEN || kind == MINSK_SYNTAX_KIND_END_OF_FILE_TOKEN)
+    if (kind == MINSK_SYNTAX_KIND_BAD_TOKEN ||
+        kind == MINSK_SYNTAX_KIND_END_OF_FILE_TOKEN)
     {
       continue;
     }
     string_t name = minsk_syntax_kind_display_name(&test_arena, kind);
-    if (string_endswith(name, STRING_REF("Token")) || string_endswith(name, STRING_REF("Keyword")))
+    if (string_endswith(name, STRING_REF("Token")) ||
+        string_endswith(name, STRING_REF("Keyword")))
     {
       kind_set_t * bucket = arena_alloc(&test_arena, sizeof(*bucket));
       memset(bucket, 0, sizeof(*bucket));

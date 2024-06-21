@@ -18,9 +18,7 @@ typedef struct
 #define EMPTY_STRING ((string_t){"", 0, 0, false})
 
 #define STRING_REF_C(str) \
-  { \
-    (char *)(str), sizeof(str) - 1, sizeof(str) - 1, true \
-  }
+  {(char *)(str), sizeof(str) - 1, sizeof(str) - 1, true}
 
 #define STRING_REF(str) ((string_t)STRING_REF_C(str))
 
