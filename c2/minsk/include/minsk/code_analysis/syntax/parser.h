@@ -1,7 +1,6 @@
 #pragma once
 
 #include <arena.h>
-#include <minsk-string/string.h>
 #include <stddef.h>
 
 #include "minsk/code_analysis/diagnostic_bag.h"

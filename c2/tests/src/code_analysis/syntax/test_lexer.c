@@ -8,6 +8,7 @@
 #include <minsk/meta/concat.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <string.h>
 #include <tau/tau.h>
 #include <uthash.h>
 
@@ -45,7 +46,10 @@ typedef struct
   string_t text;
 } simple_token_t;
 
-#define ST(kind, text_lit) {kind, STRING_REF(text_lit)}
+#define ST(kind, text_lit) \
+  { \
+    kind, STRING_REF(text_lit) \
+  }
 
 typedef BUF_T(simple_token_t) simple_token_buf_t;
 

@@ -3,7 +3,6 @@
 #include <minsk-string/string.h>
 #include <minsk/code_analysis/compilation.h>
 #include <minsk/code_analysis/diagnostic.h>
-#include <minsk/code_analysis/diagnostic_bag.h>
 #include <minsk/code_analysis/syntax/ast/node.h>
 #include <minsk/code_analysis/syntax/facts.h>
 #include <minsk/code_analysis/syntax/tree.h>

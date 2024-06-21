@@ -1,12 +1,11 @@
 #include "minsk-platform/errno.h"
 
-#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
 #ifdef _WIN32
+ #include <assert.h>
  #include <windows.h>
-#else
 #endif
 
 extern void

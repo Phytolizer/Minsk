@@ -2,8 +2,6 @@
 #include <inttypes.h>
 #include <minsk-string/string.h>
 #include <minsk/code_analysis/compilation.h>
-#include <minsk/code_analysis/diagnostic.h>
-#include <minsk/code_analysis/diagnostic_bag.h>
 #include <minsk/code_analysis/syntax/tree.h>
 #include <minsk/code_analysis/variable_map.h>
 #include <minsk/data_structures/buf.h>
@@ -85,7 +83,10 @@ TEST(evaluator, correct_evaluation)
     minsk_object_t expected;
   } test_t;
 
-#define T(i, x) {.input = STRING_REF(i), .expected = (x)}
+#define T(i, x) \
+  { \
+    .input = STRING_REF(i), .expected = (x) \
+  }
 
   test_t const test_data[] = {
     T("1", MINSK_OBJECT_INTEGER(1)),

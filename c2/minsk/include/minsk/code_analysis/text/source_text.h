@@ -1,6 +1,7 @@
 #pragma once
 
 #include <arena.h>
+#include <stddef.h>
 
 #include "minsk-string/string.h"
 #include "minsk/code_analysis/text/span.h"

@@ -1,6 +1,8 @@
+#include <arena.h>
 #include <minsk-string/string.h>
 #include <minsk/code_analysis/text/source_text.h>
 #include <minsk/data_structures/buf.h>
+#include <stddef.h>
 #include <tau/tau.h>
 
 #include "minsk-test/tau-ext.h"
