@@ -79,7 +79,9 @@ minsk_binder_bind_expression(
     case MINSK_SYNTAX_NODE_TYPE_COMPILATION_UNIT: break;
   }
 
-  DEBUGGER_FATAL("invalid syntax node type %d", syntax.type);
+  Arena arena = {0};
+  string_t type_name = minsk_syntax_node_type_display_name(&arena, syntax.type);
+  DEBUGGER_FATAL("invalid syntax node type " STRING_FMT, STRING_ARG(type_name));
 }
 
 static minsk_bound_node_t
