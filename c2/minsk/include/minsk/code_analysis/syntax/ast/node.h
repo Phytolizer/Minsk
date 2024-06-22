@@ -3,6 +3,7 @@
 #include <arena.h>
 #include <stdio.h>
 
+#include "minsk/code_analysis/syntax/ast/compilation_unit.h"
 #include "minsk/code_analysis/syntax/ast/expression.h"
 #include "minsk/code_analysis/syntax/ast/node_type.h"
 #include "minsk/code_analysis/syntax/token.h"
@@ -17,6 +18,7 @@ typedef struct minsk_syntax_node
   {
     minsk_syntax_token_t token;
     minsk_syntax_expression_t expression;
+    minsk_syntax_compilation_unit_t compilation_unit;
   };
 } minsk_syntax_node_t;
 

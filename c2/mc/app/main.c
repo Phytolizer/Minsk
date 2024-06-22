@@ -137,7 +137,13 @@ main(int argc, char ** argv)
 
     if (show_tree)
     {
-      minsk_syntax_node_pretty_print(syntax_tree.root, stdout);
+      minsk_syntax_node_pretty_print(
+        (minsk_syntax_node_t){
+          .type = MINSK_SYNTAX_NODE_TYPE_COMPILATION_UNIT,
+          .compilation_unit = syntax_tree.root,
+        },
+        stdout
+      );
     }
     minsk_compilation_t compilation = minsk_compilation_new(&a, syntax_tree);
     minsk_evaluation_result_t result =

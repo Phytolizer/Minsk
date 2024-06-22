@@ -76,6 +76,8 @@ minsk_binder_bind_expression(
     case MINSK_SYNTAX_NODE_TYPE_UNARY_EXPRESSION:
       return bind_unary_expression(binder, syntax.expression.unary);
     case MINSK_SYNTAX_NODE_TYPE_TOKEN: break;
+    case MINSK_SYNTAX_NODE_TYPE_COMPILATION_UNIT:
+      DEBUGGER_FATAL("found compilation unit in binder");
   }
 
   DEBUGGER_FATAL("invalid syntax node type %d", syntax.type);

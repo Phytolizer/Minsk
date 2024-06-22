@@ -10,7 +10,6 @@
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/code_analysis/syntax/lexer.h"
 #include "minsk/code_analysis/syntax/token.h"
-#include "minsk/code_analysis/syntax/tree.h"
 #include "minsk/runtime/object.h"
 
 static minsk_syntax_token_t
@@ -101,16 +100,14 @@ parse_binary_expression(
 static minsk_syntax_node_t
 parse_primary_expression(minsk_syntax_parser_t * parser);
 
-extern minsk_syntax_tree_t
-minsk_syntax_parser_parse(minsk_syntax_parser_t * parser)
+extern minsk_syntax_compilation_unit_t
+minsk_syntax_parser_parse_compilation_unit(minsk_syntax_parser_t * parser)
 {
   minsk_syntax_node_t expression = parse_expression(parser);
   minsk_syntax_token_t end_of_file_token =
     match_token(parser, MINSK_SYNTAX_KIND_END_OF_FILE_TOKEN);
-  return (minsk_syntax_tree_t){
-    .text = parser->_text,
-    .diagnostics = parser->diagnostics,
-    .root = expression,
+  return (minsk_syntax_compilation_unit_t){
+    .expression = minsk_syntax_node_promote(parser->_arena, expression),
     .end_of_file_token = end_of_file_token,
   };
 }

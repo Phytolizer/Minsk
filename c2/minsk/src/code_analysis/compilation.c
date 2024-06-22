@@ -23,7 +23,7 @@ minsk_compilation_evaluate(
 {
   minsk_binder_t binder = minsk_binder_new(compilation->_arena, variables);
   minsk_bound_node_t bound_expression =
-    minsk_binder_bind_expression(&binder, compilation->syntax_tree.root);
+    minsk_binder_bind_expression(&binder, *compilation->syntax_tree.root.expression);
 
   minsk_diagnostic_bag_buf_t diagnostics =
     compilation->syntax_tree.diagnostics.diagnostics;
