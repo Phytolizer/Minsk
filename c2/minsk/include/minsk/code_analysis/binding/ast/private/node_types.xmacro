@@ -1,4 +1,4 @@
-// IWYU pragma: private, include "minsk/code_analysis/binding/ast/node_type.h"
+// IWYU pragma: private, include <minsk/code_analysis/binding/ast/node_type.h>
 
 X(ASSIGNMENT_EXPRESSION)
 X(BINARY_EXPRESSION)

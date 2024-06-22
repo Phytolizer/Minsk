@@ -1,4 +1,4 @@
-// IWYU pragma: private, include "minsk/code_analysis/syntax/kind.h"
+// IWYU pragma: private, include <minsk/code_analysis/syntax/kind.h>
 
 X(BAD_TOKEN)
 X(END_OF_FILE_TOKEN)
