@@ -1,5 +1,6 @@
 #include <arena.h>
 #include <minsk-string/string.h>
+#include <minsk/code_analysis/syntax/ast/node.h>
 #include <minsk/code_analysis/syntax/ast/node_type.h>
 #include <minsk/code_analysis/syntax/facts.h>
 #include <minsk/code_analysis/syntax/kind.h>

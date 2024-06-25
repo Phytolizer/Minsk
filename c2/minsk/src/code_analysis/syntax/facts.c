@@ -1,10 +1,30 @@
 #include "minsk/code_analysis/syntax/facts.h"
 
-#include <stdlib.h>
-#include <uthash.h>
+#include <minsk-string/string.h>
 
-#include "minsk-string/string.h"
 #include "minsk/code_analysis/syntax/kind.h"
+#include "minsk/hash/fnv.h"
+
+static uint64_t
+keyword_hash(string_t key)
+{
+  return minsk_hash_fnv64a(key.data, key.length);
+}
+
+static bool
+keyword_cmpr(string_t a, string_t b)
+{
+  return STRING_EQUAL(a, b);
+}
+
+#define NAME keyword_map
+#define KEY_TY string_t
+#define VAL_TY minsk_syntax_kind_t
+#define HASH_FN keyword_hash
+#define CMPR_FN keyword_cmpr
+#include <verstable.h>
+
+typedef keyword_map keyword_map_t;
 
 extern minsk_syntax_facts_precedence_t
 minsk_syntax_facts_binary_operator_precedence(minsk_syntax_kind_t kind)
@@ -35,27 +55,18 @@ minsk_syntax_facts_unary_operator_precedence(minsk_syntax_kind_t kind)
   }
 }
 
-typedef struct
-{
-  string_t text;
-  minsk_syntax_kind_t kind;
-  UT_hash_handle hh;
-} keyword_t;
-
-static keyword_t * g_keywords;
+static keyword_map_t g_keywords;
 
 static void
 add_keyword(string_t text, minsk_syntax_kind_t kind)
 {
-  keyword_t * kw = malloc(sizeof(*kw));
-  kw->text = text;
-  kw->kind = kind;
-  HASH_ADD_KEYPTR(hh, g_keywords, kw->text.data, kw->text.length, kw);
+  keyword_map_insert(&g_keywords, text, kind);
 }
 
 static void
 init_keywords(void)
 {
+  keyword_map_init(&g_keywords);
   add_keyword(STRING_REF("true"), MINSK_SYNTAX_KIND_TRUE_KEYWORD);
   add_keyword(STRING_REF("false"), MINSK_SYNTAX_KIND_FALSE_KEYWORD);
 }
@@ -63,13 +74,7 @@ init_keywords(void)
 extern void
 minsk_syntax_facts_free_keyword_table(void)
 {
-  keyword_t * kw;
-  keyword_t * tmp;
-  HASH_ITER(hh, g_keywords, kw, tmp)
-  {
-    HASH_DEL(g_keywords, kw);
-    free(kw);
-  }
+  keyword_map_cleanup(&g_keywords);
 }
 
 extern string_t
@@ -144,16 +149,15 @@ minsk_syntax_facts_get_unary_operator_kinds(void)
 extern minsk_syntax_kind_t
 minsk_syntax_facts_keyword_kind(string_t text)
 {
-  if (g_keywords == NULL)
+  if (g_keywords.buckets_mask == 0)
   {
     init_keywords();
   }
 
-  keyword_t * kw = NULL;
-  HASH_FIND(hh, g_keywords, text.data, text.length, kw);
-  if (kw != NULL)
+  keyword_map_itr kw = keyword_map_get(&g_keywords, text);
+  if (!keyword_map_is_end(kw))
   {
-    return kw->kind;
+    return kw.data->val;
   }
   return MINSK_SYNTAX_KIND_IDENTIFIER_TOKEN;
 }

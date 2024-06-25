@@ -3,23 +3,18 @@
 #include <arena.h>
 #include <minsk-string/string.h>
 #include <stdbool.h>
-#include <uthash.h>
 
 #include "minsk/code_analysis/variable_symbol.h"
 #include "minsk/runtime/object.h"
 
-typedef struct
-{
-  minsk_variable_symbol_t key;
-  minsk_object_t value;
-  UT_hash_handle hh;
-} minsk_variable_bucket_t;
+#define NAME minsk_variable_map
+#define KEY_TY minsk_variable_symbol_t
+#define VAL_TY minsk_object_t
+#define CTX_TY Arena *
+#define HEADER_MODE
+#include <verstable.h>
 
-typedef struct
-{
-  Arena * _arena;
-  minsk_variable_bucket_t * _buckets;
-} minsk_variable_map_t;
+typedef minsk_variable_map minsk_variable_map_t;
 
 extern minsk_variable_map_t
 minsk_variable_map_new(Arena * arena);

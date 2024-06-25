@@ -4,6 +4,7 @@
 #include <minsk/code_analysis/compilation.h>
 #include <minsk/code_analysis/diagnostic.h>
 #include <minsk/code_analysis/syntax/ast/node.h>
+#include <minsk/code_analysis/syntax/ast/node_type.h>
 #include <minsk/code_analysis/syntax/facts.h>
 #include <minsk/code_analysis/syntax/tree.h>
 #include <minsk/code_analysis/text/span.h>

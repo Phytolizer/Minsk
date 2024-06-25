@@ -2,44 +2,45 @@
 
 #include <arena.h>
 #include <minsk-string/string.h>
-#include <stddef.h>
-#include <uthash.h>
+#include <stdint.h>
 
-#undef uthash_malloc
-#define uthash_malloc(sz) arena_alloc(map->_arena, (sz))
+#include "minsk/hash/fnv.h"
 
-#undef uthash_free
-#define uthash_free(ptr, sz)
+static uint64_t
+variable_symbol_hash(minsk_variable_symbol_t v);
+static bool
+variable_symbol_cmpr(minsk_variable_symbol_t a, minsk_variable_symbol_t b);
 
-static unsigned
-variable_symbol_hash(minsk_variable_symbol_t * v)
+#define NAME minsk_variable_map
+#define KEY_TY minsk_variable_symbol_t
+#define VAL_TY minsk_object_t
+#define HASH_FN variable_symbol_hash
+#define CMPR_FN variable_symbol_cmpr
+#define CTX_TY Arena *
+#define MAX_LOAD 0.8
+#define IMPLEMENTATION_MODE
+#include <verstable.h>
+
+static uint64_t
+variable_symbol_hash(minsk_variable_symbol_t v)
 {
-  unsigned hashv;
-  HASH_FUNCTION(v->name.data, v->name.length, hashv);
-  return hashv;
+  // The hash of a symbol is the hash of its name. Type is not considered
+  // except when comparing symbols for equality.
+  return minsk_hash_fnv64a(v.name.data, v.name.length);
 }
 
 static bool
-variable_symbol_equal(minsk_variable_symbol_t * a, minsk_variable_symbol_t * b)
+variable_symbol_cmpr(minsk_variable_symbol_t a, minsk_variable_symbol_t b)
 {
-  return a->type == b->type && STRING_EQUAL(a->name, b->name);
+  return a.type == b.type && STRING_EQUAL(a.name, b.name);
 }
-
-#undef HASH_FUNCTION
-#define HASH_FUNCTION(s, len, hashv) \
-  ((hashv) = variable_symbol_hash((minsk_variable_symbol_t *)s))
-
-#undef HASH_KEYCMP
-#define HASH_KEYCMP(a, b, len) \
-  (!variable_symbol_equal( \
-    (minsk_variable_symbol_t *)a, \
-    (minsk_variable_symbol_t *)b \
-  ))
 
 extern minsk_variable_map_t
 minsk_variable_map_new(Arena * arena)
 {
-  return (minsk_variable_map_t){._arena = arena};
+  minsk_variable_map_t map;
+  minsk_variable_map_init(&map, arena);
+  return map;
 }
 
 extern void
@@ -49,13 +50,11 @@ minsk_variable_map_put(
   minsk_object_t value
 )
 {
-  minsk_variable_bucket_t * bucket = arena_alloc(map->_arena, sizeof(*bucket));
-  bucket->key = (minsk_variable_symbol_t){
-    string_dup_arena(map->_arena, key.name),
-    key.type,
+  minsk_variable_symbol_t key_dup = {
+    .name = string_dup_arena(map->ctx, key.name),
+    .type = key.type,
   };
-  bucket->value = value;
-  HASH_ADD(hh, map->_buckets, key, sizeof(key), bucket);
+  minsk_variable_map_insert(map, key_dup, value);
 }
 
 bool
@@ -65,14 +64,13 @@ minsk_variable_map_try_get_value(
   minsk_object_t * out_value
 )
 {
-  minsk_variable_bucket_t * bucket = NULL;
-  HASH_FIND(hh, map->_buckets, &key, sizeof(key), bucket);
-  if (bucket == NULL)
+  minsk_variable_map_itr itr = minsk_variable_map_get(map, key);
+  if (minsk_variable_map_is_end(itr))
   {
     return false;
   }
 
-  *out_value = bucket->value;
+  *out_value = itr.data->val;
   return true;
 }
 
@@ -83,13 +81,13 @@ minsk_variable_map_find_by_name(
   minsk_variable_symbol_t * out_key
 )
 {
-  minsk_variable_bucket_t * el;
-  minsk_variable_bucket_t * tmp;
-  HASH_ITER(hh, map->_buckets, el, tmp)
+  for (minsk_variable_map_itr itr = minsk_variable_map_first(map);
+       !minsk_variable_map_is_end(itr);
+       itr = minsk_variable_map_next(itr))
   {
-    if (STRING_EQUAL(el->key.name, name))
+    if (STRING_EQUAL(itr.data->key.name, name))
     {
-      *out_key = el->key;
+      *out_key = itr.data->key;
       return true;
     }
   }
@@ -99,10 +97,5 @@ minsk_variable_map_find_by_name(
 void
 minsk_variable_map_del(minsk_variable_map_t * map, minsk_variable_symbol_t key)
 {
-  minsk_variable_bucket_t * bucket = NULL;
-  HASH_FIND(hh, map->_buckets, &key, sizeof(key), bucket);
-  if (bucket != NULL)
-  {
-    HASH_DEL(map->_buckets, bucket);
-  }
+  minsk_variable_map_erase(map, key);
 }

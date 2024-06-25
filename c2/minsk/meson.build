@@ -13,7 +13,7 @@ minsk_lib = static_library(
         icuuc_dep,
         platform_dep,
         string_dep,
-        uthash_dep,
+        verstable_dep,
         textus_coloris_dep,
     ],
 )
@@ -25,6 +25,6 @@ minsk_dep = declare_dependency(
         arena_dep,
         icuuc_dep,
         string_dep,
-        uthash_dep,
+        verstable_dep,
     ],
 )
