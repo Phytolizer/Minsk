@@ -40,6 +40,8 @@ const Object = @import("minsk_runtime").Object;
 const DiagnosticBag = @import("../DiagnosticBag.zig");
 const VariableSymbol = @import("../VariableSymbol.zig");
 
+const BoundTreeRewriter = @import("BoundTreeRewriter.zig");
+
 allocator: std.mem.Allocator,
 diagnostics: DiagnosticBag,
 scope: *BoundScope,
