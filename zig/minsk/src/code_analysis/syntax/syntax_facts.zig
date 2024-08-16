@@ -30,7 +30,7 @@ fn streq(a: []const u8, b: []const u8) bool {
 }
 
 pub fn keywordKind(text: []const u8) SyntaxKind {
-    const keywords = std.ComptimeStringMap(SyntaxKind, .{
+    const keywords = std.StaticStringMap(SyntaxKind).initComptime(.{
         .{ "true", .true_keyword },
         .{ "false", .false_keyword },
         .{ "let", .let_keyword },
