@@ -82,7 +82,7 @@ pub fn deinit(self: *const Self) void {
 }
 
 pub fn downcast(self: anytype, comptime T: type) DowncastedPointer(@TypeOf(self), T) {
-    return @fieldParentPtr(T, "base", self);
+    return @fieldParentPtr("base", self);
 }
 
 pub fn rewriteStatement(self: *Self, node: *BoundStatement) AllocError!*BoundStatement {
