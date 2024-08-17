@@ -1,1 +1,2 @@
 subdir('syntax')
+subdir('text')

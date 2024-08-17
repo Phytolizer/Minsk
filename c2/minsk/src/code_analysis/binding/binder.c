@@ -9,12 +9,6 @@
 #include "minsk/code_analysis/binding/ast/expressions/binary_operator.h"
 #include "minsk/code_analysis/binding/ast/expressions/unary_operator.h"
 #include "minsk/code_analysis/syntax/ast/expression.h"
-#include "minsk/code_analysis/syntax/ast/expressions/assignment.h"
-#include "minsk/code_analysis/syntax/ast/expressions/binary.h"
-#include "minsk/code_analysis/syntax/ast/expressions/literal.h"
-#include "minsk/code_analysis/syntax/ast/expressions/name.h"
-#include "minsk/code_analysis/syntax/ast/expressions/parenthesized.h"
-#include "minsk/code_analysis/syntax/ast/expressions/unary.h"
 #include "minsk/code_analysis/syntax/ast/node_type.h"
 #include "minsk/code_analysis/syntax/token.h"
 #include "minsk/code_analysis/variable_symbol.h"
@@ -81,10 +75,13 @@ minsk_binder_bind_expression(
       );
     case MINSK_SYNTAX_NODE_TYPE_UNARY_EXPRESSION:
       return bind_unary_expression(binder, syntax.expression.unary);
-    case MINSK_SYNTAX_NODE_TYPE_TOKEN: break;
+    case MINSK_SYNTAX_NODE_TYPE_TOKEN:
+    case MINSK_SYNTAX_NODE_TYPE_COMPILATION_UNIT: break;
   }
 
-  DEBUGGER_FATAL("invalid syntax node type %d", syntax.type);
+  Arena arena = {0};
+  string_t type_name = minsk_syntax_node_type_display_name(&arena, syntax.type);
+  DEBUGGER_FATAL("invalid syntax node type " STRING_FMT, STRING_ARG(type_name));
 }
 
 static minsk_bound_node_t

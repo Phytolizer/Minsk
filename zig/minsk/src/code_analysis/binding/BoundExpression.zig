@@ -42,10 +42,10 @@ pub fn @"type"(self: *const Self) Object.Type {
 }
 
 pub fn downcastNode(base: anytype, comptime T: type) DowncastedPointer(@TypeOf(base), T) {
-    const self = @fieldParentPtr(Self, "base", base);
-    return @fieldParentPtr(T, "base", self);
+    const self: DowncastedPointer(@TypeOf(base), Self) = @alignCast(@fieldParentPtr("base", base));
+    return @alignCast(@fieldParentPtr("base", self));
 }
 
 pub fn downcast(self: anytype, comptime T: type) DowncastedPointer(@TypeOf(self), T) {
-    return @fieldParentPtr(T, "base", self);
+    return @alignCast(@fieldParentPtr("base", self));
 }

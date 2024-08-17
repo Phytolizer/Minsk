@@ -19,7 +19,7 @@ span_fn: ?SpanFn,
 const Self = @This();
 
 pub fn downcast(self: anytype, comptime T: type) DowncastedPointer(@TypeOf(self), T) {
-    return @fieldParentPtr(T, "base", self);
+    return @alignCast(@fieldParentPtr("base", self));
 }
 
 pub fn deinit(self: *const Self, allocator: std.mem.Allocator) void {

@@ -1,12 +1,11 @@
 #pragma once
 
 #include <arena.h>
-#include <minsk-string/string.h>
 #include <stddef.h>
 
 #include "minsk/code_analysis/diagnostic_bag.h"
+#include "minsk/code_analysis/syntax/ast/compilation_unit.h"
 #include "minsk/code_analysis/syntax/token.h"
-#include "minsk/code_analysis/syntax/tree.h"
 #include "minsk/code_analysis/text/source_text.h"
 #include "minsk/data_structures/buf.h"
 
@@ -24,5 +23,5 @@ typedef struct
 extern minsk_syntax_parser_t
 minsk_syntax_parser_new(Arena * arena, minsk_text_source_text_t text);
 
-extern minsk_syntax_tree_t
-minsk_syntax_parser_parse(minsk_syntax_parser_t * parser);
+extern minsk_syntax_compilation_unit_t
+minsk_syntax_parser_parse_compilation_unit(minsk_syntax_parser_t * parser);

@@ -12,11 +12,11 @@ pub fn build(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
     });
     result.linkLibC();
     result.addCSourceFile(.{
-        .file = .{ .path = this_dir ++ "/linenoise-ship.c" },
+        .file = .{ .cwd_relative = this_dir ++ "/linenoise-ship.c" },
         .flags = &.{"-DUSE_UTF8"},
     });
-    result.addIncludePath(.{ .path = this_dir });
+    result.addIncludePath(.{ .cwd_relative = this_dir });
     const lib = b.addInstallArtifact(result, .{});
-    result.installHeader(this_dir ++ "/linenoise.h", "linenoise.h");
+    result.installHeader(.{ .cwd_relative = this_dir ++ "/linenoise.h" }, "linenoise.h");
     return .{ .raw = result, .lib = lib };
 }

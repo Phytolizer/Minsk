@@ -37,6 +37,6 @@ pub fn span(self: *const Self, allocator: std.mem.Allocator) !TextSpan {
 }
 
 pub fn downcast(base: anytype, comptime T: type) DowncastedPointer(@TypeOf(base), T) {
-    const self = @fieldParentPtr(Self, "base", base);
-    return @fieldParentPtr(T, "base", self);
+    const self: DowncastedPointer(@TypeOf(base), Self) = @alignCast(@fieldParentPtr("base", base));
+    return @alignCast(@fieldParentPtr("base", self));
 }

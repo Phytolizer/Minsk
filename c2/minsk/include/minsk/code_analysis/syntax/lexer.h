@@ -1,7 +1,6 @@
 #pragma once
 
 #include <arena.h>
-#include <minsk-string/string.h>
 #include <stdint.h>
 #include <unicode/umachine.h>
 

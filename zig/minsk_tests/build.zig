@@ -10,14 +10,14 @@ pub fn build(
     const this_dir = comptime std.fs.path.dirname(@src().file) orelse ".";
     const exe = b.addExecutable(.{
         .name = "minsk_tests",
-        .root_source_file = .{ .path = this_dir ++ "/src/main.zig" },
+        .root_source_file = .{ .cwd_relative = this_dir ++ "/src/main.zig" },
         .target = target,
         .optimize = optimize,
     });
     exe.root_module.addImport("minsk", minsk);
     exe.root_module.addImport("minsk_runtime", minsk_runtime);
     exe.root_module.addAnonymousImport("framework", .{
-        .root_source_file = .{ .path = this_dir ++ "/framework.zig" },
+        .root_source_file = .{ .cwd_relative = this_dir ++ "/framework.zig" },
     });
     _ = b.addInstallArtifact(exe, .{});
 

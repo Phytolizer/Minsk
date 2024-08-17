@@ -13,10 +13,7 @@
     bool is_ref; \
   }
 
-#define BUF_INIT \
-  { \
-    0 \
-  }
+#define BUF_INIT {0}
 
 #define BUF_REF(T, p, size) \
   (T) \

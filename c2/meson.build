@@ -27,7 +27,7 @@ arena_hdr_dep = dependency(
 )
 
 icuuc_dep = dependency('icu-uc')
-uthash_dep = dependency('uthash')
+verstable_dep = dependency('verstable')
 textus_coloris_dep = dependency('textus_coloris')
 
 subdir('arena')

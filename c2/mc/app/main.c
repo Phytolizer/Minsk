@@ -3,8 +3,8 @@
 #include <minsk-string/string.h>
 #include <minsk/code_analysis/compilation.h>
 #include <minsk/code_analysis/diagnostic.h>
-#include <minsk/code_analysis/diagnostic_bag.h>
 #include <minsk/code_analysis/syntax/ast/node.h>
+#include <minsk/code_analysis/syntax/ast/node_type.h>
 #include <minsk/code_analysis/syntax/facts.h>
 #include <minsk/code_analysis/syntax/tree.h>
 #include <minsk/code_analysis/text/span.h>
@@ -138,7 +138,13 @@ main(int argc, char ** argv)
 
     if (show_tree)
     {
-      minsk_syntax_node_pretty_print(syntax_tree.root, stdout);
+      minsk_syntax_node_pretty_print(
+        (minsk_syntax_node_t){
+          .type = MINSK_SYNTAX_NODE_TYPE_COMPILATION_UNIT,
+          .compilation_unit = syntax_tree.root,
+        },
+        stdout
+      );
     }
     minsk_compilation_t compilation = minsk_compilation_new(&a, syntax_tree);
     minsk_evaluation_result_t result =

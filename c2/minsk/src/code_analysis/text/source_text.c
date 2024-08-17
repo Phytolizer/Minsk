@@ -1,7 +1,11 @@
 #include "minsk/code_analysis/text/source_text.h"
 
+#include <arena.h>
+#include <stdbool.h>
 #include <unicode/uchar.h>
+#include <unicode/umachine.h>
 #include <unicode/urename.h>
+#include <unicode/utf.h>
 
 typedef UChar32 codepoint_t;
 

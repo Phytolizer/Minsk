@@ -14,7 +14,13 @@ minsk_syntax_tree_parse(Arena * arena, string_t text)
   minsk_text_source_text_t source_text =
     minsk_text_source_text_from(text, arena);
   minsk_syntax_parser_t parser = minsk_syntax_parser_new(arena, source_text);
-  return minsk_syntax_parser_parse(&parser);
+  minsk_syntax_compilation_unit_t compilation_unit =
+    minsk_syntax_parser_parse_compilation_unit(&parser);
+  return (minsk_syntax_tree_t){
+    .text = source_text,
+    .diagnostics = parser.diagnostics,
+    .root = compilation_unit,
+  };
 }
 
 extern minsk_syntax_token_buf_t

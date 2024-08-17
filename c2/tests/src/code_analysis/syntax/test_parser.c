@@ -1,5 +1,6 @@
 #include <arena.h>
 #include <minsk-string/string.h>
+#include <minsk/code_analysis/syntax/ast/node.h>
 #include <minsk/code_analysis/syntax/ast/node_type.h>
 #include <minsk/code_analysis/syntax/facts.h>
 #include <minsk/code_analysis/syntax/kind.h>
@@ -7,6 +8,13 @@
 #include <tau/tau.h>
 
 #include "minsk-test/asserting_iterator.h"
+
+static minsk_syntax_node_t
+parse_expression(Arena * arena, string_t text)
+{
+  minsk_syntax_tree_t tree = minsk_syntax_tree_parse(arena, text);
+  return *tree.root.expression;
+}
 
 static void
 test_binary_expression_honors_precedence(
@@ -28,11 +36,11 @@ test_binary_expression_honors_precedence(
     STRING_ARG(op1_text),
     STRING_ARG(op2_text)
   );
-  minsk_syntax_tree_t tree = minsk_syntax_tree_parse(arena, text);
+  minsk_syntax_node_t expression = parse_expression(arena, text);
 
   if (op1_precedence >= op2_precedence)
   {
-    asserting_iterator_t it = asserting_iterator_new(arena, tree.root);
+    asserting_iterator_t it = asserting_iterator_new(arena, expression);
     asserting_iterator_assert_node(
       &it,
       name,
@@ -82,7 +90,7 @@ test_binary_expression_honors_precedence(
   }
   else
   {
-    asserting_iterator_t it = asserting_iterator_new(arena, tree.root);
+    asserting_iterator_t it = asserting_iterator_new(arena, expression);
     asserting_iterator_assert_node(
       &it,
       name,
@@ -180,11 +188,11 @@ test_unary_expression_honors_precedence(
     STRING_ARG(op1_text),
     STRING_ARG(op2_text)
   );
-  minsk_syntax_tree_t tree = minsk_syntax_tree_parse(arena, text);
+  minsk_syntax_node_t expression = parse_expression(arena, text);
 
   if (op1_precedence >= op2_precedence)
   {
-    asserting_iterator_t it = asserting_iterator_new(arena, tree.root);
+    asserting_iterator_t it = asserting_iterator_new(arena, expression);
     asserting_iterator_assert_node(
       &it,
       name,
@@ -223,7 +231,7 @@ test_unary_expression_honors_precedence(
   }
   else
   {
-    asserting_iterator_t it = asserting_iterator_new(arena, tree.root);
+    asserting_iterator_t it = asserting_iterator_new(arena, expression);
     asserting_iterator_assert_node(
       &it,
       name,

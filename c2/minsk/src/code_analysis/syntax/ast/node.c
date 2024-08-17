@@ -8,12 +8,6 @@
 #include <textus_coloris.h>
 
 #include "minsk/code_analysis/syntax/ast/expression.h"
-#include "minsk/code_analysis/syntax/ast/expressions/assignment.h"
-#include "minsk/code_analysis/syntax/ast/expressions/binary.h"
-#include "minsk/code_analysis/syntax/ast/expressions/literal.h"
-#include "minsk/code_analysis/syntax/ast/expressions/name.h"
-#include "minsk/code_analysis/syntax/ast/expressions/parenthesized.h"
-#include "minsk/code_analysis/syntax/ast/expressions/unary.h"
 #include "minsk/code_analysis/syntax/ast/node_type.h"
 #include "minsk/code_analysis/syntax/kind.h"
 #include "minsk/runtime/object.h"
@@ -113,6 +107,16 @@ minsk_syntax_node_children(Arena * arena, minsk_syntax_node_t node)
 {
   switch (node.type)
   {
+    case MINSK_SYNTAX_NODE_TYPE_COMPILATION_UNIT:
+    {
+      minsk_syntax_compilation_unit_t c = node.compilation_unit;
+      return BUF_LIT_ARENA(
+        arena,
+        minsk_syntax_node_buf_t,
+        *c.expression,
+        MINSK_SYNTAX_NODE_TOKEN(c.end_of_file_token)
+      );
+    }
     case MINSK_SYNTAX_NODE_TYPE_ASSIGNMENT_EXPRESSION:
     {
       minsk_syntax_expression_assignment_t a = node.expression.assignment;

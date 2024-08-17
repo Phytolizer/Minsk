@@ -9,7 +9,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <tau/tau.h>
-#include <uthash.h>
 
 #include "minsk-test/tau-ext.h"
 
@@ -185,7 +184,8 @@ requires_separator(minsk_syntax_kind_t k1, minsk_syntax_kind_t k2)
     return true;
   }
 
-  if (k1 == MINSK_SYNTAX_KIND_NUMBER_TOKEN && k2 == MINSK_SYNTAX_KIND_NUMBER_TOKEN)
+  if (k1 == MINSK_SYNTAX_KIND_NUMBER_TOKEN &&
+      k2 == MINSK_SYNTAX_KIND_NUMBER_TOKEN)
   {
     return true;
   }
@@ -398,61 +398,54 @@ TEST(lexer, lexes_token_pair_with_separator)
   arena_free(&test_arena);
 }
 
+#define NAME kind_set
+#define KEY_TY minsk_syntax_kind_t
+#include <verstable.h>
+
+typedef kind_set kind_set_t;
+
 TEST(lexer, tests_all_tokens)
 {
   Arena test_arena = {0};
 
-  typedef struct
-  {
-    minsk_syntax_kind_t key;
-    UT_hash_handle hh;
-  } kind_set_t;
-
-  kind_set_t * all_token_kinds = NULL;
+  kind_set_t all_token_kinds;
+  kind_set_init(&all_token_kinds);
   for (minsk_syntax_kind_t kind = 0; kind < MINSK_SYNTAX_KIND_COUNT; ++kind)
   {
-    if (kind == MINSK_SYNTAX_KIND_BAD_TOKEN || kind == MINSK_SYNTAX_KIND_END_OF_FILE_TOKEN)
+    if (kind == MINSK_SYNTAX_KIND_BAD_TOKEN ||
+        kind == MINSK_SYNTAX_KIND_END_OF_FILE_TOKEN)
     {
       continue;
     }
     string_t name = minsk_syntax_kind_display_name(&test_arena, kind);
-    if (string_endswith(name, STRING_REF("Token")) || string_endswith(name, STRING_REF("Keyword")))
+    if (string_endswith(name, STRING_REF("Token")) ||
+        string_endswith(name, STRING_REF("Keyword")))
     {
-      kind_set_t * bucket = arena_alloc(&test_arena, sizeof(*bucket));
-      memset(bucket, 0, sizeof(*bucket));
-      bucket->key = kind;
-      HASH_ADD_INT(all_token_kinds, key, bucket);
+      kind_set_insert(&all_token_kinds, kind);
     }
   }
-  kind_set_t * tested_token_kinds = NULL;
+  kind_set_t tested_token_kinds;
+  kind_set_init(&tested_token_kinds);
   simple_token_buf_t all_tokens = get_all_tokens(&test_arena);
   for (size_t i = 0; i < all_tokens.len; ++i)
   {
-    kind_set_t * bucket = arena_alloc(&test_arena, sizeof(*bucket));
-    memset(bucket, 0, sizeof(*bucket));
-    bucket->key = all_tokens.ptr[i].kind;
-    HASH_ADD_INT(tested_token_kinds, key, bucket);
+    kind_set_insert(&tested_token_kinds, all_tokens.ptr[i].kind);
   }
 
-  kind_set_t * s;
-  kind_set_t * tmp;
-  HASH_ITER(hh, all_token_kinds, s, tmp)
+  for (kind_set_itr itr = kind_set_first(&all_token_kinds);
+       !kind_set_is_end(itr);
+       itr = kind_set_next(itr))
   {
-    kind_set_t * found;
-    HASH_FIND_INT(tested_token_kinds, &s->key, found);
+    kind_set_itr found = kind_set_get(&tested_token_kinds, itr.data->key);
     EXTCHECK(
-      found != NULL,
+      !kind_set_is_end(found),
       "untested token kind: " STRING_FMT,
-      STRING_ARG(minsk_syntax_kind_display_name(&test_arena, s->key))
+      STRING_ARG(minsk_syntax_kind_display_name(&test_arena, itr.data->key))
     );
-
-    HASH_DEL(all_token_kinds, s);
   }
 
-  HASH_ITER(hh, tested_token_kinds, s, tmp)
-  {
-    HASH_DEL(tested_token_kinds, s);
-  }
+  kind_set_cleanup(&all_token_kinds);
+  kind_set_cleanup(&tested_token_kinds);
 
   arena_free(&test_arena);
 }

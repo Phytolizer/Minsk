@@ -4,13 +4,8 @@
 #include <stdbool.h>
 
 #include "minsk/code_analysis/binding/ast/expression.h"
-#include "minsk/code_analysis/binding/ast/expressions/assignment.h"
-#include "minsk/code_analysis/binding/ast/expressions/binary.h"
 #include "minsk/code_analysis/binding/ast/expressions/binary_operator.h"
-#include "minsk/code_analysis/binding/ast/expressions/literal.h"
-#include "minsk/code_analysis/binding/ast/expressions/unary.h"
 #include "minsk/code_analysis/binding/ast/expressions/unary_operator.h"
-#include "minsk/code_analysis/binding/ast/expressions/variable.h"
 #include "minsk/code_analysis/binding/ast/node.h"
 #include "minsk/code_analysis/binding/ast/node_type.h"
 
