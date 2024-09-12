@@ -400,7 +400,7 @@ pub fn evaluatorTestSuite(state: *t.TestState) void {
             .allocated,
         );
 
-    inline for (@typeInfo(one_shot_tests).Struct.decls) |decl| {
+    inline for (@typeInfo(one_shot_tests).@"struct".decls) |decl| {
         t.runTest(
             state,
             void,
