@@ -3,8 +3,13 @@ const SyntaxKind = @import("syntax_kind.zig").SyntaxKind;
 
 pub fn binaryOperatorPrecedence(kind: SyntaxKind) usize {
     return switch (kind) {
-        .pipe_pipe_token => 1,
-        .ampersand_ampersand_token => 2,
+        .pipe_pipe_token,
+        .pipe_token,
+        .hat_token,
+        => 1,
+        .ampersand_ampersand_token,
+        .ampersand_token,
+        => 2,
         .equals_equals_token,
         .bang_equals_token,
         .less_token,
@@ -20,7 +25,11 @@ pub fn binaryOperatorPrecedence(kind: SyntaxKind) usize {
 
 pub fn unaryOperatorPrecedence(kind: SyntaxKind) usize {
     return switch (kind) {
-        .plus_token, .minus_token, .bang_token => 6,
+        .plus_token,
+        .minus_token,
+        .bang_token,
+        .tilde_token,
+        => 6,
         else => 0,
     };
 }
@@ -58,6 +67,10 @@ pub fn getText(kind: SyntaxKind) ?[]const u8 {
         .greater_equals_token => ">=",
         .ampersand_ampersand_token => "&&",
         .pipe_pipe_token => "||",
+        .ampersand_token => "&",
+        .pipe_token => "|",
+        .tilde_token => "~",
+        .hat_token => "^",
         .equals_equals_token => "==",
         .bang_equals_token => "!=",
         .open_parenthesis_token => "(",

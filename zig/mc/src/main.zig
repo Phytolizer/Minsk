@@ -41,6 +41,7 @@ pub fn main() !void {
     }
 
     var show_tree = false;
+    var show_program = false;
     var variables = VariableSymbol.Map.init(allocator);
     defer {
         for (variables.keys()) |vs| {
@@ -67,7 +68,7 @@ pub fn main() !void {
             const continue_prompt = "· ";
             const buf_len =
                 "\x1b[0;32m".len +
-                comptime @max(begin_prompt.len, continue_prompt.len) +
+                @max(begin_prompt.len, continue_prompt.len) +
                 "\x1b[0m".len +
                 1;
             var prompt_buf: [buf_len]u8 = undefined;
@@ -97,6 +98,15 @@ pub fn main() !void {
                         "Not showing parse trees.",
                 }) catch unreachable;
                 continue;
+            } else if (std.mem.eql(u8, input_line, "#showProgram")) {
+                show_program = !show_program;
+                stderr.print("{s}\n", .{
+                    if (show_program)
+                        "Showing bound tree."
+                    else
+                        "Not showing bound tree.",
+                }) catch unreachable;
+                continue;
             } else if (std.mem.eql(u8, input_line, "#cls")) {
                 try tty_ext.clearScreen(tty, stderr);
                 continue;
@@ -122,24 +132,28 @@ pub fn main() !void {
             continue;
         }
 
-        if (show_tree) {
-            try tree.root.base.prettyPrint(
-                parser_alloc,
-                "",
-                true,
-                stderr,
-                .colors,
-                tty,
-            );
-            stderr_buf.flush() catch unreachable;
-        }
-
         const compilation = if (previous) |p|
             try p.continueWith(tree)
         else
             try Compilation.init(parser_alloc, tree);
         const result = try compilation.evaluate(&variables);
         defer result.deinit(parser_alloc);
+
+        if (show_tree) {
+            try tree.root.base.prettyPrint(
+                parser_alloc,
+                "",
+                true,
+                stderr,
+                tty,
+            );
+        }
+
+        if (show_program) {
+            try compilation.emitTree(parser_alloc, stderr, tty);
+        }
+
+        stderr_buf.flush() catch unreachable;
 
         switch (result) {
             .failure => |diagnostics| {

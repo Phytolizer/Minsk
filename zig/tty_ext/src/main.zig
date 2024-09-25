@@ -42,12 +42,14 @@ pub fn clearScreen(tty: std.io.tty.Config, writer: anytype) !void {
 
 pub const Color = enum {
     dim_red,
+    dim_yellow,
     red,
     gray,
     cyan,
     blue,
     green,
     magenta,
+    yellow,
     reset,
 };
 
@@ -56,12 +58,14 @@ pub fn colorString(conf: std.io.tty.Config, color: Color) []const u8 {
         .no_color => "",
         else => switch (color) {
             .dim_red => "\x1b[31;2m",
+            .dim_yellow => "\x1b[33;2m",
             .red => "\x1b[0;31m",
             .gray => "\x1b[2m",
             .cyan => "\x1b[0;36m",
             .blue => "\x1b[0;34m",
             .green => "\x1b[0;32m",
             .magenta => "\x1b[0;35m",
+            .yellow => "\x1b[0;33m",
             .reset => "\x1b[0m",
         },
     };
@@ -74,6 +78,11 @@ pub fn setColor(conf: std.io.tty.Config, out_stream: anytype, color: Color) !voi
             try out_stream.writeAll(colorString(conf, color));
         },
     };
+}
+
+pub fn maybeSetColor(conf: ?std.io.tty.Config, out_stream: anytype, color: Color) !void {
+    if (conf) |c|
+        try setColor(c, out_stream, color);
 }
 
 extern "kernel32" fn SetConsoleMode(

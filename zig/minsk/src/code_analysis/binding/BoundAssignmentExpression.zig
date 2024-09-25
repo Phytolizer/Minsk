@@ -17,7 +17,7 @@ pub fn init(
 ) !*BoundExpression {
     const result = try allocator.create(Self);
     result.* = .{
-        .base = BoundExpression.init(.assignment_expression, &deinit, &@"type"),
+        .base = BoundExpression.init(.assignment_expression, &deinit, &children, &properties, &@"type"),
         .variable = variable,
         .expression = expression,
     };
@@ -28,6 +28,21 @@ fn deinit(node: *const BoundNode, allocator: std.mem.Allocator) void {
     const self = BoundExpression.downcastNode(node, Self);
     self.expression.deinit(allocator);
     allocator.destroy(self);
+}
+
+fn children(node: *const BoundNode, allocator: std.mem.Allocator) ![]*const BoundNode {
+    const self = BoundExpression.downcastNode(node, Self);
+    return try allocator.dupe(*const BoundNode, &.{
+        &self.expression.base,
+    });
+}
+
+fn properties(node: *const BoundNode, allocator: std.mem.Allocator) ![]BoundNode.Property {
+    const self = BoundExpression.downcastNode(node, Self);
+    return try allocator.dupe(BoundNode.Property, &[_]BoundNode.Property{.{
+        .name = "variable",
+        .value = self.variable.name,
+    }});
 }
 
 fn @"type"(node: *const BoundExpression) Object.Type {
