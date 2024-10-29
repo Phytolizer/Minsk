@@ -2,6 +2,7 @@
 #define MINSK_ANALYSIS_TEXT_SPAN_HPP
 
 #include <ostream>
+
 namespace minsk::analysis::text {
 
 class text_span final {

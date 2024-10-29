@@ -2,8 +2,8 @@
 #define MINSK_TEST_PARAMETRIZE_HPP
 
 #include "doctest.h"
-#include <algorithm>
-#include <string>
+#include <algorithm> // IWYU pragma: export
+#include <string>    // IWYU pragma: export
 
 #define DOCTEST_VALUE_PARAMETERIZED_DATA(data, data_container)                 \
   static size_t _doctest_subcase_idx = 0;                                      \

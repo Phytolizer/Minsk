@@ -5,6 +5,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
+
 namespace minsk_test::analysis::text {
 
 class annotated_text {

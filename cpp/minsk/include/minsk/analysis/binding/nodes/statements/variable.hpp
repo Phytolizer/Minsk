@@ -5,6 +5,7 @@
 #include "minsk/analysis/binding/nodes/expression.hpp"
 #include "minsk/analysis/binding/nodes/statement.hpp"
 #include "minsk/analysis/variable_symbol.hpp"
+
 namespace minsk::analysis::binding {
 
 class bound_variable_declaration final : public bound_statement {

@@ -7,6 +7,7 @@
 #include "minsk/analysis/syntax/nodes/statement.hpp"
 #include "minsk/analysis/syntax/token.hpp"
 #include <vector>
+
 namespace minsk::analysis::syntax {
 
 class variable_declaration_syntax final : public statement_syntax {

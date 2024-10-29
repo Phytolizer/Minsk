@@ -7,6 +7,7 @@
 #include "minsk/analysis/syntax/token.hpp"
 #include <memory>
 #include <vector>
+
 namespace minsk::analysis::syntax {
 
 class block_statement_syntax final : public statement_syntax {

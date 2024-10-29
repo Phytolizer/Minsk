@@ -1,11 +1,13 @@
 #include "minsk/analysis/text/source.hpp"
 #include "minsk/analysis/text/span.hpp"
 
-minsk::analysis::text::source_text::source_text(std::string &&text)
+using minsk::analysis::text::source_text;
+using minsk::analysis::text::text_line;
+
+source_text::source_text(std::string &&text)
     : m_text(std::move(text)), m_lines(parse_lines(this, m_text)) {}
 
-std::vector<minsk::analysis::text::text_line>
-minsk::analysis::text::source_text::parse_lines(source_text *st,
+std::vector<text_line> source_text::parse_lines(source_text *st,
                                                 std::string_view text) {
   auto result = std::vector<text_line>{};
   int line_start = 0;
@@ -24,8 +26,7 @@ minsk::analysis::text::source_text::parse_lines(source_text *st,
   return result;
 }
 
-int minsk::analysis::text::source_text::get_line_break_width(
-    std::string_view text, int i) {
+int source_text::get_line_break_width(std::string_view text, int i) {
   char c = text[i];
   char look = i + 1 == text.size() ? '\0' : text[i + 1];
   if (c == '\r' && look == '\n') {
@@ -37,20 +38,18 @@ int minsk::analysis::text::source_text::get_line_break_width(
   return 0;
 }
 
-void minsk::analysis::text::source_text::add_line(
-    std::vector<text_line> *result, int line_start, int position,
-    int line_break_width) {
+void source_text::add_line(std::vector<text_line> *result, int line_start,
+                           int position, int line_break_width) {
   int length = position - line_start;
   int length_including_line_break = length + line_break_width;
   result->emplace_back(line_start, length, length_including_line_break);
 }
 
-minsk::analysis::text::source_text
-minsk::analysis::text::source_text::from(std::string &&text) {
+source_text source_text::from(std::string &&text) {
   return source_text{std::move(text)};
 }
 
-int minsk::analysis::text::source_text::get_line_index(int position) const {
+int source_text::get_line_index(int position) const {
   int lower = 0;
   int upper = static_cast<int>(m_lines.size()) - 1;
 
@@ -72,34 +71,22 @@ int minsk::analysis::text::source_text::get_line_index(int position) const {
   return lower - 1;
 }
 
-std::string_view minsk::analysis::text::source_text::text() const {
-  return m_text;
-}
+std::string_view source_text::text() const { return m_text; }
 
-const std::vector<minsk::analysis::text::text_line> &
-minsk::analysis::text::source_text::lines() const {
-  return m_lines;
-}
+const std::vector<text_line> &source_text::lines() const { return m_lines; }
 
-std::string minsk::analysis::text::source_text::to_string(int start,
-                                                          int length) const {
+std::string source_text::to_string(int start, int length) const {
   return m_text.substr(start, length);
 }
 
-std::string
-minsk::analysis::text::source_text::to_string(text_span span) const {
+std::string source_text::to_string(text_span span) const {
   return to_string(span.start(), span.length());
 }
 
-char minsk::analysis::text::source_text::operator[](int index) const {
-  return m_text[index];
-}
+char source_text::operator[](int index) const { return m_text[index]; }
 
-int minsk::analysis::text::source_text::length() const {
-  return static_cast<int>(m_text.length());
-}
+int source_text::length() const { return static_cast<int>(m_text.length()); }
 
-std::ostream &operator<<(std::ostream &os,
-                         const minsk::analysis::text::source_text &st) {
+std::ostream &operator<<(std::ostream &os, const source_text &st) {
   return os << st.text();
 }

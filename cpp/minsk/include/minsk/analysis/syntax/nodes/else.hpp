@@ -5,6 +5,7 @@
 #include "minsk/analysis/syntax/nodes/statement.hpp"
 #include "minsk/analysis/syntax/token.hpp"
 #include <memory>
+
 namespace minsk::analysis::syntax {
 
 class else_clause_syntax final : public syntax_node {

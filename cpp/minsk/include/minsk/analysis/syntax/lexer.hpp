@@ -4,8 +4,6 @@
 #include "minsk/analysis/diagnostic_bag.hpp"
 #include "minsk/analysis/text/source.hpp"
 #include "token.hpp"
-#include <concepts>
-#include <ranges>
 
 namespace minsk::analysis::syntax {
 

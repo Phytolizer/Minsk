@@ -7,6 +7,7 @@
 #include "minsk/analysis/syntax/token.hpp"
 #include <memory>
 #include <vector>
+
 namespace minsk::analysis::syntax {
 
 class assignment_expression_syntax final : public expression_syntax {

@@ -1,6 +1,13 @@
 #include "minsk/analysis/syntax/nodes/statements/for.hpp"
 
-minsk::analysis::syntax::for_statement_syntax::for_statement_syntax(
+using minsk::analysis::syntax::expression_syntax;
+using minsk::analysis::syntax::for_statement_syntax;
+using minsk::analysis::syntax::statement_syntax;
+using minsk::analysis::syntax::syntax_kind;
+using minsk::analysis::syntax::syntax_node;
+using minsk::analysis::syntax::syntax_token;
+
+for_statement_syntax::for_statement_syntax(
     syntax_token &&for_keyword, syntax_token &&identifier_token,
     syntax_token &&equals_token,
     std::unique_ptr<expression_syntax> initial_value, syntax_token &&to_keyword,
@@ -13,13 +20,11 @@ minsk::analysis::syntax::for_statement_syntax::for_statement_syntax(
       m_to_keyword(std::move(to_keyword)),
       m_final_value(std::move(final_value)), m_body(std::move(body)) {}
 
-minsk::analysis::syntax::syntax_kind
-minsk::analysis::syntax::for_statement_syntax::kind() const {
+syntax_kind for_statement_syntax::kind() const {
   return syntax_kind::for_statement;
 }
 
-std::vector<const minsk::analysis::syntax::syntax_node *>
-minsk::analysis::syntax::for_statement_syntax::children() const {
+std::vector<const syntax_node *> for_statement_syntax::children() const {
   return {
       &m_for_keyword,        &m_identifier_token, &m_equals_token,
       m_initial_value.get(), &m_to_keyword,       m_final_value.get(),
@@ -27,37 +32,30 @@ minsk::analysis::syntax::for_statement_syntax::children() const {
   };
 }
 
-const minsk::analysis::syntax::syntax_token &
-minsk::analysis::syntax::for_statement_syntax::for_keyword() const {
+const syntax_token &for_statement_syntax::for_keyword() const {
   return m_for_keyword;
 }
 
-const minsk::analysis::syntax::syntax_token &
-minsk::analysis::syntax::for_statement_syntax::identifier_token() const {
+const syntax_token &for_statement_syntax::identifier_token() const {
   return m_identifier_token;
 }
 
-const minsk::analysis::syntax::syntax_token &
-minsk::analysis::syntax::for_statement_syntax::equals_token() const {
+const syntax_token &for_statement_syntax::equals_token() const {
   return m_equals_token;
 }
 
-const minsk::analysis::syntax::expression_syntax *
-minsk::analysis::syntax::for_statement_syntax::initial_value() const {
+const expression_syntax *for_statement_syntax::initial_value() const {
   return m_initial_value.get();
 }
 
-const minsk::analysis::syntax::syntax_token &
-minsk::analysis::syntax::for_statement_syntax::to_keyword() const {
+const syntax_token &for_statement_syntax::to_keyword() const {
   return m_to_keyword;
 }
 
-const minsk::analysis::syntax::expression_syntax *
-minsk::analysis::syntax::for_statement_syntax::final_value() const {
+const expression_syntax *for_statement_syntax::final_value() const {
   return m_final_value.get();
 }
 
-const minsk::analysis::syntax::statement_syntax *
-minsk::analysis::syntax::for_statement_syntax::body() const {
+const statement_syntax *for_statement_syntax::body() const {
   return m_body.get();
 }

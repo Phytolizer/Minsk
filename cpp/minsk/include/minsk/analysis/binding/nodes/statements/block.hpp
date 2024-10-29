@@ -5,6 +5,7 @@
 #include "minsk/analysis/binding/nodes/statement.hpp"
 #include <memory>
 #include <vector>
+
 namespace minsk::analysis::binding {
 
 class bound_block_statement final : public bound_statement {

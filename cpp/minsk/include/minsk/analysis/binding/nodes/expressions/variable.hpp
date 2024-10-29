@@ -5,14 +5,13 @@
 #include "minsk/analysis/binding/nodes/expression.hpp"
 #include "minsk/analysis/variable_symbol.hpp"
 #include "minsk/runtime/object.hpp"
-#include <string>
-#include <string_view>
+
 namespace minsk::analysis::binding {
 
 class bound_variable_expression final : public bound_expression {
   variable_symbol m_variable;
 
-  public:
+public:
   explicit bound_variable_expression(variable_symbol &&variable);
 
   bound_node_kind kind() const override;

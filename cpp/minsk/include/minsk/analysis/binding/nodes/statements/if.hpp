@@ -5,6 +5,7 @@
 #include "minsk/analysis/binding/nodes/expression.hpp"
 #include "minsk/analysis/binding/nodes/statement.hpp"
 #include <memory>
+
 namespace minsk::analysis::binding {
 
 class bound_if_statement final : public bound_statement {

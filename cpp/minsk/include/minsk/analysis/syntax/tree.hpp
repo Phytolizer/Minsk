@@ -2,13 +2,11 @@
 #define MINSK_TREE_HPP_7DCBF9EE5670440AA18C623FF8CAC78F
 
 #include "minsk/analysis/diagnostic_bag.hpp"
-#include "minsk/analysis/syntax/nodes/expression.hpp"
 #include "minsk/analysis/syntax/nodes/unit.hpp"
 #include "minsk/analysis/syntax/token.hpp"
 #include "minsk/analysis/text/source.hpp"
 #include <memory>
 #include <string>
-#include <string_view>
 #include <vector>
 
 namespace minsk::analysis::syntax {

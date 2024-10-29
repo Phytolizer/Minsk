@@ -8,6 +8,7 @@
 #include <string_view>
 #include <unordered_map>
 #include <vector>
+
 namespace minsk::analysis::binding {
 
 class bound_scope final {

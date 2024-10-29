@@ -1,18 +1,18 @@
 #include "minsk/analysis/evaluation_result.hpp"
 
-minsk::analysis::evaluation_result::evaluation_result(runtime::object_ptr value)
+using minsk::analysis::diagnostic_bag;
+using minsk::analysis::evaluation_result;
+using minsk::runtime::object;
+using minsk::runtime::object_ptr;
+
+evaluation_result::evaluation_result(object_ptr value)
     : m_value(std::move(value)) {}
 
-minsk::analysis::evaluation_result::evaluation_result(
-    diagnostic_bag &&diagnostics)
+evaluation_result::evaluation_result(diagnostic_bag &&diagnostics)
     : m_diagnostics(std::move(diagnostics)) {}
 
-const minsk::runtime::object *
-minsk::analysis::evaluation_result::value() const {
-  return m_value.get();
-}
+const object *evaluation_result::value() const { return m_value.get(); }
 
-const minsk::analysis::diagnostic_bag &
-minsk::analysis::evaluation_result::diagnostics() const {
+const diagnostic_bag &evaluation_result::diagnostics() const {
   return m_diagnostics;
 }

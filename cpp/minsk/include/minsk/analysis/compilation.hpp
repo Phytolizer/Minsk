@@ -5,7 +5,6 @@
 #include "minsk/analysis/evaluation_result.hpp"
 #include "minsk/analysis/syntax/tree.hpp"
 #include "minsk/analysis/variable_map.hpp"
-#include "minsk/runtime/object.hpp"
 #include <memory>
 
 namespace minsk::analysis {

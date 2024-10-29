@@ -1,5 +1,4 @@
 #include "minsk/analysis/syntax/parser.hpp"
-#include "fmt/format.h"
 #include "minsk/analysis/syntax/facts.hpp"
 #include "minsk/analysis/syntax/kind.hpp"
 #include "minsk/analysis/syntax/lexer.hpp"
@@ -25,8 +24,15 @@
 #include <algorithm>
 #include <memory>
 
-minsk::analysis::syntax::parser::parser(const text::source_text *text)
-    : m_text(text), m_position(0) {
+using minsk::analysis::diagnostic_bag;
+using minsk::analysis::syntax::compilation_unit_syntax;
+using minsk::analysis::syntax::expression_syntax;
+using minsk::analysis::syntax::parser;
+using minsk::analysis::syntax::statement_syntax;
+using minsk::analysis::syntax::syntax_token;
+using minsk::analysis::text::source_text;
+
+parser::parser(const source_text *text) : m_text(text), m_position(0) {
   auto lex = lexer{m_text};
   std::copy_if(lex.begin(), lex.end(), std::back_inserter(m_tokens),
                [](const syntax_token &token) {
@@ -36,19 +42,17 @@ minsk::analysis::syntax::parser::parser(const text::source_text *text)
   std::copy(lex.diagnostics().begin(), lex.diagnostics().end(),
             std::back_inserter(m_diagnostics));
 }
-std::unique_ptr<minsk::analysis::syntax::compilation_unit_syntax>
-minsk::analysis::syntax::parser::parse_compilation_unit() {
+
+std::unique_ptr<compilation_unit_syntax> parser::parse_compilation_unit() {
   auto statement = parse_statement();
   auto end_of_file_token = match_token(syntax_kind::end_of_file_token);
   return std::make_unique<compilation_unit_syntax>(
       std::move(statement), std::move(end_of_file_token));
 }
-minsk::analysis::diagnostic_bag
-minsk::analysis::syntax::parser::take_diagnostics() {
-  return std::move(m_diagnostics);
-}
-const minsk::analysis::syntax::syntax_token &
-minsk::analysis::syntax::parser::peek(int offset) const {
+
+diagnostic_bag parser::take_diagnostics() { return std::move(m_diagnostics); }
+
+const syntax_token &parser::peek(int offset) const {
   int index = m_position + offset;
   if (index >= m_tokens.size()) {
     // return end of file token
@@ -57,18 +61,16 @@ minsk::analysis::syntax::parser::peek(int offset) const {
     return m_tokens[index];
   }
 }
-const minsk::analysis::syntax::syntax_token &
-minsk::analysis::syntax::parser::current() const {
-  return peek(0);
-}
-minsk::analysis::syntax::syntax_token
-minsk::analysis::syntax::parser::next_token() {
+
+const syntax_token &parser::current() const { return peek(0); }
+
+syntax_token parser::next_token() {
   syntax_token curr = current();
   m_position += 1;
   return curr;
 }
-std::unique_ptr<minsk::analysis::syntax::statement_syntax>
-minsk::analysis::syntax::parser::parse_statement() {
+
+std::unique_ptr<statement_syntax> parser::parse_statement() {
   switch (current().kind()) {
   case syntax_kind::open_brace_token:
     return parse_block_statement();
@@ -85,8 +87,8 @@ minsk::analysis::syntax::parser::parse_statement() {
     return parse_expression_statement();
   }
 }
-std::unique_ptr<minsk::analysis::syntax::statement_syntax>
-minsk::analysis::syntax::parser::parse_block_statement() {
+
+std::unique_ptr<statement_syntax> parser::parse_block_statement() {
   auto open_brace_token = match_token(syntax_kind::open_brace_token);
   auto statements = std::vector<std::unique_ptr<statement_syntax>>{};
   while (current().kind() != syntax_kind::close_brace_token &&
@@ -104,13 +106,13 @@ minsk::analysis::syntax::parser::parse_block_statement() {
                                                   std::move(statements),
                                                   std::move(close_brace_token));
 }
-std::unique_ptr<minsk::analysis::syntax::statement_syntax>
-minsk::analysis::syntax::parser::parse_expression_statement() {
+
+std::unique_ptr<statement_syntax> parser::parse_expression_statement() {
   auto expression = parse_expression();
   return std::make_unique<expression_statement_syntax>(std::move(expression));
 }
-std::unique_ptr<minsk::analysis::syntax::statement_syntax>
-minsk::analysis::syntax::parser::parse_for_statement() {
+
+std::unique_ptr<statement_syntax> parser::parse_for_statement() {
   auto for_keyword = match_token(syntax_kind::for_keyword);
   auto identifier_token = match_token(syntax_kind::identifier_token);
   auto equals_token = match_token(syntax_kind::equals_token);
@@ -124,8 +126,8 @@ minsk::analysis::syntax::parser::parse_for_statement() {
       std::move(equals_token), std::move(initial_value), std::move(to_keyword),
       std::move(final_value), std::move(body));
 }
-std::unique_ptr<minsk::analysis::syntax::statement_syntax>
-minsk::analysis::syntax::parser::parse_if_statement() {
+
+std::unique_ptr<statement_syntax> parser::parse_if_statement() {
   auto if_keyword = match_token(syntax_kind::if_keyword);
   auto condition = parse_expression();
   auto then_statement = parse_statement();
@@ -140,16 +142,16 @@ minsk::analysis::syntax::parser::parse_if_statement() {
       std::move(if_keyword), std::move(condition), std::move(then_statement),
       std::move(else_clause));
 }
-std::unique_ptr<minsk::analysis::syntax::statement_syntax>
-minsk::analysis::syntax::parser::parse_while_statement() {
+
+std::unique_ptr<statement_syntax> parser::parse_while_statement() {
   auto while_keyword = match_token(syntax_kind::while_keyword);
   auto condition = parse_expression();
   auto body = parse_statement();
   return std::make_unique<while_statement_syntax>(
       std::move(while_keyword), std::move(condition), std::move(body));
 }
-std::unique_ptr<minsk::analysis::syntax::statement_syntax>
-minsk::analysis::syntax::parser::parse_variable_declaration() {
+
+std::unique_ptr<statement_syntax> parser::parse_variable_declaration() {
   auto is_read_only = current().kind() == syntax_kind::let_keyword;
   auto keyword_token = match_token(is_read_only ? syntax_kind::let_keyword
                                                 : syntax_kind::var_keyword);
@@ -160,12 +162,12 @@ minsk::analysis::syntax::parser::parse_variable_declaration() {
       std::move(keyword_token), std::move(identifier_token),
       std::move(equals_token), std::move(initializer));
 }
-std::unique_ptr<minsk::analysis::syntax::expression_syntax>
-minsk::analysis::syntax::parser::parse_expression() {
+
+std::unique_ptr<expression_syntax> parser::parse_expression() {
   return parse_assignment_expression();
 }
-std::unique_ptr<minsk::analysis::syntax::expression_syntax>
-minsk::analysis::syntax::parser::parse_assignment_expression() {
+
+std::unique_ptr<expression_syntax> parser::parse_assignment_expression() {
   if (peek(0).kind() != syntax_kind::identifier_token ||
       peek(1).kind() != syntax_kind::equals_token) {
     return parse_binary_expression(0);
@@ -178,9 +180,8 @@ minsk::analysis::syntax::parser::parse_assignment_expression() {
       std::move(identifier_token), std::move(equals_token),
       std::move(expression));
 }
-minsk::analysis::syntax::syntax_token
-minsk::analysis::syntax::parser::match_token(
-    minsk::analysis::syntax::syntax_kind kind) {
+
+syntax_token parser::match_token(syntax_kind kind) {
   if (current().kind() == kind) {
     return next_token();
   }
@@ -189,9 +190,9 @@ minsk::analysis::syntax::parser::match_token(
                                         current().kind());
   return syntax_token{kind, current().position(), "", nullptr};
 }
-std::unique_ptr<minsk::analysis::syntax::expression_syntax>
-minsk::analysis::syntax::parser::parse_binary_expression(
-    int parent_precedence) {
+
+std::unique_ptr<expression_syntax>
+parser::parse_binary_expression(int parent_precedence) {
   int unary_operator_precedence =
       facts::unary_operator_precedence(current().kind());
   std::unique_ptr<expression_syntax> left;
@@ -220,8 +221,8 @@ minsk::analysis::syntax::parser::parse_binary_expression(
 
   return left;
 }
-std::unique_ptr<minsk::analysis::syntax::expression_syntax>
-minsk::analysis::syntax::parser::parse_primary_expression() {
+
+std::unique_ptr<expression_syntax> parser::parse_primary_expression() {
   switch (current().kind()) {
   case syntax_kind::open_parenthesis_token:
     return parse_parenthesized_expression();
@@ -234,8 +235,8 @@ minsk::analysis::syntax::parser::parse_primary_expression() {
     return parse_name_expression();
   }
 }
-std::unique_ptr<minsk::analysis::syntax::expression_syntax>
-minsk::analysis::syntax::parser::parse_parenthesized_expression() {
+
+std::unique_ptr<expression_syntax> parser::parse_parenthesized_expression() {
   syntax_token open_parenthesis_token =
       match_token(syntax_kind::open_parenthesis_token);
   std::unique_ptr<expression_syntax> expression = parse_expression();
@@ -245,18 +246,18 @@ minsk::analysis::syntax::parser::parse_parenthesized_expression() {
       std::move(open_parenthesis_token), std::move(expression),
       std::move(close_parenthesis_token));
 }
-std::unique_ptr<minsk::analysis::syntax::expression_syntax>
-minsk::analysis::syntax::parser::parse_number_literal() {
+
+std::unique_ptr<expression_syntax> parser::parse_number_literal() {
   syntax_token number_token = match_token(syntax_kind::number_token);
   return std::make_unique<literal_expression_syntax>(std::move(number_token));
 }
-std::unique_ptr<minsk::analysis::syntax::expression_syntax>
-minsk::analysis::syntax::parser::parse_name_expression() {
+
+std::unique_ptr<expression_syntax> parser::parse_name_expression() {
   auto identifier_token = match_token(syntax_kind::identifier_token);
   return std::make_unique<name_expression_syntax>(std::move(identifier_token));
 }
-std::unique_ptr<minsk::analysis::syntax::expression_syntax>
-minsk::analysis::syntax::parser::parse_boolean_literal() {
+
+std::unique_ptr<expression_syntax> parser::parse_boolean_literal() {
   bool is_true = current().kind() == syntax_kind::true_keyword;
   syntax_token keyword_token = match_token(
       is_true ? syntax_kind::true_keyword : syntax_kind::false_keyword);

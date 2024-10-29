@@ -19,8 +19,10 @@ struct evaluation_test {
   minsk::runtime::object_ptr expected;
 
   evaluation_test() = default;
+
   evaluation_test(std::string_view text, minsk::runtime::object_ptr expected)
       : text(text), expected(std::move(expected)) {}
+
   evaluation_test &operator=(const evaluation_test &other) {
     if (&other != this) {
       text = other.text;

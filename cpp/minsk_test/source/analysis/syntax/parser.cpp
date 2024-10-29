@@ -15,7 +15,6 @@
 #include <ranges>
 #include <stack>
 #include <string_view>
-#include <type_traits>
 #include <vector>
 
 using minsk::analysis::syntax::syntax_kind;
@@ -52,6 +51,7 @@ public:
       : m_container(flatten(node)), m_iterator(std::begin(m_container)) {}
 
   ~asserting_iterator() { CHECK(m_iterator == std::ranges::end(m_container)); }
+
   asserting_iterator(const asserting_iterator &) = delete;
   asserting_iterator &operator=(const asserting_iterator &) = delete;
   asserting_iterator(asserting_iterator &&) = delete;
@@ -95,6 +95,7 @@ struct syntax_kind_pair {
   syntax_kind op2;
 
   syntax_kind_pair() = default;
+
   syntax_kind_pair(syntax_kind op1, syntax_kind op2) : op1(op1), op2(op2) {}
 };
 

@@ -7,6 +7,7 @@
 #include "minsk/analysis/syntax/nodes/statement.hpp"
 #include <memory>
 #include <vector>
+
 namespace minsk::analysis::syntax {
 
 class expression_statement_syntax final : public statement_syntax {

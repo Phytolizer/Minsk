@@ -1,8 +1,10 @@
 #include "minsk/analysis/syntax/facts.hpp"
 #include "minsk/analysis/syntax/kind.hpp"
-#include "minsk/analysis/syntax/nodes/else.hpp"
-int minsk::analysis::syntax::facts::binary_operator_precedence(
-    minsk::analysis::syntax::syntax_kind kind) {
+
+namespace facts = minsk::analysis::syntax::facts;
+using minsk::analysis::syntax::syntax_kind;
+
+int facts::binary_operator_precedence(syntax_kind kind) {
   switch (kind) {
   case syntax_kind::star_token:
   case syntax_kind::slash_token:
@@ -28,8 +30,8 @@ int minsk::analysis::syntax::facts::binary_operator_precedence(
     return 0;
   }
 }
-int minsk::analysis::syntax::facts::unary_operator_precedence(
-    minsk::analysis::syntax::syntax_kind kind) {
+
+int facts::unary_operator_precedence(syntax_kind kind) {
   switch (kind) {
   case syntax_kind::plus_token:
   case syntax_kind::minus_token:
@@ -41,8 +43,7 @@ int minsk::analysis::syntax::facts::unary_operator_precedence(
   }
 }
 
-minsk::analysis::syntax::syntax_kind
-minsk::analysis::syntax::facts::keyword_kind(std::string_view text) {
+syntax_kind facts::keyword_kind(std::string_view text) {
   if (text == "true") {
     return syntax_kind::true_keyword;
   }
@@ -73,8 +74,7 @@ minsk::analysis::syntax::facts::keyword_kind(std::string_view text) {
   return syntax_kind::identifier_token;
 }
 
-std::optional<std::string>
-minsk::analysis::syntax::facts::get_text(syntax_kind kind) {
+std::optional<std::string> facts::get_text(syntax_kind kind) {
   switch (kind) {
   case syntax_kind::plus_token:
     return "+";

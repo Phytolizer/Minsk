@@ -16,7 +16,6 @@
 #include "minsk/analysis/binding/nodes/statements/while.hpp"
 #include "minsk/analysis/variable_map.hpp"
 #include "minsk/runtime/object.hpp"
-#include <memory>
 
 namespace minsk::analysis {
 

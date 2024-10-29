@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <string>
 #include <string_view>
+
 namespace minsk::analysis {
 
 class variable_symbol final {

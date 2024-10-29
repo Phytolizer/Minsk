@@ -6,6 +6,7 @@
 #include "minsk/analysis/binding/nodes/expressions/unary/operator.hpp"
 #include "minsk/runtime/object.hpp"
 #include <memory>
+
 namespace minsk::analysis::binding {
 
 class bound_unary_expression final : public bound_expression {

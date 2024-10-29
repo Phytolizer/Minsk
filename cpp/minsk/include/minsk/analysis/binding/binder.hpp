@@ -5,7 +5,6 @@
 #include "minsk/analysis/binding/nodes/statement.hpp"
 #include "minsk/analysis/binding/scope.hpp"
 #include "minsk/analysis/binding/scope/global.hpp"
-#include "minsk/analysis/compilation.hpp"
 #include "minsk/analysis/diagnostic_bag.hpp"
 #include "minsk/analysis/syntax/nodes/expression.hpp"
 #include "minsk/analysis/syntax/nodes/expressions/assignment.hpp"
@@ -22,7 +21,6 @@
 #include "minsk/analysis/syntax/nodes/statements/variable.hpp"
 #include "minsk/analysis/syntax/nodes/statements/while.hpp"
 #include "minsk/analysis/syntax/nodes/unit.hpp"
-#include "minsk/analysis/variable_map.hpp"
 #include <memory>
 
 namespace minsk::analysis::binding {

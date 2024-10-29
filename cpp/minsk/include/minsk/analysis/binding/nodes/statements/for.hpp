@@ -6,6 +6,7 @@
 #include "minsk/analysis/binding/nodes/statement.hpp"
 #include "minsk/analysis/variable_symbol.hpp"
 #include <memory>
+
 namespace minsk::analysis::binding {
 
 class bound_for_statement final : public bound_statement {

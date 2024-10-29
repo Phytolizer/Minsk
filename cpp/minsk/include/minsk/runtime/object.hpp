@@ -51,7 +51,7 @@ public:
 
 std::unique_ptr<object> copy_object_ptr(const object *ptr);
 
-std::ostream& operator<<(std::ostream &os, const object& obj);
+std::ostream &operator<<(std::ostream &os, const object &obj);
 
 } // namespace minsk::runtime
 

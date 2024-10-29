@@ -6,7 +6,6 @@
 #include "minsk/analysis/syntax/nodes/statement.hpp"
 #include "minsk/analysis/syntax/token.hpp"
 #include <memory>
-#include <optional>
 
 namespace minsk::analysis::syntax {
 
@@ -32,8 +31,7 @@ public:
   const syntax_token &keyword_token() const;
   const expression_syntax *condition() const;
   const statement_syntax *then_statement() const;
-  const minsk::analysis::syntax::else_clause_syntax *
-else_clause() const;
+  const else_clause_syntax *else_clause() const;
 };
 
 } // namespace minsk::analysis::syntax

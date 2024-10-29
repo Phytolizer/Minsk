@@ -1,12 +1,12 @@
 #ifndef MINSK_ANALYSIS_BINDING_SCOPE_GLOBAL_HPP
 #define MINSK_ANALYSIS_BINDING_SCOPE_GLOBAL_HPP
 
-#include "minsk/analysis/binding/nodes/expression.hpp"
 #include "minsk/analysis/binding/nodes/statement.hpp"
 #include "minsk/analysis/diagnostic.hpp"
 #include "minsk/analysis/variable_symbol.hpp"
 #include <memory>
 #include <vector>
+
 namespace minsk::analysis::binding {
 
 class bound_global_scope final {

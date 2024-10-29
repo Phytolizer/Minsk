@@ -6,7 +6,6 @@
 #include "minsk/analysis/variable_symbol.hpp"
 #include "minsk/runtime/object.hpp"
 #include <memory>
-#include <string>
 
 namespace minsk::analysis::binding {
 
